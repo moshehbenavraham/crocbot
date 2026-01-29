@@ -1,11 +1,11 @@
 ---
-summary: "SSH tunnel setup for Moltbot.app connecting to a remote gateway"
+summary: "SSH tunnel setup for crocbot.app connecting to a remote gateway"
 read_when: "Connecting the macOS app to a remote gateway over SSH"
 ---
 
-# Running Moltbot.app with a Remote Gateway
+# Running crocbot.app with a Remote Gateway
 
-Moltbot.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
+crocbot.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
 
 ## Overview
 
@@ -13,7 +13,7 @@ Moltbot.app uses SSH tunneling to connect to a remote gateway. This guide shows 
 ┌─────────────────────────────────────────────────────────────┐
 │                        Client Machine                          │
 │                                                              │
-│  Moltbot.app ──► ws://127.0.0.1:18789 (local port)           │
+│  crocbot.app ──► ws://127.0.0.1:18789 (local port)           │
 │                     │                                        │
 │                     ▼                                        │
 │  SSH Tunnel ────────────────────────────────────────────────│
@@ -65,11 +65,11 @@ launchctl setenv CLAWDBOT_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### Step 5: Restart Moltbot.app
+### Step 5: Restart crocbot.app
 
 ```bash
-# Quit Moltbot.app (⌘Q), then reopen:
-open /path/to/Moltbot.app
+# Quit crocbot.app (⌘Q), then reopen:
+open /path/to/crocbot.app
 ```
 
 The app will now connect to the remote gateway through the SSH tunnel.
@@ -150,4 +150,4 @@ launchctl bootout gui/$UID/com.clawdbot.ssh-tunnel
 | `KeepAlive` | Automatically restarts tunnel if it crashes |
 | `RunAtLoad` | Starts tunnel when the agent loads |
 
-Moltbot.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.
+crocbot.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.

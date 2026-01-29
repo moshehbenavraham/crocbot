@@ -1,19 +1,19 @@
-import MoltbotProtocol
+import crocbotProtocol
 import Foundation
 
-enum MoltbotConfigFile {
+enum crocbotConfigFile {
     private static let logger = Logger(subsystem: "com.clawdbot", category: "config")
 
     static func url() -> URL {
-        MoltbotPaths.configURL
+        crocbotPaths.configURL
     }
 
     static func stateDirURL() -> URL {
-        MoltbotPaths.stateDirURL
+        crocbotPaths.stateDirURL
     }
 
     static func defaultWorkspaceURL() -> URL {
-        MoltbotPaths.workspaceURL
+        crocbotPaths.workspaceURL
     }
 
     static func loadDict() -> [String: Any] {

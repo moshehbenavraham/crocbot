@@ -12,7 +12,7 @@ final class PeekabooBridgeHostCoordinator {
     private let logger = Logger(subsystem: "com.clawdbot", category: "PeekabooBridge")
 
     private var host: PeekabooBridgeHost?
-    private var services: MoltbotPeekabooBridgeServices?
+    private var services: crocbotPeekabooBridgeServices?
 
     func setEnabled(_ enabled: Bool) async {
         if enabled {
@@ -39,7 +39,7 @@ final class PeekabooBridgeHostCoordinator {
         }
         let allowlistedBundles: Set<String> = []
 
-        let services = MoltbotPeekabooBridgeServices()
+        let services = crocbotPeekabooBridgeServices()
         let server = PeekabooBridgeServer(
             services: services,
             hostKind: .gui,
@@ -90,7 +90,7 @@ final class PeekabooBridgeHostCoordinator {
 }
 
 @MainActor
-private final class MoltbotPeekabooBridgeServices: PeekabooBridgeServiceProviding {
+private final class crocbotPeekabooBridgeServices: PeekabooBridgeServiceProviding {
     let permissions: PermissionsService
     let screenCapture: any ScreenCaptureServiceProtocol
     let automation: any UIAutomationServiceProtocol

@@ -1,10 +1,10 @@
-import MoltbotKit
+import crocbotKit
 import Foundation
 import Testing
 
 @Suite struct ToolDisplayRegistryTests {
     @Test func loadsToolDisplayConfigFromBundle() {
-        let url = MoltbotKitResources.bundle.url(forResource: "tool-display", withExtension: "json")
+        let url = crocbotKitResources.bundle.url(forResource: "tool-display", withExtension: "json")
         #expect(url != nil)
     }
 

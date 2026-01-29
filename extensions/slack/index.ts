@@ -1,4 +1,4 @@
-import type { MoltbotPluginApi } from "clawdbot/plugin-sdk";
+import type { crocbotPluginApi } from "clawdbot/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
 
 import { slackPlugin } from "./src/channel.js";
@@ -9,7 +9,7 @@ const plugin = {
   name: "Slack",
   description: "Slack channel plugin",
   configSchema: emptyPluginConfigSchema(),
-  register(api: MoltbotPluginApi) {
+  register(api: crocbotPluginApi) {
     setSlackRuntime(api.runtime);
     api.registerChannel({ plugin: slackPlugin });
   },

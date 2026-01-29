@@ -9,7 +9,7 @@ import {
 
 import { listTlonAccountIds, resolveTlonAccount } from "./types.js";
 import type { TlonResolvedAccount } from "./types.js";
-import type { MoltbotConfig } from "clawdbot/plugin-sdk";
+import type { crocbotConfig } from "clawdbot/plugin-sdk";
 
 const channel = "tlon" as const;
 
@@ -18,7 +18,7 @@ function isConfigured(account: TlonResolvedAccount): boolean {
 }
 
 function applyAccountConfig(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   accountId: string;
   input: {
     name?: string;
@@ -29,7 +29,7 @@ function applyAccountConfig(params: {
     dmAllowlist?: string[];
     autoDiscoverChannels?: boolean;
   };
-}): MoltbotConfig {
+}): crocbotConfig {
   const { cfg, accountId, input } = params;
   const useDefault = accountId === DEFAULT_ACCOUNT_ID;
   const base = cfg.channels?.tlon ?? {};

@@ -51,8 +51,8 @@ export function pickProbeHostForBind(
 }
 
 const SAFE_DAEMON_ENV_KEYS = [
-  "MOLTBOT_STATE_DIR",
-  "MOLTBOT_CONFIG_PATH",
+  "crocbot_STATE_DIR",
+  "crocbot_CONFIG_PATH",
   "CLAWDBOT_PROFILE",
   "CLAWDBOT_STATE_DIR",
   "CLAWDBOT_CONFIG_PATH",
@@ -131,7 +131,7 @@ export function renderRuntimeHints(
     }
   })();
   if (runtime.missingUnit) {
-    hints.push(`Service not installed. Run: ${formatCliCommand("moltbot gateway install", env)}`);
+    hints.push(`Service not installed. Run: ${formatCliCommand("crocbot gateway install", env)}`);
     if (fileLog) hints.push(`File logs: ${fileLog}`);
     return hints;
   }
@@ -154,8 +154,8 @@ export function renderRuntimeHints(
 
 export function renderGatewayServiceStartHints(env: NodeJS.ProcessEnv = process.env): string[] {
   const base = [
-    formatCliCommand("moltbot gateway install", env),
-    formatCliCommand("moltbot gateway", env),
+    formatCliCommand("crocbot gateway install", env),
+    formatCliCommand("crocbot gateway", env),
   ];
   const profile = env.CLAWDBOT_PROFILE;
   switch (process.platform) {

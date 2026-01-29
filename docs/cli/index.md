@@ -1,5 +1,5 @@
 ---
-summary: "Moltbot CLI reference for `moltbot` commands, subcommands, and options"
+summary: "crocbot CLI reference for `crocbot` commands, subcommands, and options"
 read_when:
   - Adding or modifying CLI commands or options
   - Documenting new command surfaces
@@ -56,7 +56,7 @@ This page describes the current CLI behavior. If commands change, update this do
 - `--dev`: isolate state under `~/.clawdbot-dev` and shift default ports.
 - `--profile <name>`: isolate state under `~/.clawdbot-<name>`.
 - `--no-color`: disable ANSI colors.
-- `--update`: shorthand for `moltbot update` (source installs only).
+- `--update`: shorthand for `crocbot update` (source installs only).
 - `-V`, `--version`, `-v`: print version and exit.
 
 ## Output styling
@@ -69,7 +69,7 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Color palette
 
-Moltbot uses a lobster palette for CLI output.
+crocbot uses a lobster palette for CLI output.
 
 - `accent` (#FF5A2D): headings, labels, primary highlights.
 - `accentBright` (#FF7A3D): command names, emphasis.
@@ -85,7 +85,7 @@ Palette source of truth: `src/terminal/palette.ts` (aka “lobster seam”).
 ## Command tree
 
 ```
-moltbot [--dev] [--profile <name>] <command>
+crocbot [--dev] [--profile <name>] <command>
   setup
   onboard
   configure
@@ -236,23 +236,23 @@ moltbot [--dev] [--profile <name>] <command>
   tui
 ```
 
-Note: plugins can add additional top-level commands (for example `moltbot voicecall`).
+Note: plugins can add additional top-level commands (for example `crocbot voicecall`).
 
 ## Security
 
-- `moltbot security audit` — audit config + local state for common security foot-guns.
-- `moltbot security audit --deep` — best-effort live Gateway probe.
-- `moltbot security audit --fix` — tighten safe defaults and chmod state/config.
+- `crocbot security audit` — audit config + local state for common security foot-guns.
+- `crocbot security audit --deep` — best-effort live Gateway probe.
+- `crocbot security audit --fix` — tighten safe defaults and chmod state/config.
 
 ## Plugins
 
 Manage extensions and their config:
 
-- `moltbot plugins list` — discover plugins (use `--json` for machine output).
-- `moltbot plugins info <id>` — show details for a plugin.
-- `moltbot plugins install <path|.tgz|npm-spec>` — install a plugin (or add a plugin path to `plugins.load.paths`).
-- `moltbot plugins enable <id>` / `disable <id>` — toggle `plugins.entries.<id>.enabled`.
-- `moltbot plugins doctor` — report plugin load errors.
+- `crocbot plugins list` — discover plugins (use `--json` for machine output).
+- `crocbot plugins info <id>` — show details for a plugin.
+- `crocbot plugins install <path|.tgz|npm-spec>` — install a plugin (or add a plugin path to `plugins.load.paths`).
+- `crocbot plugins enable <id>` / `disable <id>` — toggle `plugins.entries.<id>.enabled`.
+- `crocbot plugins doctor` — report plugin load errors.
 
 Most plugin changes require a gateway restart. See [/plugin](/plugin).
 
@@ -260,9 +260,9 @@ Most plugin changes require a gateway restart. See [/plugin](/plugin).
 
 Vector search over `MEMORY.md` + `memory/*.md`:
 
-- `moltbot memory status` — show index stats.
-- `moltbot memory index` — reindex memory files.
-- `moltbot memory search "<query>"` — semantic search over memory.
+- `crocbot memory status` — show index stats.
+- `crocbot memory index` — reindex memory files.
+- `crocbot memory search "<query>"` — semantic search over memory.
 
 ## Chat slash commands
 
@@ -335,7 +335,7 @@ Options:
 Interactive configuration wizard (models, channels, skills, gateway).
 
 ### `config`
-Non-interactive config helpers (get/set/unset). Running `moltbot config` with no
+Non-interactive config helpers (get/set/unset). Running `crocbot config` with no
 subcommand launches the wizard.
 
 Subcommands:
@@ -359,8 +359,8 @@ Manage chat channel accounts (WhatsApp/Telegram/Discord/Google Chat/Slack/Matter
 
 Subcommands:
 - `channels list`: show configured channels and auth profiles.
-- `channels status`: check gateway reachability and channel health (`--probe` runs extra checks; use `moltbot health` or `moltbot status --deep` for gateway health probes).
-- Tip: `channels status` prints warnings with suggested fixes when it can detect common misconfigurations (then points you to `moltbot doctor`).
+- `channels status`: check gateway reachability and channel health (`--probe` runs extra checks; use `crocbot health` or `crocbot status --deep` for gateway health probes).
+- Tip: `channels status` prints warnings with suggested fixes when it can detect common misconfigurations (then points you to `crocbot doctor`).
 - `channels logs`: show recent channel logs from the gateway log file.
 - `channels add`: wizard-style setup when no flags are passed; flags switch to non-interactive mode.
 - `channels remove`: disable by default; pass `--delete` to remove config entries without prompts.
@@ -394,11 +394,11 @@ More detail: [/concepts/oauth](/concepts/oauth)
 
 Examples:
 ```bash
-moltbot channels add --channel telegram --account alerts --name "Alerts Bot" --token $TELEGRAM_BOT_TOKEN
-moltbot channels add --channel discord --account work --name "Work Bot" --token $DISCORD_BOT_TOKEN
-moltbot channels remove --channel discord --account work --delete
-moltbot channels status --probe
-moltbot status --deep
+crocbot channels add --channel telegram --account alerts --name "Alerts Bot" --token $TELEGRAM_BOT_TOKEN
+crocbot channels add --channel discord --account work --name "Work Bot" --token $DISCORD_BOT_TOKEN
+crocbot channels remove --channel discord --account work --delete
+crocbot channels status --probe
+crocbot status --deep
 ```
 
 ### `skills`
@@ -455,8 +455,8 @@ Subcommands:
 - `message event <list|create>`
 
 Examples:
-- `moltbot message send --target +15555550123 --message "Hi"`
-- `moltbot message poll --channel discord --target channel:123 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
+- `crocbot message send --target +15555550123 --message "Hi"`
+- `crocbot message poll --channel discord --target channel:123 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
 
 ### `agent`
 Run one agent turn via the Gateway (or `--local` embedded).
@@ -526,11 +526,11 @@ Notes:
 - Overview includes Gateway + node host service status when available.
 
 ### Usage tracking
-Moltbot can surface provider usage/quota when OAuth/API creds are available.
+crocbot can surface provider usage/quota when OAuth/API creds are available.
 
 Surfaces:
 - `/status` (adds a short provider usage line when available)
-- `moltbot status --usage` (prints full provider breakdown)
+- `crocbot status --usage` (prints full provider breakdown)
 - macOS menu bar (Usage section under Context)
 
 Notes:
@@ -624,7 +624,7 @@ Subcommands:
 Notes:
 - `gateway status` probes the Gateway RPC by default using the service’s resolved port/config (override with `--url/--token/--password`).
 - `gateway status` supports `--no-probe`, `--deep`, and `--json` for scripting.
-- `gateway status` also surfaces legacy or extra gateway services when it can detect them (`--deep` adds system-level scans). Profile-named Moltbot services are treated as first-class and aren't flagged as "extra".
+- `gateway status` also surfaces legacy or extra gateway services when it can detect them (`--deep` adds system-level scans). Profile-named crocbot services are treated as first-class and aren't flagged as "extra".
 - `gateway status` prints which config path the CLI uses vs which config the service likely uses (service env), plus the resolved probe target URL.
 - `gateway install|uninstall|start|stop|restart` support `--json` for scripting (default output stays human-friendly).
 - `gateway install` defaults to Node runtime; bun is **not recommended** (WhatsApp/Telegram bugs).
@@ -639,11 +639,11 @@ Notes:
 
 Examples:
 ```bash
-moltbot logs --follow
-moltbot logs --limit 200
-moltbot logs --plain
-moltbot logs --json
-moltbot logs --no-color
+crocbot logs --follow
+crocbot logs --limit 200
+crocbot logs --plain
+crocbot logs --json
+crocbot logs --no-color
 ```
 
 ### `gateway <subcommand>`
@@ -674,12 +674,12 @@ Preferred Anthropic auth (setup-token):
 
 ```bash
 claude setup-token
-moltbot models auth setup-token --provider anthropic
-moltbot models status
+crocbot models auth setup-token --provider anthropic
+crocbot models status
 ```
 
 ### `models` (root)
-`moltbot models` is an alias for `models status`.
+`crocbot models` is an alias for `models status`.
 
 Root options:
 - `--status-json` (alias for `models status --json`)
@@ -807,7 +807,7 @@ All `cron` commands accept `--url`, `--token`, `--timeout`, `--expect-final`.
 ## Node host
 
 `node` runs a **headless node host** or manages it as a background service. See
-[`moltbot node`](/cli/node).
+[`crocbot node`](/cli/node).
 
 Subcommands:
 - `node run --host <gateway-host> --port 18789`
@@ -856,7 +856,7 @@ Location:
 
 ## Browser
 
-Browser control CLI (dedicated Chrome/Brave/Edge/Chromium). See [`moltbot browser`](/cli/browser) and the [Browser tool](/tools/browser).
+Browser control CLI (dedicated Chrome/Brave/Edge/Chromium). See [`crocbot browser`](/cli/browser) and the [Browser tool](/tools/browser).
 
 Common options:
 - `--url`, `--token`, `--timeout`, `--json`

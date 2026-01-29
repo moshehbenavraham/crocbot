@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { MoltbotConfig } from "../../config/config.js";
+import type { crocbotConfig } from "../../config/config.js";
 import type { FollowupRun, QueueSettings } from "./queue.js";
 import { enqueueFollowupRun, scheduleFollowupDrain } from "./queue.js";
 
@@ -26,7 +26,7 @@ function createRun(params: {
       sessionId: "sess",
       sessionFile: "/tmp/session.json",
       workspaceDir: "/tmp",
-      config: {} as MoltbotConfig,
+      config: {} as crocbotConfig,
       provider: "openai",
       model: "gpt-test",
       timeoutMs: 10_000,

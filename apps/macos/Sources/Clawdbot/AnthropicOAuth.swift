@@ -18,7 +18,7 @@ enum AnthropicAuthMode: Equatable {
 
     var shortLabel: String {
         switch self {
-        case .oauthFile: "OAuth (Moltbot token file)"
+        case .oauthFile: "OAuth (crocbot token file)"
         case .oauthEnv: "OAuth (env var)"
         case .apiKeyEnv: "API key (env var)"
         case .missing: "Missing credentials"
@@ -36,7 +36,7 @@ enum AnthropicAuthMode: Equatable {
 enum AnthropicAuthResolver {
     static func resolve(
         environment: [String: String] = ProcessInfo.processInfo.environment,
-        oauthStatus: MoltbotOAuthStore.AnthropicOAuthStatus = MoltbotOAuthStore
+        oauthStatus: crocbotOAuthStore.AnthropicOAuthStatus = crocbotOAuthStore
             .anthropicOAuthStatus()) -> AnthropicAuthMode
     {
         if oauthStatus.isConnected { return .oauthFile }
@@ -194,10 +194,10 @@ enum AnthropicOAuth {
     }
 }
 
-enum MoltbotOAuthStore {
+enum crocbotOAuthStore {
     static let oauthFilename = "oauth.json"
     private static let providerKey = "anthropic"
-    private static let moltbotOAuthDirEnv = "CLAWDBOT_OAUTH_DIR"
+    private static let crocbotOAuthDirEnv = "CLAWDBOT_OAUTH_DIR"
     private static let legacyPiDirEnv = "PI_CODING_AGENT_DIR"
 
     enum AnthropicOAuthStatus: Equatable {
@@ -215,12 +215,12 @@ enum MoltbotOAuthStore {
 
         var shortDescription: String {
             switch self {
-            case .missingFile: "Moltbot OAuth token file not found"
-            case .unreadableFile: "Moltbot OAuth token file not readable"
-            case .invalidJSON: "Moltbot OAuth token file invalid"
-            case .missingProviderEntry: "No Anthropic entry in Moltbot OAuth token file"
+            case .missingFile: "crocbot OAuth token file not found"
+            case .unreadableFile: "crocbot OAuth token file not readable"
+            case .invalidJSON: "crocbot OAuth token file invalid"
+            case .missingProviderEntry: "No Anthropic entry in crocbot OAuth token file"
             case .missingTokens: "Anthropic entry missing tokens"
-            case .connected: "Moltbot OAuth credentials found"
+            case .connected: "crocbot OAuth credentials found"
             }
         }
     }

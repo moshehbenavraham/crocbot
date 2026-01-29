@@ -81,7 +81,7 @@ function isGatewayArgv(args: string[]): boolean {
   }
 
   const exe = normalized[0] ?? "";
-  return exe.endsWith("/moltbot") || exe === "moltbot";
+  return exe.endsWith("/crocbot") || exe === "crocbot";
 }
 
 function readLinuxCmdline(pid: number): string[] | null {

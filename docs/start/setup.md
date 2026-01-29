@@ -1,5 +1,5 @@
 ---
-summary: "Setup guide: keep your Moltbot setup tailored while staying up-to-date"
+summary: "Setup guide: keep your crocbot setup tailored while staying up-to-date"
 read_when:
   - Setting up a new machine
   - You want “latest + greatest” without breaking your personal setup
@@ -10,7 +10,7 @@ read_when:
 Last updated: 2026-01-01
 
 ## TL;DR
-- **Tailoring lives outside the repo:** `~/clawd` (workspace) + `~/.clawdbot/moltbot.json` (config).
+- **Tailoring lives outside the repo:** `~/clawd` (workspace) + `~/.clawdbot/crocbot.json` (config).
 - **Stable workflow:** install the macOS app; let it run the bundled Gateway.
 - **Bleeding edge workflow:** run the Gateway yourself via `pnpm gateway:watch`, then let the macOS app attach in Local mode.
 
@@ -23,42 +23,42 @@ Last updated: 2026-01-01
 
 If you want “100% tailored to me” *and* easy updates, keep your customization in:
 
-- **Config:** `~/.clawdbot/moltbot.json` (JSON/JSON5-ish)
+- **Config:** `~/.clawdbot/crocbot.json` (JSON/JSON5-ish)
 - **Workspace:** `~/clawd` (skills, prompts, memories; make it a private git repo)
 
 Bootstrap once:
 
 ```bash
-moltbot setup
+crocbot setup
 ```
 
 From inside this repo, use the local CLI entry:
 
 ```bash
-moltbot setup
+crocbot setup
 ```
 
-If you don’t have a global install yet, run it via `pnpm moltbot setup`.
+If you don’t have a global install yet, run it via `pnpm crocbot setup`.
 
 ## Stable workflow (macOS app first)
 
-1) Install + launch **Moltbot.app** (menu bar).
+1) Install + launch **crocbot.app** (menu bar).
 2) Complete the onboarding/permissions checklist (TCC prompts).
 3) Ensure Gateway is **Local** and running (the app manages it).
 4) Link surfaces (example: WhatsApp):
 
 ```bash
-moltbot channels login
+crocbot channels login
 ```
 
 5) Sanity check:
 
 ```bash
-moltbot health
+crocbot health
 ```
 
 If onboarding is not available in your build:
-- Run `moltbot setup`, then `moltbot channels login`, then start the Gateway manually (`moltbot gateway`).
+- Run `crocbot setup`, then `crocbot channels login`, then start the Gateway manually (`crocbot gateway`).
 
 ## Bleeding edge workflow (Gateway in a terminal)
 
@@ -83,7 +83,7 @@ pnpm gateway:watch
 
 ### 2) Point the macOS app at your running Gateway
 
-In **Moltbot.app**:
+In **crocbot.app**:
 
 - Connection Mode: **Local**
 The app will attach to the running gateway on the configured port.
@@ -94,7 +94,7 @@ The app will attach to the running gateway on the configured port.
 - Or via CLI:
 
 ```bash
-moltbot health
+crocbot health
 ```
 
 ### Common footguns
@@ -102,7 +102,7 @@ moltbot health
 - **Where state lives:**
   - Credentials: `~/.clawdbot/credentials/`
   - Sessions: `~/.clawdbot/agents/<agentId>/sessions/`
-  - Logs: `/tmp/moltbot/`
+  - Logs: `/tmp/crocbot/`
 
 ## Credential storage map
 
@@ -119,7 +119,7 @@ More detail: [Security](/gateway/security#credential-storage-map).
 
 ## Updating (without wrecking your setup)
 
-- Keep `~/clawd` and `~/.clawdbot/` as “your stuff”; don’t put personal prompts/config into the `moltbot` repo.
+- Keep `~/clawd` and `~/.clawdbot/` as “your stuff”; don’t put personal prompts/config into the `crocbot` repo.
 - Updating source: `git pull` + `pnpm install` (when lockfile changed) + keep using `pnpm gateway:watch`.
 
 ## Linux (systemd user service)
@@ -140,5 +140,5 @@ user service (no lingering needed). See [Gateway runbook](/gateway) for the syst
 - [Gateway runbook](/gateway) (flags, supervision, ports)
 - [Gateway configuration](/gateway/configuration) (config schema + examples)
 - [Discord](/channels/discord) and [Telegram](/channels/telegram) (reply tags + replyToMode settings)
-- [Moltbot assistant setup](/start/clawd)
+- [crocbot assistant setup](/start/clawd)
 - [macOS app](/platforms/macos) (gateway lifecycle)

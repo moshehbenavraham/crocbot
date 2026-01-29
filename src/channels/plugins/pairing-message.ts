@@ -1,2 +1,2 @@
 export const PAIRING_APPROVED_MESSAGE =
-  "✅ Moltbot access approved. Send a message to start chatting.";
+  "✅ crocbot access approved. Send a message to start chatting.";

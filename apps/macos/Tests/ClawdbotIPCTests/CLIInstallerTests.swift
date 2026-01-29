@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized)
 @MainActor
@@ -8,12 +8,12 @@ struct CLIInstallerTests {
     @Test func installedLocationFindsExecutable() throws {
         let fm = FileManager()
         let root = fm.temporaryDirectory.appendingPathComponent(
-            "moltbot-cli-installer-\(UUID().uuidString)")
+            "crocbot-cli-installer-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: root) }
 
         let binDir = root.appendingPathComponent("bin")
         try fm.createDirectory(at: binDir, withIntermediateDirectories: true)
-        let cli = binDir.appendingPathComponent("moltbot")
+        let cli = binDir.appendingPathComponent("crocbot")
         fm.createFile(atPath: cli.path, contents: Data())
         try fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: cli.path)
 

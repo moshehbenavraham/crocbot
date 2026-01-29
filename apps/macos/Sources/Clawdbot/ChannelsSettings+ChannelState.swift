@@ -1,4 +1,4 @@
-import MoltbotProtocol
+import crocbotProtocol
 import SwiftUI
 
 extension ChannelsSettings {

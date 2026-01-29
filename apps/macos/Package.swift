@@ -1,18 +1,18 @@
 // swift-tools-version: 6.2
-// Package manifest for the Moltbot macOS companion (menu bar app + IPC library).
+// Package manifest for the crocbot macOS companion (menu bar app + IPC library).
 
 import PackageDescription
 
 let package = Package(
-    name: "Moltbot",
+    name: "crocbot",
     platforms: [
         .macOS(.v15),
     ],
     products: [
-        .library(name: "MoltbotIPC", targets: ["MoltbotIPC"]),
-        .library(name: "MoltbotDiscovery", targets: ["MoltbotDiscovery"]),
-        .executable(name: "Moltbot", targets: ["Moltbot"]),
-        .executable(name: "moltbot-mac", targets: ["MoltbotMacCLI"]),
+        .library(name: "crocbotIPC", targets: ["crocbotIPC"]),
+        .library(name: "crocbotDiscovery", targets: ["crocbotDiscovery"]),
+        .executable(name: "crocbot", targets: ["crocbot"]),
+        .executable(name: "crocbot-mac", targets: ["crocbotMacCLI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/orchetect/MenuBarExtraAccess", exact: "1.2.2"),
@@ -25,28 +25,28 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MoltbotIPC",
+            name: "crocbotIPC",
             dependencies: [],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .target(
-            name: "MoltbotDiscovery",
+            name: "crocbotDiscovery",
             dependencies: [
-                .product(name: "MoltbotKit", package: "MoltbotKit"),
+                .product(name: "crocbotKit", package: "crocbotKit"),
             ],
-            path: "Sources/MoltbotDiscovery",
+            path: "Sources/crocbotDiscovery",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .executableTarget(
-            name: "Moltbot",
+            name: "crocbot",
             dependencies: [
-                "MoltbotIPC",
-                "MoltbotDiscovery",
-                .product(name: "MoltbotKit", package: "MoltbotKit"),
-                .product(name: "MoltbotChatUI", package: "MoltbotKit"),
-                .product(name: "MoltbotProtocol", package: "MoltbotKit"),
+                "crocbotIPC",
+                "crocbotDiscovery",
+                .product(name: "crocbotKit", package: "crocbotKit"),
+                .product(name: "crocbotChatUI", package: "crocbotKit"),
+                .product(name: "crocbotProtocol", package: "crocbotKit"),
                 .product(name: "SwabbleKit", package: "swabble"),
                 .product(name: "MenuBarExtraAccess", package: "MenuBarExtraAccess"),
                 .product(name: "Subprocess", package: "swift-subprocess"),
@@ -59,30 +59,30 @@ let package = Package(
                 "Resources/Info.plist",
             ],
             resources: [
-                .copy("Resources/Moltbot.icns"),
+                .copy("Resources/crocbot.icns"),
                 .copy("Resources/DeviceModels"),
             ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .executableTarget(
-            name: "MoltbotMacCLI",
+            name: "crocbotMacCLI",
             dependencies: [
-                "MoltbotDiscovery",
-                .product(name: "MoltbotKit", package: "MoltbotKit"),
-                .product(name: "MoltbotProtocol", package: "MoltbotKit"),
+                "crocbotDiscovery",
+                .product(name: "crocbotKit", package: "crocbotKit"),
+                .product(name: "crocbotProtocol", package: "crocbotKit"),
             ],
-            path: "Sources/MoltbotMacCLI",
+            path: "Sources/crocbotMacCLI",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .testTarget(
-            name: "MoltbotIPCTests",
+            name: "crocbotIPCTests",
             dependencies: [
-                "MoltbotIPC",
-                "Moltbot",
-                "MoltbotDiscovery",
-                .product(name: "MoltbotProtocol", package: "MoltbotKit"),
+                "crocbotIPC",
+                "crocbot",
+                "crocbotDiscovery",
+                .product(name: "crocbotProtocol", package: "crocbotKit"),
                 .product(name: "SwabbleKit", package: "swabble"),
             ],
             swiftSettings: [

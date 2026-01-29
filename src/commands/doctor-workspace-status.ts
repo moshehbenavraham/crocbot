@@ -1,11 +1,11 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { buildWorkspaceSkillStatus } from "../agents/skills-status.js";
-import type { MoltbotConfig } from "../config/config.js";
-import { loadMoltbotPlugins } from "../plugins/loader.js";
+import type { crocbotConfig } from "../config/config.js";
+import { loadcrocbotPlugins } from "../plugins/loader.js";
 import { note } from "../terminal/note.js";
 import { detectLegacyWorkspaceDirs, formatLegacyWorkspaceWarning } from "./doctor-workspace.js";
 
-export function noteWorkspaceStatus(cfg: MoltbotConfig) {
+export function noteWorkspaceStatus(cfg: crocbotConfig) {
   const workspaceDir = resolveAgentWorkspaceDir(cfg, resolveDefaultAgentId(cfg));
   const legacyWorkspace = detectLegacyWorkspaceDirs({ workspaceDir });
   if (legacyWorkspace.legacyDirs.length > 0) {
@@ -25,7 +25,7 @@ export function noteWorkspaceStatus(cfg: MoltbotConfig) {
     "Skills status",
   );
 
-  const pluginRegistry = loadMoltbotPlugins({
+  const pluginRegistry = loadcrocbotPlugins({
     config: cfg,
     workspaceDir,
     logger: {

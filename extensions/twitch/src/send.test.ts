@@ -12,7 +12,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { sendMessageTwitchInternal } from "./send.js";
-import type { MoltbotConfig } from "clawdbot/plugin-sdk";
+import type { crocbotConfig } from "clawdbot/plugin-sdk";
 
 // Mock dependencies
 vi.mock("./config.js", () => ({
@@ -57,7 +57,7 @@ describe("send", () => {
         },
       },
     },
-  } as unknown as MoltbotConfig;
+  } as unknown as crocbotConfig;
 
   beforeEach(() => {
     vi.clearAllMocks();

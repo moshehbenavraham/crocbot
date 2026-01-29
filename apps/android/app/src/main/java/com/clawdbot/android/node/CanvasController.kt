@@ -84,12 +84,12 @@ class CanvasController {
     withWebViewOnMain { wv ->
       if (currentUrl == null) {
         if (BuildConfig.DEBUG) {
-          Log.d("MoltbotCanvas", "load scaffold: $scaffoldAssetUrl")
+          Log.d("crocbotCanvas", "load scaffold: $scaffoldAssetUrl")
         }
         wv.loadUrl(scaffoldAssetUrl)
       } else {
         if (BuildConfig.DEBUG) {
-          Log.d("MoltbotCanvas", "load url: $currentUrl")
+          Log.d("crocbotCanvas", "load url: $currentUrl")
         }
         wv.loadUrl(currentUrl)
       }
@@ -106,7 +106,7 @@ class CanvasController {
       val js = """
         (() => {
           try {
-            const api = globalThis.__moltbot;
+            const api = globalThis.__crocbot;
             if (!api) return;
             if (typeof api.setDebugStatusEnabled === 'function') {
               api.setDebugStatusEnabled(${if (enabled) "true" else "false"});

@@ -75,11 +75,11 @@ export function assertSupportedRuntime(
 
   runtime.error(
     [
-      "moltbot requires Node >=22.0.0.",
+      "crocbot requires Node >=22.0.0.",
       `Detected: ${runtimeLabel} (exec: ${execLabel}).`,
       `PATH searched: ${details.pathEnv}`,
       "Install Node: https://nodejs.org/en/download",
-      "Upgrade Node and re-run moltbot.",
+      "Upgrade Node and re-run crocbot.",
     ].join("\n"),
   );
   runtime.exit(1);

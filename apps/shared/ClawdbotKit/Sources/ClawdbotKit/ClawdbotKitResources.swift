@@ -1,7 +1,7 @@
 import Foundation
 
-public enum MoltbotKitResources {
-    /// Resource bundle for MoltbotKit.
+public enum crocbotKitResources {
+    /// Resource bundle for crocbotKit.
     ///
     /// Locates the SwiftPM-generated resource bundle, checking multiple locations:
     /// 1. Inside Bundle.main (packaged apps)
@@ -13,7 +13,7 @@ public enum MoltbotKitResources {
     /// SwiftPM's expectations.
     public static let bundle: Bundle = locateBundle()
 
-    private static let bundleName = "MoltbotKit_MoltbotKit"
+    private static let bundleName = "crocbotKit_crocbotKit"
 
     private static func locateBundle() -> Bundle {
         // 1. Check inside Bundle.main (packaged apps copy resources here)

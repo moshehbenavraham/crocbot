@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import { note } from "../terminal/note.js";
 import { shortenHomePath } from "../utils.js";
 
@@ -39,7 +39,7 @@ async function launchctlGetenv(name: string): Promise<string | undefined> {
   }
 }
 
-function hasConfigGatewayCreds(cfg: MoltbotConfig): boolean {
+function hasConfigGatewayCreds(cfg: crocbotConfig): boolean {
   const localToken =
     typeof cfg.gateway?.auth?.token === "string" ? cfg.gateway?.auth?.token.trim() : "";
   const localPassword =
@@ -52,7 +52,7 @@ function hasConfigGatewayCreds(cfg: MoltbotConfig): boolean {
 }
 
 export async function noteMacLaunchctlGatewayEnvOverrides(
-  cfg: MoltbotConfig,
+  cfg: crocbotConfig,
   deps?: {
     platform?: NodeJS.Platform;
     getenv?: (name: string) => Promise<string | undefined>;

@@ -1,4 +1,4 @@
-import MoltbotKit
+import crocbotKit
 import Foundation
 import SwiftUI
 
@@ -135,8 +135,8 @@ private struct ChatBubbleShape: InsettableShape {
 
 @MainActor
 struct ChatMessageBubble: View {
-    let message: MoltbotChatMessage
-    let style: MoltbotChatView.Style
+    let message: crocbotChatMessage
+    let style: crocbotChatView.Style
     let markdownVariant: ChatMarkdownVariant
     let userAccent: Color?
 
@@ -157,15 +157,15 @@ struct ChatMessageBubble: View {
 
 @MainActor
 private struct ChatMessageBody: View {
-    let message: MoltbotChatMessage
+    let message: crocbotChatMessage
     let isUser: Bool
-    let style: MoltbotChatView.Style
+    let style: crocbotChatView.Style
     let markdownVariant: ChatMarkdownVariant
     let userAccent: Color?
 
     var body: some View {
         let text = self.primaryText
-        let textColor = self.isUser ? MoltbotChatTheme.userText : MoltbotChatTheme.assistantText
+        let textColor = self.isUser ? crocbotChatTheme.userText : crocbotChatTheme.assistantText
 
         VStack(alignment: .leading, spacing: 10) {
             if self.isToolResultMessage {
@@ -232,7 +232,7 @@ private struct ChatMessageBody: View {
         return parts.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private var inlineAttachments: [MoltbotChatMessageContent] {
+    private var inlineAttachments: [crocbotChatMessageContent] {
         self.message.content.filter { content in
             switch content.type ?? "text" {
             case "file", "attachment":
@@ -243,7 +243,7 @@ private struct ChatMessageBody: View {
         }
     }
 
-    private var toolCalls: [MoltbotChatMessageContent] {
+    private var toolCalls: [crocbotChatMessageContent] {
         self.message.content.filter { content in
             let kind = (content.type ?? "").lowercased()
             if ["toolcall", "tool_call", "tooluse", "tool_use"].contains(kind) {
@@ -253,7 +253,7 @@ private struct ChatMessageBody: View {
         }
     }
 
-    private var inlineToolResults: [MoltbotChatMessageContent] {
+    private var inlineToolResults: [crocbotChatMessageContent] {
         self.message.content.filter { content in
             let kind = (content.type ?? "").lowercased()
             return kind == "toolresult" || kind == "tool_result"
@@ -276,12 +276,12 @@ private struct ChatMessageBody: View {
 
     private var bubbleFillColor: Color {
         if self.isUser {
-            return self.userAccent ?? MoltbotChatTheme.userBubble
+            return self.userAccent ?? crocbotChatTheme.userBubble
         }
         if self.style == .onboarding {
-            return MoltbotChatTheme.onboardingAssistantBubble
+            return crocbotChatTheme.onboardingAssistantBubble
         }
-        return MoltbotChatTheme.assistantBubble
+        return crocbotChatTheme.assistantBubble
     }
 
     private var bubbleBackground: AnyShapeStyle {
@@ -293,7 +293,7 @@ private struct ChatMessageBody: View {
             return Color.white.opacity(0.12)
         }
         if self.style == .onboarding {
-            return MoltbotChatTheme.onboardingAssistantBorder
+            return crocbotChatTheme.onboardingAssistantBorder
         }
         return Color.white.opacity(0.08)
     }
@@ -339,7 +339,7 @@ private struct ChatMessageBody: View {
 }
 
 private struct AttachmentRow: View {
-    let att: MoltbotChatMessageContent
+    let att: crocbotChatMessageContent
     let isUser: Bool
 
     var body: some View {
@@ -348,7 +348,7 @@ private struct AttachmentRow: View {
             Text(self.att.fileName ?? "Attachment")
                 .font(.footnote)
                 .lineLimit(1)
-                .foregroundStyle(self.isUser ? MoltbotChatTheme.userText : MoltbotChatTheme.assistantText)
+                .foregroundStyle(self.isUser ? crocbotChatTheme.userText : crocbotChatTheme.assistantText)
             Spacer()
         }
         .padding(10)
@@ -358,7 +358,7 @@ private struct AttachmentRow: View {
 }
 
 private struct ToolCallCard: View {
-    let content: MoltbotChatMessageContent
+    let content: crocbotChatMessageContent
     let isUser: Bool
 
     var body: some View {
@@ -379,7 +379,7 @@ private struct ToolCallCard: View {
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(MoltbotChatTheme.subtleCard)
+                .fill(crocbotChatTheme.subtleCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)))
@@ -414,7 +414,7 @@ private struct ToolResultCard: View {
 
             Text(self.displayText)
                 .font(.footnote.monospaced())
-                .foregroundStyle(self.isUser ? MoltbotChatTheme.userText : MoltbotChatTheme.assistantText)
+                .foregroundStyle(self.isUser ? crocbotChatTheme.userText : crocbotChatTheme.assistantText)
                 .lineLimit(self.expanded ? nil : Self.previewLineLimit)
 
             if self.shouldShowToggle {
@@ -429,7 +429,7 @@ private struct ToolResultCard: View {
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(MoltbotChatTheme.subtleCard)
+                .fill(crocbotChatTheme.subtleCard)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)))
@@ -453,7 +453,7 @@ private struct ToolResultCard: View {
 
 @MainActor
 struct ChatTypingIndicatorBubble: View {
-    let style: MoltbotChatView.Style
+    let style: crocbotChatView.Style
 
     var body: some View {
         HStack(spacing: 10) {
@@ -469,7 +469,7 @@ struct ChatTypingIndicatorBubble: View {
         .padding(.horizontal, self.style == .standard ? 12 : 14)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(MoltbotChatTheme.assistantBubble))
+                .fill(crocbotChatTheme.assistantBubble))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
@@ -496,7 +496,7 @@ struct ChatStreamingAssistantBubble: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(MoltbotChatTheme.assistantBubble))
+                .fill(crocbotChatTheme.assistantBubble))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
@@ -507,7 +507,7 @@ struct ChatStreamingAssistantBubble: View {
 
 @MainActor
 struct ChatPendingToolsBubble: View {
-    let toolCalls: [MoltbotChatPendingToolCall]
+    let toolCalls: [crocbotChatPendingToolCall]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -540,7 +540,7 @@ struct ChatPendingToolsBubble: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(MoltbotChatTheme.assistantBubble))
+                .fill(crocbotChatTheme.assistantBubble))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
@@ -609,7 +609,7 @@ private struct ChatAssistantTextBody: View {
                     context: .assistant,
                     variant: self.markdownVariant,
                     font: font,
-                    textColor: MoltbotChatTheme.assistantText)
+                    textColor: crocbotChatTheme.assistantText)
             }
         }
     }

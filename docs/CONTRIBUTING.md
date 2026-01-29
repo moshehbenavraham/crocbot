@@ -1,11 +1,11 @@
-# Contributing to Moltbot
+# Contributing to crocbot
 
 Welcome to the lobster tank! 🦞
 
 ## Quick Links
-- **GitHub:** https://github.com/moltbot/moltbot
+- **GitHub:** https://github.com/crocbot/crocbot
 - **Discord:** https://discord.gg/qkhbAGHRBT
-- **X/Twitter:** [@steipete](https://x.com/steipete) / [@moltbot](https://x.com/moltbot)
+- **X/Twitter:** [@steipete](https://x.com/steipete) / [@crocbot](https://x.com/crocbot)
 
 ## Maintainers
 
@@ -20,11 +20,11 @@ Welcome to the lobster tank! 🦞
 
 ## How to Contribute
 1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/moltbot/moltbot/discussions) or ask in Discord first
+2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/crocbot/crocbot/discussions) or ask in Discord first
 3. **Questions** → Discord #setup-help
 
 ## Before You PR
-- Test locally with your Moltbot instance
+- Test locally with your crocbot instance
 - Run linter: `npm run lint`
 - Keep PRs focused (one thing per PR)
 - Describe what & why
@@ -49,4 +49,4 @@ We are currently prioritizing:
 - **Skills**: Expanding the library of bundled skills and improving the Skill Creation developer experience.
 - **Performance**: Optimizing token usage and compaction logic.
 
-Check the [GitHub Issues](https://github.com/moltbot/moltbot/issues) for "good first issue" labels!
+Check the [GitHub Issues](https://github.com/crocbot/crocbot/issues) for "good first issue" labels!

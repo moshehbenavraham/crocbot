@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { createConfigIO } from "./io.js";
 
 async function withTempHome(run: (home: string) => Promise<void>): Promise<void> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "moltbot-config-"));
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-config-"));
   try {
     await run(home);
   } finally {
@@ -14,18 +14,18 @@ async function withTempHome(run: (home: string) => Promise<void>): Promise<void>
   }
 }
 
-async function writeConfig(home: string, dirname: ".moltbot" | ".clawdbot", port: number) {
+async function writeConfig(home: string, dirname: ".crocbot" | ".clawdbot", port: number) {
   const dir = path.join(home, dirname);
   await fs.mkdir(dir, { recursive: true });
-  const configPath = path.join(dir, "moltbot.json");
+  const configPath = path.join(dir, "crocbot.json");
   await fs.writeFile(configPath, JSON.stringify({ gateway: { port } }, null, 2));
   return configPath;
 }
 
 describe("config io compat (new + legacy folders)", () => {
-  it("prefers ~/.moltbot/moltbot.json when both configs exist", async () => {
+  it("prefers ~/.crocbot/crocbot.json when both configs exist", async () => {
     await withTempHome(async (home) => {
-      const newConfigPath = await writeConfig(home, ".moltbot", 19001);
+      const newConfigPath = await writeConfig(home, ".crocbot", 19001);
       await writeConfig(home, ".clawdbot", 18789);
 
       const io = createConfigIO({
@@ -37,7 +37,7 @@ describe("config io compat (new + legacy folders)", () => {
     });
   });
 
-  it("falls back to ~/.clawdbot/moltbot.json when only legacy exists", async () => {
+  it("falls back to ~/.clawdbot/crocbot.json when only legacy exists", async () => {
     await withTempHome(async (home) => {
       const legacyConfigPath = await writeConfig(home, ".clawdbot", 20001);
 
@@ -53,7 +53,7 @@ describe("config io compat (new + legacy folders)", () => {
 
   it("honors explicit legacy config path env override", async () => {
     await withTempHome(async (home) => {
-      const newConfigPath = await writeConfig(home, ".moltbot", 19002);
+      const newConfigPath = await writeConfig(home, ".crocbot", 19002);
       const legacyConfigPath = await writeConfig(home, ".clawdbot", 20002);
 
       const io = createConfigIO({

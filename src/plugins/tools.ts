@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "../agents/tools/common.js";
 import { normalizeToolName } from "../agents/tool-policy.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
-import { loadMoltbotPlugins } from "./loader.js";
-import type { MoltbotPluginToolContext } from "./types.js";
+import { loadcrocbotPlugins } from "./loader.js";
+import type { crocbotPluginToolContext } from "./types.js";
 
 const log = createSubsystemLogger("plugins");
 
@@ -35,11 +35,11 @@ function isOptionalToolAllowed(params: {
 }
 
 export function resolvePluginTools(params: {
-  context: MoltbotPluginToolContext;
+  context: crocbotPluginToolContext;
   existingToolNames?: Set<string>;
   toolAllowlist?: string[];
 }): AnyAgentTool[] {
-  const registry = loadMoltbotPlugins({
+  const registry = loadcrocbotPlugins({
     config: params.context.config,
     workspaceDir: params.context.workspaceDir,
     logger: {

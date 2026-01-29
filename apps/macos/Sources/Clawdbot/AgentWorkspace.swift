@@ -34,7 +34,7 @@ enum AgentWorkspace {
 
     static func resolveWorkspaceURL(from userInput: String?) -> URL {
         let trimmed = userInput?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if trimmed.isEmpty { return MoltbotConfigFile.defaultWorkspaceURL() }
+        if trimmed.isEmpty { return crocbotConfigFile.defaultWorkspaceURL() }
         let expanded = (trimmed as NSString).expandingTildeInPath
         return URL(fileURLWithPath: expanded, isDirectory: true)
     }
@@ -154,7 +154,7 @@ enum AgentWorkspace {
 
     static func defaultTemplate() -> String {
         let fallback = """
-        # AGENTS.md - Moltbot Workspace
+        # AGENTS.md - crocbot Workspace
 
         This folder is the assistant's working directory.
 
@@ -265,7 +265,7 @@ enum AgentWorkspace {
         - Timezone (optional)
         - Notes
 
-        3) ~/.clawdbot/moltbot.json
+        3) ~/.clawdbot/crocbot.json
         Set identity.name, identity.theme, identity.emoji to match IDENTITY.md.
 
         ## Cleanup

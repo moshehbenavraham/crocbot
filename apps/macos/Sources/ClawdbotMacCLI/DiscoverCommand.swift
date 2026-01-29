@@ -1,4 +1,4 @@
-import MoltbotDiscovery
+import crocbotDiscovery
 import Foundation
 
 struct DiscoveryOptions {
@@ -58,10 +58,10 @@ func runDiscover(_ args: [String]) async {
     let opts = DiscoveryOptions.parse(args)
     if opts.help {
         print("""
-        moltbot-mac discover
+        crocbot-mac discover
 
         Usage:
-          moltbot-mac discover [--timeout <ms>] [--json] [--include-local]
+          crocbot-mac discover [--timeout <ms>] [--json] [--include-local]
 
         Options:
           --timeout <ms>     Discovery window in milliseconds (default: 2000)

@@ -1,10 +1,10 @@
 import Foundation
 
-public enum MoltbotBonjour {
+public enum crocbotBonjour {
     // v0: internal-only, subject to rename.
-    public static let gatewayServiceType = "_moltbot-gw._tcp"
+    public static let gatewayServiceType = "_crocbot-gw._tcp"
     public static let gatewayServiceDomain = "local."
-    public static let wideAreaGatewayServiceDomain = "moltbot.internal."
+    public static let wideAreaGatewayServiceDomain = "crocbot.internal."
 
     public static let gatewayServiceDomains = [
         gatewayServiceDomain,

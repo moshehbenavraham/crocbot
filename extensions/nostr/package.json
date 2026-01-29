@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/nostr",
+  "name": "@crocbot/nostr",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot Nostr channel plugin for NIP-04 encrypted DMs",
-  "moltbot": {
+  "description": "crocbot Nostr channel plugin for NIP-04 encrypted DMs",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -18,13 +18,13 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/nostr",
+      "npmSpec": "@crocbot/nostr",
       "localPath": "extensions/nostr",
       "defaultChoice": "npm"
     }
   },
   "dependencies": {
-    "moltbot": "workspace:*",
+    "crocbot": "workspace:*",
     "nostr-tools": "^2.20.0",
     "zod": "^4.3.6"
   }

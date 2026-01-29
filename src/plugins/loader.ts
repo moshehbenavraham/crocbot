@@ -3,11 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createJiti } from "jiti";
 
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import type { GatewayRequestHandler } from "../gateway/server-methods/types.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveUserPath } from "../utils.js";
-import { discoverMoltbotPlugins } from "./discovery.js";
+import { discovercrocbotPlugins } from "./discovery.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import {
   normalizePluginsConfig,
@@ -22,8 +22,8 @@ import { createPluginRuntime } from "./runtime/index.js";
 import { setActivePluginRegistry } from "./runtime.js";
 import { validateJsonSchemaValue } from "./schema-validator.js";
 import type {
-  MoltbotPluginDefinition,
-  MoltbotPluginModule,
+  crocbotPluginDefinition,
+  crocbotPluginModule,
   PluginDiagnostic,
   PluginLogger,
 } from "./types.js";
@@ -31,7 +31,7 @@ import type {
 export type PluginLoadResult = PluginRegistry;
 
 export type PluginLoadOptions = {
-  config?: MoltbotConfig;
+  config?: crocbotConfig;
   workspaceDir?: string;
   logger?: PluginLogger;
   coreGatewayHandlers?: Record<string, GatewayRequestHandler>;
@@ -98,8 +98,8 @@ function validatePluginConfig(params: {
 }
 
 function resolvePluginModuleExport(moduleExport: unknown): {
-  definition?: MoltbotPluginDefinition;
-  register?: MoltbotPluginDefinition["register"];
+  definition?: crocbotPluginDefinition;
+  register?: crocbotPluginDefinition["register"];
 } {
   const resolved =
     moduleExport &&
@@ -109,11 +109,11 @@ function resolvePluginModuleExport(moduleExport: unknown): {
       : moduleExport;
   if (typeof resolved === "function") {
     return {
-      register: resolved as MoltbotPluginDefinition["register"],
+      register: resolved as crocbotPluginDefinition["register"],
     };
   }
   if (resolved && typeof resolved === "object") {
-    const def = resolved as MoltbotPluginDefinition;
+    const def = resolved as crocbotPluginDefinition;
     const register = def.register ?? def.activate;
     return { definition: def, register };
   }
@@ -161,7 +161,7 @@ function pushDiagnostics(diagnostics: PluginDiagnostic[], append: PluginDiagnost
   diagnostics.push(...append);
 }
 
-export function loadMoltbotPlugins(options: PluginLoadOptions = {}): PluginRegistry {
+export function loadcrocbotPlugins(options: PluginLoadOptions = {}): PluginRegistry {
   const cfg = options.config ?? {};
   const logger = options.logger ?? defaultLogger();
   const validateOnly = options.mode === "validate";
@@ -189,7 +189,7 @@ export function loadMoltbotPlugins(options: PluginLoadOptions = {}): PluginRegis
     coreGatewayHandlers: options.coreGatewayHandlers as Record<string, GatewayRequestHandler>,
   });
 
-  const discovery = discoverMoltbotPlugins({
+  const discovery = discovercrocbotPlugins({
     workspaceDir: options.workspaceDir,
     extraPaths: normalized.loadPaths,
   });
@@ -210,7 +210,7 @@ export function loadMoltbotPlugins(options: PluginLoadOptions = {}): PluginRegis
       ? {
           alias: {
             "clawdbot/plugin-sdk": pluginSdkAlias,
-            "moltbot/plugin-sdk": pluginSdkAlias,
+            "crocbot/plugin-sdk": pluginSdkAlias,
           },
         }
       : {}),
@@ -289,9 +289,9 @@ export function loadMoltbotPlugins(options: PluginLoadOptions = {}): PluginRegis
       continue;
     }
 
-    let mod: MoltbotPluginModule | null = null;
+    let mod: crocbotPluginModule | null = null;
     try {
-      mod = jiti(candidate.source) as MoltbotPluginModule;
+      mod = jiti(candidate.source) as crocbotPluginModule;
     } catch (err) {
       logger.error(`[plugins] ${record.id} failed to load from ${record.source}: ${String(err)}`);
       record.status = "error";

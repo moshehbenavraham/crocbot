@@ -2,7 +2,7 @@
 summary: "Research notes: offline memory system for Clawd workspaces (Markdown source-of-truth + derived index)"
 read_when:
   - Designing workspace memory (~/clawd) beyond daily Markdown logs
-  - Deciding: standalone CLI vs deep Moltbot integration
+  - Deciding: standalone CLI vs deep crocbot integration
   - Adding offline recall + reflection (retain/recall/reflect)
 ---
 
@@ -155,16 +155,16 @@ Opinion evolution (simple, explainable):
 
 ## CLI integration: standalone vs deep integration
 
-Recommendation: **deep integration in Moltbot**, but keep a separable core library.
+Recommendation: **deep integration in crocbot**, but keep a separable core library.
 
-### Why integrate into Moltbot?
-- Moltbot already knows:
+### Why integrate into crocbot?
+- crocbot already knows:
   - the workspace path (`agents.defaults.workspace`)
   - the session model + heartbeats
   - logging + troubleshooting patterns
 - You want the agent itself to call the tools:
-  - `moltbot memory recall "…" --k 25 --since 30d`
-  - `moltbot memory reflect --since 7d`
+  - `crocbot memory recall "…" --k 25 --since 30d`
+  - `crocbot memory reflect --since 7d`
 
 ### Why still split a library?
 - keep memory logic testable without gateway/runtime

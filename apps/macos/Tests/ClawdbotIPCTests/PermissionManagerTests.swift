@@ -1,7 +1,7 @@
-import MoltbotIPC
+import crocbotIPC
 import CoreLocation
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized)
 @MainActor

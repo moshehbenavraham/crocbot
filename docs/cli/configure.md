@@ -1,18 +1,18 @@
 ---
-summary: "CLI reference for `moltbot configure` (interactive configuration prompts)"
+summary: "CLI reference for `crocbot configure` (interactive configuration prompts)"
 read_when:
   - You want to tweak credentials, devices, or agent defaults interactively
 ---
 
-# `moltbot configure`
+# `crocbot configure`
 
 Interactive prompt to set up credentials, devices, and agent defaults.
 
 Note: The **Model** section now includes a multi-select for the
 `agents.defaults.models` allowlist (what shows up in `/model` and the model picker).
 
-Tip: `moltbot config` without a subcommand opens the same wizard. Use
-`moltbot config get|set|unset` for non-interactive edits.
+Tip: `crocbot config` without a subcommand opens the same wizard. Use
+`crocbot config get|set|unset` for non-interactive edits.
 
 Related:
 - Gateway configuration reference: [Configuration](/gateway/configuration)
@@ -25,6 +25,6 @@ Notes:
 ## Examples
 
 ```bash
-moltbot configure
-moltbot configure --section models --section channels
+crocbot configure
+crocbot configure --section models --section channels
 ```

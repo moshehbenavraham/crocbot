@@ -6,15 +6,15 @@ enum LogLocator {
             return URL(fileURLWithPath: override)
         }
 
-        return URL(fileURLWithPath: "/tmp/moltbot")
+        return URL(fileURLWithPath: "/tmp/crocbot")
     }
 
     private static var stdoutLog: URL {
-        logDir.appendingPathComponent("moltbot-stdout.log")
+        logDir.appendingPathComponent("crocbot-stdout.log")
     }
 
     private static var gatewayLog: URL {
-        logDir.appendingPathComponent("moltbot-gateway.log")
+        logDir.appendingPathComponent("crocbot-gateway.log")
     }
 
     private static func ensureLogDirExists() {
@@ -25,7 +25,7 @@ enum LogLocator {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
     }
 
-    /// Returns the newest log file under /tmp/moltbot/ (rolling or stdout), or nil if none exist.
+    /// Returns the newest log file under /tmp/crocbot/ (rolling or stdout), or nil if none exist.
     static func bestLogFile() -> URL? {
         self.ensureLogDirExists()
         let fm = FileManager()
@@ -35,7 +35,7 @@ enum LogLocator {
             options: [.skipsHiddenFiles])) ?? []
 
         return files
-            .filter { $0.lastPathComponent.hasPrefix("moltbot") && $0.pathExtension == "log" }
+            .filter { $0.lastPathComponent.hasPrefix("crocbot") && $0.pathExtension == "log" }
             .max { lhs, rhs in
                 self.modificationDate(for: lhs) < self.modificationDate(for: rhs)
             }

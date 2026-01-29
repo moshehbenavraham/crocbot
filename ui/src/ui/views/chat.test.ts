@@ -37,7 +37,7 @@ function createProps(overrides: Partial<ChatProps> = {}): ChatProps {
     error: null,
     sessions: createSessions(),
     focusMode: false,
-    assistantName: "Moltbot",
+    assistantName: "crocbot",
     assistantAvatar: null,
     onRefresh: () => undefined,
     onToggleFocusMode: () => undefined,

@@ -1,4 +1,4 @@
-name: Moltbot
+name: crocbot
 options:
   bundleIdPrefix: com.clawdbot
   deploymentTarget:
@@ -10,33 +10,33 @@ settings:
     SWIFT_VERSION: "6.0"
 
 packages:
-  MoltbotKit:
+  crocbotKit:
     path: ../shared/ClawdbotKit
   Swabble:
     path: ../../Swabble
 
 schemes:
-  Moltbot:
+  crocbot:
     shared: true
     build:
       targets:
-        Moltbot: all
+        crocbot: all
     test:
       targets:
-        - MoltbotTests
+        - crocbotTests
 
 targets:
-  Moltbot:
+  crocbot:
     type: application
     platform: iOS
     sources:
       - path: Sources
     dependencies:
-      - package: MoltbotKit
-      - package: MoltbotKit
-        product: MoltbotChatUI
-      - package: MoltbotKit
-        product: MoltbotProtocol
+      - package: crocbotKit
+      - package: crocbotKit
+        product: crocbotChatUI
+      - package: crocbotKit
+        product: crocbotProtocol
       - package: Swabble
         product: SwabbleKit
       - sdk: AppIntents.framework
@@ -79,7 +79,7 @@ targets:
     info:
       path: Sources/Info.plist
       properties:
-        CFBundleDisplayName: Moltbot
+        CFBundleDisplayName: crocbot
         CFBundleIconName: AppIcon
         CFBundleShortVersionString: "2026.1.26"
         CFBundleVersion: "20260126"
@@ -88,16 +88,16 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UIBackgroundModes:
           - audio
-        NSLocalNetworkUsageDescription: Moltbot discovers and connects to your Moltbot gateway on the local network.
+        NSLocalNetworkUsageDescription: crocbot discovers and connects to your crocbot gateway on the local network.
         NSAppTransportSecurity:
           NSAllowsArbitraryLoadsInWebContent: true
         NSBonjourServices:
-          - _moltbot-gw._tcp
-        NSCameraUsageDescription: Moltbot can capture photos or short video clips when requested via the gateway.
-        NSLocationWhenInUseUsageDescription: Moltbot uses your location when you allow location sharing.
-        NSLocationAlwaysAndWhenInUseUsageDescription: Moltbot can share your location in the background when you enable Always.
-        NSMicrophoneUsageDescription: Moltbot needs microphone access for voice wake.
-        NSSpeechRecognitionUsageDescription: Moltbot uses on-device speech recognition for voice wake.
+          - _crocbot-gw._tcp
+        NSCameraUsageDescription: crocbot can capture photos or short video clips when requested via the gateway.
+        NSLocationWhenInUseUsageDescription: crocbot uses your location when you allow location sharing.
+        NSLocationAlwaysAndWhenInUseUsageDescription: crocbot can share your location in the background when you enable Always.
+        NSMicrophoneUsageDescription: crocbot needs microphone access for voice wake.
+        NSSpeechRecognitionUsageDescription: crocbot uses on-device speech recognition for voice wake.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
@@ -109,13 +109,13 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
 
-  MoltbotTests:
+  crocbotTests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: Tests
     dependencies:
-      - target: Moltbot
+      - target: crocbot
       - package: Swabble
         product: SwabbleKit
       - sdk: AppIntents.framework
@@ -124,11 +124,11 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.clawdbot.ios.tests
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Moltbot.app/Moltbot"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/crocbot.app/crocbot"
         BUNDLE_LOADER: "$(TEST_HOST)"
     info:
       path: Tests/Info.plist
       properties:
-        CFBundleDisplayName: MoltbotTests
+        CFBundleDisplayName: crocbotTests
         CFBundleShortVersionString: "2026.1.26"
         CFBundleVersion: "20260126"

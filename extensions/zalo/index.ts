@@ -1,4 +1,4 @@
-import type { MoltbotPluginApi } from "clawdbot/plugin-sdk";
+import type { crocbotPluginApi } from "clawdbot/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
 
 import { zaloDock, zaloPlugin } from "./src/channel.js";
@@ -10,7 +10,7 @@ const plugin = {
   name: "Zalo",
   description: "Zalo channel plugin (Bot API)",
   configSchema: emptyPluginConfigSchema(),
-  register(api: MoltbotPluginApi) {
+  register(api: crocbotPluginApi) {
     setZaloRuntime(api.runtime);
     api.registerChannel({ plugin: zaloPlugin, dock: zaloDock });
     api.registerHttpHandler(handleZaloWebhookRequest);

@@ -1,5 +1,5 @@
-import MoltbotKit
-import MoltbotProtocol
+import crocbotKit
+import crocbotProtocol
 import Foundation
 import Observation
 import SwiftUI
@@ -56,7 +56,7 @@ final class WorkActivityStore {
         phase: String,
         name: String?,
         meta: String?,
-        args: [String: MoltbotProtocol.AnyCodable]?)
+        args: [String: crocbotProtocol.AnyCodable]?)
     {
         let toolKind = Self.mapToolKind(name)
         let label = Self.buildLabel(name: name, meta: meta, args: args)
@@ -225,7 +225,7 @@ final class WorkActivityStore {
     private static func buildLabel(
         name: String?,
         meta: String?,
-        args: [String: MoltbotProtocol.AnyCodable]?) -> String
+        args: [String: crocbotProtocol.AnyCodable]?) -> String
     {
         let wrappedArgs = self.wrapToolArgs(args)
         let display = ToolDisplayRegistry.resolve(name: name ?? "tool", args: wrappedArgs, meta: meta)
@@ -236,17 +236,17 @@ final class WorkActivityStore {
         return display.label
     }
 
-    private static func wrapToolArgs(_ args: [String: MoltbotProtocol.AnyCodable]?) -> MoltbotKit.AnyCodable? {
+    private static func wrapToolArgs(_ args: [String: crocbotProtocol.AnyCodable]?) -> crocbotKit.AnyCodable? {
         guard let args else { return nil }
         let converted: [String: Any] = args.mapValues { self.unwrapJSONValue($0.value) }
-        return MoltbotKit.AnyCodable(converted)
+        return crocbotKit.AnyCodable(converted)
     }
 
     private static func unwrapJSONValue(_ value: Any) -> Any {
-        if let dict = value as? [String: MoltbotProtocol.AnyCodable] {
+        if let dict = value as? [String: crocbotProtocol.AnyCodable] {
             return dict.mapValues { self.unwrapJSONValue($0.value) }
         }
-        if let array = value as? [MoltbotProtocol.AnyCodable] {
+        if let array = value as? [crocbotProtocol.AnyCodable] {
             return array.map { self.unwrapJSONValue($0.value) }
         }
         if let dict = value as? [String: Any] {

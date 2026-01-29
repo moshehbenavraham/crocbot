@@ -27,7 +27,7 @@ const NodeHostSchema = z
   .strict()
   .optional();
 
-export const MoltbotSchema = z
+export const crocbotSchema = z
   .object({
     meta: z
       .object({

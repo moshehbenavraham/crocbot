@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { MoltbotSchema } from "./zod-schema.js";
+import { crocbotSchema } from "./zod-schema.js";
 
 describe("telegram custom commands schema", () => {
   it("normalizes custom commands", () => {
-    const res = MoltbotSchema.safeParse({
+    const res = crocbotSchema.safeParse({
       channels: {
         telegram: {
           customCommands: [{ command: "/Backup", description: "  Git backup  " }],
@@ -21,7 +21,7 @@ describe("telegram custom commands schema", () => {
   });
 
   it("rejects custom commands with invalid names", () => {
-    const res = MoltbotSchema.safeParse({
+    const res = crocbotSchema.safeParse({
       channels: {
         telegram: {
           customCommands: [{ command: "Bad-Name", description: "Override status" }],

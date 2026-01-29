@@ -1,4 +1,4 @@
-import type { MoltbotConfig } from "clawdbot/plugin-sdk";
+import type { crocbotConfig } from "clawdbot/plugin-sdk";
 
 export type TlonResolvedAccount = {
   accountId: string;
@@ -14,7 +14,7 @@ export type TlonResolvedAccount = {
   showModelSignature: boolean | null;
 };
 
-export function resolveTlonAccount(cfg: MoltbotConfig, accountId?: string | null): TlonResolvedAccount {
+export function resolveTlonAccount(cfg: crocbotConfig, accountId?: string | null): TlonResolvedAccount {
   const base = cfg.channels?.tlon as
     | {
         name?: string;
@@ -75,7 +75,7 @@ export function resolveTlonAccount(cfg: MoltbotConfig, accountId?: string | null
   };
 }
 
-export function listTlonAccountIds(cfg: MoltbotConfig): string[] {
+export function listTlonAccountIds(cfg: crocbotConfig): string[] {
   const base = cfg.channels?.tlon as
     | { ship?: string; accounts?: Record<string, Record<string, unknown>> }
     | undefined;

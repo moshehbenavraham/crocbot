@@ -10,7 +10,7 @@ import {
   VENICE_DEFAULT_MODEL_REF,
   VENICE_MODEL_CATALOG,
 } from "../agents/venice-models.js";
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import {
   OPENROUTER_DEFAULT_MODEL_REF,
   VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF,
@@ -27,7 +27,7 @@ import {
   MOONSHOT_DEFAULT_MODEL_REF,
 } from "./onboard-auth.models.js";
 
-export function applyZaiConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyZaiConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[ZAI_DEFAULT_MODEL_REF] = {
     ...models[ZAI_DEFAULT_MODEL_REF],
@@ -55,7 +55,7 @@ export function applyZaiConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyOpenrouterProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyOpenrouterProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[OPENROUTER_DEFAULT_MODEL_REF] = {
     ...models[OPENROUTER_DEFAULT_MODEL_REF],
@@ -74,7 +74,7 @@ export function applyOpenrouterProviderConfig(cfg: MoltbotConfig): MoltbotConfig
   };
 }
 
-export function applyVercelAiGatewayProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyVercelAiGatewayProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF] = {
     ...models[VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF],
@@ -93,7 +93,7 @@ export function applyVercelAiGatewayProviderConfig(cfg: MoltbotConfig): MoltbotC
   };
 }
 
-export function applyVercelAiGatewayConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyVercelAiGatewayConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applyVercelAiGatewayProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -115,7 +115,7 @@ export function applyVercelAiGatewayConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyOpenrouterConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyOpenrouterConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applyOpenrouterProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -137,7 +137,7 @@ export function applyOpenrouterConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyMoonshotProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyMoonshotProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[MOONSHOT_DEFAULT_MODEL_REF] = {
     ...models[MOONSHOT_DEFAULT_MODEL_REF],
@@ -180,7 +180,7 @@ export function applyMoonshotProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyMoonshotConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyMoonshotConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applyMoonshotProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -202,7 +202,7 @@ export function applyMoonshotConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyKimiCodeProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyKimiCodeProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[KIMI_CODE_MODEL_REF] = {
     ...models[KIMI_CODE_MODEL_REF],
@@ -245,7 +245,7 @@ export function applyKimiCodeProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applyKimiCodeConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyKimiCodeConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applyKimiCodeProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -267,7 +267,7 @@ export function applyKimiCodeConfig(cfg: MoltbotConfig): MoltbotConfig {
   };
 }
 
-export function applySyntheticProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applySyntheticProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[SYNTHETIC_DEFAULT_MODEL_REF] = {
     ...models[SYNTHETIC_DEFAULT_MODEL_REF],
@@ -314,7 +314,7 @@ export function applySyntheticProviderConfig(cfg: MoltbotConfig): MoltbotConfig 
   };
 }
 
-export function applySyntheticConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applySyntheticConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applySyntheticProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -340,7 +340,7 @@ export function applySyntheticConfig(cfg: MoltbotConfig): MoltbotConfig {
  * Apply Venice provider configuration without changing the default model.
  * Registers Venice models and sets up the provider, but preserves existing model selection.
  */
-export function applyVeniceProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyVeniceProviderConfig(cfg: crocbotConfig): crocbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[VENICE_DEFAULT_MODEL_REF] = {
     ...models[VENICE_DEFAULT_MODEL_REF],
@@ -389,7 +389,7 @@ export function applyVeniceProviderConfig(cfg: MoltbotConfig): MoltbotConfig {
  * Apply Venice provider configuration AND set Venice as the default model.
  * Use this when Venice is the primary provider choice during onboarding.
  */
-export function applyVeniceConfig(cfg: MoltbotConfig): MoltbotConfig {
+export function applyVeniceConfig(cfg: crocbotConfig): crocbotConfig {
   const next = applyVeniceProviderConfig(cfg);
   const existingModel = next.agents?.defaults?.model;
   return {
@@ -412,7 +412,7 @@ export function applyVeniceConfig(cfg: MoltbotConfig): MoltbotConfig {
 }
 
 export function applyAuthProfileConfig(
-  cfg: MoltbotConfig,
+  cfg: crocbotConfig,
   params: {
     profileId: string;
     provider: string;
@@ -420,7 +420,7 @@ export function applyAuthProfileConfig(
     email?: string;
     preferProfileFirst?: boolean;
   },
-): MoltbotConfig {
+): crocbotConfig {
   const profiles = {
     ...cfg.auth?.profiles,
     [params.profileId]: {

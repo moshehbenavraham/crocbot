@@ -1,7 +1,7 @@
-import MoltbotDiscovery
+import crocbotDiscovery
 import SwiftUI
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized)
 @MainActor

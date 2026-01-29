@@ -1,7 +1,7 @@
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { getChannelPlugin, normalizeChannelId } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import type { AgentBinding } from "../config/types.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAgentId } from "../routing/session-key.js";
 import type { ChannelChoice } from "./onboard-types.js";
@@ -29,10 +29,10 @@ export function describeBinding(binding: AgentBinding) {
 }
 
 export function applyAgentBindings(
-  cfg: MoltbotConfig,
+  cfg: crocbotConfig,
   bindings: AgentBinding[],
 ): {
-  config: MoltbotConfig;
+  config: crocbotConfig;
   added: AgentBinding[];
   skipped: AgentBinding[];
   conflicts: Array<{ binding: AgentBinding; existingAgentId: string }>;
@@ -81,7 +81,7 @@ export function applyAgentBindings(
   };
 }
 
-function resolveDefaultAccountId(cfg: MoltbotConfig, provider: ChannelId): string {
+function resolveDefaultAccountId(cfg: crocbotConfig, provider: ChannelId): string {
   const plugin = getChannelPlugin(provider);
   if (!plugin) return DEFAULT_ACCOUNT_ID;
   return resolveChannelDefaultAccountId({ plugin, cfg });
@@ -90,7 +90,7 @@ function resolveDefaultAccountId(cfg: MoltbotConfig, provider: ChannelId): strin
 export function buildChannelBindings(params: {
   agentId: string;
   selection: ChannelChoice[];
-  config: MoltbotConfig;
+  config: crocbotConfig;
   accountIds?: Partial<Record<ChannelChoice, string>>;
 }): AgentBinding[] {
   const bindings: AgentBinding[] = [];
@@ -114,7 +114,7 @@ export function buildChannelBindings(params: {
 export function parseBindingSpecs(params: {
   agentId: string;
   specs?: string[];
-  config: MoltbotConfig;
+  config: crocbotConfig;
 }): { bindings: AgentBinding[]; errors: string[] } {
   const bindings: AgentBinding[] = [];
   const errors: string[] = [];

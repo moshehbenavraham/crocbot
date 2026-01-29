@@ -1,4 +1,4 @@
-import MoltbotProtocol
+import crocbotProtocol
 import Foundation
 import OSLog
 
@@ -41,7 +41,7 @@ public actor GatewayNodeSession {
                 return BridgeInvokeResponse(
                     id: request.id,
                     ok: false,
-                    error: MoltbotNodeError(
+                    error: crocbotNodeError(
                         code: .unavailable,
                         message: "node invoke timed out")
                 )

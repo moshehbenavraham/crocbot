@@ -57,7 +57,7 @@ extension CronSettings {
     static func exerciseForTesting() {
         let store = CronJobsStore(isPreview: true)
         store.schedulerEnabled = false
-        store.schedulerStorePath = "/tmp/moltbot-cron-store.json"
+        store.schedulerStorePath = "/tmp/crocbot-cron-store.json"
 
         let job = CronJob(
             id: "job-1",

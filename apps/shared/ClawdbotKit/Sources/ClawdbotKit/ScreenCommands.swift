@@ -1,10 +1,10 @@
 import Foundation
 
-public enum MoltbotScreenCommand: String, Codable, Sendable {
+public enum crocbotScreenCommand: String, Codable, Sendable {
     case record = "screen.record"
 }
 
-public struct MoltbotScreenRecordParams: Codable, Sendable, Equatable {
+public struct crocbotScreenRecordParams: Codable, Sendable, Equatable {
     public var screenIndex: Int?
     public var durationMs: Int?
     public var fps: Double?

@@ -1,15 +1,15 @@
-import type { MoltbotConfig } from "../../../config/config.js";
+import type { crocbotConfig } from "../../../config/config.js";
 import type { RuntimeEnv } from "../../../runtime.js";
 import { randomToken } from "../../onboard-helpers.js";
 import type { OnboardOptions } from "../../onboard-types.js";
 
 export function applyNonInteractiveGatewayConfig(params: {
-  nextConfig: MoltbotConfig;
+  nextConfig: crocbotConfig;
   opts: OnboardOptions;
   runtime: RuntimeEnv;
   defaultPort: number;
 }): {
-  nextConfig: MoltbotConfig;
+  nextConfig: crocbotConfig;
   port: number;
   bind: string;
   authMode: string;

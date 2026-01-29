@@ -1,8 +1,8 @@
 import AppKit
-import MoltbotDiscovery
-import MoltbotIPC
-import MoltbotKit
-import MoltbotProtocol
+import crocbotDiscovery
+import crocbotIPC
+import crocbotKit
+import crocbotProtocol
 import Foundation
 import Observation
 import OSLog

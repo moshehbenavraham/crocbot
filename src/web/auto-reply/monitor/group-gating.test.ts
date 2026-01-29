@@ -9,7 +9,7 @@ const baseConfig = {
       groups: { "*": { requireMention: true } },
     },
   },
-  session: { store: "/tmp/moltbot-sessions.json" },
+  session: { store: "/tmp/crocbot-sessions.json" },
 } as const;
 
 describe("applyGroupGating", () => {

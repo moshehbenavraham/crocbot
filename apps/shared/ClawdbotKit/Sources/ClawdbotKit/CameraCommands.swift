@@ -1,38 +1,38 @@
 import Foundation
 
-public enum MoltbotCameraCommand: String, Codable, Sendable {
+public enum crocbotCameraCommand: String, Codable, Sendable {
     case list = "camera.list"
     case snap = "camera.snap"
     case clip = "camera.clip"
 }
 
-public enum MoltbotCameraFacing: String, Codable, Sendable {
+public enum crocbotCameraFacing: String, Codable, Sendable {
     case back
     case front
 }
 
-public enum MoltbotCameraImageFormat: String, Codable, Sendable {
+public enum crocbotCameraImageFormat: String, Codable, Sendable {
     case jpg
     case jpeg
 }
 
-public enum MoltbotCameraVideoFormat: String, Codable, Sendable {
+public enum crocbotCameraVideoFormat: String, Codable, Sendable {
     case mp4
 }
 
-public struct MoltbotCameraSnapParams: Codable, Sendable, Equatable {
-    public var facing: MoltbotCameraFacing?
+public struct crocbotCameraSnapParams: Codable, Sendable, Equatable {
+    public var facing: crocbotCameraFacing?
     public var maxWidth: Int?
     public var quality: Double?
-    public var format: MoltbotCameraImageFormat?
+    public var format: crocbotCameraImageFormat?
     public var deviceId: String?
     public var delayMs: Int?
 
     public init(
-        facing: MoltbotCameraFacing? = nil,
+        facing: crocbotCameraFacing? = nil,
         maxWidth: Int? = nil,
         quality: Double? = nil,
-        format: MoltbotCameraImageFormat? = nil,
+        format: crocbotCameraImageFormat? = nil,
         deviceId: String? = nil,
         delayMs: Int? = nil)
     {
@@ -45,18 +45,18 @@ public struct MoltbotCameraSnapParams: Codable, Sendable, Equatable {
     }
 }
 
-public struct MoltbotCameraClipParams: Codable, Sendable, Equatable {
-    public var facing: MoltbotCameraFacing?
+public struct crocbotCameraClipParams: Codable, Sendable, Equatable {
+    public var facing: crocbotCameraFacing?
     public var durationMs: Int?
     public var includeAudio: Bool?
-    public var format: MoltbotCameraVideoFormat?
+    public var format: crocbotCameraVideoFormat?
     public var deviceId: String?
 
     public init(
-        facing: MoltbotCameraFacing? = nil,
+        facing: crocbotCameraFacing? = nil,
         durationMs: Int? = nil,
         includeAudio: Bool? = nil,
-        format: MoltbotCameraVideoFormat? = nil,
+        format: crocbotCameraVideoFormat? = nil,
         deviceId: String? = nil)
     {
         self.facing = facing

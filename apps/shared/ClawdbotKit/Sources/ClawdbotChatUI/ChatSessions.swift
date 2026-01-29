@@ -1,11 +1,11 @@
 import Foundation
 
-public struct MoltbotChatSessionsDefaults: Codable, Sendable {
+public struct crocbotChatSessionsDefaults: Codable, Sendable {
     public let model: String?
     public let contextTokens: Int?
 }
 
-public struct MoltbotChatSessionEntry: Codable, Identifiable, Sendable, Hashable {
+public struct crocbotChatSessionEntry: Codable, Identifiable, Sendable, Hashable {
     public var id: String { self.key }
 
     public let key: String
@@ -31,10 +31,10 @@ public struct MoltbotChatSessionEntry: Codable, Identifiable, Sendable, Hashable
     public let contextTokens: Int?
 }
 
-public struct MoltbotChatSessionsListResponse: Codable, Sendable {
+public struct crocbotChatSessionsListResponse: Codable, Sendable {
     public let ts: Double?
     public let path: String?
     public let count: Int?
-    public let defaults: MoltbotChatSessionsDefaults?
-    public let sessions: [MoltbotChatSessionEntry]
+    public let defaults: crocbotChatSessionsDefaults?
+    public let sessions: [crocbotChatSessionEntry]
 }

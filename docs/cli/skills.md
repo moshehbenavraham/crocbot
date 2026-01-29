@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `moltbot skills` (list/info/check) and skill eligibility"
+summary: "CLI reference for `crocbot skills` (list/info/check) and skill eligibility"
 read_when:
   - You want to see which skills are available and ready to run
   - You want to debug missing binaries/env/config for skills
 ---
 
-# `moltbot skills`
+# `crocbot skills`
 
 Inspect skills (bundled + workspace + managed overrides) and see what’s eligible vs missing requirements.
 
@@ -17,9 +17,9 @@ Related:
 ## Commands
 
 ```bash
-moltbot skills list
-moltbot skills list --eligible
-moltbot skills info <name>
-moltbot skills check
+crocbot skills list
+crocbot skills list --eligible
+crocbot skills info <name>
+crocbot skills check
 ```
 

@@ -46,7 +46,7 @@ describe("agent concurrency defaults", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify({}, null, 2),
         "utf-8",
       );

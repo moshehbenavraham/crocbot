@@ -29,7 +29,7 @@ class NodeForegroundService : Service() {
   override fun onCreate() {
     super.onCreate()
     ensureChannel()
-    val initial = buildNotification(title = "Moltbot Node", text = "Starting…")
+    val initial = buildNotification(title = "crocbot Node", text = "Starting…")
     startForegroundWithTypes(notification = initial, requiresMic = false)
 
     val runtime = (application as NodeApp).runtime
@@ -44,7 +44,7 @@ class NodeForegroundService : Service() {
         ) { status, server, connected, voiceMode, voiceListening ->
           Quint(status, server, connected, voiceMode, voiceListening)
         }.collect { (status, server, connected, voiceMode, voiceListening) ->
-          val title = if (connected) "Moltbot Node · Connected" else "Moltbot Node"
+          val title = if (connected) "crocbot Node · Connected" else "crocbot Node"
           val voiceSuffix =
             if (voiceMode == VoiceWakeMode.Always) {
               if (voiceListening) " · Voice Wake: Listening" else " · Voice Wake: Paused"
@@ -91,7 +91,7 @@ class NodeForegroundService : Service() {
         "Connection",
         NotificationManager.IMPORTANCE_LOW,
       ).apply {
-        description = "Moltbot node connection status"
+        description = "crocbot node connection status"
         setShowBadge(false)
       }
     mgr.createNotificationChannel(channel)

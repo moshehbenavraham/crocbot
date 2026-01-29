@@ -1,7 +1,7 @@
-# Moltbot Fly.io deployment configuration
+# crocbot Fly.io deployment configuration
 # See https://fly.io/docs/reference/configuration/
 
-app = "moltbot"
+app = "crocbot"
 primary_region = "iad"  # change to your closest region
 
 [build]
@@ -30,5 +30,5 @@ primary_region = "iad"  # change to your closest region
   memory = "2048mb"
 
 [mounts]
-  source = "moltbot_data"
+  source = "crocbot_data"
   destination = "/data"

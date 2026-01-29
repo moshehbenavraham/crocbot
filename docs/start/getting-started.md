@@ -9,11 +9,11 @@ read_when:
 
 Goal: go from **zero** → **first working chat** (with sane defaults) as quickly as possible.
 
-Fastest chat: open the Control UI (no channel setup needed). Run `moltbot dashboard`
+Fastest chat: open the Control UI (no channel setup needed). Run `crocbot dashboard`
 and chat in the browser, or open `http://127.0.0.1:18789/` on the gateway host.
 Docs: [Dashboard](/web/dashboard) and [Control UI](/web/control-ui).
 
-Recommended path: use the **CLI onboarding wizard** (`moltbot onboard`). It sets up:
+Recommended path: use the **CLI onboarding wizard** (`crocbot onboard`). It sets up:
 - model/auth (OAuth recommended)
 - gateway settings
 - channels (WhatsApp/Telegram/Discord/Mattermost (plugin)/...)
@@ -45,7 +45,7 @@ run on host, set an explicit per-agent override:
 - Node `>=22`
 - `pnpm` (optional; recommended if you build from source)
 - **Recommended:** Brave Search API key for web search. Easiest path:
-  `moltbot configure --section web` (stores `tools.web.search.apiKey`).
+  `crocbot configure --section web` (stores `tools.web.search.apiKey`).
   See [Web tools](/tools/web).
 
 macOS: if you plan to build the apps, install Xcode / CLT. For the CLI + gateway only, Node is enough.
@@ -68,17 +68,17 @@ iwr -useb https://molt.bot/install.ps1 | iex
 Alternative (global install):
 
 ```bash
-npm install -g moltbot@latest
+npm install -g crocbot@latest
 ```
 
 ```bash
-pnpm add -g moltbot@latest
+pnpm add -g crocbot@latest
 ```
 
 ## 2) Run the onboarding wizard (and install the service)
 
 ```bash
-moltbot onboard --install-daemon
+crocbot onboard --install-daemon
 ```
 
 What you’ll choose:
@@ -105,13 +105,13 @@ Headless/server tip: do OAuth on a normal machine first, then copy `oauth.json` 
 If you installed the service during onboarding, the Gateway should already be running:
 
 ```bash
-moltbot gateway status
+crocbot gateway status
 ```
 
 Manual run (foreground):
 
 ```bash
-moltbot gateway --port 18789 --verbose
+crocbot gateway --port 18789 --verbose
 ```
 
 Dashboard (local loopback): `http://127.0.0.1:18789/`
@@ -123,9 +123,9 @@ channels. If you use WhatsApp or Telegram, run the Gateway with **Node**.
 ## 3.5) Quick verify (2 min)
 
 ```bash
-moltbot status
-moltbot health
-moltbot security audit --deep
+crocbot status
+crocbot health
+crocbot security audit --deep
 ```
 
 ## 4) Pair + connect your first chat surface
@@ -133,7 +133,7 @@ moltbot security audit --deep
 ### WhatsApp (QR login)
 
 ```bash
-moltbot channels login
+crocbot channels login
 ```
 
 Scan via WhatsApp → Settings → Linked Devices.
@@ -155,26 +155,26 @@ Default posture: unknown DMs get a short code and messages are not processed unt
 If your first DM gets no reply, approve the pairing:
 
 ```bash
-moltbot pairing list whatsapp
-moltbot pairing approve whatsapp <code>
+crocbot pairing list whatsapp
+crocbot pairing approve whatsapp <code>
 ```
 
 Pairing doc: [Pairing](/start/pairing)
 
 ## From source (development)
 
-If you’re hacking on Moltbot itself, run from source:
+If you’re hacking on crocbot itself, run from source:
 
 ```bash
-git clone https://github.com/moltbot/moltbot.git
-cd moltbot
+git clone https://github.com/crocbot/crocbot.git
+cd crocbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
-moltbot onboard --install-daemon
+crocbot onboard --install-daemon
 ```
 
-If you don’t have a global install yet, run the onboarding step via `pnpm moltbot ...` from the repo.
+If you don’t have a global install yet, run the onboarding step via `pnpm crocbot ...` from the repo.
 `pnpm build` also bundles A2UI assets; if you need to run just that step, use `pnpm canvas:a2ui:bundle`.
 
 Gateway (from this repo):
@@ -188,13 +188,13 @@ node dist/entry.js gateway --port 18789 --verbose
 In a new terminal, send a test message:
 
 ```bash
-moltbot message send --target +15555550123 --message "Hello from Moltbot"
+crocbot message send --target +15555550123 --message "Hello from crocbot"
 ```
 
-If `moltbot health` shows “no auth configured”, go back to the wizard and set OAuth/key auth — the agent won’t be able to respond without it.
+If `crocbot health` shows “no auth configured”, go back to the wizard and set OAuth/key auth — the agent won’t be able to respond without it.
 
-Tip: `moltbot status --all` is the best pasteable, read-only debug report.
-Health probes: `moltbot health` (or `moltbot status --deep`) asks the running gateway for a health snapshot.
+Tip: `crocbot status --all` is the best pasteable, read-only debug report.
+Health probes: `crocbot health` (or `crocbot status --deep`) asks the running gateway for a health snapshot.
 
 ## Next steps (optional, but great)
 

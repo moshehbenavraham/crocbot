@@ -1,4 +1,4 @@
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import type { PluginSlotsConfig } from "../config/types.plugins.js";
 import type { PluginKind } from "./types.js";
 
@@ -27,13 +27,13 @@ export function defaultSlotIdForKey(slotKey: PluginSlotKey): string {
 }
 
 export type SlotSelectionResult = {
-  config: MoltbotConfig;
+  config: crocbotConfig;
   warnings: string[];
   changed: boolean;
 };
 
 export function applyExclusiveSlotSelection(params: {
-  config: MoltbotConfig;
+  config: crocbotConfig;
   selectedId: string;
   selectedKind?: PluginKind;
   registry?: { plugins: SlotPluginRecord[] };

@@ -34,9 +34,9 @@ describe("oauth paths", () => {
 });
 
 describe("state + config path candidates", () => {
-  it("prefers MOLTBOT_STATE_DIR over legacy state dir env", () => {
+  it("prefers crocbot_STATE_DIR over legacy state dir env", () => {
     const env = {
-      MOLTBOT_STATE_DIR: "/new/state",
+      crocbot_STATE_DIR: "/new/state",
       CLAWDBOT_STATE_DIR: "/legacy/state",
     } as NodeJS.ProcessEnv;
 
@@ -46,7 +46,7 @@ describe("state + config path candidates", () => {
   it("orders default config candidates as new then legacy", () => {
     const home = "/home/test";
     const candidates = resolveDefaultConfigCandidates({} as NodeJS.ProcessEnv, () => home);
-    expect(candidates[0]).toBe(path.join(home, ".moltbot", "moltbot.json"));
-    expect(candidates[1]).toBe(path.join(home, ".clawdbot", "moltbot.json"));
+    expect(candidates[0]).toBe(path.join(home, ".crocbot", "crocbot.json"));
+    expect(candidates[1]).toBe(path.join(home, ".clawdbot", "crocbot.json"));
   });
 });

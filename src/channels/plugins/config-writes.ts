@@ -1,4 +1,4 @@
-import type { MoltbotConfig } from "../../config/config.js";
+import type { crocbotConfig } from "../../config/config.js";
 import type { ChannelId } from "./types.js";
 import { normalizeAccountId } from "../../routing/session-key.js";
 
@@ -17,7 +17,7 @@ function resolveAccountConfig(accounts: ChannelConfigWithAccounts["accounts"], a
 }
 
 export function resolveChannelConfigWrites(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   channelId?: ChannelId | null;
   accountId?: string | null;
 }): boolean {

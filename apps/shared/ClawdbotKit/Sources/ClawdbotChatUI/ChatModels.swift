@@ -1,4 +1,4 @@
-import MoltbotKit
+import crocbotKit
 import Foundation
 
 // NOTE: keep this file lightweight; decode must be resilient to varying transcript formats.
@@ -6,14 +6,14 @@ import Foundation
 #if canImport(AppKit)
 import AppKit
 
-public typealias MoltbotPlatformImage = NSImage
+public typealias crocbotPlatformImage = NSImage
 #elseif canImport(UIKit)
 import UIKit
 
-public typealias MoltbotPlatformImage = UIImage
+public typealias crocbotPlatformImage = UIImage
 #endif
 
-public struct MoltbotChatUsageCost: Codable, Hashable, Sendable {
+public struct crocbotChatUsageCost: Codable, Hashable, Sendable {
     public let input: Double?
     public let output: Double?
     public let cacheRead: Double?
@@ -21,12 +21,12 @@ public struct MoltbotChatUsageCost: Codable, Hashable, Sendable {
     public let total: Double?
 }
 
-public struct MoltbotChatUsage: Codable, Hashable, Sendable {
+public struct crocbotChatUsage: Codable, Hashable, Sendable {
     public let input: Int?
     public let output: Int?
     public let cacheRead: Int?
     public let cacheWrite: Int?
-    public let cost: MoltbotChatUsageCost?
+    public let cost: crocbotChatUsageCost?
     public let total: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -45,7 +45,7 @@ public struct MoltbotChatUsage: Codable, Hashable, Sendable {
         self.output = try container.decodeIfPresent(Int.self, forKey: .output)
         self.cacheRead = try container.decodeIfPresent(Int.self, forKey: .cacheRead)
         self.cacheWrite = try container.decodeIfPresent(Int.self, forKey: .cacheWrite)
-        self.cost = try container.decodeIfPresent(MoltbotChatUsageCost.self, forKey: .cost)
+        self.cost = try container.decodeIfPresent(crocbotChatUsageCost.self, forKey: .cost)
         self.total =
             try container.decodeIfPresent(Int.self, forKey: .total) ??
             container.decodeIfPresent(Int.self, forKey: .totalTokens)
@@ -62,7 +62,7 @@ public struct MoltbotChatUsage: Codable, Hashable, Sendable {
     }
 }
 
-public struct MoltbotChatMessageContent: Codable, Hashable, Sendable {
+public struct crocbotChatMessageContent: Codable, Hashable, Sendable {
     public let type: String?
     public let text: String?
     public let thinking: String?
@@ -135,14 +135,14 @@ public struct MoltbotChatMessageContent: Codable, Hashable, Sendable {
     }
 }
 
-public struct MoltbotChatMessage: Codable, Identifiable, Sendable {
+public struct crocbotChatMessage: Codable, Identifiable, Sendable {
     public var id: UUID = .init()
     public let role: String
-    public let content: [MoltbotChatMessageContent]
+    public let content: [crocbotChatMessageContent]
     public let timestamp: Double?
     public let toolCallId: String?
     public let toolName: String?
-    public let usage: MoltbotChatUsage?
+    public let usage: crocbotChatUsage?
     public let stopReason: String?
 
     enum CodingKeys: String, CodingKey {
@@ -160,11 +160,11 @@ public struct MoltbotChatMessage: Codable, Identifiable, Sendable {
     public init(
         id: UUID = .init(),
         role: String,
-        content: [MoltbotChatMessageContent],
+        content: [crocbotChatMessageContent],
         timestamp: Double?,
         toolCallId: String? = nil,
         toolName: String? = nil,
-        usage: MoltbotChatUsage? = nil,
+        usage: crocbotChatUsage? = nil,
         stopReason: String? = nil)
     {
         self.id = id
@@ -187,10 +187,10 @@ public struct MoltbotChatMessage: Codable, Identifiable, Sendable {
         self.toolName =
             try container.decodeIfPresent(String.self, forKey: .toolName) ??
             container.decodeIfPresent(String.self, forKey: .tool_name)
-        self.usage = try container.decodeIfPresent(MoltbotChatUsage.self, forKey: .usage)
+        self.usage = try container.decodeIfPresent(crocbotChatUsage.self, forKey: .usage)
         self.stopReason = try container.decodeIfPresent(String.self, forKey: .stopReason)
 
-        if let decoded = try? container.decode([MoltbotChatMessageContent].self, forKey: .content) {
+        if let decoded = try? container.decode([crocbotChatMessageContent].self, forKey: .content) {
             self.content = decoded
             return
         }
@@ -198,7 +198,7 @@ public struct MoltbotChatMessage: Codable, Identifiable, Sendable {
         // Some session log formats store `content` as a plain string.
         if let text = try? container.decode(String.self, forKey: .content) {
             self.content = [
-                MoltbotChatMessageContent(
+                crocbotChatMessageContent(
                     type: "text",
                     text: text,
                     thinking: nil,
@@ -228,40 +228,40 @@ public struct MoltbotChatMessage: Codable, Identifiable, Sendable {
     }
 }
 
-public struct MoltbotChatHistoryPayload: Codable, Sendable {
+public struct crocbotChatHistoryPayload: Codable, Sendable {
     public let sessionKey: String
     public let sessionId: String?
     public let messages: [AnyCodable]?
     public let thinkingLevel: String?
 }
 
-public struct MoltbotSessionPreviewItem: Codable, Hashable, Sendable {
+public struct crocbotSessionPreviewItem: Codable, Hashable, Sendable {
     public let role: String
     public let text: String
 }
 
-public struct MoltbotSessionPreviewEntry: Codable, Sendable {
+public struct crocbotSessionPreviewEntry: Codable, Sendable {
     public let key: String
     public let status: String
-    public let items: [MoltbotSessionPreviewItem]
+    public let items: [crocbotSessionPreviewItem]
 }
 
-public struct MoltbotSessionsPreviewPayload: Codable, Sendable {
+public struct crocbotSessionsPreviewPayload: Codable, Sendable {
     public let ts: Int
-    public let previews: [MoltbotSessionPreviewEntry]
+    public let previews: [crocbotSessionPreviewEntry]
 
-    public init(ts: Int, previews: [MoltbotSessionPreviewEntry]) {
+    public init(ts: Int, previews: [crocbotSessionPreviewEntry]) {
         self.ts = ts
         self.previews = previews
     }
 }
 
-public struct MoltbotChatSendResponse: Codable, Sendable {
+public struct crocbotChatSendResponse: Codable, Sendable {
     public let runId: String
     public let status: String
 }
 
-public struct MoltbotChatEventPayload: Codable, Sendable {
+public struct crocbotChatEventPayload: Codable, Sendable {
     public let runId: String?
     public let sessionKey: String?
     public let state: String?
@@ -269,7 +269,7 @@ public struct MoltbotChatEventPayload: Codable, Sendable {
     public let errorMessage: String?
 }
 
-public struct MoltbotAgentEventPayload: Codable, Sendable, Identifiable {
+public struct crocbotAgentEventPayload: Codable, Sendable, Identifiable {
     public var id: String { "\(self.runId)-\(self.seq ?? -1)" }
     public let runId: String
     public let seq: Int?
@@ -278,7 +278,7 @@ public struct MoltbotAgentEventPayload: Codable, Sendable, Identifiable {
     public let data: [String: AnyCodable]
 }
 
-public struct MoltbotChatPendingToolCall: Identifiable, Hashable, Sendable {
+public struct crocbotChatPendingToolCall: Identifiable, Hashable, Sendable {
     public var id: String { self.toolCallId }
     public let toolCallId: String
     public let name: String
@@ -287,18 +287,18 @@ public struct MoltbotChatPendingToolCall: Identifiable, Hashable, Sendable {
     public let isError: Bool?
 }
 
-public struct MoltbotGatewayHealthOK: Codable, Sendable {
+public struct crocbotGatewayHealthOK: Codable, Sendable {
     public let ok: Bool?
 }
 
-public struct MoltbotPendingAttachment: Identifiable {
+public struct crocbotPendingAttachment: Identifiable {
     public let id = UUID()
     public let url: URL?
     public let data: Data
     public let fileName: String
     public let mimeType: String
     public let type: String
-    public let preview: MoltbotPlatformImage?
+    public let preview: crocbotPlatformImage?
 
     public init(
         url: URL?,
@@ -306,7 +306,7 @@ public struct MoltbotPendingAttachment: Identifiable {
         fileName: String,
         mimeType: String,
         type: String = "file",
-        preview: MoltbotPlatformImage?)
+        preview: crocbotPlatformImage?)
     {
         self.url = url
         self.data = data
@@ -317,7 +317,7 @@ public struct MoltbotPendingAttachment: Identifiable {
     }
 }
 
-public struct MoltbotChatAttachmentPayload: Codable, Sendable, Hashable {
+public struct crocbotChatAttachmentPayload: Codable, Sendable, Hashable {
     public let type: String
     public let mimeType: String
     public let fileName: String

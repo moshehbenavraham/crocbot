@@ -1,9 +1,9 @@
 ---
-summary: "Schema-accurate configuration examples for common Moltbot setups"
+summary: "Schema-accurate configuration examples for common crocbot setups"
 read_when:
-  - Learning how to configure Moltbot
+  - Learning how to configure crocbot
   - Looking for configuration examples
-  - Setting up Moltbot for the first time
+  - Setting up crocbot for the first time
 ---
 # Configuration Examples
 
@@ -19,7 +19,7 @@ Examples below are aligned with the current config schema. For the exhaustive re
 }
 ```
 
-Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
+Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
 
 ### Recommended starter
 ```json5
@@ -85,7 +85,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
   // Logging
   logging: {
     level: "info",
-    file: "/tmp/moltbot/moltbot.log",
+    file: "/tmp/crocbot/crocbot.log",
     consoleLevel: "info",
     consoleStyle: "pretty",
     redactSensitive: "tools"
@@ -93,7 +93,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
 
   // Message formatting
   messages: {
-    messagePrefix: "[moltbot]",
+    messagePrefix: "[crocbot]",
     responsePrefix: ">",
     ackReaction: "👀",
     ackReactionScope: "group-mentions"
@@ -102,7 +102,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
   // Routing + queue
   routing: {
     groupChat: {
-      mentionPatterns: ["@clawd", "moltbot"],
+      mentionPatterns: ["@clawd", "crocbot"],
       historyLimit: 50
     },
     queue: {
@@ -274,7 +274,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
         perSession: true,
         workspaceRoot: "~/.clawdbot/sandboxes",
         docker: {
-          image: "moltbot-sandbox:bookworm-slim",
+          image: "crocbot-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -369,7 +369,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
       }
     ],
     gmail: {
-      account: "moltbot@gmail.com",
+      account: "crocbot@gmail.com",
       label: "INBOX",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
@@ -388,7 +388,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
     mode: "local",
     port: 18789,
     bind: "loopback",
-    controlUi: { enabled: true, basePath: "/moltbot" },
+    controlUi: { enabled: true, basePath: "/crocbot" },
     auth: {
       mode: "token",
       token: "gateway-token",

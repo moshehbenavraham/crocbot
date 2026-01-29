@@ -5,7 +5,7 @@ import { isTruthyEnvValue } from "./env.js";
 
 import { resolveBrewPathDirs } from "./brew.js";
 
-type EnsureMoltbotPathOpts = {
+type EnsurecrocbotPathOpts = {
   execPath?: string;
   cwd?: string;
   homeDir?: string;
@@ -48,7 +48,7 @@ function mergePath(params: { existing: string; prepend: string[] }): string {
   return merged.join(path.delimiter);
 }
 
-function candidateBinDirs(opts: EnsureMoltbotPathOpts): string[] {
+function candidateBinDirs(opts: EnsurecrocbotPathOpts): string[] {
   const execPath = opts.execPath ?? process.execPath;
   const cwd = opts.cwd ?? process.cwd();
   const homeDir = opts.homeDir ?? os.homedir();
@@ -56,19 +56,19 @@ function candidateBinDirs(opts: EnsureMoltbotPathOpts): string[] {
 
   const candidates: string[] = [];
 
-  // Bundled macOS app: `moltbot` lives next to the executable (process.execPath).
+  // Bundled macOS app: `crocbot` lives next to the executable (process.execPath).
   try {
     const execDir = path.dirname(execPath);
-    const siblingMoltbot = path.join(execDir, "moltbot");
-    if (isExecutable(siblingMoltbot)) candidates.push(execDir);
+    const siblingcrocbot = path.join(execDir, "crocbot");
+    if (isExecutable(siblingcrocbot)) candidates.push(execDir);
   } catch {
     // ignore
   }
 
-  // Project-local installs (best effort): if a `node_modules/.bin/moltbot` exists near cwd,
+  // Project-local installs (best effort): if a `node_modules/.bin/crocbot` exists near cwd,
   // include it. This helps when running under launchd or other minimal PATH environments.
   const localBinDir = path.join(cwd, "node_modules", ".bin");
-  if (isExecutable(path.join(localBinDir, "moltbot"))) candidates.push(localBinDir);
+  if (isExecutable(path.join(localBinDir, "crocbot"))) candidates.push(localBinDir);
 
   const miseDataDir = process.env.MISE_DATA_DIR ?? path.join(homeDir, ".local", "share", "mise");
   const miseShims = path.join(miseDataDir, "shims");
@@ -91,10 +91,10 @@ function candidateBinDirs(opts: EnsureMoltbotPathOpts): string[] {
 }
 
 /**
- * Best-effort PATH bootstrap so skills that require the `moltbot` CLI can run
+ * Best-effort PATH bootstrap so skills that require the `crocbot` CLI can run
  * under launchd/minimal environments (and inside the macOS app bundle).
  */
-export function ensureMoltbotCliOnPath(opts: EnsureMoltbotPathOpts = {}) {
+export function ensurecrocbotCliOnPath(opts: EnsurecrocbotPathOpts = {}) {
   if (isTruthyEnvValue(process.env.CLAWDBOT_PATH_BOOTSTRAPPED)) return;
   process.env.CLAWDBOT_PATH_BOOTSTRAPPED = "1";
 

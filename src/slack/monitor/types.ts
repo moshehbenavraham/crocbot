@@ -1,4 +1,4 @@
-import type { MoltbotConfig, SlackSlashCommandConfig } from "../../config/config.js";
+import type { crocbotConfig, SlackSlashCommandConfig } from "../../config/config.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { SlackFile, SlackMessageEvent } from "../types.js";
 
@@ -7,7 +7,7 @@ export type MonitorSlackOpts = {
   appToken?: string;
   accountId?: string;
   mode?: "socket" | "http";
-  config?: MoltbotConfig;
+  config?: crocbotConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   mediaMaxMb?: number;

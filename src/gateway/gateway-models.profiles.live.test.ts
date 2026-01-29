@@ -7,7 +7,7 @@ import path from "node:path";
 import type { Api, Model } from "@mariozechner/pi-ai";
 import { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
 import { describe, it } from "vitest";
-import { resolveMoltbotAgentDir } from "../agents/agent-paths.js";
+import { resolvecrocbotAgentDir } from "../agents/agent-paths.js";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import {
   type AuthProfileStore,
@@ -21,9 +21,9 @@ import {
 } from "../agents/live-auth-keys.js";
 import { isModernModelRef } from "../agents/live-model-filter.js";
 import { getApiKeyForModel } from "../agents/model-auth.js";
-import { ensureMoltbotModelsJson } from "../agents/models-config.js";
+import { ensurecrocbotModelsJson } from "../agents/models-config.js";
 import { loadConfig } from "../config/config.js";
-import type { MoltbotConfig, ModelProviderConfig } from "../config/types.js";
+import type { crocbotConfig, ModelProviderConfig } from "../config/types.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
@@ -331,7 +331,7 @@ async function connectClient(params: { url: string; token: string }) {
 
 type GatewayModelSuiteParams = {
   label: string;
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   candidates: Array<Model<Api>>;
   extraToolProbes: boolean;
   extraImageProbes: boolean;
@@ -340,10 +340,10 @@ type GatewayModelSuiteParams = {
 };
 
 function buildLiveGatewayConfig(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   candidates: Array<Model<Api>>;
   providerOverrides?: Record<string, ModelProviderConfig>;
-}): MoltbotConfig {
+}): crocbotConfig {
   const providerOverrides = params.providerOverrides ?? {};
   const lmstudioProvider = params.cfg.models?.providers?.lmstudio;
   const baseProviders = params.cfg.models?.providers ?? {};
@@ -382,16 +382,16 @@ function buildLiveGatewayConfig(params: {
 }
 
 function sanitizeAuthConfig(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   agentDir: string;
-}): MoltbotConfig["auth"] | undefined {
+}): crocbotConfig["auth"] | undefined {
   const auth = params.cfg.auth;
   if (!auth) return auth;
   const store = ensureAuthProfileStore(params.agentDir, {
     allowKeychainPrompt: false,
   });
 
-  let profiles: NonNullable<MoltbotConfig["auth"]>["profiles"] | undefined;
+  let profiles: NonNullable<crocbotConfig["auth"]>["profiles"] | undefined;
   if (auth.profiles) {
     profiles = {};
     for (const [profileId, profile] of Object.entries(auth.profiles)) {
@@ -421,7 +421,7 @@ function sanitizeAuthConfig(params: {
 }
 
 function buildMinimaxProviderOverride(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   api: "openai-completions" | "anthropic-messages";
   baseUrl: string;
 }): ModelProviderConfig | null {
@@ -458,7 +458,7 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   process.env.CLAWDBOT_GATEWAY_TOKEN = token;
   const agentId = "dev";
 
-  const hostAgentDir = resolveMoltbotAgentDir();
+  const hostAgentDir = resolvecrocbotAgentDir();
   const hostStore = ensureAuthProfileStore(hostAgentDir, {
     allowKeychainPrompt: false,
   });
@@ -471,7 +471,7 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     lastGood: hostStore.lastGood ? { ...hostStore.lastGood } : undefined,
     usageStats: hostStore.usageStats ? { ...hostStore.usageStats } : undefined,
   };
-  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "moltbot-live-state-"));
+  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-live-state-"));
   process.env.CLAWDBOT_STATE_DIR = tempStateDir;
   tempAgentDir = path.join(tempStateDir, "agents", DEFAULT_AGENT_ID, "agent");
   saveAuthProfileStore(sanitizedStore, tempAgentDir);
@@ -489,8 +489,8 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   const toolProbePath = path.join(workspaceDir, `.clawdbot-live-tool-probe.${nonceA}.txt`);
   await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
-  const agentDir = resolveMoltbotAgentDir();
-  const sanitizedCfg: MoltbotConfig = {
+  const agentDir = resolvecrocbotAgentDir();
+  const sanitizedCfg: crocbotConfig = {
     ...params.cfg,
     auth: sanitizeAuthConfig({ cfg: params.cfg, agentDir }),
   };
@@ -499,12 +499,12 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     candidates: params.candidates,
     providerOverrides: params.providerOverrides,
   });
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "moltbot-live-"));
-  const tempConfigPath = path.join(tempDir, "moltbot.json");
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-live-"));
+  const tempConfigPath = path.join(tempDir, "crocbot.json");
   await fs.writeFile(tempConfigPath, `${JSON.stringify(nextCfg, null, 2)}\n`);
   process.env.CLAWDBOT_CONFIG_PATH = tempConfigPath;
 
-  await ensureMoltbotModelsJson(nextCfg);
+  await ensurecrocbotModelsJson(nextCfg);
 
   const port = await getFreeGatewayPort();
   const server = await startGatewayServer(port, {
@@ -636,7 +636,7 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
               sessionKey,
               idempotencyKey: `idem-${runIdTool}-tool`,
               message:
-                "Moltbot live tool probe (local, safe): " +
+                "crocbot live tool probe (local, safe): " +
                 `use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolProbePath}"}. ` +
                 "Then reply with the two nonce values you read (include both).",
               thinking: params.thinkingLevel,
@@ -676,7 +676,7 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
                 sessionKey,
                 idempotencyKey: `idem-${runIdTool}-exec-read`,
                 message:
-                  "Moltbot live tool probe (local, safe): " +
+                  "crocbot live tool probe (local, safe): " +
                   "use the tool named `exec` (or `Exec`) to run this command: " +
                   `mkdir -p "${tempDir}" && printf '%s' '${nonceC}' > "${toolWritePath}". ` +
                   `Then use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolWritePath}"}. ` +
@@ -957,9 +957,9 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     "runs meaningful prompts across models with available keys",
     async () => {
       const cfg = loadConfig();
-      await ensureMoltbotModelsJson(cfg);
+      await ensurecrocbotModelsJson(cfg);
 
-      const agentDir = resolveMoltbotAgentDir();
+      const agentDir = resolvecrocbotAgentDir();
       const authStore = ensureAuthProfileStore(agentDir, {
         allowKeychainPrompt: false,
       });
@@ -1061,9 +1061,9 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     process.env.CLAWDBOT_GATEWAY_TOKEN = token;
 
     const cfg = loadConfig();
-    await ensureMoltbotModelsJson(cfg);
+    await ensurecrocbotModelsJson(cfg);
 
-    const agentDir = resolveMoltbotAgentDir();
+    const agentDir = resolvecrocbotAgentDir();
     const authStorage = discoverAuthStorage(agentDir);
     const modelRegistry = discoverModels(authStorage, agentDir);
     const anthropic = modelRegistry.find("anthropic", "claude-opus-4-5") as Model<Api> | null;

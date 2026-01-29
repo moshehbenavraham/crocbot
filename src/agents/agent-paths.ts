@@ -4,7 +4,7 @@ import { resolveStateDir } from "../config/paths.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import { resolveUserPath } from "../utils.js";
 
-export function resolveMoltbotAgentDir(): string {
+export function resolvecrocbotAgentDir(): string {
   const override =
     process.env.CLAWDBOT_AGENT_DIR?.trim() || process.env.PI_CODING_AGENT_DIR?.trim();
   if (override) return resolveUserPath(override);
@@ -12,8 +12,8 @@ export function resolveMoltbotAgentDir(): string {
   return resolveUserPath(defaultAgentDir);
 }
 
-export function ensureMoltbotAgentEnv(): string {
-  const dir = resolveMoltbotAgentDir();
+export function ensurecrocbotAgentEnv(): string {
+  const dir = resolvecrocbotAgentDir();
   if (!process.env.CLAWDBOT_AGENT_DIR) process.env.CLAWDBOT_AGENT_DIR = dir;
   if (!process.env.PI_CODING_AGENT_DIR) process.env.PI_CODING_AGENT_DIR = dir;
   return dir;

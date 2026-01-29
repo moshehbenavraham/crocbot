@@ -1,11 +1,11 @@
 import AppKit
-import MoltbotIPC
-import MoltbotKit
+import crocbotIPC
+import crocbotKit
 import Foundation
 import WebKit
 
 final class CanvasA2UIActionMessageHandler: NSObject, WKScriptMessageHandler {
-    static let messageName = "moltbotCanvasA2UIAction"
+    static let messageName = "crocbotCanvasA2UIAction"
 
     private let sessionKey: String
 
@@ -52,7 +52,7 @@ final class CanvasA2UIActionMessageHandler: NSObject, WKScriptMessageHandler {
         }()
         guard !userAction.isEmpty else { return }
 
-        guard let name = MoltbotCanvasA2UIAction.extractActionName(userAction) else { return }
+        guard let name = crocbotCanvasA2UIAction.extractActionName(userAction) else { return }
         let actionId =
             (userAction["id"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty
                 ?? UUID().uuidString
@@ -64,15 +64,15 @@ final class CanvasA2UIActionMessageHandler: NSObject, WKScriptMessageHandler {
         let sourceComponentId = (userAction["sourceComponentId"] as? String)?
             .trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ?? "-"
         let instanceId = InstanceIdentity.instanceId.lowercased()
-        let contextJSON = MoltbotCanvasA2UIAction.compactJSON(userAction["context"])
+        let contextJSON = crocbotCanvasA2UIAction.compactJSON(userAction["context"])
 
         // Token-efficient and unambiguous. The agent should treat this as a UI event and (by default) update Canvas.
-        let messageContext = MoltbotCanvasA2UIAction.AgentMessageContext(
+        let messageContext = crocbotCanvasA2UIAction.AgentMessageContext(
             actionName: name,
             session: .init(key: self.sessionKey, surfaceId: surfaceId),
             component: .init(id: sourceComponentId, host: InstanceIdentity.displayName, instanceId: instanceId),
             contextJSON: contextJSON)
-        let text = MoltbotCanvasA2UIAction.formatAgentMessage(messageContext)
+        let text = crocbotCanvasA2UIAction.formatAgentMessage(messageContext)
 
         Task { [weak webView] in
             if AppStateStore.shared.connectionMode == .local {
@@ -91,7 +91,7 @@ final class CanvasA2UIActionMessageHandler: NSObject, WKScriptMessageHandler {
 
             await MainActor.run {
                 guard let webView else { return }
-                let js = MoltbotCanvasA2UIAction.jsDispatchA2UIActionStatus(
+                let js = crocbotCanvasA2UIAction.jsDispatchA2UIActionStatus(
                     actionId: actionId,
                     ok: result.ok,
                     error: result.error)
@@ -144,5 +144,5 @@ final class CanvasA2UIActionMessageHandler: NSObject, WKScriptMessageHandler {
         return false
     }
 
-    // Formatting helpers live in MoltbotKit (`MoltbotCanvasA2UIAction`).
+    // Formatting helpers live in crocbotKit (`crocbotCanvasA2UIAction`).
 }

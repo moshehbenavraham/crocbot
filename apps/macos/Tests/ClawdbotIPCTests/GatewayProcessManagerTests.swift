@@ -1,8 +1,8 @@
-import MoltbotKit
+import crocbotKit
 import Foundation
 import os
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized)
 @MainActor

@@ -2,7 +2,7 @@ import WebSocket from "ws";
 
 import type {
   ChannelAccountSnapshot,
-  MoltbotConfig,
+  crocbotConfig,
   ReplyPayload,
   RuntimeEnv,
 } from "clawdbot/plugin-sdk";
@@ -45,7 +45,7 @@ export type MonitorMattermostOpts = {
   botToken?: string;
   baseUrl?: string;
   accountId?: string;
-  config?: MoltbotConfig;
+  config?: crocbotConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   statusSink?: (patch: Partial<ChannelAccountSnapshot>) => void;

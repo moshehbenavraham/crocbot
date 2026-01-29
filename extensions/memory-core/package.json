@@ -1,14 +1,14 @@
 {
-  "name": "@moltbot/memory-core",
+  "name": "@crocbot/memory-core",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot core memory search plugin",
-  "moltbot": {
+  "description": "crocbot core memory search plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ]
   },
   "peerDependencies": {
-    "moltbot": ">=2026.1.26"
+    "crocbot": ">=2026.1.26"
   }
 }

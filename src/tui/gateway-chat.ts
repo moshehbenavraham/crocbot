@@ -112,7 +112,7 @@ export class GatewayChatClient {
       token: resolved.token,
       password: resolved.password,
       clientName: GATEWAY_CLIENT_NAMES.GATEWAY_CLIENT,
-      clientDisplayName: "moltbot-tui",
+      clientDisplayName: "crocbot-tui",
       clientVersion: VERSION,
       platform: process.platform,
       mode: GATEWAY_CLIENT_MODES.UI,

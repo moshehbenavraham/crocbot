@@ -1,7 +1,7 @@
 import type {
   ChannelOnboardingAdapter,
   ChannelOnboardingDmPolicy,
-  MoltbotConfig,
+  crocbotConfig,
   DmPolicy,
   WizardPrompter,
 } from "clawdbot/plugin-sdk";
@@ -22,7 +22,7 @@ import { parseBlueBubblesAllowTarget, normalizeBlueBubblesHandle } from "./targe
 
 const channel = "bluebubbles" as const;
 
-function setBlueBubblesDmPolicy(cfg: MoltbotConfig, dmPolicy: DmPolicy): MoltbotConfig {
+function setBlueBubblesDmPolicy(cfg: crocbotConfig, dmPolicy: DmPolicy): crocbotConfig {
   const allowFrom =
     dmPolicy === "open" ? addWildcardAllowFrom(cfg.channels?.bluebubbles?.allowFrom) : undefined;
   return {
@@ -39,10 +39,10 @@ function setBlueBubblesDmPolicy(cfg: MoltbotConfig, dmPolicy: DmPolicy): Moltbot
 }
 
 function setBlueBubblesAllowFrom(
-  cfg: MoltbotConfig,
+  cfg: crocbotConfig,
   accountId: string,
   allowFrom: string[],
-): MoltbotConfig {
+): crocbotConfig {
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return {
       ...cfg,
@@ -81,10 +81,10 @@ function parseBlueBubblesAllowFromInput(raw: string): string[] {
 }
 
 async function promptBlueBubblesAllowFrom(params: {
-  cfg: MoltbotConfig;
+  cfg: crocbotConfig;
   prompter: WizardPrompter;
   accountId?: string;
-}): Promise<MoltbotConfig> {
+}): Promise<crocbotConfig> {
   const accountId =
     params.accountId && normalizeAccountId(params.accountId)
       ? (normalizeAccountId(params.accountId) ?? DEFAULT_ACCOUNT_ID)
@@ -318,7 +318,7 @@ export const blueBubblesOnboardingAdapter: ChannelOnboardingAdapter = {
       [
         "Configure the webhook URL in BlueBubbles Server:",
         "1. Open BlueBubbles Server → Settings → Webhooks",
-        "2. Add your Moltbot gateway URL + webhook path",
+        "2. Add your crocbot gateway URL + webhook path",
         "   Example: https://your-gateway-host:3000/bluebubbles-webhook",
         "3. Enable the webhook and save",
         "",

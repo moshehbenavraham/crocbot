@@ -63,7 +63,7 @@ class ScreenRecordManager(private val context: Context) {
       val height = metrics.heightPixels
       val densityDpi = metrics.densityDpi
 
-      val file = File.createTempFile("moltbot-screen-", ".mp4")
+      val file = File.createTempFile("crocbot-screen-", ".mp4")
       if (includeAudio) ensureMicPermission()
 
       val recorder = createMediaRecorder()
@@ -90,7 +90,7 @@ class ScreenRecordManager(private val context: Context) {
         val surface = recorder.surface
         virtualDisplay =
           projection.createVirtualDisplay(
-            "moltbot-screen",
+            "crocbot-screen",
             width,
             height,
             densityDpi,

@@ -4,15 +4,15 @@ set -euo pipefail
 INSTALL_URL="${CLAWDBOT_INSTALL_URL:-https://molt.bot/install.sh}"
 SMOKE_PREVIOUS_VERSION="${CLAWDBOT_INSTALL_SMOKE_PREVIOUS:-}"
 SKIP_PREVIOUS="${CLAWDBOT_INSTALL_SMOKE_SKIP_PREVIOUS:-0}"
-DEFAULT_PACKAGE="moltbot"
+DEFAULT_PACKAGE="crocbot"
 if [[ -z "${CLAWDBOT_INSTALL_PACKAGE:-}" && "$INSTALL_URL" == *"clawd.bot"* ]]; then
   DEFAULT_PACKAGE="clawdbot"
 fi
 PACKAGE_NAME="${CLAWDBOT_INSTALL_PACKAGE:-$DEFAULT_PACKAGE}"
-if [[ "$PACKAGE_NAME" == "moltbot" ]]; then
+if [[ "$PACKAGE_NAME" == "crocbot" ]]; then
   ALT_PACKAGE_NAME="clawdbot"
 else
-  ALT_PACKAGE_NAME="moltbot"
+  ALT_PACKAGE_NAME="crocbot"
 fi
 
 echo "==> Resolve npm versions"

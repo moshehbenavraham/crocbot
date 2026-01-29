@@ -1,7 +1,7 @@
 import AppKit
-import MoltbotChatUI
-import MoltbotKit
-import MoltbotProtocol
+import crocbotChatUI
+import crocbotKit
+import crocbotProtocol
 import Foundation
 import OSLog
 import QuartzCore
@@ -16,8 +16,8 @@ private enum WebChatSwiftUILayout {
     static let anchorPadding: CGFloat = 8
 }
 
-struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
-    func requestHistory(sessionKey: String) async throws -> MoltbotChatHistoryPayload {
+struct MacGatewayChatTransport: crocbotChatTransport, Sendable {
+    func requestHistory(sessionKey: String) async throws -> crocbotChatHistoryPayload {
         try await GatewayConnection.shared.chatHistory(sessionKey: sessionKey)
     }
 
@@ -31,7 +31,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
             timeoutMs: 10000)
     }
 
-    func listSessions(limit: Int?) async throws -> MoltbotChatSessionsListResponse {
+    func listSessions(limit: Int?) async throws -> crocbotChatSessionsListResponse {
         var params: [String: AnyCodable] = [
             "includeGlobal": AnyCodable(true),
             "includeUnknown": AnyCodable(false),
@@ -43,7 +43,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
             method: "sessions.list",
             params: params,
             timeoutMs: 15000)
-        return try JSONDecoder().decode(MoltbotChatSessionsListResponse.self, from: data)
+        return try JSONDecoder().decode(crocbotChatSessionsListResponse.self, from: data)
     }
 
     func sendMessage(
@@ -51,7 +51,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
         message: String,
         thinking: String,
         idempotencyKey: String,
-        attachments: [MoltbotChatAttachmentPayload]) async throws -> MoltbotChatSendResponse
+        attachments: [crocbotChatAttachmentPayload]) async throws -> crocbotChatSendResponse
     {
         try await GatewayConnection.shared.chatSend(
             sessionKey: sessionKey,
@@ -65,7 +65,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
         try await GatewayConnection.shared.healthOK(timeoutMs: timeoutMs)
     }
 
-    func events() -> AsyncStream<MoltbotChatTransportEvent> {
+    func events() -> AsyncStream<crocbotChatTransportEvent> {
         AsyncStream { continuation in
             let task = Task {
                 do {
@@ -89,11 +89,11 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
         }
     }
 
-    static func mapPushToTransportEvent(_ push: GatewayPush) -> MoltbotChatTransportEvent? {
+    static func mapPushToTransportEvent(_ push: GatewayPush) -> crocbotChatTransportEvent? {
         switch push {
         case let .snapshot(hello):
             let ok = (try? JSONDecoder().decode(
-                MoltbotGatewayHealthOK.self,
+                crocbotGatewayHealthOK.self,
                 from: JSONEncoder().encode(hello.snapshot.health)))?.ok ?? true
             return .health(ok: ok)
 
@@ -102,7 +102,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
             case "health":
                 guard let payload = evt.payload else { return nil }
                 let ok = (try? JSONDecoder().decode(
-                    MoltbotGatewayHealthOK.self,
+                    crocbotGatewayHealthOK.self,
                     from: JSONEncoder().encode(payload)))?.ok ?? true
                 return .health(ok: ok)
             case "tick":
@@ -110,7 +110,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
             case "chat":
                 guard let payload = evt.payload else { return nil }
                 guard let chat = try? JSONDecoder().decode(
-                    MoltbotChatEventPayload.self,
+                    crocbotChatEventPayload.self,
                     from: JSONEncoder().encode(payload))
                 else {
                     return nil
@@ -119,7 +119,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
             case "agent":
                 guard let payload = evt.payload else { return nil }
                 guard let agent = try? JSONDecoder().decode(
-                    MoltbotAgentEventPayload.self,
+                    crocbotAgentEventPayload.self,
                     from: JSONEncoder().encode(payload))
                 else {
                     return nil
@@ -141,7 +141,7 @@ struct MacGatewayChatTransport: MoltbotChatTransport, Sendable {
 final class WebChatSwiftUIWindowController {
     private let presentation: WebChatPresentation
     private let sessionKey: String
-    private let hosting: NSHostingController<MoltbotChatView>
+    private let hosting: NSHostingController<crocbotChatView>
     private let contentController: NSViewController
     private var window: NSWindow?
     private var dismissMonitor: Any?
@@ -152,12 +152,12 @@ final class WebChatSwiftUIWindowController {
         self.init(sessionKey: sessionKey, presentation: presentation, transport: MacGatewayChatTransport())
     }
 
-    init(sessionKey: String, presentation: WebChatPresentation, transport: any MoltbotChatTransport) {
+    init(sessionKey: String, presentation: WebChatPresentation, transport: any crocbotChatTransport) {
         self.sessionKey = sessionKey
         self.presentation = presentation
-        let vm = MoltbotChatViewModel(sessionKey: sessionKey, transport: transport)
+        let vm = crocbotChatViewModel(sessionKey: sessionKey, transport: transport)
         let accent = Self.color(fromHex: AppStateStore.shared.seamColorHex)
-        self.hosting = NSHostingController(rootView: MoltbotChatView(
+        self.hosting = NSHostingController(rootView: crocbotChatView(
             viewModel: vm,
             showsSessionSwitcher: true,
             userAccent: accent))
@@ -268,7 +268,7 @@ final class WebChatSwiftUIWindowController {
                 styleMask: [.titled, .closable, .resizable, .miniaturizable],
                 backing: .buffered,
                 defer: false)
-            window.title = "Moltbot Chat"
+            window.title = "crocbot Chat"
             window.contentViewController = contentViewController
             window.isReleasedWhenClosed = false
             window.titleVisibility = .visible
@@ -311,7 +311,7 @@ final class WebChatSwiftUIWindowController {
 
     private static func makeContentController(
         for presentation: WebChatPresentation,
-        hosting: NSHostingController<MoltbotChatView>) -> NSViewController
+        hosting: NSHostingController<crocbotChatView>) -> NSViewController
     {
         let controller = NSViewController()
         let effectView = NSVisualEffectView()

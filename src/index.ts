@@ -20,7 +20,7 @@ import { ensureBinary } from "./infra/binaries.js";
 import { loadDotEnv } from "./infra/dotenv.js";
 import { normalizeEnv } from "./infra/env.js";
 import { isMainModule } from "./infra/is-main.js";
-import { ensureMoltbotCliOnPath } from "./infra/path-env.js";
+import { ensurecrocbotCliOnPath } from "./infra/path-env.js";
 import {
   describePortOwner,
   ensurePortAvailable,
@@ -36,7 +36,7 @@ import { assertWebChannel, normalizeE164, toWhatsappJid } from "./utils.js";
 
 loadDotEnv({ quiet: true });
 normalizeEnv();
-ensureMoltbotCliOnPath();
+ensurecrocbotCliOnPath();
 
 // Capture all console output into structured logs while keeping stdout/stderr behavior.
 enableConsoleCapture();
@@ -83,12 +83,12 @@ if (isMain) {
   installUnhandledRejectionHandler();
 
   process.on("uncaughtException", (error) => {
-    console.error("[moltbot] Uncaught exception:", formatUncaughtError(error));
+    console.error("[crocbot] Uncaught exception:", formatUncaughtError(error));
     process.exit(1);
   });
 
   void program.parseAsync(process.argv).catch((err) => {
-    console.error("[moltbot] CLI failed:", formatUncaughtError(err));
+    console.error("[crocbot] CLI failed:", formatUncaughtError(err));
     process.exit(1);
   });
 }

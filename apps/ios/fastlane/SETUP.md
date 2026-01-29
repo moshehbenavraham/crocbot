@@ -1,4 +1,4 @@
-# fastlane setup (Moltbot iOS)
+# fastlane setup (crocbot iOS)
 
 Install:
 

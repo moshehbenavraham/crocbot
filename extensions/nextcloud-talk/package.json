@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/nextcloud-talk",
+  "name": "@crocbot/nextcloud-talk",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot Nextcloud Talk channel plugin",
-  "moltbot": {
+  "description": "crocbot Nextcloud Talk channel plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -22,7 +22,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/nextcloud-talk",
+      "npmSpec": "@crocbot/nextcloud-talk",
       "localPath": "extensions/nextcloud-talk",
       "defaultChoice": "npm"
     }

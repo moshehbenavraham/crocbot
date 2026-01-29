@@ -1,9 +1,9 @@
-import MoltbotChatUI
-import MoltbotKit
-import MoltbotProtocol
+import crocbotChatUI
+import crocbotKit
+import crocbotProtocol
 import Foundation
 
-struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
+struct IOSGatewayChatTransport: crocbotChatTransport, Sendable {
     private let gateway: GatewayNodeSession
 
     init(gateway: GatewayNodeSession) {
@@ -20,7 +20,7 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
         _ = try await self.gateway.request(method: "chat.abort", paramsJSON: json, timeoutSeconds: 10)
     }
 
-    func listSessions(limit: Int?) async throws -> MoltbotChatSessionsListResponse {
+    func listSessions(limit: Int?) async throws -> crocbotChatSessionsListResponse {
         struct Params: Codable {
             var includeGlobal: Bool
             var includeUnknown: Bool
@@ -29,7 +29,7 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
         let data = try JSONEncoder().encode(Params(includeGlobal: true, includeUnknown: false, limit: limit))
         let json = String(data: data, encoding: .utf8)
         let res = try await self.gateway.request(method: "sessions.list", paramsJSON: json, timeoutSeconds: 15)
-        return try JSONDecoder().decode(MoltbotChatSessionsListResponse.self, from: res)
+        return try JSONDecoder().decode(crocbotChatSessionsListResponse.self, from: res)
     }
 
     func setActiveSessionKey(_ sessionKey: String) async throws {
@@ -39,12 +39,12 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
         await self.gateway.sendEvent(event: "chat.subscribe", payloadJSON: json)
     }
 
-    func requestHistory(sessionKey: String) async throws -> MoltbotChatHistoryPayload {
+    func requestHistory(sessionKey: String) async throws -> crocbotChatHistoryPayload {
         struct Params: Codable { var sessionKey: String }
         let data = try JSONEncoder().encode(Params(sessionKey: sessionKey))
         let json = String(data: data, encoding: .utf8)
         let res = try await self.gateway.request(method: "chat.history", paramsJSON: json, timeoutSeconds: 15)
-        return try JSONDecoder().decode(MoltbotChatHistoryPayload.self, from: res)
+        return try JSONDecoder().decode(crocbotChatHistoryPayload.self, from: res)
     }
 
     func sendMessage(
@@ -52,13 +52,13 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
         message: String,
         thinking: String,
         idempotencyKey: String,
-        attachments: [MoltbotChatAttachmentPayload]) async throws -> MoltbotChatSendResponse
+        attachments: [crocbotChatAttachmentPayload]) async throws -> crocbotChatSendResponse
     {
         struct Params: Codable {
             var sessionKey: String
             var message: String
             var thinking: String
-            var attachments: [MoltbotChatAttachmentPayload]?
+            var attachments: [crocbotChatAttachmentPayload]?
             var timeoutMs: Int
             var idempotencyKey: String
         }
@@ -73,16 +73,16 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
         let data = try JSONEncoder().encode(params)
         let json = String(data: data, encoding: .utf8)
         let res = try await self.gateway.request(method: "chat.send", paramsJSON: json, timeoutSeconds: 35)
-        return try JSONDecoder().decode(MoltbotChatSendResponse.self, from: res)
+        return try JSONDecoder().decode(crocbotChatSendResponse.self, from: res)
     }
 
     func requestHealth(timeoutMs: Int) async throws -> Bool {
         let seconds = max(1, Int(ceil(Double(timeoutMs) / 1000.0)))
         let res = try await self.gateway.request(method: "health", paramsJSON: nil, timeoutSeconds: seconds)
-        return (try? JSONDecoder().decode(MoltbotGatewayHealthOK.self, from: res))?.ok ?? true
+        return (try? JSONDecoder().decode(crocbotGatewayHealthOK.self, from: res))?.ok ?? true
     }
 
-    func events() -> AsyncStream<MoltbotChatTransportEvent> {
+    func events() -> AsyncStream<crocbotChatTransportEvent> {
         AsyncStream { continuation in
             let task = Task {
                 let stream = await self.gateway.subscribeServerEvents()
@@ -97,13 +97,13 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
                         guard let payload = evt.payload else { break }
                         let ok = (try? GatewayPayloadDecoding.decode(
                             payload,
-                            as: MoltbotGatewayHealthOK.self))?.ok ?? true
+                            as: crocbotGatewayHealthOK.self))?.ok ?? true
                         continuation.yield(.health(ok: ok))
                     case "chat":
                         guard let payload = evt.payload else { break }
                         if let chatPayload = try? GatewayPayloadDecoding.decode(
                             payload,
-                            as: MoltbotChatEventPayload.self)
+                            as: crocbotChatEventPayload.self)
                         {
                             continuation.yield(.chat(chatPayload))
                         }
@@ -111,7 +111,7 @@ struct IOSGatewayChatTransport: MoltbotChatTransport, Sendable {
                         guard let payload = evt.payload else { break }
                         if let agentPayload = try? GatewayPayloadDecoding.decode(
                             payload,
-                            as: MoltbotAgentEventPayload.self)
+                            as: crocbotAgentEventPayload.self)
                         {
                             continuation.yield(.agent(agentPayload))
                         }

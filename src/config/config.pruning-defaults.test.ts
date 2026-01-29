@@ -13,7 +13,7 @@ describe("config pruning defaults", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify({ agents: { defaults: {} } }, null, 2),
         "utf-8",
       );
@@ -41,7 +41,7 @@ describe("config pruning defaults", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify(
           {
             auth: {
@@ -72,7 +72,7 @@ describe("config pruning defaults", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify(
           {
             auth: {
@@ -110,7 +110,7 @@ describe("config pruning defaults", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify({ agents: { defaults: { contextPruning: { mode: "off" } } } }, null, 2),
         "utf-8",
       );

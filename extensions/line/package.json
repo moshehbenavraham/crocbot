@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/line",
+  "name": "@crocbot/line",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot LINE channel plugin",
-  "moltbot": {
+  "description": "crocbot LINE channel plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -18,12 +18,12 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/line",
+      "npmSpec": "@crocbot/line",
       "localPath": "extensions/line",
       "defaultChoice": "npm"
     }
   },
   "devDependencies": {
-    "moltbot": "workspace:*"
+    "crocbot": "workspace:*"
   }
 }

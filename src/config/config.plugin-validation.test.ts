@@ -25,7 +25,7 @@ async function writePluginFixture(params: {
     manifest.channels = params.channels;
   }
   await fs.writeFile(
-    path.join(params.dir, "moltbot.plugin.json"),
+    path.join(params.dir, "crocbot.plugin.json"),
     JSON.stringify(manifest, null, 2),
     "utf-8",
   );

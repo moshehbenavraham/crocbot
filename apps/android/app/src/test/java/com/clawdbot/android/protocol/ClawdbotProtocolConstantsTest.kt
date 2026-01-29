@@ -3,33 +3,33 @@ package com.clawdbot.android.protocol
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class MoltbotProtocolConstantsTest {
+class crocbotProtocolConstantsTest {
   @Test
   fun canvasCommandsUseStableStrings() {
-    assertEquals("canvas.present", MoltbotCanvasCommand.Present.rawValue)
-    assertEquals("canvas.hide", MoltbotCanvasCommand.Hide.rawValue)
-    assertEquals("canvas.navigate", MoltbotCanvasCommand.Navigate.rawValue)
-    assertEquals("canvas.eval", MoltbotCanvasCommand.Eval.rawValue)
-    assertEquals("canvas.snapshot", MoltbotCanvasCommand.Snapshot.rawValue)
+    assertEquals("canvas.present", crocbotCanvasCommand.Present.rawValue)
+    assertEquals("canvas.hide", crocbotCanvasCommand.Hide.rawValue)
+    assertEquals("canvas.navigate", crocbotCanvasCommand.Navigate.rawValue)
+    assertEquals("canvas.eval", crocbotCanvasCommand.Eval.rawValue)
+    assertEquals("canvas.snapshot", crocbotCanvasCommand.Snapshot.rawValue)
   }
 
   @Test
   fun a2uiCommandsUseStableStrings() {
-    assertEquals("canvas.a2ui.push", MoltbotCanvasA2UICommand.Push.rawValue)
-    assertEquals("canvas.a2ui.pushJSONL", MoltbotCanvasA2UICommand.PushJSONL.rawValue)
-    assertEquals("canvas.a2ui.reset", MoltbotCanvasA2UICommand.Reset.rawValue)
+    assertEquals("canvas.a2ui.push", crocbotCanvasA2UICommand.Push.rawValue)
+    assertEquals("canvas.a2ui.pushJSONL", crocbotCanvasA2UICommand.PushJSONL.rawValue)
+    assertEquals("canvas.a2ui.reset", crocbotCanvasA2UICommand.Reset.rawValue)
   }
 
   @Test
   fun capabilitiesUseStableStrings() {
-    assertEquals("canvas", MoltbotCapability.Canvas.rawValue)
-    assertEquals("camera", MoltbotCapability.Camera.rawValue)
-    assertEquals("screen", MoltbotCapability.Screen.rawValue)
-    assertEquals("voiceWake", MoltbotCapability.VoiceWake.rawValue)
+    assertEquals("canvas", crocbotCapability.Canvas.rawValue)
+    assertEquals("camera", crocbotCapability.Camera.rawValue)
+    assertEquals("screen", crocbotCapability.Screen.rawValue)
+    assertEquals("voiceWake", crocbotCapability.VoiceWake.rawValue)
   }
 
   @Test
   fun screenCommandsUseStableStrings() {
-    assertEquals("screen.record", MoltbotScreenCommand.Record.rawValue)
+    assertEquals("screen.record", crocbotScreenCommand.Record.rawValue)
   }
 }

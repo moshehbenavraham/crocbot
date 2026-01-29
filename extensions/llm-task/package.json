@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/llm-task",
+  "name": "@crocbot/llm-task",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot JSON-only LLM task plugin",
-  "moltbot": {
+  "description": "crocbot JSON-only LLM task plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ]

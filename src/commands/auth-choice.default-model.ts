@@ -1,16 +1,16 @@
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 
 export async function applyDefaultModelChoice(params: {
-  config: MoltbotConfig;
+  config: crocbotConfig;
   setDefaultModel: boolean;
   defaultModel: string;
-  applyDefaultConfig: (config: MoltbotConfig) => MoltbotConfig;
-  applyProviderConfig: (config: MoltbotConfig) => MoltbotConfig;
+  applyDefaultConfig: (config: crocbotConfig) => crocbotConfig;
+  applyProviderConfig: (config: crocbotConfig) => crocbotConfig;
   noteDefault?: string;
   noteAgentModel: (model: string) => Promise<void>;
   prompter: WizardPrompter;
-}): Promise<{ config: MoltbotConfig; agentModelOverride?: string }> {
+}): Promise<{ config: crocbotConfig; agentModelOverride?: string }> {
   if (params.setDefaultModel) {
     const next = params.applyDefaultConfig(params.config);
     if (params.noteDefault) {

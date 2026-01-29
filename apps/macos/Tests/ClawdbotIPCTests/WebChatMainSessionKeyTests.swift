@@ -1,12 +1,12 @@
 import Foundation
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite struct WebChatMainSessionKeyTests {
     @Test func configGetSnapshotMainKeyFallsBackToMainWhenMissing() throws {
         let json = """
         {
-          "path": "/Users/pete/.clawdbot/moltbot.json",
+          "path": "/Users/pete/.clawdbot/crocbot.json",
           "exists": true,
           "raw": null,
           "parsed": {},
@@ -22,7 +22,7 @@ import Testing
     @Test func configGetSnapshotMainKeyTrimsAndUsesValue() throws {
         let json = """
         {
-          "path": "/Users/pete/.clawdbot/moltbot.json",
+          "path": "/Users/pete/.clawdbot/crocbot.json",
           "exists": true,
           "raw": null,
           "parsed": {},

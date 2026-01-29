@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite struct HealthDecodeTests {
     private let sampleJSON: String = // minimal but complete payload

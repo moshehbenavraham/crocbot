@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/mattermost",
+  "name": "@crocbot/mattermost",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot Mattermost channel plugin",
-  "moltbot": {
+  "description": "crocbot Mattermost channel plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -17,7 +17,7 @@
       "order": 65
     },
     "install": {
-      "npmSpec": "@moltbot/mattermost",
+      "npmSpec": "@crocbot/mattermost",
       "localPath": "extensions/mattermost",
       "defaultChoice": "npm"
     }

@@ -31,7 +31,7 @@ class SecurePrefs(context: Context) {
   private val prefs =
     EncryptedSharedPreferences.create(
       context,
-      "moltbot.node.secure",
+      "crocbot.node.secure",
       masterKey,
       EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
       EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,

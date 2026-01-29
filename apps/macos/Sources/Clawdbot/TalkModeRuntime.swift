@@ -1,6 +1,6 @@
 import AVFoundation
-import MoltbotChatUI
-import MoltbotKit
+import crocbotChatUI
+import crocbotKit
 import Foundation
 import OSLog
 import Speech
@@ -416,9 +416,9 @@ actor TalkModeRuntime {
         do {
             let history = try await GatewayConnection.shared.chatHistory(sessionKey: sessionKey)
             let messages = history.messages ?? []
-            let decoded: [MoltbotChatMessage] = messages.compactMap { item in
+            let decoded: [crocbotChatMessage] = messages.compactMap { item in
                 guard let data = try? JSONEncoder().encode(item) else { return nil }
-                return try? JSONDecoder().decode(MoltbotChatMessage.self, from: data)
+                return try? JSONDecoder().decode(crocbotChatMessage.self, from: data)
             }
             let assistant = decoded.last { message in
                 guard message.role == "assistant" else { return false }

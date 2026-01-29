@@ -27,10 +27,10 @@ enum DeviceIdentityPaths {
         }
 
         if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-            return appSupport.appendingPathComponent("moltbot", isDirectory: true)
+            return appSupport.appendingPathComponent("crocbot", isDirectory: true)
         }
 
-        return FileManager.default.temporaryDirectory.appendingPathComponent("moltbot", isDirectory: true)
+        return FileManager.default.temporaryDirectory.appendingPathComponent("crocbot", isDirectory: true)
     }
 }
 

@@ -1,10 +1,10 @@
-import type { MoltbotConfig } from "../config/config.js";
-export function normalizeLegacyConfigValues(cfg: MoltbotConfig): {
-  config: MoltbotConfig;
+import type { crocbotConfig } from "../config/config.js";
+export function normalizeLegacyConfigValues(cfg: crocbotConfig): {
+  config: crocbotConfig;
   changes: string[];
 } {
   const changes: string[] = [];
-  let next: MoltbotConfig = cfg;
+  let next: crocbotConfig = cfg;
 
   const legacyAckReaction = cfg.messages?.ackReaction?.trim();
   const hasWhatsAppConfig = cfg.channels?.whatsapp !== undefined;

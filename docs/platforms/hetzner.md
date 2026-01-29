@@ -1,25 +1,25 @@
 ---
-summary: "Run Moltbot Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
+summary: "Run crocbot Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
 read_when:
-  - You want Moltbot running 24/7 on a cloud VPS (not your laptop)
+  - You want crocbot running 24/7 on a cloud VPS (not your laptop)
   - You want a production-grade, always-on Gateway on your own VPS
   - You want full control over persistence, binaries, and restart behavior
-  - You are running Moltbot in Docker on Hetzner or a similar provider
+  - You are running crocbot in Docker on Hetzner or a similar provider
 ---
 
-# Moltbot on Hetzner (Docker, Production VPS Guide)
+# crocbot on Hetzner (Docker, Production VPS Guide)
 
 ## Goal
-Run a persistent Moltbot Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
+Run a persistent crocbot Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
 
-If you want “Moltbot 24/7 for ~$5”, this is the simplest reliable setup.
+If you want “crocbot 24/7 for ~$5”, this is the simplest reliable setup.
 Hetzner pricing changes; pick the smallest Debian/Ubuntu VPS and scale up if you hit OOMs.
 
 ## What are we doing (simple terms)?
 
 - Rent a small Linux server (Hetzner VPS)
 - Install Docker (isolated app runtime)
-- Start the Moltbot Gateway in Docker
+- Start the crocbot Gateway in Docker
 - Persist `~/.clawdbot` + `~/clawd` on the host (survives restarts/rebuilds)
 - Access the Control UI from your laptop via an SSH tunnel
 
@@ -37,7 +37,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 
 1) Provision Hetzner VPS  
 2) Install Docker  
-3) Clone Moltbot repository  
+3) Clone crocbot repository  
 4) Create persistent host directories  
 5) Configure `.env` and `docker-compose.yml`  
 6) Bake required binaries into the image  
@@ -93,11 +93,11 @@ docker compose version
 
 ---
 
-## 3) Clone the Moltbot repository
+## 3) Clone the crocbot repository
 
 ```bash
-git clone https://github.com/moltbot/moltbot.git
-cd moltbot
+git clone https://github.com/crocbot/crocbot.git
+cd crocbot
 ```
 
 This guide assumes you will build a custom image to guarantee binary persistence.
@@ -125,7 +125,7 @@ chown -R 1000:1000 /root/clawd
 Create `.env` in the repository root.
 
 ```bash
-CLAWDBOT_IMAGE=moltbot:latest
+CLAWDBOT_IMAGE=crocbot:latest
 CLAWDBOT_GATEWAY_TOKEN=change-me-now
 CLAWDBOT_GATEWAY_BIND=lan
 CLAWDBOT_GATEWAY_PORT=18789
@@ -153,7 +153,7 @@ Create or update `docker-compose.yml`.
 
 ```yaml
 services:
-  moltbot-gateway:
+  crocbot-gateway:
     image: ${CLAWDBOT_IMAGE}
     build: .
     restart: unless-stopped
@@ -259,15 +259,15 @@ CMD ["node","dist/index.js"]
 
 ```bash
 docker compose build
-docker compose up -d moltbot-gateway
+docker compose up -d crocbot-gateway
 ```
 
 Verify binaries:
 
 ```bash
-docker compose exec moltbot-gateway which gog
-docker compose exec moltbot-gateway which goplaces
-docker compose exec moltbot-gateway which wacli
+docker compose exec crocbot-gateway which gog
+docker compose exec crocbot-gateway which goplaces
+docker compose exec crocbot-gateway which wacli
 ```
 
 Expected output:
@@ -283,7 +283,7 @@ Expected output:
 ## 9) Verify Gateway
 
 ```bash
-docker compose logs -f moltbot-gateway
+docker compose logs -f crocbot-gateway
 ```
 
 Success:
@@ -308,12 +308,12 @@ Paste your gateway token.
 
 ## What persists where (source of truth)
 
-Moltbot runs in Docker, but Docker is not the source of truth.
+crocbot runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
 | Component | Location | Persistence mechanism | Notes |
 |---|---|---|---|
-| Gateway config | `/home/node/.clawdbot/` | Host volume mount | Includes `moltbot.json`, tokens |
+| Gateway config | `/home/node/.clawdbot/` | Host volume mount | Includes `crocbot.json`, tokens |
 | Model auth profiles | `/home/node/.clawdbot/` | Host volume mount | OAuth tokens, API keys |
 | Skill configs | `/home/node/.clawdbot/skills/` | Host volume mount | Skill-level state |
 | Agent workspace | `/home/node/clawd/` | Host volume mount | Code and agent artifacts |

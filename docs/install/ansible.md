@@ -1,5 +1,5 @@
 ---
-summary: "Automated, hardened Moltbot installation with Ansible, Tailscale VPN, and firewall isolation"
+summary: "Automated, hardened crocbot installation with Ansible, Tailscale VPN, and firewall isolation"
 read_when:
   - You want automated server deployment with security hardening
   - You need firewall-isolated setup with VPN access
@@ -8,19 +8,19 @@ read_when:
 
 # Ansible Installation
 
-The recommended way to deploy Moltbot to production servers is via **[moltbot-ansible](https://github.com/moltbot/moltbot-ansible)** — an automated installer with security-first architecture.
+The recommended way to deploy crocbot to production servers is via **[crocbot-ansible](https://github.com/crocbot/crocbot-ansible)** — an automated installer with security-first architecture.
 
 ## Quick Start
 
 One-command install:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/moltbot/moltbot-ansible/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/crocbot/crocbot-ansible/main/install.sh | bash
 ```
 
-> **📦 Full guide: [github.com/moltbot/moltbot-ansible](https://github.com/moltbot/moltbot-ansible)**
+> **📦 Full guide: [github.com/crocbot/crocbot-ansible](https://github.com/crocbot/crocbot-ansible)**
 >
-> The moltbot-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
+> The crocbot-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
 
 ## What You Get
 
@@ -46,22 +46,22 @@ The Ansible playbook installs and configures:
 2. **UFW firewall** (SSH + Tailscale ports only)
 3. **Docker CE + Compose V2** (for agent sandboxes)
 4. **Node.js 22.x + pnpm** (runtime dependencies)
-5. **Moltbot** (host-based, not containerized)
+5. **crocbot** (host-based, not containerized)
 6. **Systemd service** (auto-start with security hardening)
 
 Note: The gateway runs **directly on the host** (not in Docker), but agent sandboxes use Docker for isolation. See [Sandboxing](/gateway/sandboxing) for details.
 
 ## Post-Install Setup
 
-After installation completes, switch to the moltbot user:
+After installation completes, switch to the crocbot user:
 
 ```bash
-sudo -i -u moltbot
+sudo -i -u crocbot
 ```
 
 The post-install script will guide you through:
 
-1. **Onboarding wizard**: Configure Moltbot settings
+1. **Onboarding wizard**: Configure crocbot settings
 2. **Provider login**: Connect WhatsApp/Telegram/Discord/Signal
 3. **Gateway testing**: Verify the installation
 4. **Tailscale setup**: Connect to your VPN mesh
@@ -70,17 +70,17 @@ The post-install script will guide you through:
 
 ```bash
 # Check service status
-sudo systemctl status moltbot
+sudo systemctl status crocbot
 
 # View live logs
-sudo journalctl -u moltbot -f
+sudo journalctl -u crocbot -f
 
 # Restart gateway
-sudo systemctl restart moltbot
+sudo systemctl restart crocbot
 
-# Provider login (run as moltbot user)
-sudo -i -u moltbot
-moltbot channels login
+# Provider login (run as crocbot user)
+sudo -i -u crocbot
+crocbot channels login
 ```
 
 ## Security Architecture
@@ -117,8 +117,8 @@ If you prefer manual control over the automation:
 sudo apt update && sudo apt install -y ansible git
 
 # 2. Clone repository
-git clone https://github.com/moltbot/moltbot-ansible.git
-cd moltbot-ansible
+git clone https://github.com/crocbot/crocbot-ansible.git
+cd crocbot-ansible
 
 # 3. Install Ansible collections
 ansible-galaxy collection install -r requirements.yml
@@ -126,18 +126,18 @@ ansible-galaxy collection install -r requirements.yml
 # 4. Run playbook
 ./run-playbook.sh
 
-# Or run directly (then manually execute /tmp/moltbot-setup.sh after)
+# Or run directly (then manually execute /tmp/crocbot-setup.sh after)
 # ansible-playbook playbook.yml --ask-become-pass
 ```
 
-## Updating Moltbot
+## Updating crocbot
 
-The Ansible installer sets up Moltbot for manual updates. See [Updating](/install/updating) for the standard update flow.
+The Ansible installer sets up crocbot for manual updates. See [Updating](/install/updating) for the standard update flow.
 
 To re-run the Ansible playbook (e.g., for configuration changes):
 
 ```bash
-cd moltbot-ansible
+cd crocbot-ansible
 ./run-playbook.sh
 ```
 
@@ -156,14 +156,14 @@ If you're locked out:
 
 ```bash
 # Check logs
-sudo journalctl -u moltbot -n 100
+sudo journalctl -u crocbot -n 100
 
 # Verify permissions
-sudo ls -la /opt/moltbot
+sudo ls -la /opt/crocbot
 
 # Test manual start
-sudo -i -u moltbot
-cd ~/moltbot
+sudo -i -u crocbot
+cd ~/crocbot
 pnpm start
 ```
 
@@ -174,32 +174,32 @@ pnpm start
 sudo systemctl status docker
 
 # Check sandbox image
-sudo docker images | grep moltbot-sandbox
+sudo docker images | grep crocbot-sandbox
 
 # Build sandbox image if missing
-cd /opt/moltbot/moltbot
-sudo -u moltbot ./scripts/sandbox-setup.sh
+cd /opt/crocbot/crocbot
+sudo -u crocbot ./scripts/sandbox-setup.sh
 ```
 
 ### Provider login fails
 
-Make sure you're running as the `moltbot` user:
+Make sure you're running as the `crocbot` user:
 
 ```bash
-sudo -i -u moltbot
-moltbot channels login
+sudo -i -u crocbot
+crocbot channels login
 ```
 
 ## Advanced Configuration
 
 For detailed security architecture and troubleshooting:
-- [Security Architecture](https://github.com/moltbot/moltbot-ansible/blob/main/docs/security.md)
-- [Technical Details](https://github.com/moltbot/moltbot-ansible/blob/main/docs/architecture.md)
-- [Troubleshooting Guide](https://github.com/moltbot/moltbot-ansible/blob/main/docs/troubleshooting.md)
+- [Security Architecture](https://github.com/crocbot/crocbot-ansible/blob/main/docs/security.md)
+- [Technical Details](https://github.com/crocbot/crocbot-ansible/blob/main/docs/architecture.md)
+- [Troubleshooting Guide](https://github.com/crocbot/crocbot-ansible/blob/main/docs/troubleshooting.md)
 
 ## Related
 
-- [moltbot-ansible](https://github.com/moltbot/moltbot-ansible) — full deployment guide
+- [crocbot-ansible](https://github.com/crocbot/crocbot-ansible) — full deployment guide
 - [Docker](/install/docker) — containerized gateway setup
 - [Sandboxing](/gateway/sandboxing) — agent sandbox configuration
 - [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) — per-agent isolation

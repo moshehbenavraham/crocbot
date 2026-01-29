@@ -110,7 +110,7 @@ enum TestIsolation {
 
     nonisolated static func tempConfigPath() -> String {
         FileManager().temporaryDirectory
-            .appendingPathComponent("moltbot-test-config-\(UUID().uuidString).json")
+            .appendingPathComponent("crocbot-test-config-\(UUID().uuidString).json")
             .path
     }
 }

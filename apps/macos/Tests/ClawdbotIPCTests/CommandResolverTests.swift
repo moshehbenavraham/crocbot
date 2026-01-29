@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized) struct CommandResolverTests {
     private func makeDefaults() -> UserDefaults {
@@ -24,18 +24,18 @@ import Testing
         try FileManager().setAttributes([.posixPermissions: 0o755], ofItemAtPath: path.path)
     }
 
-    @Test func prefersMoltbotBinary() async throws {
+    @Test func preferscrocbotBinary() async throws {
         let defaults = self.makeDefaults()
         defaults.set(AppState.ConnectionMode.local.rawValue, forKey: connectionModeKey)
 
         let tmp = try makeTempDir()
         CommandResolver.setProjectRoot(tmp.path)
 
-        let moltbotPath = tmp.appendingPathComponent("node_modules/.bin/moltbot")
-        try self.makeExec(at: moltbotPath)
+        let crocbotPath = tmp.appendingPathComponent("node_modules/.bin/crocbot")
+        try self.makeExec(at: crocbotPath)
 
         let cmd = CommandResolver.clawdbotCommand(subcommand: "gateway", defaults: defaults, configRoot: [:])
-        #expect(cmd.prefix(2).elementsEqual([moltbotPath.path, "gateway"]))
+        #expect(cmd.prefix(2).elementsEqual([crocbotPath.path, "gateway"]))
     }
 
     @Test func fallsBackToNodeAndScript() async throws {
@@ -46,7 +46,7 @@ import Testing
         CommandResolver.setProjectRoot(tmp.path)
 
         let nodePath = tmp.appendingPathComponent("node_modules/.bin/node")
-        let scriptPath = tmp.appendingPathComponent("bin/moltbot.js")
+        let scriptPath = tmp.appendingPathComponent("bin/crocbot.js")
         try self.makeExec(at: nodePath)
         try "#!/bin/sh\necho v22.0.0\n".write(to: nodePath, atomically: true, encoding: .utf8)
         try FileManager().setAttributes([.posixPermissions: 0o755], ofItemAtPath: nodePath.path)
@@ -78,7 +78,7 @@ import Testing
 
         let cmd = CommandResolver.clawdbotCommand(subcommand: "rpc", defaults: defaults, configRoot: [:])
 
-        #expect(cmd.prefix(4).elementsEqual([pnpmPath.path, "--silent", "moltbot", "rpc"]))
+        #expect(cmd.prefix(4).elementsEqual([pnpmPath.path, "--silent", "crocbot", "rpc"]))
     }
 
     @Test func pnpmKeepsExtraArgsAfterSubcommand() async throws {
@@ -97,7 +97,7 @@ import Testing
             defaults: defaults,
             configRoot: [:])
 
-        #expect(cmd.prefix(5).elementsEqual([pnpmPath.path, "--silent", "moltbot", "health", "--json"]))
+        #expect(cmd.prefix(5).elementsEqual([pnpmPath.path, "--silent", "crocbot", "health", "--json"]))
         #expect(cmd.suffix(2).elementsEqual(["--timeout", "5"]))
     }
 
@@ -114,7 +114,7 @@ import Testing
         defaults.set(AppState.ConnectionMode.remote.rawValue, forKey: connectionModeKey)
         defaults.set("clawd@example.com:2222", forKey: remoteTargetKey)
         defaults.set("/tmp/id_ed25519", forKey: remoteIdentityKey)
-        defaults.set("/srv/moltbot", forKey: remoteProjectRootKey)
+        defaults.set("/srv/crocbot", forKey: remoteProjectRootKey)
 
         let cmd = CommandResolver.clawdbotCommand(
             subcommand: "status",
@@ -131,9 +131,9 @@ import Testing
         #expect(cmd.contains("-i"))
         #expect(cmd.contains("/tmp/id_ed25519"))
         if let script = cmd.last {
-            #expect(script.contains("PRJ='/srv/moltbot'"))
+            #expect(script.contains("PRJ='/srv/crocbot'"))
             #expect(script.contains("cd \"$PRJ\""))
-            #expect(script.contains("moltbot"))
+            #expect(script.contains("crocbot"))
             #expect(script.contains("status"))
             #expect(script.contains("--json"))
             #expect(script.contains("CLI="))
@@ -154,15 +154,15 @@ import Testing
         let tmp = try makeTempDir()
         CommandResolver.setProjectRoot(tmp.path)
 
-        let moltbotPath = tmp.appendingPathComponent("node_modules/.bin/moltbot")
-        try self.makeExec(at: moltbotPath)
+        let crocbotPath = tmp.appendingPathComponent("node_modules/.bin/crocbot")
+        try self.makeExec(at: crocbotPath)
 
         let cmd = CommandResolver.clawdbotCommand(
             subcommand: "daemon",
             defaults: defaults,
             configRoot: ["gateway": ["mode": "local"]])
 
-        #expect(cmd.first == moltbotPath.path)
+        #expect(cmd.first == crocbotPath.path)
         #expect(cmd.count >= 2)
         if cmd.count >= 2 {
             #expect(cmd[1] == "daemon")

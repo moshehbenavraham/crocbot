@@ -1,55 +1,55 @@
 ---
-summary: "CLI reference for `moltbot devices` (device pairing + token rotation/revocation)"
+summary: "CLI reference for `crocbot devices` (device pairing + token rotation/revocation)"
 read_when:
   - You are approving device pairing requests
   - You need to rotate or revoke device tokens
 ---
 
-# `moltbot devices`
+# `crocbot devices`
 
 Manage device pairing requests and device-scoped tokens.
 
 ## Commands
 
-### `moltbot devices list`
+### `crocbot devices list`
 
 List pending pairing requests and paired devices.
 
 ```
-moltbot devices list
-moltbot devices list --json
+crocbot devices list
+crocbot devices list --json
 ```
 
-### `moltbot devices approve <requestId>`
+### `crocbot devices approve <requestId>`
 
 Approve a pending device pairing request.
 
 ```
-moltbot devices approve <requestId>
+crocbot devices approve <requestId>
 ```
 
-### `moltbot devices reject <requestId>`
+### `crocbot devices reject <requestId>`
 
 Reject a pending device pairing request.
 
 ```
-moltbot devices reject <requestId>
+crocbot devices reject <requestId>
 ```
 
-### `moltbot devices rotate --device <id> --role <role> [--scope <scope...>]`
+### `crocbot devices rotate --device <id> --role <role> [--scope <scope...>]`
 
 Rotate a device token for a specific role (optionally updating scopes).
 
 ```
-moltbot devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
+crocbot devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
-### `moltbot devices revoke --device <id> --role <role>`
+### `crocbot devices revoke --device <id> --role <role>`
 
 Revoke a device token for a specific role.
 
 ```
-moltbot devices revoke --device <deviceId> --role node
+crocbot devices revoke --device <deviceId> --role node
 ```
 
 ## Common options

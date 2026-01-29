@@ -1,4 +1,4 @@
-import MoltbotProtocol
+import crocbotProtocol
 
 /// Server-push messages from the gateway websocket.
 ///

@@ -19,7 +19,7 @@ describe("config strict validation", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify({
           agents: { list: [{ id: "pi" }] },
           routing: { allowFrom: ["+15555550123"] },

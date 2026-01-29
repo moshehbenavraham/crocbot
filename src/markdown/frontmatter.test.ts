@@ -22,7 +22,7 @@ description: |
 name: session-memory
 metadata:
   {
-    "moltbot":
+    "crocbot":
       {
         "emoji": "disk",
         "events": ["command:new"],
@@ -33,18 +33,18 @@ metadata:
     const result = parseFrontmatterBlock(content);
     expect(result.metadata).toBeDefined();
 
-    const parsed = JSON5.parse(result.metadata ?? "") as { moltbot?: { emoji?: string } };
-    expect(parsed.moltbot?.emoji).toBe("disk");
+    const parsed = JSON5.parse(result.metadata ?? "") as { crocbot?: { emoji?: string } };
+    expect(parsed.crocbot?.emoji).toBe("disk");
   });
 
   it("preserves inline JSON values", () => {
     const content = `---
 name: inline-json
-metadata: {"moltbot": {"events": ["test"]}}
+metadata: {"crocbot": {"events": ["test"]}}
 ---
 `;
     const result = parseFrontmatterBlock(content);
-    expect(result.metadata).toBe('{"moltbot": {"events": ["test"]}}');
+    expect(result.metadata).toBe('{"crocbot": {"events": ["test"]}}');
   });
 
   it("stringifies YAML objects and arrays", () => {
@@ -56,7 +56,7 @@ tags:
   - alpha
   - beta
 metadata:
-  moltbot:
+  crocbot:
     events:
       - command:new
 ---
@@ -65,8 +65,8 @@ metadata:
     expect(result.enabled).toBe("true");
     expect(result.retries).toBe("3");
     expect(JSON.parse(result.tags ?? "[]")).toEqual(["alpha", "beta"]);
-    const parsed = JSON5.parse(result.metadata ?? "") as { moltbot?: { events?: string[] } };
-    expect(parsed.moltbot?.events).toEqual(["command:new"]);
+    const parsed = JSON5.parse(result.metadata ?? "") as { crocbot?: { events?: string[] } };
+    expect(parsed.crocbot?.events).toEqual(["command:new"]);
   });
 
   it("returns empty when frontmatter is missing", () => {

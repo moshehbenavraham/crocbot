@@ -1,11 +1,11 @@
-import MoltbotKit
+import crocbotKit
 import Foundation
 import Testing
 
 @Suite struct CanvasSnapshotFormatTests {
     @Test func acceptsJpgAlias() throws {
         struct Wrapper: Codable {
-            var format: MoltbotCanvasSnapshotFormat
+            var format: crocbotCanvasSnapshotFormat
         }
 
         let data = try #require("{\"format\":\"jpg\"}".data(using: .utf8))

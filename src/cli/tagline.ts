@@ -1,4 +1,4 @@
-const DEFAULT_TAGLINE = "All your chats, one Moltbot.";
+const DEFAULT_TAGLINE = "All your chats, one crocbot.";
 
 const HOLIDAY_TAGLINES = {
   newYear:

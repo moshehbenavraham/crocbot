@@ -1,9 +1,9 @@
 import fs from "node:fs";
 
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import { resolveUserPath } from "../utils.js";
 import { normalizePluginsConfig, type NormalizedPluginsConfig } from "./config-state.js";
-import { discoverMoltbotPlugins, type PluginCandidate } from "./discovery.js";
+import { discovercrocbotPlugins, type PluginCandidate } from "./discovery.js";
 import { loadPluginManifest, type PluginManifest } from "./manifest.js";
 import type { PluginConfigUiHint, PluginDiagnostic, PluginKind, PluginOrigin } from "./types.js";
 
@@ -100,7 +100,7 @@ function buildRecord(params: {
 }
 
 export function loadPluginManifestRegistry(params: {
-  config?: MoltbotConfig;
+  config?: crocbotConfig;
   workspaceDir?: string;
   cache?: boolean;
   env?: NodeJS.ProcessEnv;
@@ -122,7 +122,7 @@ export function loadPluginManifestRegistry(params: {
         candidates: params.candidates,
         diagnostics: params.diagnostics ?? [],
       }
-    : discoverMoltbotPlugins({
+    : discovercrocbotPlugins({
         workspaceDir: params.workspaceDir,
         extraPaths: normalized.loadPaths,
       });

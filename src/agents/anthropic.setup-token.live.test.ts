@@ -12,7 +12,7 @@ import {
   validateAnthropicSetupToken,
 } from "../commands/auth-token.js";
 import { loadConfig } from "../config/config.js";
-import { resolveMoltbotAgentDir } from "./agent-paths.js";
+import { resolvecrocbotAgentDir } from "./agent-paths.js";
 import {
   type AuthProfileCredential,
   ensureAuthProfileStore,
@@ -20,7 +20,7 @@ import {
 } from "./auth-profiles.js";
 import { getApiKeyForModel, requireApiKey } from "./model-auth.js";
 import { normalizeProviderId, parseModelRef } from "./model-selection.js";
-import { ensureMoltbotModelsJson } from "./models-config.js";
+import { ensurecrocbotModelsJson } from "./models-config.js";
 
 const LIVE = isTruthyEnvValue(process.env.LIVE) || isTruthyEnvValue(process.env.CLAWDBOT_LIVE_TEST);
 const SETUP_TOKEN_RAW = process.env.CLAWDBOT_LIVE_SETUP_TOKEN?.trim() ?? "";
@@ -70,7 +70,7 @@ async function resolveTokenSource(): Promise<TokenSource> {
     if (error) {
       throw new Error(`Invalid setup-token: ${error}`);
     }
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "moltbot-setup-token-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-setup-token-"));
     const profileId = `anthropic:setup-token-live-${randomUUID()}`;
     const store = ensureAuthProfileStore(tempDir, {
       allowKeychainPrompt: false,
@@ -90,7 +90,7 @@ async function resolveTokenSource(): Promise<TokenSource> {
     };
   }
 
-  const agentDir = resolveMoltbotAgentDir();
+  const agentDir = resolvecrocbotAgentDir();
   const store = ensureAuthProfileStore(agentDir, {
     allowKeychainPrompt: false,
   });
@@ -153,7 +153,7 @@ describeLive("live anthropic setup-token", () => {
       const tokenSource = await resolveTokenSource();
       try {
         const cfg = loadConfig();
-        await ensureMoltbotModelsJson(cfg, tokenSource.agentDir);
+        await ensurecrocbotModelsJson(cfg, tokenSource.agentDir);
 
         const authStorage = discoverAuthStorage(tokenSource.agentDir);
         const modelRegistry = discoverModels(authStorage, tokenSource.agentDir);

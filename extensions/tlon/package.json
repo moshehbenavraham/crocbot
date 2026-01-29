@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/tlon",
+  "name": "@crocbot/tlon",
   "version": "2026.1.26",
   "type": "module",
-  "description": "Moltbot Tlon/Urbit channel plugin",
-  "moltbot": {
+  "description": "crocbot Tlon/Urbit channel plugin",
+  "crocbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -18,7 +18,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/tlon",
+      "npmSpec": "@crocbot/tlon",
       "localPath": "extensions/tlon",
       "defaultChoice": "npm"
     }

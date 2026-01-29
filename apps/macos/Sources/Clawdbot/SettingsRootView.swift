@@ -111,8 +111,8 @@ struct SettingsRootView: View {
 
     private var nixManagedBanner: some View {
         // Prefer gateway-resolved paths; fall back to local env defaults if disconnected.
-        let configPath = self.snapshotPaths.configPath ?? MoltbotPaths.configURL.path
-        let stateDir = self.snapshotPaths.stateDir ?? MoltbotPaths.stateDirURL.path
+        let configPath = self.snapshotPaths.configPath ?? crocbotPaths.configURL.path
+        let stateDir = self.snapshotPaths.stateDir ?? crocbotPaths.stateDirURL.path
 
         return VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
@@ -227,7 +227,7 @@ enum SettingsTabRouter {
 }
 
 extension Notification.Name {
-    static let moltbotSelectSettingsTab = Notification.Name("moltbotSelectSettingsTab")
+    static let crocbotSelectSettingsTab = Notification.Name("crocbotSelectSettingsTab")
 }
 
 #if DEBUG

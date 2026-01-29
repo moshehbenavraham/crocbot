@@ -1,5 +1,5 @@
 ---
-summary: "Run Moltbot Gateway on exe.dev (VM + HTTPS proxy) for remote access"
+summary: "Run crocbot Gateway on exe.dev (VM + HTTPS proxy) for remote access"
 read_when:
   - You want a cheap always-on Linux host for the Gateway
   - You want remote Control UI access without running your own VPS
@@ -7,7 +7,7 @@ read_when:
 
 # exe.dev
 
-Goal: Moltbot Gateway running on an exe.dev VM, reachable from your laptop via:
+Goal: crocbot Gateway running on an exe.dev VM, reachable from your laptop via:
 - **exe.dev HTTPS proxy** (easy, no tunnel) or
 - **SSH tunnel** (most secure; loopback-only Gateway)
 
@@ -17,8 +17,8 @@ If you’re on any other Linux VPS, the same steps apply — you just won’t us
 
 ## Beginner quick path
 
-1) Create VM → install Node 22 → install Moltbot  
-2) Run `moltbot onboard --install-daemon`  
+1) Create VM → install Node 22 → install crocbot  
+2) Run `crocbot onboard --install-daemon`  
 3) Tunnel from laptop (`ssh -N -L 18789:127.0.0.1:18789 …`)  
 4) Open `http://127.0.0.1:18789/` and paste your token
 
@@ -34,16 +34,16 @@ If you’re on any other Linux VPS, the same steps apply — you just won’t us
 From your laptop:
 
 ```bash
-ssh exe.dev new --name=moltbot
+ssh exe.dev new --name=crocbot
 ```
 
 Then connect:
 
 ```bash
-ssh moltbot.exe.xyz
+ssh crocbot.exe.xyz
 ```
 
-Tip: keep this VM **stateful**. Moltbot stores state under `~/.clawdbot/` and `~/clawd/`.
+Tip: keep this VM **stateful**. crocbot stores state under `~/.clawdbot/` and `~/clawd/`.
 
 ## 2) Install prerequisites (on the VM)
 
@@ -69,13 +69,13 @@ curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-## 3) Install Moltbot
+## 3) Install crocbot
 
 Recommended on servers: npm global install.
 
 ```bash
-npm i -g moltbot@latest
-moltbot --version
+npm i -g crocbot@latest
+crocbot --version
 ```
 
 If native deps fail to install (rare; usually `sharp`), add build tools:
@@ -89,12 +89,12 @@ sudo apt-get install -y build-essential python3
 Run the onboarding wizard on the VM:
 
 ```bash
-moltbot onboard --install-daemon
+crocbot onboard --install-daemon
 ```
 
 It can set up:
 - `~/clawd` workspace bootstrap
-- `~/.clawdbot/moltbot.json` config
+- `~/.clawdbot/crocbot.json` config
 - model auth profiles
 - model provider config/login
 - Linux systemd **user** service (service)
@@ -108,7 +108,7 @@ If you’re doing OAuth on a headless VM: do OAuth on a normal machine first, th
 Keep Gateway on loopback (default) and tunnel it from your laptop:
 
 ```bash
-ssh -N -L 18789:127.0.0.1:18789 moltbot.exe.xyz
+ssh -N -L 18789:127.0.0.1:18789 crocbot.exe.xyz
 ```
 
 Open locally:
@@ -122,10 +122,10 @@ To let exe.dev proxy traffic to the VM, bind the Gateway to the LAN interface an
 
 ```bash
 export CLAWDBOT_GATEWAY_TOKEN="$(openssl rand -hex 32)"
-moltbot gateway --bind lan --port 8080 --token "$CLAWDBOT_GATEWAY_TOKEN"
+crocbot gateway --bind lan --port 8080 --token "$CLAWDBOT_GATEWAY_TOKEN"
 ```
 
-For service runs, persist it in `~/.clawdbot/moltbot.json`:
+For service runs, persist it in `~/.clawdbot/crocbot.json`:
 
 ```json5
 {
@@ -145,11 +145,11 @@ Notes:
 Then point exe.dev’s proxy at `8080` (or whatever port you chose) and open your VM’s HTTPS URL:
 
 ```bash
-ssh exe.dev share port moltbot 8080
+ssh exe.dev share port crocbot 8080
 ```
 
 Open:
-- `https://moltbot.exe.xyz/`
+- `https://crocbot.exe.xyz/`
 
 In the Control UI, paste the token (UI → Settings → token). The UI sends it as `connect.params.auth.token`.
 
@@ -161,10 +161,10 @@ Control UI details: [Control UI](/web/control-ui)
 
 ## 6) Keep it running (service)
 
-On Linux, Moltbot uses a systemd **user** service. After `--install-daemon`, verify:
+On Linux, crocbot uses a systemd **user** service. After `--install-daemon`, verify:
 
 ```bash
-systemctl --user status moltbot-gateway[-<profile>].service
+systemctl --user status crocbot-gateway[-<profile>].service
 ```
 
 If the service dies after logout, enable lingering:
@@ -178,10 +178,10 @@ More: [Linux](/platforms/linux)
 ## 7) Updates
 
 ```bash
-npm i -g moltbot@latest
-moltbot doctor
-moltbot gateway restart
-moltbot health
+npm i -g crocbot@latest
+crocbot doctor
+crocbot gateway restart
+crocbot health
 ```
 
 Guide: [Updating](/install/updating)

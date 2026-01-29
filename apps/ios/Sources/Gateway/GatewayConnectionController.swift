@@ -1,4 +1,4 @@
-import MoltbotKit
+import crocbotKit
 import Darwin
 import Foundation
 import Network
@@ -283,7 +283,7 @@ final class GatewayConnectionController {
             caps: self.currentCaps(),
             commands: self.currentCommands(),
             permissions: [:],
-            clientId: "moltbot-ios",
+            clientId: "crocbot-ios",
             clientMode: "node",
             clientDisplayName: displayName)
     }
@@ -304,51 +304,51 @@ final class GatewayConnectionController {
     }
 
     private func currentCaps() -> [String] {
-        var caps = [MoltbotCapability.canvas.rawValue, MoltbotCapability.screen.rawValue]
+        var caps = [crocbotCapability.canvas.rawValue, crocbotCapability.screen.rawValue]
 
         // Default-on: if the key doesn't exist yet, treat it as enabled.
         let cameraEnabled =
             UserDefaults.standard.object(forKey: "camera.enabled") == nil
                 ? true
                 : UserDefaults.standard.bool(forKey: "camera.enabled")
-        if cameraEnabled { caps.append(MoltbotCapability.camera.rawValue) }
+        if cameraEnabled { caps.append(crocbotCapability.camera.rawValue) }
 
         let voiceWakeEnabled = UserDefaults.standard.bool(forKey: VoiceWakePreferences.enabledKey)
-        if voiceWakeEnabled { caps.append(MoltbotCapability.voiceWake.rawValue) }
+        if voiceWakeEnabled { caps.append(crocbotCapability.voiceWake.rawValue) }
 
         let locationModeRaw = UserDefaults.standard.string(forKey: "location.enabledMode") ?? "off"
-        let locationMode = MoltbotLocationMode(rawValue: locationModeRaw) ?? .off
-        if locationMode != .off { caps.append(MoltbotCapability.location.rawValue) }
+        let locationMode = crocbotLocationMode(rawValue: locationModeRaw) ?? .off
+        if locationMode != .off { caps.append(crocbotCapability.location.rawValue) }
 
         return caps
     }
 
     private func currentCommands() -> [String] {
         var commands: [String] = [
-            MoltbotCanvasCommand.present.rawValue,
-            MoltbotCanvasCommand.hide.rawValue,
-            MoltbotCanvasCommand.navigate.rawValue,
-            MoltbotCanvasCommand.evalJS.rawValue,
-            MoltbotCanvasCommand.snapshot.rawValue,
-            MoltbotCanvasA2UICommand.push.rawValue,
-            MoltbotCanvasA2UICommand.pushJSONL.rawValue,
-            MoltbotCanvasA2UICommand.reset.rawValue,
-            MoltbotScreenCommand.record.rawValue,
-            MoltbotSystemCommand.notify.rawValue,
-            MoltbotSystemCommand.which.rawValue,
-            MoltbotSystemCommand.run.rawValue,
-            MoltbotSystemCommand.execApprovalsGet.rawValue,
-            MoltbotSystemCommand.execApprovalsSet.rawValue,
+            crocbotCanvasCommand.present.rawValue,
+            crocbotCanvasCommand.hide.rawValue,
+            crocbotCanvasCommand.navigate.rawValue,
+            crocbotCanvasCommand.evalJS.rawValue,
+            crocbotCanvasCommand.snapshot.rawValue,
+            crocbotCanvasA2UICommand.push.rawValue,
+            crocbotCanvasA2UICommand.pushJSONL.rawValue,
+            crocbotCanvasA2UICommand.reset.rawValue,
+            crocbotScreenCommand.record.rawValue,
+            crocbotSystemCommand.notify.rawValue,
+            crocbotSystemCommand.which.rawValue,
+            crocbotSystemCommand.run.rawValue,
+            crocbotSystemCommand.execApprovalsGet.rawValue,
+            crocbotSystemCommand.execApprovalsSet.rawValue,
         ]
 
         let caps = Set(self.currentCaps())
-        if caps.contains(MoltbotCapability.camera.rawValue) {
-            commands.append(MoltbotCameraCommand.list.rawValue)
-            commands.append(MoltbotCameraCommand.snap.rawValue)
-            commands.append(MoltbotCameraCommand.clip.rawValue)
+        if caps.contains(crocbotCapability.camera.rawValue) {
+            commands.append(crocbotCameraCommand.list.rawValue)
+            commands.append(crocbotCameraCommand.snap.rawValue)
+            commands.append(crocbotCameraCommand.clip.rawValue)
         }
-        if caps.contains(MoltbotCapability.location.rawValue) {
-            commands.append(MoltbotLocationCommand.get.rawValue)
+        if caps.contains(crocbotCapability.location.rawValue) {
+            commands.append(crocbotLocationCommand.get.rawValue)
         }
 
         return commands

@@ -1,6 +1,6 @@
-import MoltbotProtocol
+import crocbotProtocol
 import Testing
-@testable import Moltbot
+@testable import crocbot
 
 @Suite(.serialized)
 @MainActor
@@ -12,7 +12,7 @@ struct SkillsSettingsSmokeTests {
             SkillStatus(
                 name: "Needs Setup",
                 description: "Missing bins and env",
-                source: "moltbot-managed",
+                source: "crocbot-managed",
                 filePath: "/tmp/skills/needs-setup",
                 baseDir: "/tmp/skills",
                 skillKey: "needs-setup",
@@ -39,7 +39,7 @@ struct SkillsSettingsSmokeTests {
             SkillStatus(
                 name: "Ready Skill",
                 description: "All set",
-                source: "moltbot-bundled",
+                source: "crocbot-bundled",
                 filePath: "/tmp/skills/ready",
                 baseDir: "/tmp/skills",
                 skillKey: "ready",
@@ -59,7 +59,7 @@ struct SkillsSettingsSmokeTests {
             SkillStatus(
                 name: "Disabled Skill",
                 description: "Disabled in config",
-                source: "moltbot-extra",
+                source: "crocbot-extra",
                 filePath: "/tmp/skills/disabled",
                 baseDir: "/tmp/skills",
                 skillKey: "disabled",
@@ -90,7 +90,7 @@ struct SkillsSettingsSmokeTests {
             SkillStatus(
                 name: "Local Skill",
                 description: "Local ready",
-                source: "moltbot-workspace",
+                source: "crocbot-workspace",
                 filePath: "/tmp/skills/local",
                 baseDir: "/tmp/skills",
                 skillKey: "local",

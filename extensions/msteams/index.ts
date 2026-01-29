@@ -1,4 +1,4 @@
-import type { MoltbotPluginApi } from "clawdbot/plugin-sdk";
+import type { crocbotPluginApi } from "clawdbot/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
 
 import { msteamsPlugin } from "./src/channel.js";
@@ -9,7 +9,7 @@ const plugin = {
   name: "Microsoft Teams",
   description: "Microsoft Teams channel plugin (Bot Framework)",
   configSchema: emptyPluginConfigSchema(),
-  register(api: MoltbotPluginApi) {
+  register(api: crocbotPluginApi) {
     setMSTeamsRuntime(api.runtime);
     api.registerChannel({ plugin: msteamsPlugin });
   },

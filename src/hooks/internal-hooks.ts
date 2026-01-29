@@ -1,19 +1,19 @@
 /**
- * Hook system for moltbot agent events
+ * Hook system for crocbot agent events
  *
  * Provides an extensible event-driven hook system for agent events
  * like command processing, session lifecycle, etc.
  */
 
 import type { WorkspaceBootstrapFile } from "../agents/workspace.js";
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 
 export type InternalHookEventType = "command" | "session" | "agent" | "gateway";
 
 export type AgentBootstrapHookContext = {
   workspaceDir: string;
   bootstrapFiles: WorkspaceBootstrapFile[];
-  cfg?: MoltbotConfig;
+  cfg?: crocbotConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;

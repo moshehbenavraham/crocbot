@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import {
   CONTEXT_WINDOW_HARD_MIN_TOKENS,
   CONTEXT_WINDOW_WARN_BELOW_TOKENS,
@@ -72,7 +72,7 @@ describe("context-window-guard", () => {
           },
         },
       },
-    } satisfies MoltbotConfig;
+    } satisfies crocbotConfig;
 
     const info = resolveContextWindowInfo({
       cfg,
@@ -89,7 +89,7 @@ describe("context-window-guard", () => {
   it("falls back to agents.defaults.contextTokens", () => {
     const cfg = {
       agents: { defaults: { contextTokens: 20_000 } },
-    } satisfies MoltbotConfig;
+    } satisfies crocbotConfig;
     const info = resolveContextWindowInfo({
       cfg,
       provider: "anthropic",

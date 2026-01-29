@@ -1,4 +1,4 @@
-import type { MoltbotPluginApi } from "clawdbot/plugin-sdk";
+import type { crocbotPluginApi } from "clawdbot/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
 
 const memoryCorePlugin = {
@@ -7,7 +7,7 @@ const memoryCorePlugin = {
   description: "File-backed memory search tools and CLI",
   kind: "memory",
   configSchema: emptyPluginConfigSchema(),
-  register(api: MoltbotPluginApi) {
+  register(api: crocbotPluginApi) {
     api.registerTool(
       (ctx) => {
         const memorySearchTool = api.runtime.tools.createMemorySearchTool({

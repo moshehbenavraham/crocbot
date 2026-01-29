@@ -1,6 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import type { MoltbotConfig } from "./types.js";
+import type { crocbotConfig } from "./types.js";
 
 /**
  * Nix mode detection: When CLAWDBOT_NIX_MODE=1, the gateway is running under Nix.
@@ -16,8 +16,8 @@ export function resolveIsNixMode(env: NodeJS.ProcessEnv = process.env): boolean 
 export const isNixMode = resolveIsNixMode();
 
 const LEGACY_STATE_DIRNAME = ".clawdbot";
-const NEW_STATE_DIRNAME = ".moltbot";
-const CONFIG_FILENAME = "moltbot.json";
+const NEW_STATE_DIRNAME = ".crocbot";
+const CONFIG_FILENAME = "crocbot.json";
 
 function legacyStateDir(homedir: () => string = os.homedir): string {
   return path.join(homedir(), LEGACY_STATE_DIRNAME);
@@ -29,14 +29,14 @@ function newStateDir(homedir: () => string = os.homedir): string {
 
 /**
  * State directory for mutable data (sessions, logs, caches).
- * Can be overridden via MOLTBOT_STATE_DIR (preferred) or CLAWDBOT_STATE_DIR (legacy).
+ * Can be overridden via crocbot_STATE_DIR (preferred) or CLAWDBOT_STATE_DIR (legacy).
  * Default: ~/.clawdbot (legacy default for compatibility)
  */
 export function resolveStateDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const override = env.MOLTBOT_STATE_DIR?.trim() || env.CLAWDBOT_STATE_DIR?.trim();
+  const override = env.crocbot_STATE_DIR?.trim() || env.CLAWDBOT_STATE_DIR?.trim();
   if (override) return resolveUserPath(override);
   return legacyStateDir(homedir);
 }
@@ -55,14 +55,14 @@ export const STATE_DIR = resolveStateDir();
 
 /**
  * Config file path (JSON5).
- * Can be overridden via MOLTBOT_CONFIG_PATH (preferred) or CLAWDBOT_CONFIG_PATH (legacy).
- * Default: ~/.clawdbot/moltbot.json (or $*_STATE_DIR/moltbot.json)
+ * Can be overridden via crocbot_CONFIG_PATH (preferred) or CLAWDBOT_CONFIG_PATH (legacy).
+ * Default: ~/.clawdbot/crocbot.json (or $*_STATE_DIR/crocbot.json)
  */
 export function resolveConfigPath(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, os.homedir),
 ): string {
-  const override = env.MOLTBOT_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
+  const override = env.crocbot_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
   if (override) return resolveUserPath(override);
   return path.join(stateDir, CONFIG_FILENAME);
 }
@@ -77,13 +77,13 @@ export function resolveDefaultConfigCandidates(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string[] {
-  const explicit = env.MOLTBOT_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
+  const explicit = env.crocbot_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
   if (explicit) return [resolveUserPath(explicit)];
 
   const candidates: string[] = [];
-  const moltbotStateDir = env.MOLTBOT_STATE_DIR?.trim();
-  if (moltbotStateDir) {
-    candidates.push(path.join(resolveUserPath(moltbotStateDir), CONFIG_FILENAME));
+  const crocbotStateDir = env.crocbot_STATE_DIR?.trim();
+  if (crocbotStateDir) {
+    candidates.push(path.join(resolveUserPath(crocbotStateDir), CONFIG_FILENAME));
   }
   const legacyStateDirOverride = env.CLAWDBOT_STATE_DIR?.trim();
   if (legacyStateDirOverride) {
@@ -99,12 +99,12 @@ export const DEFAULT_GATEWAY_PORT = 18789;
 
 /**
  * Gateway lock directory (ephemeral).
- * Default: os.tmpdir()/moltbot-<uid> (uid suffix when available).
+ * Default: os.tmpdir()/crocbot-<uid> (uid suffix when available).
  */
 export function resolveGatewayLockDir(tmpdir: () => string = os.tmpdir): string {
   const base = tmpdir();
   const uid = typeof process.getuid === "function" ? process.getuid() : undefined;
-  const suffix = uid != null ? `moltbot-${uid}` : "moltbot";
+  const suffix = uid != null ? `crocbot-${uid}` : "crocbot";
   return path.join(base, suffix);
 }
 
@@ -135,7 +135,7 @@ export function resolveOAuthPath(
 }
 
 export function resolveGatewayPort(
-  cfg?: MoltbotConfig,
+  cfg?: crocbotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): number {
   const envRaw = env.CLAWDBOT_GATEWAY_PORT?.trim();

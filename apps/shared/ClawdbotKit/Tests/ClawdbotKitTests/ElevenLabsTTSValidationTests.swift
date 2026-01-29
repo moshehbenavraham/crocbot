@@ -1,5 +1,5 @@
 import XCTest
-@testable import MoltbotKit
+@testable import crocbotKit
 
 final class ElevenLabsTTSValidationTests: XCTestCase {
     func testValidatedOutputFormatAllowsOnlyMp3Presets() {

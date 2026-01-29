@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MoltbotCanvasNavigateParams: Codable, Sendable, Equatable {
+public struct crocbotCanvasNavigateParams: Codable, Sendable, Equatable {
     public var url: String
 
     public init(url: String) {
@@ -8,7 +8,7 @@ public struct MoltbotCanvasNavigateParams: Codable, Sendable, Equatable {
     }
 }
 
-public struct MoltbotCanvasPlacement: Codable, Sendable, Equatable {
+public struct crocbotCanvasPlacement: Codable, Sendable, Equatable {
     public var x: Double?
     public var y: Double?
     public var width: Double?
@@ -22,17 +22,17 @@ public struct MoltbotCanvasPlacement: Codable, Sendable, Equatable {
     }
 }
 
-public struct MoltbotCanvasPresentParams: Codable, Sendable, Equatable {
+public struct crocbotCanvasPresentParams: Codable, Sendable, Equatable {
     public var url: String?
-    public var placement: MoltbotCanvasPlacement?
+    public var placement: crocbotCanvasPlacement?
 
-    public init(url: String? = nil, placement: MoltbotCanvasPlacement? = nil) {
+    public init(url: String? = nil, placement: crocbotCanvasPlacement? = nil) {
         self.url = url
         self.placement = placement
     }
 }
 
-public struct MoltbotCanvasEvalParams: Codable, Sendable, Equatable {
+public struct crocbotCanvasEvalParams: Codable, Sendable, Equatable {
     public var javaScript: String
 
     public init(javaScript: String) {
@@ -40,7 +40,7 @@ public struct MoltbotCanvasEvalParams: Codable, Sendable, Equatable {
     }
 }
 
-public enum MoltbotCanvasSnapshotFormat: String, Codable, Sendable {
+public enum crocbotCanvasSnapshotFormat: String, Codable, Sendable {
     case png
     case jpeg
 
@@ -63,12 +63,12 @@ public enum MoltbotCanvasSnapshotFormat: String, Codable, Sendable {
     }
 }
 
-public struct MoltbotCanvasSnapshotParams: Codable, Sendable, Equatable {
+public struct crocbotCanvasSnapshotParams: Codable, Sendable, Equatable {
     public var maxWidth: Int?
     public var quality: Double?
-    public var format: MoltbotCanvasSnapshotFormat?
+    public var format: crocbotCanvasSnapshotFormat?
 
-    public init(maxWidth: Int? = nil, quality: Double? = nil, format: MoltbotCanvasSnapshotFormat? = nil) {
+    public init(maxWidth: Int? = nil, quality: Double? = nil, format: crocbotCanvasSnapshotFormat? = nil) {
         self.maxWidth = maxWidth
         self.quality = quality
         self.format = format

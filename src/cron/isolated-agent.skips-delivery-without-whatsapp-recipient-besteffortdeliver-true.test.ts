@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { withTempHome as withTempHomeBase } from "../../test/helpers/temp-home.js";
 import type { CliDeps } from "../cli/deps.js";
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createPluginRuntime } from "../plugins/runtime/index.js";
 import { createTestRegistry } from "../test-utils/channel-plugins.js";
@@ -31,7 +31,7 @@ import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import { runCronIsolatedAgentTurn } from "./isolated-agent.js";
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
-  return withTempHomeBase(fn, { prefix: "moltbot-cron-" });
+  return withTempHomeBase(fn, { prefix: "crocbot-cron-" });
 }
 
 async function writeSessionStore(home: string) {
@@ -60,9 +60,9 @@ async function writeSessionStore(home: string) {
 function makeCfg(
   home: string,
   storePath: string,
-  overrides: Partial<MoltbotConfig> = {},
-): MoltbotConfig {
-  const base: MoltbotConfig = {
+  overrides: Partial<crocbotConfig> = {},
+): crocbotConfig {
+  const base: crocbotConfig = {
     agents: {
       defaults: {
         model: "anthropic/claude-opus-4-5",
@@ -70,7 +70,7 @@ function makeCfg(
       },
     },
     session: { store: storePath, mainKey: "main" },
-  } as MoltbotConfig;
+  } as crocbotConfig;
   return { ...base, ...overrides };
 }
 

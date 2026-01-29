@@ -12,7 +12,7 @@ function readVersionFromPackageJson(): string | null {
   }
 }
 
-// Single source of truth for the current moltbot version.
+// Single source of truth for the current crocbot version.
 // - Embedded/bundled builds: injected define or env var.
 // - Dev/npm builds: package.json.
 export const VERSION =

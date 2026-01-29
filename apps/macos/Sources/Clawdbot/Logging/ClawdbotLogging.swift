@@ -52,14 +52,14 @@ enum AppLogLevel: String, CaseIterable, Identifiable {
     }
 }
 
-enum MoltbotLogging {
+enum crocbotLogging {
     private static let labelSeparator = "::"
 
     private static let didBootstrap: Void = {
         LoggingSystem.bootstrap { label in
             let (subsystem, category) = Self.parseLabel(label)
-            let osHandler = MoltbotOSLogHandler(subsystem: subsystem, category: category)
-            let fileHandler = MoltbotFileLogHandler(label: label)
+            let osHandler = crocbotOSLogHandler(subsystem: subsystem, category: category)
+            let fileHandler = crocbotFileLogHandler(label: label)
             return MultiplexLogHandler([osHandler, fileHandler])
         }
     }()
@@ -84,8 +84,8 @@ enum MoltbotLogging {
 
 extension Logging.Logger {
     init(subsystem: String, category: String) {
-        MoltbotLogging.bootstrapIfNeeded()
-        let label = MoltbotLogging.makeLabel(subsystem: subsystem, category: category)
+        crocbotLogging.bootstrapIfNeeded()
+        let label = crocbotLogging.makeLabel(subsystem: subsystem, category: category)
         self.init(label: label)
     }
 }
@@ -96,7 +96,7 @@ extension Logger.Message.StringInterpolation {
     }
 }
 
-struct MoltbotOSLogHandler: LogHandler {
+struct crocbotOSLogHandler: LogHandler {
     private let osLogger: os.Logger
     var metadata: Logger.Metadata = [:]
 
@@ -174,7 +174,7 @@ struct MoltbotOSLogHandler: LogHandler {
     }
 }
 
-struct MoltbotFileLogHandler: LogHandler {
+struct crocbotFileLogHandler: LogHandler {
     let label: String
     var metadata: Logger.Metadata = [:]
 
@@ -198,7 +198,7 @@ struct MoltbotFileLogHandler: LogHandler {
         line: UInt)
     {
         guard AppLogSettings.fileLoggingEnabled() else { return }
-        let (subsystem, category) = MoltbotLogging.parseLabel(self.label)
+        let (subsystem, category) = crocbotLogging.parseLabel(self.label)
         var fields: [String: String] = [
             "subsystem": subsystem,
             "category": category,

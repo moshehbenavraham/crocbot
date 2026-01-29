@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import { isDiagnosticFlagEnabled, resolveDiagnosticFlags } from "./diagnostic-flags.js";
 
 describe("diagnostic flags", () => {
   it("merges config + env flags", () => {
     const cfg = {
       diagnostics: { flags: ["telegram.http", "cache.*"] },
-    } as MoltbotConfig;
+    } as crocbotConfig;
     const env = {
       CLAWDBOT_DIAGNOSTICS: "foo,bar",
     } as NodeJS.ProcessEnv;

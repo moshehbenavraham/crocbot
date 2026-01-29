@@ -175,7 +175,7 @@ Disable cron entirely:
 
 One-shot reminder (UTC ISO, auto-delete after success):
 ```bash
-moltbot cron add \
+crocbot cron add \
   --name "Send reminder" \
   --at "2026-01-12T18:00:00Z" \
   --session main \
@@ -186,7 +186,7 @@ moltbot cron add \
 
 One-shot reminder (main session, wake immediately):
 ```bash
-moltbot cron add \
+crocbot cron add \
   --name "Calendar check" \
   --at "20m" \
   --session main \
@@ -196,7 +196,7 @@ moltbot cron add \
 
 Recurring isolated job (deliver to WhatsApp):
 ```bash
-moltbot cron add \
+crocbot cron add \
   --name "Morning status" \
   --cron "0 7 * * *" \
   --tz "America/Los_Angeles" \
@@ -209,7 +209,7 @@ moltbot cron add \
 
 Recurring isolated job (deliver to a Telegram topic):
 ```bash
-moltbot cron add \
+crocbot cron add \
   --name "Nightly summary (topic)" \
   --cron "0 22 * * *" \
   --tz "America/Los_Angeles" \
@@ -222,7 +222,7 @@ moltbot cron add \
 
 Isolated job with model and thinking override:
 ```bash
-moltbot cron add \
+crocbot cron add \
   --name "Deep analysis" \
   --cron "0 6 * * 1" \
   --tz "America/Los_Angeles" \
@@ -237,22 +237,22 @@ moltbot cron add \
 Agent selection (multi-agent setups):
 ```bash
 # Pin a job to agent "ops" (falls back to default if that agent is missing)
-moltbot cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
+crocbot cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
 
 # Switch or clear the agent on an existing job
-moltbot cron edit <jobId> --agent ops
-moltbot cron edit <jobId> --clear-agent
+crocbot cron edit <jobId> --agent ops
+crocbot cron edit <jobId> --clear-agent
 ```
 ```
 
 Manual run (debug):
 ```bash
-moltbot cron run <jobId> --force
+crocbot cron run <jobId> --force
 ```
 
 Edit an existing job (patch fields):
 ```bash
-moltbot cron edit <jobId> \
+crocbot cron edit <jobId> \
   --message "Updated prompt" \
   --model "opus" \
   --thinking low
@@ -260,18 +260,18 @@ moltbot cron edit <jobId> \
 
 Run history:
 ```bash
-moltbot cron runs --id <jobId> --limit 50
+crocbot cron runs --id <jobId> --limit 50
 ```
 
 Immediate system event without creating a job:
 ```bash
-moltbot system event --mode now --text "Next heartbeat: check battery."
+crocbot system event --mode now --text "Next heartbeat: check battery."
 ```
 
 ## Gateway API surface
 - `cron.list`, `cron.status`, `cron.add`, `cron.update`, `cron.remove`
 - `cron.run` (force or due), `cron.runs`
-For immediate system events without a job, use [`moltbot system event`](/cli/system).
+For immediate system events without a job, use [`crocbot system event`](/cli/system).
 
 ## Troubleshooting
 

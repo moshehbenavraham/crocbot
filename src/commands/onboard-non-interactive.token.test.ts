@@ -25,10 +25,10 @@ describe("onboard (non-interactive): token auth", () => {
     delete process.env.CLAWDBOT_GATEWAY_TOKEN;
     delete process.env.CLAWDBOT_GATEWAY_PASSWORD;
 
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "moltbot-onboard-token-"));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-onboard-token-"));
     process.env.HOME = tempHome;
     process.env.CLAWDBOT_STATE_DIR = tempHome;
-    process.env.CLAWDBOT_CONFIG_PATH = path.join(tempHome, "moltbot.json");
+    process.env.CLAWDBOT_CONFIG_PATH = path.join(tempHome, "crocbot.json");
     vi.resetModules();
 
     const token = `sk-ant-oat01-${"a".repeat(80)}`;

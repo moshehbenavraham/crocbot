@@ -1,7 +1,7 @@
 import CoreLocation
 import Testing
 
-@testable import Moltbot
+@testable import crocbot
 
 @Suite("PermissionManager Location")
 struct PermissionManagerLocationTests {

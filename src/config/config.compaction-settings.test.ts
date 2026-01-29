@@ -9,7 +9,7 @@ describe("config compaction settings", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify(
           {
             agents: {
@@ -51,7 +51,7 @@ describe("config compaction settings", () => {
       const configDir = path.join(home, ".clawdbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "moltbot.json"),
+        path.join(configDir, "crocbot.json"),
         JSON.stringify(
           {
             agents: {

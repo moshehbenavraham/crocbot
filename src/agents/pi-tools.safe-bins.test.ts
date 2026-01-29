@@ -2,9 +2,9 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { MoltbotConfig } from "../config/config.js";
+import type { crocbotConfig } from "../config/config.js";
 import type { ExecApprovalsResolved } from "../infra/exec-approvals.js";
-import { createMoltbotCodingTools } from "./pi-tools.js";
+import { createcrocbotCodingTools } from "./pi-tools.js";
 
 vi.mock("../infra/exec-approvals.js", async (importOriginal) => {
   const mod = await importOriginal<typeof import("../infra/exec-approvals.js")>();
@@ -40,12 +40,12 @@ vi.mock("../infra/exec-approvals.js", async (importOriginal) => {
   return { ...mod, resolveExecApprovals: () => approvals };
 });
 
-describe("createMoltbotCodingTools safeBins", () => {
+describe("createcrocbotCodingTools safeBins", () => {
   it("threads tools.exec.safeBins into exec allowlist checks", async () => {
     if (process.platform === "win32") return;
 
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "moltbot-safe-bins-"));
-    const cfg: MoltbotConfig = {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-safe-bins-"));
+    const cfg: crocbotConfig = {
       tools: {
         exec: {
           host: "gateway",
@@ -56,7 +56,7 @@ describe("createMoltbotCodingTools safeBins", () => {
       },
     };
 
-    const tools = createMoltbotCodingTools({
+    const tools = createcrocbotCodingTools({
       config: cfg,
       sessionKey: "agent:main:main",
       workspaceDir: tmpDir,

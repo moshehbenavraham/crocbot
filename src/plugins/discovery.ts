@@ -5,7 +5,7 @@ import { resolveConfigDir, resolveUserPath } from "../utils.js";
 import { resolveBundledPluginsDir } from "./bundled-dir.js";
 import {
   getPackageManifestMetadata,
-  type MoltbotPackageManifest,
+  type crocbotPackageManifest,
   type PackageManifest,
 } from "./manifest.js";
 import type { PluginDiagnostic, PluginOrigin } from "./types.js";
@@ -22,7 +22,7 @@ export type PluginCandidate = {
   packageVersion?: string;
   packageDescription?: string;
   packageDir?: string;
-  packageMoltbot?: MoltbotPackageManifest;
+  packagecrocbot?: crocbotPackageManifest;
 };
 
 export type PluginDiscoveryResult = {
@@ -63,7 +63,7 @@ function deriveIdHint(params: {
   if (!rawPackageName) return base;
 
   // Prefer the unscoped name so config keys stay stable even when the npm
-  // package is scoped (example: @moltbot/voice-call -> voice-call).
+  // package is scoped (example: @crocbot/voice-call -> voice-call).
   const unscoped = rawPackageName.includes("/")
     ? (rawPackageName.split("/").pop() ?? rawPackageName)
     : rawPackageName;
@@ -97,7 +97,7 @@ function addCandidate(params: {
     packageVersion: manifest?.version?.trim() || undefined,
     packageDescription: manifest?.description?.trim() || undefined,
     packageDir: params.packageDir,
-    packageMoltbot: getPackageManifestMetadata(manifest ?? undefined),
+    packagecrocbot: getPackageManifestMetadata(manifest ?? undefined),
   });
 }
 
@@ -281,7 +281,7 @@ function discoverFromPath(params: {
   }
 }
 
-export function discoverMoltbotPlugins(params: {
+export function discovercrocbotPlugins(params: {
   workspaceDir?: string;
   extraPaths?: string[];
 }): PluginDiscoveryResult {

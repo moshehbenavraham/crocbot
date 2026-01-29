@@ -1,6 +1,6 @@
 import AppKit
-import MoltbotDiscovery
-import MoltbotIPC
+import crocbotDiscovery
+import crocbotIPC
 import Foundation
 import SwiftUI
 
@@ -35,7 +35,7 @@ extension OnboardingView {
                 user: user,
                 host: host,
                 port: gateway.sshPort)
-            MoltbotConfigFile.setRemoteGatewayUrl(host: host, port: gateway.gatewayPort)
+            crocbotConfigFile.setRemoteGatewayUrl(host: host, port: gateway.gatewayPort)
         }
         self.state.remoteCliPath = gateway.cliPath ?? ""
 
@@ -67,7 +67,7 @@ extension OnboardingView {
     }
 
     func finish() {
-        UserDefaults.standard.set(true, forKey: "moltbot.onboardingSeen")
+        UserDefaults.standard.set(true, forKey: "crocbot.onboardingSeen")
         UserDefaults.standard.set(currentOnboardingVersion, forKey: onboardingVersionKey)
         OnboardingController.shared.close()
     }
@@ -113,9 +113,9 @@ extension OnboardingView {
                 code: parsed.code,
                 state: parsed.state,
                 verifier: pkce.verifier)
-            try MoltbotOAuthStore.saveAnthropicOAuth(creds)
+            try crocbotOAuthStore.saveAnthropicOAuth(creds)
             self.refreshAnthropicOAuthStatus()
-            self.anthropicAuthStatus = "Connected. Moltbot can now use Claude."
+            self.anthropicAuthStatus = "Connected. crocbot can now use Claude."
         } catch {
             self.anthropicAuthStatus = "OAuth failed: \(error.localizedDescription)"
         }
