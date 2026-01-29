@@ -13,8 +13,8 @@ const SLOT_BY_KIND: Record<PluginKind, PluginSlotKey> = {
   memory: "memory",
 };
 
-const DEFAULT_SLOT_BY_KEY: Record<PluginSlotKey, string> = {
-  memory: "memory-core",
+const DEFAULT_SLOT_BY_KEY: Record<PluginSlotKey, string | undefined> = {
+  memory: undefined, // memory-core extension removed in session 02
 };
 
 export function slotKeyForPluginKind(kind?: PluginKind): PluginSlotKey | null {
@@ -22,7 +22,7 @@ export function slotKeyForPluginKind(kind?: PluginKind): PluginSlotKey | null {
   return SLOT_BY_KIND[kind] ?? null;
 }
 
-export function defaultSlotIdForKey(slotKey: PluginSlotKey): string {
+export function defaultSlotIdForKey(slotKey: PluginSlotKey): string | undefined {
   return DEFAULT_SLOT_BY_KEY[slotKey];
 }
 

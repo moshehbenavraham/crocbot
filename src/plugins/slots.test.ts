@@ -58,7 +58,8 @@ describe("applyExclusiveSlotSelection", () => {
     expect(result.config).toBe(config);
   });
 
-  it("warns when the slot falls back to a default", () => {
+  // memory-core extension removed in session 02; default slot is now undefined
+  it("does not warn when no default slot exists", () => {
     const config: crocbotConfig = {
       plugins: {
         entries: {
@@ -75,9 +76,8 @@ describe("applyExclusiveSlotSelection", () => {
     });
 
     expect(result.changed).toBe(true);
-    expect(result.warnings).toContain(
-      'Exclusive slot "memory" switched from "memory-core" to "memory".',
-    );
+    // No "switched from" warning since default is undefined
+    expect(result.warnings).toHaveLength(0);
   });
 
   it("skips changes when no exclusive slot applies", () => {

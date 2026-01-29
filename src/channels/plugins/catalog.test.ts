@@ -6,13 +6,15 @@ import { describe, expect, it } from "vitest";
 import { getChannelPluginCatalogEntry, listChannelPluginCatalogEntries } from "./catalog.js";
 
 describe("channel plugin catalog", () => {
-  it("includes Microsoft Teams", () => {
+  // Extension plugins removed in session 02; catalog discovery now finds zero bundled plugins.
+  // These tests verified workspace extension discovery which no longer applies.
+  it.skip("includes Microsoft Teams", () => {
     const entry = getChannelPluginCatalogEntry("msteams");
     expect(entry?.install.npmSpec).toBe("@crocbot/msteams");
     expect(entry?.meta.aliases).toContain("teams");
   });
 
-  it("lists plugin catalog entries", () => {
+  it.skip("lists plugin catalog entries", () => {
     const ids = listChannelPluginCatalogEntries().map((entry) => entry.id);
     expect(ids).toContain("msteams");
   });

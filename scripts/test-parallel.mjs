@@ -9,10 +9,6 @@ const runs = [
     args: ["vitest", "run", "--config", "vitest.unit.config.ts"],
   },
   {
-    name: "extensions",
-    args: ["vitest", "run", "--config", "vitest.extensions.config.ts"],
-  },
-  {
     name: "gateway",
     args: ["vitest", "run", "--config", "vitest.gateway.config.ts"],
   },

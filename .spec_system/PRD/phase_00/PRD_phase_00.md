@@ -4,7 +4,7 @@
 **Sessions**: 8 (initial estimate)
 **Estimated Duration**: 16-32 hours
 
-**Progress**: 1/8 sessions (12.5%)
+**Progress**: 2/8 sessions (25%)
 
 ---
 
@@ -19,7 +19,7 @@ Transform the crocbot codebase from a multi-platform application with macOS app,
 | Session | Name | Status | Est. Tasks | Validated |
 |---------|------|--------|------------|-----------|
 | 01 | Remove Native Apps | Complete | 20 | 2026-01-30 |
-| 02 | Remove Extensions | Not Started | ~12-18 | - |
+| 02 | Remove Extensions | Complete | 15 | 2026-01-30 |
 | 03 | Remove Non-Telegram Channels | Not Started | ~20-25 | - |
 | 04 | Simplify Build and CI | Not Started | ~15-20 | - |
 | 05 | Remove Unused Dependencies | Not Started | ~12-18 | - |
@@ -32,12 +32,13 @@ Transform the crocbot codebase from a multi-platform application with macOS app,
 ## Completed Sessions
 
 - **Session 01: Remove Native Apps** (2026-01-30) - Removed ~548 files (apps/, src/macos/)
+- **Session 02: Remove Extensions** (2026-01-30) - Removed 30 packages, 547 files (extensions/)
 
 ---
 
 ## Upcoming Sessions
 
-- Session 02: Remove Extensions
+- Session 03: Remove Non-Telegram Channels
 
 ---
 

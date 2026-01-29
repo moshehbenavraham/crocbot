@@ -3,9 +3,10 @@ import { describe, expect, it } from "vitest";
 import { normalizePluginsConfig } from "./config-state.js";
 
 describe("normalizePluginsConfig", () => {
-  it("uses default memory slot when not specified", () => {
+  // memory-core extension removed in session 02; default slot is now undefined
+  it("uses undefined memory slot when not specified", () => {
     const result = normalizePluginsConfig({});
-    expect(result.slots.memory).toBe("memory-core");
+    expect(result.slots.memory).toBeUndefined();
   });
 
   it("respects explicit memory slot value", () => {
@@ -36,17 +37,18 @@ describe("normalizePluginsConfig", () => {
     expect(result.slots.memory).toBe("custom-memory");
   });
 
-  it("uses default when memory slot is empty string", () => {
+  // memory-core extension removed in session 02; default slot is now undefined
+  it("uses undefined when memory slot is empty string", () => {
     const result = normalizePluginsConfig({
       slots: { memory: "" },
     });
-    expect(result.slots.memory).toBe("memory-core");
+    expect(result.slots.memory).toBeUndefined();
   });
 
-  it("uses default when memory slot is whitespace only", () => {
+  it("uses undefined when memory slot is whitespace only", () => {
     const result = normalizePluginsConfig({
       slots: { memory: "   " },
     });
-    expect(result.slots.memory).toBe("memory-core");
+    expect(result.slots.memory).toBeUndefined();
   });
 });

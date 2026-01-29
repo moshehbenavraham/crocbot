@@ -32,7 +32,11 @@ function resolveMemoryPluginStatus(cfg: ReturnType<typeof loadConfig>): MemoryPl
   if (raw && raw.toLowerCase() === "none") {
     return { enabled: false, slot: null, reason: 'plugins.slots.memory="none"' };
   }
-  return { enabled: true, slot: raw || "memory-core" };
+  // memory-core extension removed in session 02; no default memory slot
+  if (!raw) {
+    return { enabled: false, slot: null, reason: "no memory plugin configured" };
+  }
+  return { enabled: true, slot: raw };
 }
 
 export type StatusScanResult = {
