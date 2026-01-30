@@ -7,8 +7,8 @@ read_when:
 
 # Onboarding Wizard (CLI)
 
-The onboarding wizard is the **recommended** way to set up crocbot on macOS,
-Linux, or Windows (via WSL2; strongly recommended).
+The onboarding wizard is the **recommended** way to set up crocbot on
+Linux or Windows (via WSL2; strongly recommended).
 It configures a local Gateway or a remote Gateway connection, plus channels, skills,
 and workspace defaults in one guided flow.
 
@@ -41,7 +41,7 @@ The wizard starts with **QuickStart** (defaults) vs **Advanced** (full control).
 - Gateway port **18789**
 - Gateway auth **Token** (auto‑generated, even on loopback)
 - Tailscale exposure **Off**
-- Telegram + WhatsApp DMs default to **allowlist** (you’ll be prompted for your phone number)
+- Telegram DMs default to **allowlist**
 
 **Advanced** exposes every step (mode, workspace, gateway, channels, daemon, skills).
 
@@ -51,8 +51,8 @@ The wizard starts with **QuickStart** (defaults) vs **Advanced** (full control).
   - Model/auth (OpenAI Code (Codex) subscription OAuth, Anthropic API key (recommended) or setup-token (paste), plus MiniMax/GLM/Moonshot/AI Gateway options)
 - Workspace location + bootstrap files
 - Gateway settings (port/bind/auth/tailscale)
-- Providers (Telegram, WhatsApp, Discord, Google Chat, Mattermost (plugin), Signal)
-- Daemon install (LaunchAgent / systemd user unit)
+- Telegram channel
+- Daemon install (systemd user unit)
 - Health check
 - Skills (recommended)
 
@@ -117,22 +117,14 @@ Tip: `--json` does **not** imply non-interactive mode. Use `--non-interactive` (
    - Non‑loopback binds still require auth.
 
 5) **Channels**
-  - WhatsApp: optional QR login.
-  - Telegram: bot token.
-  - Discord: bot token.
-  - Google Chat: service account JSON + webhook audience.
-  - Mattermost (plugin): bot token + base URL.
-   - Signal: optional `signal-cli` install + account config.
-   - iMessage: local `imsg` CLI path + DB access.
-  - DM security: default is pairing. First DM sends a code; approve via `crocbot pairing approve <channel> <code>` or use allowlists.
+  - Telegram: bot token from BotFather.
+  - DM security: default is pairing. First DM sends a code; approve via `crocbot pairing approve telegram <code>` or use allowlists.
 
 6) **Daemon install**
-   - macOS: LaunchAgent
-     - Requires a logged-in user session; for headless, use a custom LaunchDaemon (not shipped).
    - Linux (and Windows via WSL2): systemd user unit
      - Wizard attempts to enable lingering via `loginctl enable-linger <user>` so the Gateway stays up after logout.
      - May prompt for sudo (writes `/var/lib/systemd/linger`); it tries without sudo first.
-   - **Runtime selection:** Node (recommended; required for WhatsApp/Telegram). Bun is **not recommended**.
+   - **Runtime selection:** Node (recommended). Bun is **not recommended**.
 
 7) **Health check**
    - Starts the Gateway (if needed) and runs `crocbot health`.
@@ -141,10 +133,10 @@ Tip: `--json` does **not** imply non-interactive mode. Use `--non-interactive` (
 8) **Skills (recommended)**
    - Reads the available skills and checks requirements.
    - Lets you choose a node manager: **npm / pnpm** (bun not recommended).
-   - Installs optional dependencies (some use Homebrew on macOS).
+   - Installs optional dependencies.
 
 9) **Finish**
-   - Summary + next steps, including iOS/Android/macOS apps for extra features.
+   - Summary + next steps.
   - If no GUI is detected, the wizard prints SSH port-forward instructions for the Control UI instead of opening a browser.
   - If the Control UI assets are missing, the wizard attempts to build them; fallback is `pnpm ui:build` (auto-installs UI deps).
 
@@ -152,15 +144,14 @@ Tip: `--json` does **not** imply non-interactive mode. Use `--non-interactive` (
 
 Remote mode configures a local client to connect to a Gateway elsewhere.
 
-What you’ll set:
+What you'll set:
 - Remote Gateway URL (`ws://...`)
 - Token if the remote Gateway requires auth (recommended)
 
 Notes:
 - No remote installs or daemon changes are performed.
-- If the Gateway is loopback‑only, use SSH tunneling or a tailnet.
+- If the Gateway is loopback-only, use SSH tunneling or a tailnet.
 - Discovery hints:
-  - macOS: Bonjour (`dns-sd`)
   - Linux: Avahi (`avahi-browse`)
 
 ## Add another agent
@@ -268,7 +259,7 @@ Add agent (non‑interactive) example:
 crocbot agents add work \
   --workspace ~/clawd-work \
   --model openai/gpt-5.2 \
-  --bind whatsapp:biz \
+  --bind telegram:main \
   --non-interactive \
   --json
 ```
@@ -278,26 +269,13 @@ crocbot agents add work \
 The Gateway exposes the wizard flow over RPC (`wizard.start`, `wizard.next`, `wizard.cancel`, `wizard.status`).
 Clients (macOS app, Control UI) can render steps without re‑implementing onboarding logic.
 
-## Signal setup (signal-cli)
-
-The wizard can install `signal-cli` from GitHub releases:
-- Downloads the appropriate release asset.
-- Stores it under `~/.clawdbot/tools/signal-cli/<version>/`.
-- Writes `channels.signal.cliPath` to your config.
-
-Notes:
-- JVM builds require **Java 21**.
-- Native builds are used when available.
-- Windows uses WSL2; signal-cli install follows the Linux flow inside WSL.
-
 ## What the wizard writes
 
 Typical fields in `~/.clawdbot/crocbot.json`:
 - `agents.defaults.workspace`
 - `agents.defaults.model` / `models.providers` (if Minimax chosen)
 - `gateway.*` (mode, bind, auth, tailscale)
-- `channels.telegram.botToken`, `channels.discord.token`, `channels.signal.*`, `channels.imessage.*`
-- Channel allowlists (Slack/Discord/Matrix/Microsoft Teams) when you opt in during the prompts (names resolve to IDs when possible).
+- `channels.telegram.botToken`
 - `skills.install.nodeManager`
 - `wizard.lastRunAt`
 - `wizard.lastRunVersion`
@@ -307,15 +285,10 @@ Typical fields in `~/.clawdbot/crocbot.json`:
 
 `crocbot agents add` writes `agents.list[]` and optional `bindings`.
 
-WhatsApp credentials go under `~/.clawdbot/credentials/whatsapp/<accountId>/`.
 Sessions are stored under `~/.clawdbot/agents/<agentId>/sessions/`.
-
-Some channels are delivered as plugins. When you pick one during onboarding, the wizard
-will prompt to install it (npm or a local path) before it can be configured.
 
 ## Related docs
 
-- macOS app onboarding: [Onboarding](/start/onboarding)
 - Config reference: [Gateway configuration](/gateway/configuration)
-- Providers: [WhatsApp](/channels/whatsapp), [Telegram](/channels/telegram), [Discord](/channels/discord), [Google Chat](/channels/googlechat), [Signal](/channels/signal), [iMessage](/channels/imessage)
+- Telegram: [Telegram](/channels/telegram)
 - Skills: [Skills](/tools/skills), [Skills config](/tools/skills-config)

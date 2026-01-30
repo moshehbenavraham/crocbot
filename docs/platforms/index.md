@@ -1,5 +1,5 @@
 ---
-summary: "Platform support overview (Gateway + companion apps)"
+summary: "Platform support overview (Gateway)"
 read_when:
   - Looking for OS support or install paths
   - Deciding where to run the Gateway
@@ -7,18 +7,11 @@ read_when:
 # Platforms
 
 crocbot core is written in TypeScript. **Node is the recommended runtime**.
-Bun is not recommended for the Gateway (WhatsApp/Telegram bugs).
-
-Companion apps exist for macOS (menu bar app) and mobile nodes (iOS/Android). Windows and
-Linux companion apps are planned, but the Gateway is fully supported today.
-Native companion apps for Windows are also planned; the Gateway is recommended via WSL2.
+Bun is not recommended for the Gateway.
 
 ## Choose your OS
 
-- macOS: [macOS](/platforms/macos)
-- iOS: [iOS](/platforms/ios)
-- Android: [Android](/platforms/android)
-- Windows: [Windows](/platforms/windows)
+- Windows: [Windows (WSL2)](/platforms/windows)
 - Linux: [Linux](/platforms/linux)
 
 ## VPS & hosting
@@ -42,9 +35,8 @@ Use one of these (all supported):
 
 - Wizard (recommended): `crocbot onboard --install-daemon`
 - Direct: `crocbot gateway install`
-- Configure flow: `crocbot configure` → select **Gateway service**
+- Configure flow: `crocbot configure` -> select **Gateway service**
 - Repair/migrate: `crocbot doctor` (offers to install or fix the service)
 
 The service target depends on OS:
-- macOS: LaunchAgent (`com.clawdbot.gateway` or `com.clawdbot.<profile>`)
 - Linux/WSL2: systemd user service (`crocbot-gateway[-<profile>].service`)

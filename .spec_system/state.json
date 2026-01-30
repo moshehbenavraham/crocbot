@@ -8,7 +8,7 @@
     "0": {
       "name": "Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment",
       "description": "Transform crocbot from multi-platform app to lean CLI + Telegram gateway for VPS hosting",
-      "status": "in_progress",
+      "status": "complete",
       "session_count": 8
     }
   },
@@ -19,7 +19,8 @@
     "phase00-session04-simplify-build",
     "phase00-session05-remove-dependencies",
     "phase00-session06-refactor-dead-code",
-    "phase00-session07-remove-mobile-code"
+    "phase00-session07-remove-mobile-code",
+    "phase00-session08-update-documentation"
   ],
   "next_session_history": [
     {
@@ -180,6 +181,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session07-remove-mobile-code",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session08-update-documentation",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session08-update-documentation",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session08-update-documentation",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session08-update-documentation",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session08-update-documentation",
       "status": "completed"
     }
   ]

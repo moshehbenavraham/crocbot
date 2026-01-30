@@ -49,7 +49,7 @@ npm i -g crocbot@latest
 ```bash
 pnpm add -g crocbot@latest
 ```
-We do **not** recommend Bun for the Gateway runtime (WhatsApp/Telegram bugs).
+Note: **Node** is the recommended Gateway runtime.
 
 To switch update channels (git + npm installs):
 

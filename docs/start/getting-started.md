@@ -16,7 +16,7 @@ Docs: [Dashboard](/web/dashboard) and [Control UI](/web/control-ui).
 Recommended path: use the **CLI onboarding wizard** (`crocbot onboard`). It sets up:
 - model/auth (OAuth recommended)
 - gateway settings
-- channels (WhatsApp/Telegram/Discord/Mattermost (plugin)/...)
+- Telegram channel
 - pairing defaults (secure DMs)
 - workspace bootstrap + skills
 - optional background service
@@ -48,7 +48,6 @@ run on host, set an explicit per-agent override:
   `crocbot configure --section web` (stores `tools.web.search.apiKey`).
   See [Web tools](/tools/web).
 
-macOS: if you plan to build the apps, install Xcode / CLT. For the CLI + gateway only, Node is enough.
 Windows: use **WSL2** (Ubuntu recommended). WSL2 is strongly recommended; native Windows is untested, more problematic, and has poorer tool compatibility. Install WSL2 first, then run the Linux steps inside WSL. See [Windows (WSL2)](/platforms/windows).
 
 ## 1) Install the CLI (recommended)
@@ -81,12 +80,12 @@ pnpm add -g crocbot@latest
 crocbot onboard --install-daemon
 ```
 
-What you’ll choose:
+What you'll choose:
 - **Local vs Remote** gateway
 - **Auth**: OpenAI Code (Codex) subscription (OAuth) or API keys. For Anthropic we recommend an API key; `claude setup-token` is also supported.
-- **Providers**: WhatsApp QR login, Telegram/Discord bot tokens, Mattermost plugin tokens, etc.
-- **Daemon**: background install (launchd/systemd; WSL2 uses systemd)
-  - **Runtime**: Node (recommended; required for WhatsApp/Telegram). Bun is **not recommended**.
+- **Telegram**: bot token from BotFather
+- **Daemon**: background install (systemd; WSL2 uses systemd)
+  - **Runtime**: Node (recommended). Bun is **not recommended**.
 - **Gateway token**: the wizard generates one by default (even on loopback) and stores it in `gateway.auth.token`.
 
 Wizard doc: [Wizard](/start/wizard)
@@ -117,8 +116,7 @@ crocbot gateway --port 18789 --verbose
 Dashboard (local loopback): `http://127.0.0.1:18789/`
 If a token is configured, paste it into the Control UI settings (stored as `connect.params.auth.token`).
 
-⚠️ **Bun warning (WhatsApp + Telegram):** Bun has known issues with these
-channels. If you use WhatsApp or Telegram, run the Gateway with **Node**.
+Note: **Node** is the recommended runtime for the Gateway.
 
 ## 3.5) Quick verify (2 min)
 
@@ -128,26 +126,16 @@ crocbot health
 crocbot security audit --deep
 ```
 
-## 4) Pair + connect your first chat surface
+## 4) Connect Telegram
 
-### WhatsApp (QR login)
+### Telegram bot token
 
-```bash
-crocbot channels login
-```
+The wizard can write tokens/config for you. If you prefer manual config:
+- Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
+- Set `TELEGRAM_BOT_TOKEN` or add to config: `channels.telegram.botToken`
+- Telegram doc: [Telegram](/channels/telegram)
 
-Scan via WhatsApp → Settings → Linked Devices.
-
-WhatsApp doc: [WhatsApp](/channels/whatsapp)
-
-### Telegram / Discord / others
-
-The wizard can write tokens/config for you. If you prefer manual config, start with:
-- Telegram: [Telegram](/channels/telegram)
-- Discord: [Discord](/channels/discord)
-- Mattermost (plugin): [Mattermost](/channels/mattermost)
-
-**Telegram DM tip:** your first DM returns a pairing code. Approve it (see next step) or the bot won’t respond.
+**Telegram DM tip:** your first DM returns a pairing code. Approve it (see next step) or the bot won't respond.
 
 ## 5) DM safety (pairing approvals)
 
@@ -155,8 +143,8 @@ Default posture: unknown DMs get a short code and messages are not processed unt
 If your first DM gets no reply, approve the pairing:
 
 ```bash
-crocbot pairing list whatsapp
-crocbot pairing approve whatsapp <code>
+crocbot pairing list telegram
+crocbot pairing approve telegram <code>
 ```
 
 Pairing doc: [Pairing](/start/pairing)
@@ -198,7 +186,5 @@ Health probes: `crocbot health` (or `crocbot status --deep`) asks the running ga
 
 ## Next steps (optional, but great)
 
-- macOS menu bar app + voice wake: [macOS app](/platforms/macos)
-- iOS/Android nodes (Canvas/camera/voice): [Nodes](/nodes)
 - Remote access (SSH tunnel / Tailscale Serve): [Remote access](/gateway/remote) and [Tailscale](/gateway/tailscale)
-- Always-on / VPN setups: [Remote access](/gateway/remote), [exe.dev](/platforms/exe-dev), [Hetzner](/platforms/hetzner), [macOS remote](/platforms/mac/remote)
+- VPS hosting: [exe.dev](/platforms/exe-dev), [Hetzner](/platforms/hetzner), [Fly.io](/platforms/fly)

@@ -168,24 +168,14 @@ CMD ["node","dist/index.js"]
 
 ### Channel setup (optional)
 
-Use the CLI container to configure channels, then restart the gateway if needed.
-
-WhatsApp (QR):
-```bash
-docker compose run --rm crocbot-cli channels login
-```
+Use the CLI container to configure Telegram, then restart the gateway if needed.
 
 Telegram (bot token):
 ```bash
 docker compose run --rm crocbot-cli channels add --channel telegram --token "<token>"
 ```
 
-Discord (bot token):
-```bash
-docker compose run --rm crocbot-cli channels add --channel discord --token "<token>"
-```
-
-Docs: [WhatsApp](/channels/whatsapp), [Telegram](/channels/telegram), [Discord](/channels/discord)
+Docs: [Telegram](/channels/telegram)
 
 ### Health check
 
@@ -250,7 +240,7 @@ precedence, and troubleshooting.
 - Auto-prune: idle > 24h OR age > 7d
 - Network: `none` by default (explicitly opt-in if you need egress)
 - Default allow: `exec`, `process`, `read`, `write`, `edit`, `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `session_status`
-- Default deny: `browser`, `canvas`, `nodes`, `cron`, `discord`, `gateway`
+- Default deny: `browser`, `cron`, `gateway`
 
 ### Enable sandboxing
 
@@ -305,7 +295,7 @@ log a warning with the exact `crocbot sandbox recreate ...` command.
     sandbox: {
       tools: {
         allow: ["exec", "process", "read", "write", "edit", "sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status"],
-        deny: ["browser", "canvas", "nodes", "cron", "discord", "gateway"]
+        deny: ["browser", "cron", "gateway"]
       }
     }
   }

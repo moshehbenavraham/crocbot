@@ -7,10 +7,10 @@ read_when:
 
 # Bun (experimental)
 
-Goal: run this repo with **Bun** (optional, not recommended for WhatsApp/Telegram)
+Goal: run this repo with **Bun** (optional, not recommended for production)
 without diverging from pnpm workflows.
 
-⚠️ **Not recommended for Gateway runtime** (WhatsApp/Telegram bugs). Use Node for production.
+Note: **Node** is the recommended Gateway runtime. Bun is experimental.
 
 ## Status
 
