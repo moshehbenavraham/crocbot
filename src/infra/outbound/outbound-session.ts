@@ -155,43 +155,6 @@ function resolveMatrixSession(
   };
 }
 
-function resolveMSTeamsSession(
-  params: ResolveOutboundSessionRouteParams,
-): OutboundSessionRoute | null {
-  let trimmed = params.target.trim();
-  if (!trimmed) return null;
-  trimmed = trimmed.replace(/^(msteams|teams):/i, "").trim();
-
-  const lower = trimmed.toLowerCase();
-  const isUser = lower.startsWith("user:");
-  const rawId = stripKindPrefix(trimmed);
-  if (!rawId) return null;
-  const conversationId = rawId.split(";")[0] ?? rawId;
-  const isChannel = !isUser && /@thread\.tacv2/i.test(conversationId);
-  const peer: RoutePeer = {
-    kind: isUser ? "dm" : isChannel ? "channel" : "group",
-    id: conversationId,
-  };
-  const baseSessionKey = buildBaseSessionKey({
-    cfg: params.cfg,
-    agentId: params.agentId,
-    channel: "msteams",
-    peer,
-  });
-  return {
-    sessionKey: baseSessionKey,
-    baseSessionKey,
-    peer,
-    chatType: isUser ? "direct" : isChannel ? "channel" : "group",
-    from: isUser
-      ? `msteams:${conversationId}`
-      : isChannel
-        ? `msteams:channel:${conversationId}`
-        : `msteams:group:${conversationId}`,
-    to: isUser ? `user:${conversationId}` : `conversation:${conversationId}`,
-  };
-}
-
 function resolveMattermostSession(
   params: ResolveOutboundSessionRouteParams,
 ): OutboundSessionRoute | null {
@@ -428,8 +391,6 @@ export async function resolveOutboundSessionRoute(
       return resolveTelegramSession({ ...params, target });
     case "matrix":
       return resolveMatrixSession({ ...params, target });
-    case "msteams":
-      return resolveMSTeamsSession({ ...params, target });
     case "mattermost":
       return resolveMattermostSession({ ...params, target });
     case "nextcloud-talk":

@@ -4,7 +4,6 @@ import { theme } from "../../terminal/theme.js";
 import { formatHelpExamples } from "../help-format.js";
 import type { ProgramContext } from "./context.js";
 import { createMessageCliHelpers } from "./message/helpers.js";
-import { registerMessageDiscordAdminCommands } from "./message/register.discord-admin.js";
 import {
   registerMessageEmojiCommands,
   registerMessageStickerCommands,
@@ -64,5 +63,4 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/message", "docs.molt.bot/cli/mess
   registerMessageThreadCommands(message, helpers);
   registerMessageEmojiCommands(message, helpers);
   registerMessageStickerCommands(message, helpers);
-  registerMessageDiscordAdminCommands(message, helpers);
 }

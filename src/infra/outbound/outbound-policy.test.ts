@@ -7,18 +7,11 @@ import {
   enforceCrossContextPolicy,
 } from "./outbound-policy.js";
 
-const slackConfig = {
+const telegramConfig = {
   channels: {
-    slack: {
-      botToken: "xoxb-test",
-      appToken: "xapp-test",
+    telegram: {
+      botToken: "123:abc",
     },
-  },
-} as crocbotConfig;
-
-const discordConfig = {
-  channels: {
-    discord: {},
   },
 } as crocbotConfig;
 
@@ -26,18 +19,18 @@ describe("outbound policy", () => {
   it("blocks cross-provider sends by default", () => {
     expect(() =>
       enforceCrossContextPolicy({
-        cfg: slackConfig,
-        channel: "telegram",
+        cfg: telegramConfig,
+        channel: "whatsapp",
         action: "send",
-        args: { to: "telegram:@ops" },
-        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+        args: { to: "whatsapp:+15555550123" },
+        toolContext: { currentChannelId: "123456789", currentChannelProvider: "telegram" },
       }),
     ).toThrow(/Cross-context messaging denied/);
   });
 
   it("allows cross-provider sends when enabled", () => {
     const cfg = {
-      ...slackConfig,
+      ...telegramConfig,
       tools: {
         message: { crossContext: { allowAcrossProviders: true } },
       },
@@ -46,37 +39,37 @@ describe("outbound policy", () => {
     expect(() =>
       enforceCrossContextPolicy({
         cfg,
-        channel: "telegram",
+        channel: "whatsapp",
         action: "send",
-        args: { to: "telegram:@ops" },
-        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+        args: { to: "whatsapp:+15555550123" },
+        toolContext: { currentChannelId: "123456789", currentChannelProvider: "telegram" },
       }),
     ).not.toThrow();
   });
 
   it("blocks same-provider cross-context when disabled", () => {
     const cfg = {
-      ...slackConfig,
+      ...telegramConfig,
       tools: { message: { crossContext: { allowWithinProvider: false } } },
     } as crocbotConfig;
 
     expect(() =>
       enforceCrossContextPolicy({
         cfg,
-        channel: "slack",
+        channel: "telegram",
         action: "send",
-        args: { to: "C99999999" },
-        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+        args: { to: "987654321" },
+        toolContext: { currentChannelId: "123456789", currentChannelProvider: "telegram" },
       }),
     ).toThrow(/Cross-context messaging denied/);
   });
 
-  it("uses embeds when available and preferred", async () => {
+  it("falls back to text prefix when no embeds available", async () => {
     const decoration = await buildCrossContextDecoration({
-      cfg: discordConfig,
-      channel: "discord",
-      target: "123",
-      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "discord" },
+      cfg: telegramConfig,
+      channel: "telegram",
+      target: "987654321",
+      toolContext: { currentChannelId: "123456789", currentChannelProvider: "telegram" },
     });
 
     expect(decoration).not.toBeNull();
@@ -86,8 +79,10 @@ describe("outbound policy", () => {
       preferEmbeds: true,
     });
 
-    expect(applied.usedEmbeds).toBe(true);
-    expect(applied.embeds?.length).toBeGreaterThan(0);
-    expect(applied.message).toBe("hello");
+    // Telegram does not support embeds, so usedEmbeds should be false
+    // and the message gets a text prefix
+    expect(applied.usedEmbeds).toBe(false);
+    expect(applied.message).toContain("hello");
+    expect(applied.message).toMatch(/\[from/);
   });
 });

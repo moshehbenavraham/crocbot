@@ -17,7 +17,8 @@
     "phase00-session02-remove-extensions",
     "phase00-session03-remove-channels",
     "phase00-session04-simplify-build",
-    "phase00-session05-remove-dependencies"
+    "phase00-session05-remove-dependencies",
+    "phase00-session06-refactor-dead-code"
   ],
   "next_session_history": [
     {
@@ -128,6 +129,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session05-remove-dependencies",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session06-refactor-dead-code",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session06-refactor-dead-code",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session06-refactor-dead-code",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session06-refactor-dead-code",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session06-refactor-dead-code",
       "status": "completed"
     }
   ]
