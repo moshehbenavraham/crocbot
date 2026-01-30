@@ -1,11 +1,41 @@
+# Git and version control
 .git
+.gitignore
 .worktrees
+
+# Development caches
 .bun-cache
 .bun
 .tmp
 **/.tmp
 .DS_Store
 **/.DS_Store
+.pnpm-store
+**/.pnpm-store
+.turbo
+**/.turbo
+.cache
+**/.cache
+.next
+**/.next
+.vscode
+.idea
+
+# Build output (rebuilt in Docker)
+dist
+**/dist
+
+# Coverage and test artifacts
+coverage
+**/coverage
+**/*.trace
+
+# Logs
+*.log
+tmp
+**/tmp
+
+# Media files (not needed for build)
 *.png
 *.jpg
 *.jpeg
@@ -15,34 +45,60 @@
 *.mov
 *.wav
 *.mp3
+
+# Node modules (reinstalled in Docker)
 node_modules
 **/node_modules
-.pnpm-store
-**/.pnpm-store
-.turbo
-**/.turbo
-.cache
-**/.cache
-.next
-**/.next
-coverage
-**/coverage
-*.log
-tmp
-**/tmp
 
-# build artifacts
-dist
-**/dist
-apps/macos/.build
-apps/ios/build
-**/*.trace
-
-# large app trees not needed for CLI build
+# Large app trees not needed for CLI build
 apps/
-assets/
 Peekaboo/
 Swabble/
 Core/
 Users/
 vendor/
+
+# Spec system (development only)
+.spec_system/
+
+# Docker files (avoid recursive context)
+Dockerfile
+docker-compose.yml
+docker-compose*.yml
+*.dockerfile
+
+# IDE and editor configs
+.editorconfig
+*.swp
+*.swo
+*~
+
+# Test files (not needed in production)
+**/*.test.ts
+**/*.e2e.test.ts
+**/__mocks__/
+**/__fixtures__/
+vitest.config.ts
+
+# Documentation build artifacts
+docs/.mintlify
+docs/node_modules
+
+# CI/CD configs
+.github/
+.circleci/
+.travis.yml
+fly.toml
+renovate.json
+
+# Linting configs
+.eslintrc*
+.prettierrc*
+biome.json
+
+# README files (not needed in runtime)
+README.md
+README-header.png
+CHANGELOG.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md

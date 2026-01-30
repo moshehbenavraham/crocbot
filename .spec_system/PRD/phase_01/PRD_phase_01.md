@@ -4,7 +4,7 @@
 **Sessions**: 5
 **Estimated Duration**: 2-3 days
 
-**Progress**: 1/5 sessions (20%)
+**Progress**: 2/5 sessions (40%)
 
 ---
 
@@ -19,7 +19,7 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 | Session | Name | Status | Est. Tasks | Validated |
 |---------|------|--------|------------|-----------|
 | 01 | Clean Technical Debt | Complete | 20 | 2026-01-30 |
-| 02 | Docker Optimization | Not Started | ~15-20 | - |
+| 02 | Docker Optimization | Complete | 20 | 2026-01-30 |
 | 03 | Gateway Hardening | Not Started | ~15-20 | - |
 | 04 | CI/CD Finalization | Not Started | ~12-18 | - |
 | 05 | Internal Docs Cleanup | Not Started | ~12-18 | - |
@@ -35,11 +35,22 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 - Kept 3 stub files for compatibility (device-pairing, pairing-store, telegram pairing-store)
 - Achieved clean build/lint/test with 3582 tests passing
 
+### Session 02: Docker Optimization (2026-01-30)
+
+- Implemented 3-stage multi-stage build (builder -> pruner -> runtime)
+- Reduced image size from 2.61GB to 688MB (73% reduction)
+- Switched to node:22-slim base for runtime stage
+- Removed Bun from runtime (build-only)
+- Pruned dev dependencies and unused optional deps (node-llama-cpp: 700MB+)
+- Achieved 2.2s startup time (target: <10s)
+- Verified graceful SIGTERM shutdown (662ms, exit code 0)
+- Created environment variables documentation
+
 ---
 
 ## Upcoming Sessions
 
-- Session 02: Docker Optimization
+- Session 03: Gateway Hardening
 
 ---
 
@@ -97,13 +108,13 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 
 Phase complete when:
 - [x] Session 01 - Clean Technical Debt completed
-- [ ] Session 02 - Docker Optimization completed
+- [x] Session 02 - Docker Optimization completed
 - [ ] Session 03 - Gateway Hardening completed
 - [ ] Session 04 - CI/CD Finalization completed
 - [ ] Session 05 - Internal Docs Cleanup completed
 - [ ] No stub files remaining for removed features
 - [ ] No orphaned code referencing removed channels
-- [ ] Docker image optimized and tested
+- [x] Docker image optimized and tested
 - [ ] Gateway handles disconnects and errors gracefully
 - [ ] CI/CD pipelines verified for production use
 - [ ] Internal docs cleaned of stale references
