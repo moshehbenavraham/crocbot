@@ -239,4 +239,6 @@ export type GatewayConfig = {
    * `x-real-ip`) to determine the client IP for local pairing and HTTP checks.
    */
   trustedProxies?: string[];
+  /** Alerting configuration for error notifications. */
+  alerting?: import("./types.alerting.js").AlertingConfig;
 };

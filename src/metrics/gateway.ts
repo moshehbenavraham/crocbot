@@ -43,7 +43,7 @@ const messagesCounter = new Counter({
 const errorsCounter = new Counter({
   name: "crocbot_errors_total",
   help: "Total errors encountered",
-  labelNames: ["channel", "type"] as const,
+  labelNames: ["channel", "type", "severity"] as const,
   registers: [getRegistry()],
 });
 
@@ -79,7 +79,22 @@ export function incrementMessages(channel: string, type: string = "text"): void 
  * @param type - The error type (e.g., "processing", "network", "timeout")
  */
 export function incrementErrors(channel: string, type: string = "processing"): void {
-  errorsCounter.inc({ channel, type });
+  errorsCounter.inc({ channel, type, severity: "unknown" });
+}
+
+/**
+ * Increment the errors counter with severity label.
+ *
+ * @param channel - The channel/context where the error occurred
+ * @param severity - The error severity level (critical, warning, info)
+ * @param type - The error type (e.g., "processing", "network", "timeout")
+ */
+export function incrementErrorsWithSeverity(
+  channel: string,
+  severity: string,
+  type: string = "processing",
+): void {
+  errorsCounter.inc({ channel, type, severity });
 }
 
 /**

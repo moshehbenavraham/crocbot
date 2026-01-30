@@ -1,5 +1,6 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { initSubagentRegistry } from "../agents/subagent-registry.js";
+import { initializeReporter } from "../alerting/index.js";
 import { enableDefaultMetrics, markGatewayStarted } from "../metrics/index.js";
 import { registerSkillsChangeListener } from "../agents/skills/refresh.js";
 import type { CanvasHostServer } from "../canvas-host/server.js";
@@ -221,6 +222,9 @@ export async function startGatewayServer(
   // Initialize Prometheus metrics collection
   enableDefaultMetrics();
   markGatewayStarted();
+
+  // Initialize error alerting system
+  initializeReporter(cfgAtStart.gateway?.alerting);
   const defaultAgentId = resolveDefaultAgentId(cfgAtStart);
   const defaultWorkspaceDir = resolveAgentWorkspaceDir(cfgAtStart, defaultAgentId);
   const baseMethods = listGatewayMethods();

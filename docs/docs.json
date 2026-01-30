@@ -749,6 +749,7 @@
           "gateway/background-process",
           "gateway/health",
           "gateway/metrics",
+          "gateway/alerting",
           "gateway/heartbeat",
           "gateway/doctor",
           "gateway/logging",

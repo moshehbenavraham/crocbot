@@ -267,6 +267,26 @@ export function createGatewayHttpServer(opts: {
       return;
     }
 
+    // Alert webhook test endpoint (for testing webhook delivery)
+    if (req.method === "POST" && req.url === "/alerts/webhook") {
+      try {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) {
+          chunks.push(chunk as Buffer);
+        }
+        const body = Buffer.concat(chunks).toString("utf8");
+        const payload = body ? JSON.parse(body) : {};
+        sendJson(res, 200, {
+          received: true,
+          timestamp: new Date().toISOString(),
+          payload,
+        });
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON payload" });
+      }
+      return;
+    }
+
     try {
       const configSnapshot = loadConfig();
       const trustedProxies = configSnapshot.gateway?.trustedProxies ?? [];
