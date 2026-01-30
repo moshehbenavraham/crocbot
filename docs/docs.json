@@ -748,6 +748,7 @@
           "gateway/local-models",
           "gateway/background-process",
           "gateway/health",
+          "gateway/metrics",
           "gateway/heartbeat",
           "gateway/doctor",
           "gateway/logging",

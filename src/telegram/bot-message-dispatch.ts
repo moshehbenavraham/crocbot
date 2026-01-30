@@ -1,5 +1,7 @@
 // @ts-nocheck
 import { EmbeddedBlockChunker } from "../agents/pi-embedded-block-chunker.js";
+import { incrementMessages, incrementErrors } from "../metrics/index.js";
+import { startLatencyTimer } from "../metrics/index.js";
 import {
   findModelInCatalog,
   loadModelCatalog,
@@ -45,6 +47,9 @@ export const dispatchTelegramMessage = async ({
   opts,
   resolveBotTopicsEnabled,
 }) => {
+  // Start latency timer for this message
+  const endLatencyTimer = startLatencyTimer("text");
+
   const {
     ctxPayload,
     primaryCtx,
@@ -227,6 +232,7 @@ export const dispatchTelegramMessage = async ({
       },
       onError: (err, info) => {
         runtime.error?.(danger(`telegram ${info.kind} reply failed: ${String(err)}`));
+        incrementErrors("telegram", "processing");
       },
       onReplyStart: createTypingCallbacks({
         start: sendTyping,
@@ -279,4 +285,8 @@ export const dispatchTelegramMessage = async ({
   if (isGroup && historyKey) {
     clearHistoryEntriesIfEnabled({ historyMap: groupHistories, historyKey, limit: historyLimit });
   }
+
+  // Record metrics for successful message processing
+  incrementMessages("telegram", "text");
+  endLatencyTimer();
 };

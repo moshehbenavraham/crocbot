@@ -26,6 +26,7 @@ import {
   resolveHookDeliver,
 } from "./hooks.js";
 import { applyHookMappings } from "./hooks-mapping.js";
+import { getMetrics, getMetricsContentType } from "../metrics/index.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
@@ -248,6 +249,21 @@ export function createGatewayHttpServer(opts: {
           rssMb: Math.round(memUsage.rss / 1024 / 1024),
         },
       });
+      return;
+    }
+
+    // Prometheus metrics endpoint for monitoring (no auth, internal use)
+    if (req.method === "GET" && req.url === "/metrics") {
+      try {
+        const metricsOutput = await getMetrics();
+        res.statusCode = 200;
+        res.setHeader("Content-Type", getMetricsContentType());
+        res.end(metricsOutput);
+      } catch {
+        res.statusCode = 500;
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.end("Failed to collect metrics");
+      }
       return;
     }
 

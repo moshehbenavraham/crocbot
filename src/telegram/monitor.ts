@@ -1,6 +1,7 @@
 import { type RunOptions, run } from "@grammyjs/runner";
 import type { crocbotConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
+import { incrementReconnects } from "../metrics/index.js";
 import { resolveAgentMaxConcurrent } from "../config/agent-limits.js";
 import { computeBackoff, sleepWithAbort } from "../infra/backoff.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -178,10 +179,12 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
       }
       restartAttempts += 1;
       const delayMs = computeBackoff(TELEGRAM_POLL_RESTART_POLICY, restartAttempts);
-      const reason = isConflict ? "getUpdates conflict" : "network error";
+      const reason = isConflict ? "conflict" : "network";
+      incrementReconnects(reason);
+      const reasonLabel = isConflict ? "getUpdates conflict" : "network error";
       const errMsg = formatErrorMessage(err);
       logError(
-        `telegram: ${reason} (attempt ${restartAttempts}): ${errMsg}; retrying in ${formatDurationMs(delayMs)}`,
+        `telegram: ${reasonLabel} (attempt ${restartAttempts}): ${errMsg}; retrying in ${formatDurationMs(delayMs)}`,
       );
       try {
         await sleepWithAbort(delayMs, opts.abortSignal);
