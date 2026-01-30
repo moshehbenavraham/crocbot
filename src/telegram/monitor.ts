@@ -139,6 +139,8 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
 
   // Use grammyjs/runner for concurrent update processing
   let restartAttempts = 0;
+  const log = opts.runtime?.log ?? console.log;
+  const logError = opts.runtime?.error ?? console.error;
 
   while (!opts.abortSignal?.aborted) {
     const runner = run(bot, createTelegramRunnerOptions(cfg));
@@ -148,7 +150,12 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
       }
     };
     opts.abortSignal?.addEventListener("abort", stopOnAbort, { once: true });
+    const attemptStart = Date.now();
     try {
+      // Log reconnection attempt if recovering from errors
+      if (restartAttempts > 0) {
+        log(`telegram: reconnection attempt ${restartAttempts + 1} starting`);
+      }
       // runner.task() returns a promise that resolves when the runner stops
       await runner.task();
       return;
@@ -161,12 +168,20 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
       if (!isConflict && !isRecoverable) {
         throw err;
       }
+      // Reset counter if connection was stable for a reasonable period (>60s)
+      const connectionDuration = Date.now() - attemptStart;
+      if (connectionDuration > 60_000 && restartAttempts > 0) {
+        log(
+          `telegram: connection was stable for ${formatDurationMs(connectionDuration)}; resetting retry counter`,
+        );
+        restartAttempts = 0;
+      }
       restartAttempts += 1;
       const delayMs = computeBackoff(TELEGRAM_POLL_RESTART_POLICY, restartAttempts);
       const reason = isConflict ? "getUpdates conflict" : "network error";
       const errMsg = formatErrorMessage(err);
-      (opts.runtime?.error ?? console.error)(
-        `Telegram ${reason}: ${errMsg}; retrying in ${formatDurationMs(delayMs)}.`,
+      logError(
+        `telegram: ${reason} (attempt ${restartAttempts}): ${errMsg}; retrying in ${formatDurationMs(delayMs)}`,
       );
       try {
         await sleepWithAbort(delayMs, opts.abortSignal);

@@ -9,6 +9,13 @@ import type { defaultRuntime } from "../../runtime.js";
 
 const gatewayLog = createSubsystemLogger("gateway");
 
+function formatMemoryMb(): string {
+  const usage = process.memoryUsage();
+  const heapMb = Math.round(usage.heapUsed / 1024 / 1024);
+  const rssMb = Math.round(usage.rss / 1024 / 1024);
+  return `heap=${heapMb}MB rss=${rssMb}MB`;
+}
+
 type GatewayRunSignalAction = "stop" | "restart";
 
 export async function runGatewayLoop(params: {
@@ -33,7 +40,10 @@ export async function runGatewayLoop(params: {
     }
     shuttingDown = true;
     const isRestart = action === "restart";
-    gatewayLog.info(`received ${signal}; ${isRestart ? "restarting" : "shutting down"}`);
+    const shutdownStart = Date.now();
+    gatewayLog.info(
+      `received ${signal}; ${isRestart ? "restarting" : "shutting down"} (${formatMemoryMb()})`,
+    );
 
     const forceExitTimer = setTimeout(() => {
       gatewayLog.error("shutdown timed out; exiting without full cleanup");
@@ -51,6 +61,8 @@ export async function runGatewayLoop(params: {
         gatewayLog.error(`shutdown error: ${String(err)}`);
       } finally {
         clearTimeout(forceExitTimer);
+        const shutdownMs = Date.now() - shutdownStart;
+        gatewayLog.info(`shutdown completed in ${shutdownMs}ms`);
         server = null;
         if (isRestart) {
           shuttingDown = false;
@@ -93,6 +105,7 @@ export async function runGatewayLoop(params: {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       server = await params.start();
+      gatewayLog.info(`gateway started (${formatMemoryMb()})`);
       await new Promise<void>((resolve) => {
         restartResolver = resolve;
       });

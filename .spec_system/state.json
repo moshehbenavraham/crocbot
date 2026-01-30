@@ -28,7 +28,8 @@
     "phase00-session07-remove-mobile-code",
     "phase00-session08-update-documentation",
     "phase01-session01-clean-technical-debt",
-    "phase01-session02-docker-optimization"
+    "phase01-session02-docker-optimization",
+    "phase01-session03-gateway-hardening"
   ],
   "next_session_history": [
     {
@@ -264,6 +265,31 @@
     {
       "date": "2026-01-30",
       "session": "phase01-session02-docker-optimization",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session03-gateway-hardening",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session03-gateway-hardening",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session03-gateway-hardening",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session03-gateway-hardening",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session03-gateway-hardening",
       "status": "completed"
     }
   ]

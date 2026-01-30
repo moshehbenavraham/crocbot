@@ -184,4 +184,26 @@ describe("monitorTelegramProvider (grammY)", () => {
 
     await expect(monitorTelegramProvider({ token: "tok" })).rejects.toThrow("bad token");
   });
+
+  it("logs reconnection attempt count", async () => {
+    const networkError = Object.assign(new Error("timeout"), { code: "ETIMEDOUT" });
+    const logSpy = vi.fn();
+    const errorSpy = vi.fn();
+    const runtime = { log: logSpy, error: errorSpy, exit: vi.fn() };
+
+    runSpy
+      .mockImplementationOnce(() => ({
+        task: () => Promise.reject(networkError),
+        stop: vi.fn(),
+      }))
+      .mockImplementationOnce(() => ({
+        task: () => Promise.resolve(),
+        stop: vi.fn(),
+      }));
+
+    await monitorTelegramProvider({ token: "tok", runtime });
+
+    // Should log error with attempt count
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("attempt 1"));
+  });
 });

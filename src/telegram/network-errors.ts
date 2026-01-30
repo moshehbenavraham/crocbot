@@ -17,6 +17,14 @@ const RECOVERABLE_ERROR_CODES = new Set([
   "UND_ERR_ABORTED",
 ]);
 
+// HTTP status codes that indicate transient Telegram API errors worth retrying
+const RECOVERABLE_HTTP_STATUS_CODES = new Set([
+  429, // Too Many Requests (rate limited)
+  502, // Bad Gateway
+  503, // Service Unavailable
+  504, // Gateway Timeout
+]);
+
 const RECOVERABLE_ERROR_NAMES = new Set([
   "AbortError",
   "TimeoutError",
@@ -50,6 +58,15 @@ function getErrorCode(err: unknown): string | undefined {
   const errno = (err as { errno?: unknown }).errno;
   if (typeof errno === "string") return errno;
   if (typeof errno === "number") return String(errno);
+  return undefined;
+}
+
+function getHttpStatusCode(err: unknown): number | undefined {
+  if (!err || typeof err !== "object") return undefined;
+  // grammy uses error_code for Telegram API HTTP status
+  const typed = err as { error_code?: unknown; errorCode?: unknown; status?: unknown };
+  const code = typed.error_code ?? typed.errorCode ?? typed.status;
+  if (typeof code === "number" && code >= 100 && code < 600) return code;
   return undefined;
 }
 
@@ -96,6 +113,9 @@ export function isRecoverableTelegramNetworkError(
   for (const candidate of collectErrorCandidates(err)) {
     const code = normalizeCode(getErrorCode(candidate));
     if (code && RECOVERABLE_ERROR_CODES.has(code)) return true;
+
+    const httpStatus = getHttpStatusCode(candidate);
+    if (httpStatus && RECOVERABLE_HTTP_STATUS_CODES.has(httpStatus)) return true;
 
     const name = getErrorName(candidate);
     if (name && RECOVERABLE_ERROR_NAMES.has(name)) return true;

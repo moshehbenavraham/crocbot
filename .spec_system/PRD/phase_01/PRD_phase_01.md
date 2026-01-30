@@ -4,7 +4,7 @@
 **Sessions**: 5
 **Estimated Duration**: 2-3 days
 
-**Progress**: 2/5 sessions (40%)
+**Progress**: 3/5 sessions (60%)
 
 ---
 
@@ -20,7 +20,7 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 |---------|------|--------|------------|-----------|
 | 01 | Clean Technical Debt | Complete | 20 | 2026-01-30 |
 | 02 | Docker Optimization | Complete | 20 | 2026-01-30 |
-| 03 | Gateway Hardening | Not Started | ~15-20 | - |
+| 03 | Gateway Hardening | Complete | 20 | 2026-01-30 |
 | 04 | CI/CD Finalization | Not Started | ~12-18 | - |
 | 05 | Internal Docs Cleanup | Not Started | ~12-18 | - |
 
@@ -46,11 +46,22 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 - Verified graceful SIGTERM shutdown (662ms, exit code 0)
 - Created environment variables documentation
 
+### Session 03: Gateway Hardening (2026-01-30)
+
+- Added HTTP status code detection (429, 502, 503, 504) to recoverable errors
+- Consolidated duplicate bot.catch() handler in bot.ts
+- Added reconnection attempt logging with counter
+- Added restart counter reset after 60s stable connection
+- Enhanced /health endpoint with memory metrics (heapUsedMb, heapTotalMb, rssMb)
+- Added memory logging at gateway startup/shutdown
+- Added shutdown timing logging
+- 3590 tests passing, full quality gates verified
+
 ---
 
 ## Upcoming Sessions
 
-- Session 03: Gateway Hardening
+- Session 04: CI/CD Finalization
 
 ---
 
@@ -109,13 +120,13 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 Phase complete when:
 - [x] Session 01 - Clean Technical Debt completed
 - [x] Session 02 - Docker Optimization completed
-- [ ] Session 03 - Gateway Hardening completed
+- [x] Session 03 - Gateway Hardening completed
 - [ ] Session 04 - CI/CD Finalization completed
 - [ ] Session 05 - Internal Docs Cleanup completed
 - [ ] No stub files remaining for removed features
 - [ ] No orphaned code referencing removed channels
 - [x] Docker image optimized and tested
-- [ ] Gateway handles disconnects and errors gracefully
+- [x] Gateway handles disconnects and errors gracefully
 - [ ] CI/CD pipelines verified for production use
 - [ ] Internal docs cleaned of stale references
 - [ ] All tests passing with coverage thresholds met
