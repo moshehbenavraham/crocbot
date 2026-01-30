@@ -15,7 +15,8 @@
   "completed_sessions": [
     "phase00-session01-remove-native-apps",
     "phase00-session02-remove-extensions",
-    "phase00-session03-remove-channels"
+    "phase00-session03-remove-channels",
+    "phase00-session04-simplify-build"
   ],
   "next_session_history": [
     {
@@ -76,6 +77,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session03-remove-channels",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session04-simplify-build",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session04-simplify-build",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session04-simplify-build",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session04-simplify-build",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session04-simplify-build",
       "status": "completed"
     }
   ]

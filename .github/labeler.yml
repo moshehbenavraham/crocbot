@@ -1,33 +1,8 @@
-"channel: discord":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "src/discord/**"
-          - "docs/channels/discord.md"
-"channel: imessage":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "src/imessage/**"
-          - "docs/channels/imessage.md"
-"channel: signal":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "src/signal/**"
-          - "docs/channels/signal.md"
-"channel: slack":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "src/slack/**"
-          - "docs/channels/slack.md"
 "channel: telegram":
   - changed-files:
       - any-glob-to-any-file:
           - "src/telegram/**"
           - "docs/channels/telegram.md"
-"channel: whatsapp-web":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "src/web/**"
-          - "docs/channels/whatsapp.md"
 
 "app: web-ui":
   - changed-files:
