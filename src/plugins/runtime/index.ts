@@ -65,11 +65,6 @@ import { getImageMetadata, resizeToJpeg } from "../../media/image-ops.js";
 import { detectMime } from "../../media/mime.js";
 import { saveMediaBuffer } from "../../media/store.js";
 import { loadWebMedia } from "../../media/load.js";
-import { buildPairingReply } from "../../pairing/pairing-messages.js";
-import {
-  readChannelAllowFromStore,
-  upsertChannelPairingRequest,
-} from "../../pairing/pairing-store.js";
 import { runCommandWithTimeout } from "../../process/exec.js";
 import { resolveAgentRoute } from "../../routing/resolve-route.js";
 import {
@@ -82,7 +77,6 @@ import { sendMessageTelegram } from "../../telegram/send.js";
 import { resolveTelegramToken } from "../../telegram/token.js";
 import { registerMemoryCli } from "../../cli/memory-cli.js";
 import { formatNativeDependencyHint } from "./native-deps.js";
-import { textToSpeechTelephony } from "../../tts/tts.js";
 
 import type { PluginRuntime } from "./types.js";
 
@@ -121,9 +115,6 @@ export function createPluginRuntime(): PluginRuntime {
       getImageMetadata,
       resizeToJpeg,
     },
-    tts: {
-      textToSpeechTelephony,
-    },
     tools: {
       createMemoryGetTool,
       createMemorySearchTool,
@@ -155,11 +146,6 @@ export function createPluginRuntime(): PluginRuntime {
       },
       routing: {
         resolveAgentRoute,
-      },
-      pairing: {
-        buildPairingReply,
-        readAllowFromStore: readChannelAllowFromStore,
-        upsertPairingRequest: upsertChannelPairingRequest,
       },
       media: {
         fetchRemoteMedia,

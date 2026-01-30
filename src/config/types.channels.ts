@@ -1,5 +1,4 @@
 import type { TelegramConfig } from "./types.telegram.js";
-import type { WhatsAppConfig } from "./types.whatsapp.js";
 import type { GroupPolicy } from "./types.base.js";
 
 export type ChannelHeartbeatVisibilityConfig = {
@@ -20,6 +19,5 @@ export type ChannelDefaultsConfig = {
 export type ChannelsConfig = {
   defaults?: ChannelDefaultsConfig;
   telegram?: TelegramConfig;
-  whatsapp?: WhatsAppConfig;
   [key: string]: unknown;
 };

@@ -77,9 +77,7 @@ export async function requestNodePairing(opts: {
   };
 }
 
-export async function approveNodePairing(
-  _requestId: string,
-): Promise<{ node: PairedNode } | null> {
+export async function approveNodePairing(_requestId: string): Promise<{ node: PairedNode } | null> {
   return null;
 }
 

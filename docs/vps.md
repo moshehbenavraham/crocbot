@@ -32,10 +32,9 @@ deployments work at a high level.
 Remote access: [Gateway remote](/gateway/remote)  
 Platforms hub: [Platforms](/platforms)
 
-## Using nodes with a VPS
+## Remote access
 
-You can keep the Gateway in the cloud and pair **nodes** on your local devices
-(Mac/iOS/Android/headless). Nodes provide local screen/camera/canvas and `system.run`
-capabilities while the Gateway stays in the cloud.
+The Gateway runs on the VPS and handles all Telegram traffic. Access the Gateway
+remotely via Tailscale Serve/Funnel or SSH tunnel.
 
-Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes)
+Docs: [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale)

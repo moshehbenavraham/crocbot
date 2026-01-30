@@ -1,77 +1,59 @@
 ---
-summary: "First-run onboarding flow for crocbot (macOS app)"
+summary: "First-run onboarding flow for crocbot CLI"
 read_when:
-  - Designing the macOS onboarding assistant
+  - Understanding the onboarding process
   - Implementing auth or identity setup
 ---
-# Onboarding (macOS app)
+# Onboarding (CLI)
 
-This doc describes the **current** first‑run onboarding flow. The goal is a
-smooth “day 0” experience: pick where the Gateway runs, connect auth, run the
+This doc describes the **current** first-run onboarding flow. The goal is a
+smooth "day 0" experience: configure the Gateway, connect auth, run the
 wizard, and let the agent bootstrap itself.
 
-## Page order (current)
+## Onboarding flow
 
-1) Welcome + security notice
-2) **Gateway selection** (Local / Remote / Configure later)
-3) **Auth (Anthropic OAuth)** — local only
-4) **Setup Wizard** (Gateway‑driven)
-5) **Permissions** (TCC prompts)
-6) **CLI** (optional)
-7) **Onboarding chat** (dedicated session)
-8) Ready
+Run the onboarding wizard:
 
-## 1) Local vs Remote
+```bash
+crocbot onboard --install-daemon
+```
 
-Where does the **Gateway** run?
+The wizard walks through:
 
-- **Local (this Mac):** onboarding can run OAuth flows and write credentials
-  locally.
-- **Remote (over SSH/Tailnet):** onboarding does **not** run OAuth locally;
-  credentials must exist on the gateway host.
-- **Configure later:** skip setup and leave the app unconfigured.
+1. **Gateway configuration** - Set up the gateway bind, port, and token
+2. **Auth setup** - Configure Anthropic OAuth or API keys
+3. **Telegram bot setup** - Configure your Telegram bot token
+4. **Service installation** - Install the gateway as a launchd/systemd user service
 
-Gateway auth tip:
-- The wizard now generates a **token** even for loopback, so local WS clients must authenticate.
-- If you disable auth, any local process can connect; use that only on fully trusted machines.
-- Use a **token** for multi‑machine access or non‑loopback binds.
+## Auth setup
 
-## 2) Local-only auth (Anthropic OAuth)
+### Anthropic OAuth (Claude Pro/Max)
 
-The macOS app supports Anthropic OAuth (Claude Pro/Max). The flow:
+The CLI supports Anthropic OAuth (PKCE flow):
 
-- Opens the browser for OAuth (PKCE)
-- Asks the user to paste the `code#state` value
-- Writes credentials to `~/.clawdbot/credentials/oauth.json`
+```bash
+crocbot auth login --provider anthropic
+```
 
-Other providers (OpenAI, custom APIs) are configured via environment variables
-or config files for now.
+This opens the browser for OAuth and writes credentials to `~/.clawdbot/credentials/oauth.json`.
 
-## 3) Setup Wizard (Gateway‑driven)
+### API Keys
 
-The app can run the same setup wizard as the CLI. This keeps onboarding in sync
-with Gateway‑side behavior and avoids duplicating logic in SwiftUI.
+Alternatively, configure API keys via environment variables or config:
 
-## 4) Permissions
+```bash
+crocbot config set anthropic.apiKey "sk-ant-..."
+```
 
-Onboarding requests TCC permissions needed for:
+## Telegram bot configuration
 
-- Notifications
-- Accessibility
-- Screen Recording
-- Microphone / Speech Recognition
-- Automation (AppleScript)
+Configure your Telegram bot token:
 
-## 5) CLI (optional)
+```bash
+crocbot config set channels.telegram.botToken "123456:ABCDEF"
+```
 
-The app can install the global `crocbot` CLI via npm/pnpm so terminal
-workflows and launchd tasks work out of the box.
-
-## 6) Onboarding chat (dedicated session)
-
-After setup, the app opens a dedicated onboarding chat session so the agent can
-introduce itself and guide next steps. This keeps first‑run guidance separate
-from your normal conversation.
+See [Telegram setup](/channels/telegram) for full details.
 
 ## Agent bootstrap ritual
 
@@ -82,20 +64,10 @@ On the first agent run, crocbot bootstraps a workspace (default `~/clawd`):
 - Writes identity + preferences to `IDENTITY.md`, `USER.md`, `SOUL.md`
 - Removes `BOOTSTRAP.md` when finished so it only runs once
 
-## Optional: Gmail hooks (manual)
-
-Gmail Pub/Sub setup is currently a manual step. Use:
-
-```bash
-crocbot webhooks gmail setup --account you@gmail.com
-```
-
-See [/automation/gmail-pubsub](/automation/gmail-pubsub) for details.
-
 ## Remote mode notes
 
 When the Gateway runs on another machine, credentials and workspace files live
-**on that host**. If you need OAuth in remote mode, create:
+**on that host**. Create:
 
 - `~/.clawdbot/credentials/oauth.json`
 - `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`

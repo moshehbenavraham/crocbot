@@ -2,7 +2,7 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 0,
+  "current_phase": 1,
   "current_session": null,
   "phases": {
     "0": {
@@ -10,6 +10,12 @@
       "description": "Transform crocbot from multi-platform app to lean CLI + Telegram gateway for VPS hosting",
       "status": "complete",
       "session_count": 8
+    },
+    "1": {
+      "name": "Production Hardening and Deployment",
+      "description": "Clean technical debt, optimize Docker, harden gateway, finalize CI/CD, and clean internal docs for production readiness",
+      "status": "in_progress",
+      "session_count": 5
     }
   },
   "completed_sessions": [
@@ -20,7 +26,8 @@
     "phase00-session05-remove-dependencies",
     "phase00-session06-refactor-dead-code",
     "phase00-session07-remove-mobile-code",
-    "phase00-session08-update-documentation"
+    "phase00-session08-update-documentation",
+    "phase01-session01-clean-technical-debt"
   ],
   "next_session_history": [
     {
@@ -206,6 +213,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session08-update-documentation",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session01-clean-technical-debt",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session01-clean-technical-debt",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session01-clean-technical-debt",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session01-clean-technical-debt",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase01-session01-clean-technical-debt",
       "status": "completed"
     }
   ]

@@ -3,17 +3,11 @@
 import type { GatewayRequestContext } from "./types.js";
 import type { RespondFn } from "./types.js";
 
-export function pickBrowserNode(
-  _ctx: GatewayRequestContext,
-  _nodeHint?: string | null,
-): null {
+export function pickBrowserNode(_ctx: GatewayRequestContext, _nodeHint?: string | null): null {
   return null;
 }
 
-export function requireBrowserNode(
-  _ctx: GatewayRequestContext,
-  _nodeHint?: string | null,
-): never {
+export function requireBrowserNode(_ctx: GatewayRequestContext, _nodeHint?: string | null): never {
   throw new Error("Browser node functionality requires a connected node");
 }
 

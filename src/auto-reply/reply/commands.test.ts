@@ -421,16 +421,3 @@ describe("handleCommands subagents", () => {
   });
 });
 
-describe("handleCommands /tts", () => {
-  it("returns status for bare /tts on text command surfaces", async () => {
-    const cfg = {
-      commands: { text: true },
-      channels: { whatsapp: { allowFrom: ["*"] } },
-      messages: { tts: { prefsPath: path.join(testWorkspaceDir, "tts.json") } },
-    } as crocbotConfig;
-    const params = buildParams("/tts", cfg);
-    const result = await handleCommands(params);
-    expect(result.shouldContinue).toBe(false);
-    expect(result.reply?.text).toContain("TTS status");
-  });
-});

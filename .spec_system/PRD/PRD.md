@@ -81,7 +81,8 @@ This system delivers the product via phases. Each phase is implemented via multi
 
 | Phase | Name | Sessions | Status |
 |-------|------|----------|--------|
-| 00 | Strip Moltbot to minimal footprint | 8 | Not Started |
+| 00 | Strip Moltbot to minimal footprint | 8 | Complete |
+| 01 | Production Hardening and Deployment | 5 | Not Started |
 
 ## Phase 00: Strip Moltbot to minimal footprint
 

@@ -1,6 +1,6 @@
 # Contributing to crocbot
 
-Welcome to the lobster tank! 🦞
+Welcome to the lobster tank!
 
 ## Quick Links
 - **GitHub:** https://github.com/crocbot/crocbot
@@ -12,7 +12,7 @@ Welcome to the lobster tank! 🦞
 - **Peter Steinberger** - Benevolent Dictator
   - GitHub: [@steipete](https://github.com/steipete) · X: [@steipete](https://x.com/steipete)
 
-- **Shadow** - Discord + Slack subsystem
+- **Shadow** - Gateway + API
   - GitHub: [@thewilloftheshadow](https://github.com/thewilloftheshadow) · X: [@4shad0wed](https://x.com/4shad0wed)
 
 - **Jos** - Telegram, API, Nix mode
@@ -41,10 +41,10 @@ Please include in your PR:
 
 AI PRs are first-class citizens here. We just want transparency so reviewers know what to look for.
 
-## Current Focus & Roadmap 🗺
+## Current Focus & Roadmap
 
 We are currently prioritizing:
-- **Stability**: Fixing edge cases in channel connections (WhatsApp/Telegram).
+- **Stability**: Fixing edge cases in Telegram channel connections.
 - **UX**: Improving the onboarding wizard and error messages.
 - **Skills**: Expanding the library of bundled skills and improving the Skill Creation developer experience.
 - **Performance**: Optimizing token usage and compaction logic.

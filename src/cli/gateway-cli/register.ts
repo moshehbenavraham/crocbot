@@ -251,5 +251,4 @@ export function registerGatewayCli(program: Command) {
         await gatewayStatusCommand(opts, defaultRuntime);
       });
     });
-
 }

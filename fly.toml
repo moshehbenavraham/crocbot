@@ -25,6 +25,14 @@ primary_region = "iad"  # change to your closest region
   min_machines_running = 1
   processes = ["app"]
 
+  [http_service.checks]
+    [http_service.checks.health]
+      interval = "30s"
+      timeout = "5s"
+      grace_period = "10s"
+      method = "GET"
+      path = "/health"
+
 [[vm]]
   size = "shared-cpu-2x"
   memory = "2048mb"

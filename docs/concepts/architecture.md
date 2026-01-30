@@ -9,15 +9,11 @@ Last updated: 2026-01-22
 
 ## Overview
 
-- A single long‑lived **Gateway** owns all messaging surfaces (WhatsApp via
-  Baileys, Telegram via grammY, Slack, Discord, Signal, iMessage, WebChat).
-- Control-plane clients (macOS app, CLI, web UI, automations) connect to the
+- A single long-lived **Gateway** owns the Telegram messaging surface (via grammY) and WebChat.
+- Control-plane clients (CLI, web UI, automations) connect to the
   Gateway over **WebSocket** on the configured bind host (default
   `127.0.0.1:18789`).
-- **Nodes** (macOS/iOS/Android/headless) also connect over **WebSocket**, but
-  declare `role: node` with explicit caps/commands.
-- One Gateway per host; it is the only place that opens a WhatsApp session.
-- A **canvas host** (default `18793`) serves agent‑editable HTML and A2UI.
+- One Gateway per host; it is the only place that opens a Telegram session.
 
 ## Components and flows
 
@@ -27,16 +23,10 @@ Last updated: 2026-01-22
 - Validates inbound frames against JSON Schema.
 - Emits events like `agent`, `chat`, `presence`, `health`, `heartbeat`, `cron`.
 
-### Clients (mac app / CLI / web admin)
+### Clients (CLI / web admin)
 - One WS connection per client.
 - Send requests (`health`, `status`, `send`, `agent`, `system-presence`).
 - Subscribe to events (`tick`, `agent`, `presence`, `shutdown`).
-
-### Nodes (macOS / iOS / Android / headless)
-- Connect to the **same WS server** with `role: node`.
-- Provide a device identity in `connect`; pairing is **device‑based** (role `node`) and
-  approval lives in the device pairing store.
-- Expose commands like `canvas.*`, `camera.*`, `screen.record`, `location.get`.
 
 Protocol details:
 - [Gateway protocol](/gateway/protocol)
@@ -78,20 +68,13 @@ Client                    Gateway
   safely retry; the server keeps a short‑lived dedupe cache.
 - Nodes must include `role: "node"` plus caps/commands/permissions in `connect`.
 
-## Pairing + local trust
+## Authentication
 
-- All WS clients (operators + nodes) include a **device identity** on `connect`.
-- New device IDs require pairing approval; the Gateway issues a **device token**
-  for subsequent connects.
-- **Local** connects (loopback or the gateway host’s own tailnet address) can be
-  auto‑approved to keep same‑host UX smooth.
-- **Non‑local** connects must sign the `connect.challenge` nonce and require
-  explicit approval.
-- Gateway auth (`gateway.auth.*`) still applies to **all** connections, local or
-  remote.
+- Gateway auth (`gateway.auth.*`) applies to all connections.
+- Token-based authentication is recommended for non-loopback binds.
+- **Local** connects (loopback) can be auto-approved to keep same-host UX smooth.
 
-Details: [Gateway protocol](/gateway/protocol), [Pairing](/start/pairing),
-[Security](/gateway/security).
+Details: [Gateway protocol](/gateway/protocol), [Security](/gateway/security).
 
 ## Protocol typing and codegen
 
@@ -117,6 +100,6 @@ Details: [Gateway protocol](/gateway/protocol), [Pairing](/start/pairing),
 
 ## Invariants
 
-- Exactly one Gateway controls a single Baileys session per host.
-- Handshake is mandatory; any non‑JSON or non‑connect first frame is a hard close.
+- Exactly one Gateway controls a single Telegram session per host.
+- Handshake is mandatory; any non-JSON or non-connect first frame is a hard close.
 - Events are not replayed; clients must refresh on gaps.

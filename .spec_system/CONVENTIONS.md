@@ -110,8 +110,36 @@
 | Linter | oxlint | `pnpm lint` |
 | Type Safety | TypeScript (strict) | tsconfig.json |
 | Testing | Vitest | vitest.config.ts |
-| Git Hooks | prek | `prek install` |
+| Observability | tslog | src/logging/ |
+| Git Hooks | git-hooks/ | `git config core.hooksPath` |
 | Runtime | Node 22+ / Bun | scripts/run-node.mjs |
+
+## CI/CD Workflows
+
+Platform: GitHub Actions
+
+| Bundle | Status | Workflow |
+|--------|--------|----------|
+| Code Quality | configured | `.github/workflows/ci.yml` (lint, format, typecheck) |
+| Build & Test | configured | `.github/workflows/ci.yml` (build, test with coverage) |
+| Security | configured | `.github/workflows/ci.yml` (detect-secrets), `.github/workflows/security.yml` (CodeQL, dependency-review, npm-audit) |
+| Integration | configured | `.github/workflows/install-smoke.yml` |
+| Operations | configured | `.github/workflows/docker-release.yml`, `.github/dependabot.yml` |
+
+Additional workflows:
+- `.github/workflows/workflow-sanity.yml` - Validates workflow files
+- `.github/workflows/labeler.yml` - Auto-labels PRs
+- `.github/workflows/auto-response.yml` - Automated issue/PR responses
+
+## Infrastructure
+
+| Component | Provider | Details |
+|-----------|----------|---------|
+| Hosting | Fly.io / Docker | `fly.toml`, `docker-compose.yml` |
+| Health Endpoint | HTTP `/health` | `src/gateway/server-http.ts`, returns `{status, timestamp, uptime}` |
+| Health Probes | Fly.io / Docker | Fly: 30s interval, Docker: healthcheck |
+| Security (CI) | GitHub Actions | CodeQL, dependency-review, npm-audit (`.github/workflows/security.yml`) |
+| Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
 
 ## When In Doubt
 

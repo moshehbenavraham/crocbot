@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -48,6 +49,32 @@ const openClient = async (opts?: Parameters<typeof connectOk>[1]) => {
 };
 
 describe("gateway server health/presence", () => {
+  test("HTTP /health endpoint returns healthy status", async () => {
+    const response = await new Promise<{
+      statusCode: number;
+      body: { status: string; timestamp: string; uptime: number };
+    }>((resolve, reject) => {
+      const req = http.get(`http://127.0.0.1:${port}/health`, (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => {
+          try {
+            resolve({ statusCode: res.statusCode ?? 0, body: JSON.parse(data) });
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      req.on("error", reject);
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("healthy");
+    expect(typeof response.body.timestamp).toBe("string");
+    expect(typeof response.body.uptime).toBe("number");
+    expect(response.body.uptime).toBeGreaterThan(0);
+  });
+
   test("connect + health + presence + status succeed", { timeout: 60_000 }, async () => {
     const ws = await openClient();
 

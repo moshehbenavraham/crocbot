@@ -33,10 +33,7 @@ export function getAllPairedPeers(): PairedPeer[] {
   return [];
 }
 
-export function getPairedPeer(
-  _channel: PairingChannel,
-  _peerId: string,
-): PairedPeer | undefined {
+export function getPairedPeer(_channel: PairingChannel, _peerId: string): PairedPeer | undefined {
   return undefined;
 }
 
