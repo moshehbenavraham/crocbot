@@ -7,18 +7,15 @@ import { chatHandlers } from "./server-methods/chat.js";
 import { configHandlers } from "./server-methods/config.js";
 import { connectHandlers } from "./server-methods/connect.js";
 import { cronHandlers } from "./server-methods/cron.js";
-import { deviceHandlers } from "./server-methods/devices.js";
 import { execApprovalsHandlers } from "./server-methods/exec-approvals.js";
 import { healthHandlers } from "./server-methods/health.js";
 import { logsHandlers } from "./server-methods/logs.js";
 import { modelsHandlers } from "./server-methods/models.js";
-import { nodeHandlers } from "./server-methods/nodes.js";
 import { sendHandlers } from "./server-methods/send.js";
 import { sessionsHandlers } from "./server-methods/sessions.js";
 import { skillsHandlers } from "./server-methods/skills.js";
 import { systemHandlers } from "./server-methods/system.js";
 import { talkHandlers } from "./server-methods/talk.js";
-import { ttsHandlers } from "./server-methods/tts.js";
 import type { GatewayRequestHandlers, GatewayRequestOptions } from "./server-methods/types.js";
 import { updateHandlers } from "./server-methods/update.js";
 import { usageHandlers } from "./server-methods/usage.js";
@@ -30,23 +27,9 @@ const ADMIN_SCOPE = "operator.admin";
 const READ_SCOPE = "operator.read";
 const WRITE_SCOPE = "operator.write";
 const APPROVALS_SCOPE = "operator.approvals";
-const PAIRING_SCOPE = "operator.pairing";
 
 const APPROVAL_METHODS = new Set(["exec.approval.request", "exec.approval.resolve"]);
 const NODE_ROLE_METHODS = new Set(["node.invoke.result", "node.event", "skills.bins"]);
-const PAIRING_METHODS = new Set([
-  "node.pair.request",
-  "node.pair.list",
-  "node.pair.approve",
-  "node.pair.reject",
-  "node.pair.verify",
-  "device.pair.list",
-  "device.pair.approve",
-  "device.pair.reject",
-  "device.token.rotate",
-  "device.token.revoke",
-  "node.rename",
-]);
 const ADMIN_METHOD_PREFIXES = ["exec.approvals."];
 const READ_METHODS = new Set([
   "health",
@@ -55,8 +38,6 @@ const READ_METHODS = new Set([
   "status",
   "usage.status",
   "usage.cost",
-  "tts.status",
-  "tts.providers",
   "models.list",
   "agents.list",
   "agent.identity.get",
@@ -69,8 +50,6 @@ const READ_METHODS = new Set([
   "cron.runs",
   "system-presence",
   "last-heartbeat",
-  "node.list",
-  "node.describe",
   "chat.history",
 ]);
 const WRITE_METHODS = new Set([
@@ -79,12 +58,7 @@ const WRITE_METHODS = new Set([
   "agent.wait",
   "wake",
   "talk.mode",
-  "tts.enable",
-  "tts.disable",
-  "tts.convert",
-  "tts.setProvider",
   "voicewake.set",
-  "node.invoke",
   "chat.send",
   "chat.abort",
   "browser.request",
@@ -108,9 +82,6 @@ function authorizeGatewayMethod(method: string, client: GatewayRequestOptions["c
   if (APPROVAL_METHODS.has(method) && !scopes.includes(APPROVALS_SCOPE)) {
     return errorShape(ErrorCodes.INVALID_REQUEST, "missing scope: operator.approvals");
   }
-  if (PAIRING_METHODS.has(method) && !scopes.includes(PAIRING_SCOPE)) {
-    return errorShape(ErrorCodes.INVALID_REQUEST, "missing scope: operator.pairing");
-  }
   if (READ_METHODS.has(method) && !(scopes.includes(READ_SCOPE) || scopes.includes(WRITE_SCOPE))) {
     return errorShape(ErrorCodes.INVALID_REQUEST, "missing scope: operator.read");
   }
@@ -118,7 +89,6 @@ function authorizeGatewayMethod(method: string, client: GatewayRequestOptions["c
     return errorShape(ErrorCodes.INVALID_REQUEST, "missing scope: operator.write");
   }
   if (APPROVAL_METHODS.has(method)) return null;
-  if (PAIRING_METHODS.has(method)) return null;
   if (READ_METHODS.has(method)) return null;
   if (WRITE_METHODS.has(method)) return null;
   if (ADMIN_METHOD_PREFIXES.some((prefix) => method.startsWith(prefix))) {
@@ -153,19 +123,16 @@ export const coreGatewayHandlers: GatewayRequestHandlers = {
   ...channelsHandlers,
   ...chatHandlers,
   ...cronHandlers,
-  ...deviceHandlers,
   ...execApprovalsHandlers,
   ...webHandlers,
   ...modelsHandlers,
   ...configHandlers,
   ...wizardHandlers,
   ...talkHandlers,
-  ...ttsHandlers,
   ...skillsHandlers,
   ...sessionsHandlers,
   ...systemHandlers,
   ...updateHandlers,
-  ...nodeHandlers,
   ...sendHandlers,
   ...usageHandlers,
   ...agentHandlers,

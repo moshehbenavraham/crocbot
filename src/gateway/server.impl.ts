@@ -307,7 +307,6 @@ export async function startGatewayServer(
     logHooks,
     logPlugins,
   });
-  let bonjourStop: (() => Promise<void>) | null = null;
   const nodeRegistry = new NodeRegistry();
   const nodePresenceTimers = new Map<string, ReturnType<typeof setInterval>>();
   const nodeSubscriptions = createNodeSubscriptionManager();
@@ -344,7 +343,7 @@ export async function startGatewayServer(
     channelManager;
 
   const machineDisplayName = await getMachineDisplayName();
-  const discovery = await startGatewayDiscovery({
+  await startGatewayDiscovery({
     machineDisplayName,
     port,
     gatewayTls: gatewayTls.enabled
@@ -352,10 +351,8 @@ export async function startGatewayServer(
       : undefined,
     wideAreaDiscoveryEnabled: cfgAtStart.discovery?.wideArea?.enabled === true,
     tailscaleMode,
-    mdnsMode: cfgAtStart.discovery?.mdns?.mode,
     logDiscovery,
   });
-  bonjourStop = discovery.bonjourStop;
 
   setSkillsRemoteRegistry(nodeRegistry);
   void primeRemoteSkillsCache();
@@ -545,7 +542,6 @@ export async function startGatewayServer(
   });
 
   const close = createGatewayCloseHandler({
-    bonjourStop,
     tailscaleCleanup,
     canvasHost,
     canvasHostServer,

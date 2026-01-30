@@ -127,7 +127,6 @@ export async function primeRemoteSkillsCache() {
         deviceFamily: node.deviceFamily,
         commands: node.commands,
         remoteIp: node.remoteIp,
-        bins: node.bins,
       });
       if (isMacPlatform(node.platform, node.deviceFamily) && supportsSystemRun(node.commands)) {
         sawMac = true;
@@ -275,7 +274,7 @@ export async function refreshRemoteNodeBins(params: {
     const hasChanged = !areBinSetsEqual(existingBins, nextBins);
     recordRemoteNodeBins(params.nodeId, bins);
     if (!hasChanged) return;
-    await updatePairedNodeMetadata(params.nodeId, { bins });
+    await updatePairedNodeMetadata(params.nodeId, {});
     bumpSkillsSnapshotVersion({ reason: "remote-node" });
   } catch (err) {
     logRemoteBinProbeFailure(params.nodeId, err);

@@ -1,14 +1,11 @@
 import type { Command } from "commander";
 import { gatewayStatusCommand } from "../../commands/gateway-status.js";
 import { formatHealthChannelLines, type HealthSummary } from "../../commands/health.js";
-import { discoverGatewayBeacons } from "../../infra/bonjour-discovery.js";
 import type { CostUsageSummary } from "../../infra/session-cost-usage.js";
-import { WIDE_AREA_DISCOVERY_DOMAIN } from "../../infra/widearea-dns.js";
 import { defaultRuntime } from "../../runtime.js";
 import { formatDocsLink } from "../../terminal/links.js";
 import { colorize, isRich, theme } from "../../terminal/theme.js";
 import { formatTokenCount, formatUsd } from "../../utils/usage-format.js";
-import { withProgress } from "../progress.js";
 import { runCommandWithRuntime } from "../cli-utils.js";
 import {
   runDaemonInstall,
@@ -19,14 +16,6 @@ import {
   runDaemonUninstall,
 } from "../daemon-cli.js";
 import { callGatewayCli, gatewayCallOpts } from "./call.js";
-import type { GatewayDiscoverOpts } from "./discover.js";
-import {
-  dedupeBeacons,
-  parseDiscoverTimeoutMs,
-  pickBeaconHost,
-  pickGatewayPort,
-  renderBeaconLines,
-} from "./discover.js";
 import { addGatewayRunCommand } from "./run.js";
 
 function styleHealthChannelLine(line: string, rich: boolean): string {
@@ -253,7 +242,6 @@ export function registerGatewayCli(program: Command) {
     .option("--url <url>", "Explicit Gateway WebSocket URL (still probes localhost)")
     .option("--ssh <target>", "SSH target for remote gateway tunnel (user@host or user@host:port)")
     .option("--ssh-identity <path>", "SSH identity file path")
-    .option("--ssh-auto", "Try to derive an SSH target from Bonjour discovery", false)
     .option("--token <token>", "Gateway token (applies to all probes)")
     .option("--password <password>", "Gateway password (applies to all probes)")
     .option("--timeout <ms>", "Overall probe budget in ms", "3000")
@@ -264,69 +252,4 @@ export function registerGatewayCli(program: Command) {
       });
     });
 
-  gateway
-    .command("discover")
-    .description(
-      `Discover gateways via Bonjour (multicast local. + unicast ${WIDE_AREA_DISCOVERY_DOMAIN})`,
-    )
-    .option("--timeout <ms>", "Per-command timeout in ms", "2000")
-    .option("--json", "Output JSON", false)
-    .action(async (opts: GatewayDiscoverOpts) => {
-      await runGatewayCommand(async () => {
-        const timeoutMs = parseDiscoverTimeoutMs(opts.timeout, 2000);
-        const beacons = await withProgress(
-          {
-            label: "Scanning for gateways…",
-            indeterminate: true,
-            enabled: opts.json !== true,
-            delayMs: 0,
-          },
-          async () => await discoverGatewayBeacons({ timeoutMs }),
-        );
-
-        const deduped = dedupeBeacons(beacons).sort((a, b) =>
-          String(a.displayName || a.instanceName).localeCompare(
-            String(b.displayName || b.instanceName),
-          ),
-        );
-
-        if (opts.json) {
-          const enriched = deduped.map((b) => {
-            const host = pickBeaconHost(b);
-            const port = pickGatewayPort(b);
-            return { ...b, wsUrl: host ? `ws://${host}:${port}` : null };
-          });
-          defaultRuntime.log(
-            JSON.stringify(
-              {
-                timeoutMs,
-                domains: ["local.", WIDE_AREA_DISCOVERY_DOMAIN],
-                count: enriched.length,
-                beacons: enriched,
-              },
-              null,
-              2,
-            ),
-          );
-          return;
-        }
-
-        const rich = isRich();
-        defaultRuntime.log(colorize(rich, theme.heading, "Gateway Discovery"));
-        defaultRuntime.log(
-          colorize(
-            rich,
-            theme.muted,
-            `Found ${deduped.length} gateway(s) · domains: local., ${WIDE_AREA_DISCOVERY_DOMAIN}`,
-          ),
-        );
-        if (deduped.length === 0) return;
-
-        for (const beacon of deduped) {
-          for (const line of renderBeaconLines(beacon, rich)) {
-            defaultRuntime.log(line);
-          }
-        }
-      }, "gateway discover failed");
-    });
 }

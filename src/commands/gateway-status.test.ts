@@ -8,7 +8,6 @@ const loadConfig = vi.fn(() => ({
   },
 }));
 const resolveGatewayPort = vi.fn(() => 18789);
-const discoverGatewayBeacons = vi.fn(async () => []);
 const pickPrimaryTailnetIPv4 = vi.fn(() => "100.64.0.10");
 const sshStop = vi.fn(async () => {});
 const resolveSshConfig = vi.fn(async () => null);
@@ -84,10 +83,6 @@ vi.mock("../config/config.js", () => ({
   resolveGatewayPort: (cfg: unknown) => resolveGatewayPort(cfg),
 }));
 
-vi.mock("../infra/bonjour-discovery.js", () => ({
-  discoverGatewayBeacons: (opts: unknown) => discoverGatewayBeacons(opts),
-}));
-
 vi.mock("../infra/tailnet.js", () => ({
   pickPrimaryTailnetIPv4: () => pickPrimaryTailnetIPv4(),
 }));
@@ -128,7 +123,6 @@ describe("gateway-status command", () => {
 
     expect(runtimeErrors).toHaveLength(0);
     expect(runtimeLogs.join("\n")).toContain("Gateway Status");
-    expect(runtimeLogs.join("\n")).toContain("Discovery (this machine)");
     expect(runtimeLogs.join("\n")).toContain("Targets");
   });
 

@@ -1,49 +1,42 @@
-import type { ErrorObject } from "ajv";
-import { ErrorCodes, errorShape, formatValidationErrors } from "../protocol/index.js";
-import { formatForLog } from "../ws-log.js";
+// Node helpers removed - stubs for compatibility
+
+import type { GatewayRequestContext } from "./types.js";
 import type { RespondFn } from "./types.js";
 
-type ValidatorFn = ((value: unknown) => boolean) & {
-  errors?: ErrorObject[] | null;
-};
-
-export function respondInvalidParams(params: {
-  respond: RespondFn;
-  method: string;
-  validator: ValidatorFn;
-}) {
-  params.respond(
-    false,
-    undefined,
-    errorShape(
-      ErrorCodes.INVALID_REQUEST,
-      `invalid ${params.method} params: ${formatValidationErrors(params.validator.errors)}`,
-    ),
-  );
+export function pickBrowserNode(
+  _ctx: GatewayRequestContext,
+  _nodeHint?: string | null,
+): null {
+  return null;
 }
 
-export async function respondUnavailableOnThrow(respond: RespondFn, fn: () => Promise<void>) {
+export function requireBrowserNode(
+  _ctx: GatewayRequestContext,
+  _nodeHint?: string | null,
+): never {
+  throw new Error("Browser node functionality requires a connected node");
+}
+
+export function safeParseJson(raw: unknown): unknown {
+  if (typeof raw !== "string") return raw;
   try {
-    await fn();
-  } catch (err) {
-    respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, formatForLog(err)));
+    return JSON.parse(raw);
+  } catch {
+    return raw;
   }
 }
 
-export function uniqueSortedStrings(values: unknown[]) {
-  return [...new Set(values.filter((v) => typeof v === "string"))]
-    .map((v) => v.trim())
-    .filter(Boolean)
-    .sort();
-}
-
-export function safeParseJson(value: string | null | undefined): unknown {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
+export async function respondUnavailableOnThrow<T>(
+  respond: RespondFn,
+  fn: () => Promise<T>,
+): Promise<T | undefined> {
   try {
-    return JSON.parse(trimmed) as unknown;
-  } catch {
-    return { payloadJSON: value };
+    return await fn();
+  } catch (err) {
+    respond(false, undefined, {
+      code: "-32603",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return undefined;
   }
 }

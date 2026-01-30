@@ -18,7 +18,8 @@
     "phase00-session03-remove-channels",
     "phase00-session04-simplify-build",
     "phase00-session05-remove-dependencies",
-    "phase00-session06-refactor-dead-code"
+    "phase00-session06-refactor-dead-code",
+    "phase00-session07-remove-mobile-code"
   ],
   "next_session_history": [
     {
@@ -154,6 +155,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session06-refactor-dead-code",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session07-remove-mobile-code",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session07-remove-mobile-code",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session07-remove-mobile-code",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session07-remove-mobile-code",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session07-remove-mobile-code",
       "status": "completed"
     }
   ]

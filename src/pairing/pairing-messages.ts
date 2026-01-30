@@ -1,20 +1,29 @@
-import { formatCliCommand } from "../cli/command-format.js";
-import type { PairingChannel } from "./pairing-store.js";
+// Pairing messages removed - stubs for compatibility
 
-export function buildPairingReply(params: {
-  channel: PairingChannel;
-  idLine: string;
-  code: string;
-}): string {
-  const { channel, idLine, code } = params;
-  return [
-    "crocbot: access not configured.",
-    "",
-    idLine,
-    "",
-    `Pairing code: ${code}`,
-    "",
-    "Ask the bot owner to approve with:",
-    formatCliCommand(`crocbot pairing approve ${channel} <code>`),
-  ].join("\n");
+export const PAIRING_REQUEST_MESSAGE = "";
+export const PAIRING_APPROVED_MESSAGE = "";
+export const PAIRING_REJECTED_MESSAGE = "";
+export const PAIRING_DM_INSTRUCTION = "";
+
+export function formatPairingRequestMessage(_displayName?: string): string {
+  return "";
+}
+
+export function formatPairingApprovedMessage(_displayName?: string): string {
+  return "";
+}
+
+export function formatPairingRejectedMessage(_displayName?: string): string {
+  return "";
+}
+
+export type PairingReplyOptions = {
+  channel: string;
+  peerId: string;
+  displayName?: string;
+  code?: string;
+};
+
+export function buildPairingReply(_opts: PairingReplyOptions): string {
+  return "";
 }

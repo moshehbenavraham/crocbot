@@ -93,14 +93,6 @@ const entries: SubCliEntry[] = [
     },
   },
   {
-    name: "devices",
-    description: "Device pairing + token management",
-    register: async (program) => {
-      const mod = await import("../devices-cli.js");
-      mod.registerDevicesCli(program);
-    },
-  },
-  {
     name: "node",
     description: "Node control",
     register: async (program) => {
@@ -162,14 +154,6 @@ const entries: SubCliEntry[] = [
     register: async (program) => {
       const mod = await import("../webhooks-cli.js");
       mod.registerWebhooksCli(program);
-    },
-  },
-  {
-    name: "pairing",
-    description: "Pairing helpers",
-    register: async (program) => {
-      const mod = await import("../pairing-cli.js");
-      mod.registerPairingCli(program);
     },
   },
   {

@@ -102,7 +102,7 @@ export function registerDnsCli(program: Command) {
 
   dns
     .command("setup")
-    .description("Set up CoreDNS to serve crocbot.internal for unicast DNS-SD (Wide-Area Bonjour)")
+    .description("Set up CoreDNS to serve crocbot.internal for unicast DNS-SD")
     .option(
       "--apply",
       "Install/update CoreDNS config and (re)start the service (requires sudo)",

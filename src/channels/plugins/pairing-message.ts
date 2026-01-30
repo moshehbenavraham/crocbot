@@ -1,2 +1,2 @@
-export const PAIRING_APPROVED_MESSAGE =
-  "✅ crocbot access approved. Send a message to start chatting.";
+// Pairing removed - kept for compatibility
+export const PAIRING_APPROVED_MESSAGE = "";
