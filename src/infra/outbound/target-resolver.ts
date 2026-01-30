@@ -136,8 +136,8 @@ function detectTargetKind(
   if (trimmed.startsWith("@") || /^<@!?/.test(trimmed) || /^user:/i.test(trimmed)) return "user";
   if (trimmed.startsWith("#") || /^channel:/i.test(trimmed)) return "group";
 
-  // For some channels (e.g., BlueBubbles/iMessage), bare phone numbers are almost always DM targets.
-  if ((channel === "bluebubbles" || channel === "imessage") && /^\+?\d{6,}$/.test(trimmed)) {
+  // For iMessage, bare phone numbers are almost always DM targets.
+  if (channel === "imessage" && /^\+?\d{6,}$/.test(trimmed)) {
     return "user";
   }
 

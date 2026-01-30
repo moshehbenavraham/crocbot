@@ -12,7 +12,6 @@ const ENVELOPE_CHANNELS = [
   "Matrix",
   "Zalo",
   "Zalo Personal",
-  "BlueBubbles",
 ];
 
 const MESSAGE_ID_LINE = /^\s*\[message_id:\s*[^\]]+\]\s*$/i;

@@ -21,8 +21,6 @@ Items requiring attention in upcoming phases. Review before each session.
 
 - [P00] **WhatsApp types retained**: `src/config/types.whatsapp.ts` kept because WhatsApp web provider (`src/provider-web.ts`) still in use. Assess if this provider is still needed.
 
-- [P00] **BlueBubbles provider status**: BlueBubbles provider appears in config schemas but may be unused after channel removals. Verify if still needed.
-
 ### Performance / Security
 <!-- Max 5 items -->
 
@@ -101,6 +99,7 @@ Recently closed items (buffer - rotates out after 2 phases).
 | P00 | Mobile infrastructure (TTS/Bonjour/pairing) | Stubbed/disabled in Session 07 |
 | P00 | User-facing documentation | Updated for Telegram-only in Session 08 |
 | P01 | Internal docs cleanup | Cleaned 130+ files in Session 05 |
+| P02 | BlueBubbles provider removal | Removed from config schemas and code in Session 03 |
 
 ---
 
