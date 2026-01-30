@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { LEGACY_MANIFEST_KEY } from "../compat/legacy-names.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { CONFIG_DIR, resolveUserPath } from "../utils.js";
 import {
@@ -22,7 +21,6 @@ type PackageManifest = {
   version?: string;
   dependencies?: Record<string, string>;
   crocbot?: { extensions?: string[] };
-  [LEGACY_MANIFEST_KEY]?: { extensions?: string[] };
 };
 
 export type InstallPluginResult =
@@ -55,7 +53,7 @@ function safeFileName(input: string): string {
 }
 
 async function ensurecrocbotExtensions(manifest: PackageManifest) {
-  const extensions = manifest.crocbot?.extensions ?? manifest[LEGACY_MANIFEST_KEY]?.extensions;
+  const extensions = manifest.crocbot?.extensions;
   if (!Array.isArray(extensions)) {
     throw new Error("package.json missing crocbot.extensions");
   }

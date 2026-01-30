@@ -210,7 +210,6 @@ export function loadcrocbotPlugins(options: PluginLoadOptions = {}): PluginRegis
       ? {
           alias: {
             "crocbot/plugin-sdk": pluginSdkAlias,
-            "crocbot/plugin-sdk": pluginSdkAlias,
           },
         }
       : {}),

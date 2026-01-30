@@ -1,14 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { LEGACY_MANIFEST_KEY, LEGACY_PLUGIN_MANIFEST_FILENAME } from "../compat/legacy-names.js";
 import type { PluginConfigUiHint, PluginKind } from "./types.js";
 
 export const PLUGIN_MANIFEST_FILENAME = "crocbot.plugin.json";
-export const PLUGIN_MANIFEST_FILENAMES = [
-  PLUGIN_MANIFEST_FILENAME,
-  LEGACY_PLUGIN_MANIFEST_FILENAME,
-] as const;
+export const PLUGIN_MANIFEST_FILENAMES = [PLUGIN_MANIFEST_FILENAME] as const;
 
 export type PluginManifest = {
   id: string;
@@ -141,12 +137,11 @@ export type PackageManifest = {
   version?: string;
   description?: string;
   crocbot?: crocbotPackageManifest;
-  [LEGACY_MANIFEST_KEY]?: crocbotPackageManifest;
 };
 
 export function getPackageManifestMetadata(
   manifest: PackageManifest | undefined,
 ): crocbotPackageManifest | undefined {
   if (!manifest) return undefined;
-  return manifest.crocbot ?? manifest[LEGACY_MANIFEST_KEY];
+  return manifest.crocbot;
 }

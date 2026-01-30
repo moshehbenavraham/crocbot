@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { LEGACY_MANIFEST_KEY } from "../../compat/legacy-names.js";
 import { discovercrocbotPlugins } from "../../plugins/discovery.js";
 import type { PluginOrigin } from "../../plugins/types.js";
 import type { crocbotPackageManifest } from "../../plugins/manifest.js";
@@ -51,7 +50,6 @@ type ExternalCatalogEntry = {
   version?: string;
   description?: string;
   crocbot?: crocbotPackageManifest;
-  [LEGACY_MANIFEST_KEY]?: crocbotPackageManifest;
 };
 
 const DEFAULT_CATALOG_PATHS = [
@@ -206,7 +204,7 @@ function buildCatalogEntry(candidate: {
 }
 
 function buildExternalCatalogEntry(entry: ExternalCatalogEntry): ChannelPluginCatalogEntry | null {
-  const manifest = entry.crocbot ?? entry[LEGACY_MANIFEST_KEY];
+  const manifest = entry.crocbot;
   return buildCatalogEntry({
     packageName: entry.name,
     packagecrocbot: manifest,

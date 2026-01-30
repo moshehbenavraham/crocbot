@@ -3,7 +3,6 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LEGACY_CANVAS_HANDLER_NAME } from "../compat/legacy-names.js";
 import { detectMime } from "../media/mime.js";
 
 export const A2UI_PATH = "/__crocbot__/a2ui";
@@ -92,15 +91,14 @@ async function resolveA2uiFilePath(rootReal: string, urlPath: string) {
 }
 
 export function injectCanvasLiveReload(html: string): string {
-  const legacyHandlerName = LEGACY_CANVAS_HANDLER_NAME;
   const snippet = `
 <script>
 (() => {
   // Cross-platform action bridge helper.
   // Works on:
-  // - iOS: window.webkit.messageHandlers.(current|legacy)CanvasA2UIAction.postMessage(...)
-  // - Android: window.(current|legacy)CanvasA2UIAction.postMessage(...)
-  const handlerNames = ["crocbotCanvasA2UIAction", "${legacyHandlerName}"];
+  // - iOS: window.webkit.messageHandlers.crocbotCanvasA2UIAction.postMessage(...)
+  // - Android: window.crocbotCanvasA2UIAction.postMessage(...)
+  const handlerNames = ["crocbotCanvasA2UIAction"];
   function postToNode(payload) {
     try {
       const raw = typeof payload === "string" ? payload : JSON.stringify(payload);

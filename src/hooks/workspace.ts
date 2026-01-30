@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { LEGACY_MANIFEST_KEY } from "../compat/legacy-names.js";
 import type { crocbotConfig } from "../config/config.js";
 import { CONFIG_DIR, resolveUserPath } from "../utils.js";
 import { resolveBundledHooksDir } from "./bundled-dir.js";
@@ -23,7 +22,6 @@ import type {
 type HookPackageManifest = {
   name?: string;
   crocbot?: { hooks?: string[] };
-  [LEGACY_MANIFEST_KEY]?: { hooks?: string[] };
 };
 
 function filterHookEntries(
@@ -46,7 +44,7 @@ function readHookPackageManifest(dir: string): HookPackageManifest | null {
 }
 
 function resolvePackageHooks(manifest: HookPackageManifest): string[] {
-  const raw = manifest.crocbot?.hooks ?? manifest[LEGACY_MANIFEST_KEY]?.hooks;
+  const raw = manifest.crocbot?.hooks;
   if (!Array.isArray(raw)) return [];
   return raw.map((entry) => (typeof entry === "string" ? entry.trim() : "")).filter(Boolean);
 }

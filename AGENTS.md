@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project Snapshot
-- crocbot is a Telegram-first personal AI assistant and gateway CLI (`crocbot`/`crocbot` binaries).
+- crocbot is a Telegram-first personal AI assistant and gateway CLI (`crocbot` binary).
 - Chat channels: Telegram only (`src/channels/registry.ts`). Other channels and native apps were removed during the strip-down.
 - Plugin runtime remains (`src/plugins`, `src/plugin-sdk`); there are no bundled `extensions/`.
 
@@ -18,7 +18,6 @@
 - Use `scripts/committer "<msg>" <file...>` for commits (scoped staging).
 
 ## Docs Rules
-- Docs host: `https://docs.github.com/moshehbenavraham/crocbot`.
 - Internal links in `docs/**/*.md`: root-relative, no `.md`/`.mdx`.
 - Keep docs generic (no real hostnames/tokens). Update `docs/docs.json` when adding/removing pages.
 
