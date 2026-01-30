@@ -18,7 +18,7 @@ crocbot has two log “surfaces”:
 
 - Default rolling log file is under `/tmp/crocbot/` (one file per day): `crocbot-YYYY-MM-DD.log`
   - Date uses the gateway host's local timezone.
-- The log file path and level can be configured via `~/.clawdbot/crocbot.json`:
+- The log file path and level can be configured via `~/.crocbot/crocbot.json`:
   - `logging.file`
   - `logging.level`
 

@@ -70,7 +70,7 @@ Transform the crocbot codebase from a multi-platform application with macOS app,
 - Gateway runs as standalone Node.js process
 - CLI provides configuration and management interface
 - Telegram bot via grammy library handles all messaging
-- Configuration stored in `~/.clawdbot/` directory
+- Configuration stored in `~/.crocbot/` directory
 
 ### Technologies
 - Node.js 22+ (runtime)

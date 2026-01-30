@@ -33,7 +33,7 @@ Sandboxing details: [Sandboxing](/gateway/sandboxing)
 From repo root:
 
 ```bash
-./docker-setup.sh
+./scripts/scripts/docker-setup.sh
 ```
 
 This script:
@@ -44,17 +44,17 @@ This script:
 - generates a gateway token and writes it to `.env`
 
 Optional env vars:
-- `CLAWDBOT_DOCKER_APT_PACKAGES` — install extra apt packages during build
-- `CLAWDBOT_EXTRA_MOUNTS` — add extra host bind mounts
-- `CLAWDBOT_HOME_VOLUME` — persist `/home/node` in a named volume
+- `CROCBOT_DOCKER_APT_PACKAGES` — install extra apt packages during build
+- `CROCBOT_EXTRA_MOUNTS` — add extra host bind mounts
+- `CROCBOT_HOME_VOLUME` — persist `/home/node` in a named volume
 
 After it finishes:
 - Open `http://127.0.0.1:18789/` in your browser.
 - Paste the token into the Control UI (Settings → token).
 
 It writes config/workspace on the host:
-- `~/.clawdbot/`
-- `~/clawd`
+- `~/.crocbot/`
+- `~/croc`
 
 Running on a VPS? See [Hetzner (Docker VPS)](/platforms/hetzner).
 
@@ -69,68 +69,68 @@ docker compose up -d crocbot-gateway
 ### Extra mounts (optional)
 
 If you want to mount additional host directories into the containers, set
-`CLAWDBOT_EXTRA_MOUNTS` before running `docker-setup.sh`. This accepts a
+`CROCBOT_EXTRA_MOUNTS` before running `scripts/docker-setup.sh`. This accepts a
 comma-separated list of Docker bind mounts and applies them to both
 `crocbot-gateway` and `crocbot-cli` by generating `docker-compose.extra.yml`.
 
 Example:
 
 ```bash
-export CLAWDBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
-./docker-setup.sh
+export CROCBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+./scripts/scripts/docker-setup.sh
 ```
 
 Notes:
 - Paths must be shared with Docker Desktop on macOS/Windows.
-- If you edit `CLAWDBOT_EXTRA_MOUNTS`, rerun `docker-setup.sh` to regenerate the
+- If you edit `CROCBOT_EXTRA_MOUNTS`, rerun `scripts/docker-setup.sh` to regenerate the
   extra compose file.
 - `docker-compose.extra.yml` is generated. Don’t hand-edit it.
 
 ### Persist the entire container home (optional)
 
 If you want `/home/node` to persist across container recreation, set a named
-volume via `CLAWDBOT_HOME_VOLUME`. This creates a Docker volume and mounts it at
+volume via `CROCBOT_HOME_VOLUME`. This creates a Docker volume and mounts it at
 `/home/node`, while keeping the standard config/workspace bind mounts. Use a
 named volume here (not a bind path); for bind mounts, use
-`CLAWDBOT_EXTRA_MOUNTS`.
+`CROCBOT_EXTRA_MOUNTS`.
 
 Example:
 
 ```bash
-export CLAWDBOT_HOME_VOLUME="crocbot_home"
-./docker-setup.sh
+export CROCBOT_HOME_VOLUME="crocbot_home"
+./scripts/scripts/docker-setup.sh
 ```
 
 You can combine this with extra mounts:
 
 ```bash
-export CLAWDBOT_HOME_VOLUME="crocbot_home"
-export CLAWDBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
-./docker-setup.sh
+export CROCBOT_HOME_VOLUME="crocbot_home"
+export CROCBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+./scripts/scripts/docker-setup.sh
 ```
 
 Notes:
-- If you change `CLAWDBOT_HOME_VOLUME`, rerun `docker-setup.sh` to regenerate the
+- If you change `CROCBOT_HOME_VOLUME`, rerun `scripts/docker-setup.sh` to regenerate the
   extra compose file.
 - The named volume persists until removed with `docker volume rm <name>`.
 
 ### Install extra apt packages (optional)
 
 If you need system packages inside the image (for example, build tools or media
-libraries), set `CLAWDBOT_DOCKER_APT_PACKAGES` before running `docker-setup.sh`.
+libraries), set `CROCBOT_DOCKER_APT_PACKAGES` before running `scripts/docker-setup.sh`.
 This installs the packages during the image build, so they persist even if the
 container is deleted.
 
 Example:
 
 ```bash
-export CLAWDBOT_DOCKER_APT_PACKAGES="ffmpeg build-essential"
-./docker-setup.sh
+export CROCBOT_DOCKER_APT_PACKAGES="ffmpeg build-essential"
+./scripts/scripts/docker-setup.sh
 ```
 
 Notes:
 - This accepts a space-separated list of apt package names.
-- If you change `CLAWDBOT_DOCKER_APT_PACKAGES`, rerun `docker-setup.sh` to rebuild
+- If you change `CROCBOT_DOCKER_APT_PACKAGES`, rerun `scripts/docker-setup.sh` to rebuild
   the image.
 
 ### Faster rebuilds (recommended)
@@ -180,7 +180,7 @@ Docs: [Telegram](/channels/telegram)
 ### Health check
 
 ```bash
-docker compose exec crocbot-gateway node dist/index.js health --token "$CLAWDBOT_GATEWAY_TOKEN"
+docker compose exec crocbot-gateway node dist/index.js health --token "$CROCBOT_GATEWAY_TOKEN"
 ```
 
 ### E2E smoke test (Docker)
@@ -198,7 +198,7 @@ pnpm test:docker:qr
 ### Notes
 
 - Gateway bind defaults to `lan` for container use.
-- The gateway container is the source of truth for sessions (`~/.clawdbot/agents/<agentId>/sessions/`).
+- The gateway container is the source of truth for sessions (`~/.crocbot/agents/<agentId>/sessions/`).
 
 ## Agent Sandbox (host gateway + Docker tools)
 
@@ -234,7 +234,7 @@ precedence, and troubleshooting.
 
 - Image: `crocbot-sandbox:bookworm-slim`
 - One container per agent
-- Agent workspace access: `workspaceAccess: "none"` (default) uses `~/.clawdbot/sandboxes`
+- Agent workspace access: `workspaceAccess: "none"` (default) uses `~/.crocbot/sandboxes`
   - `"ro"` keeps the sandbox workspace at `/workspace` and mounts the agent workspace read-only at `/agent` (disables `write`/`edit`/`apply_patch`)
   - `"rw"` mounts the agent workspace read/write at `/workspace`
 - Auto-prune: idle > 24h OR age > 7d
@@ -260,7 +260,7 @@ log a warning with the exact `crocbot sandbox recreate ...` command.
         mode: "non-main", // off | non-main | all
         scope: "agent", // session | agent | shared (agent is default)
         workspaceAccess: "none", // none | ro | rw
-        workspaceRoot: "~/.clawdbot/sandboxes",
+        workspaceRoot: "~/.crocbot/sandboxes",
         docker: {
           image: "crocbot-sandbox:bookworm-slim",
           workdir: "/workspace",
@@ -427,7 +427,7 @@ Example:
 
 ## Troubleshooting
 
-- Image missing: build with [`scripts/sandbox-setup.sh`](https://github.com/crocbot/crocbot/blob/main/scripts/sandbox-setup.sh) or set `agents.defaults.sandbox.docker.image`.
+- Image missing: build with [`scripts/sandbox-setup.sh`](https://github.com/moshehbenavraham/crocbot/blob/main/scripts/sandbox-setup.sh) or set `agents.defaults.sandbox.docker.image`.
 - Container not running: it will auto-create per session on demand.
 - Permission errors in sandbox: set `docker.user` to a UID:GID that matches your
   mounted workspace ownership (or chown the workspace folder).

@@ -16,7 +16,7 @@ describe("resolveAgentConfig", () => {
   it("should return undefined when agent id does not exist", () => {
     const cfg: crocbotConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/clawd" }],
+        list: [{ id: "main", workspace: "~/croc" }],
       },
     };
     const result = resolveAgentConfig(cfg, "nonexistent");
@@ -30,8 +30,8 @@ describe("resolveAgentConfig", () => {
           {
             id: "main",
             name: "Main Agent",
-            workspace: "~/clawd",
-            agentDir: "~/.clawdbot/agents/main",
+            workspace: "~/croc",
+            agentDir: "~/.crocbot/agents/main",
             model: "anthropic/claude-opus-4",
           },
         ],
@@ -40,8 +40,8 @@ describe("resolveAgentConfig", () => {
     const result = resolveAgentConfig(cfg, "main");
     expect(result).toEqual({
       name: "Main Agent",
-      workspace: "~/clawd",
-      agentDir: "~/.clawdbot/agents/main",
+      workspace: "~/croc",
+      agentDir: "~/.crocbot/agents/main",
       model: "anthropic/claude-opus-4",
       identity: undefined,
       groupChat: undefined,
@@ -113,7 +113,7 @@ describe("resolveAgentConfig", () => {
         list: [
           {
             id: "work",
-            workspace: "~/clawd-work",
+            workspace: "~/croc-work",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -141,7 +141,7 @@ describe("resolveAgentConfig", () => {
         list: [
           {
             id: "restricted",
-            workspace: "~/clawd-restricted",
+            workspace: "~/croc-restricted",
             tools: {
               allow: ["read"],
               deny: ["exec", "write", "edit"],
@@ -171,7 +171,7 @@ describe("resolveAgentConfig", () => {
         list: [
           {
             id: "family",
-            workspace: "~/clawd-family",
+            workspace: "~/croc-family",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -192,12 +192,12 @@ describe("resolveAgentConfig", () => {
   it("should normalize agent id", () => {
     const cfg: crocbotConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/clawd" }],
+        list: [{ id: "main", workspace: "~/croc" }],
       },
     };
     // Should normalize to "main" (default)
     const result = resolveAgentConfig(cfg, "");
     expect(result).toBeDefined();
-    expect(result?.workspace).toBe("~/clawd");
+    expect(result?.workspace).toBe("~/croc");
   });
 });

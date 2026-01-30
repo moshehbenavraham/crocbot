@@ -29,7 +29,7 @@ describe("registerSubCliCommands", () => {
 
   beforeEach(() => {
     process.env = { ...originalEnv };
-    delete process.env.CLAWDBOT_DISABLE_LAZY_SUBCOMMANDS;
+    delete process.env.CROCBOT_DISABLE_LAZY_SUBCOMMANDS;
     registerAcpCli.mockClear();
     acpAction.mockClear();
     registerNodesCli.mockClear();

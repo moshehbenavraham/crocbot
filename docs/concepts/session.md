@@ -21,8 +21,8 @@ All session state is **owned by the gateway** (the "master" crocbot). UI clients
 
 ## Where state lives
 - On the **gateway host**:
-  - Store file: `~/.clawdbot/agents/<agentId>/sessions/sessions.json` (per agent).
-- Transcripts: `~/.clawdbot/agents/<agentId>/sessions/<SessionId>.jsonl` (Telegram topic sessions use `.../<SessionId>-topic-<threadId>.jsonl`).
+  - Store file: `~/.crocbot/agents/<agentId>/sessions/sessions.json` (per agent).
+- Transcripts: `~/.crocbot/agents/<agentId>/sessions/<SessionId>.jsonl` (Telegram topic sessions use `.../<SessionId>-topic-<threadId>.jsonl`).
 - The store is a map `sessionKey -> { sessionId, updatedAt, ... }`. Deleting entries is safe; they are recreated on demand.
 - Group entries may include `displayName`, `channel`, `subject`, `room`, and `space` to label sessions in UIs.
 - Session entries include `origin` metadata (label + routing hints) so UIs can explain where a session came from.
@@ -90,7 +90,7 @@ Send these as standalone messages so they register.
 
 ## Configuration (optional rename example)
 ```json5
-// ~/.clawdbot/crocbot.json
+// ~/.crocbot/crocbot.json
 {
   session: {
     scope: "per-sender",      // keep group keys separate
@@ -114,7 +114,7 @@ Send these as standalone messages so they register.
       telegram: { mode: "idle", idleMinutes: 10080 }
     },
     resetTriggers: ["/new", "/reset"],
-    store: "~/.clawdbot/agents/{agentId}/sessions/sessions.json",
+    store: "~/.crocbot/agents/{agentId}/sessions/sessions.json",
     mainKey: "main",
   }
 }

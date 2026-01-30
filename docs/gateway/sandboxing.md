@@ -46,7 +46,7 @@ Group/channel sessions use their own keys, so they count as non-main and will be
 
 ## Workspace access
 `agents.defaults.sandbox.workspaceAccess` controls **what the sandbox can see**:
-- `"none"` (default): tools see a sandbox workspace under `~/.clawdbot/sandboxes`.
+- `"none"` (default): tools see a sandbox workspace under `~/.crocbot/sandboxes`.
 - `"ro"`: mounts the agent workspace read-only at `/agent` (disables `write`/`edit`/`apply_patch`).
 - `"rw"`: mounts the agent workspace read/write at `/workspace`.
 

@@ -138,10 +138,10 @@ export async function statusAllCommand(
           ? typeof remote?.token === "string" && remote.token.trim()
             ? remote.token.trim()
             : undefined
-          : process.env.CLAWDBOT_GATEWAY_TOKEN?.trim() ||
+          : process.env.CROCBOT_GATEWAY_TOKEN?.trim() ||
             (typeof authToken === "string" && authToken.trim() ? authToken.trim() : undefined);
       const password =
-        process.env.CLAWDBOT_GATEWAY_PASSWORD?.trim() ||
+        process.env.CROCBOT_GATEWAY_PASSWORD?.trim() ||
         (mode === "remote"
           ? typeof remote?.password === "string" && remote.password.trim()
             ? remote.password.trim()

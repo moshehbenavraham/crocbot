@@ -51,7 +51,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({
       detected,
@@ -92,7 +92,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -113,7 +113,7 @@ describe("doctor legacy state migrations", () => {
 
     const result = await autoMigrateLegacyState({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
       log,
     });
 
@@ -138,7 +138,7 @@ describe("doctor legacy state migrations", () => {
 
     const result = await autoMigrateLegacyState({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
       log,
       now: () => 123,
     });
@@ -164,7 +164,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -180,7 +180,7 @@ describe("doctor legacy state migrations", () => {
     const cfg: crocbotConfig = {};
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
     expect(result.changes).toEqual([]);
@@ -199,7 +199,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -222,7 +222,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -245,7 +245,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -267,7 +267,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -288,7 +288,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     await runLegacyStateMigrations({ detected, now: () => 123 });
 
@@ -311,7 +311,7 @@ describe("doctor legacy state migrations", () => {
 
     const result = await autoMigrateLegacyState({
       cfg,
-      env: { CLAWDBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { CROCBOT_STATE_DIR: root } as NodeJS.ProcessEnv,
       log,
     });
 

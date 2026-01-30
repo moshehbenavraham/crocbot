@@ -8,27 +8,27 @@ describe("onboard (non-interactive): token auth", () => {
   it("writes token profile config and stores the token", async () => {
     const prev = {
       home: process.env.HOME,
-      stateDir: process.env.CLAWDBOT_STATE_DIR,
-      configPath: process.env.CLAWDBOT_CONFIG_PATH,
-      skipChannels: process.env.CLAWDBOT_SKIP_CHANNELS,
-      skipGmail: process.env.CLAWDBOT_SKIP_GMAIL_WATCHER,
-      skipCron: process.env.CLAWDBOT_SKIP_CRON,
-      skipCanvas: process.env.CLAWDBOT_SKIP_CANVAS_HOST,
-      token: process.env.CLAWDBOT_GATEWAY_TOKEN,
-      password: process.env.CLAWDBOT_GATEWAY_PASSWORD,
+      stateDir: process.env.CROCBOT_STATE_DIR,
+      configPath: process.env.CROCBOT_CONFIG_PATH,
+      skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
+      skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
+      skipCron: process.env.CROCBOT_SKIP_CRON,
+      skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
+      token: process.env.CROCBOT_GATEWAY_TOKEN,
+      password: process.env.CROCBOT_GATEWAY_PASSWORD,
     };
 
-    process.env.CLAWDBOT_SKIP_CHANNELS = "1";
-    process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = "1";
-    process.env.CLAWDBOT_SKIP_CRON = "1";
-    process.env.CLAWDBOT_SKIP_CANVAS_HOST = "1";
-    delete process.env.CLAWDBOT_GATEWAY_TOKEN;
-    delete process.env.CLAWDBOT_GATEWAY_PASSWORD;
+    process.env.CROCBOT_SKIP_CHANNELS = "1";
+    process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
+    process.env.CROCBOT_SKIP_CRON = "1";
+    process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
+    delete process.env.CROCBOT_GATEWAY_TOKEN;
+    delete process.env.CROCBOT_GATEWAY_PASSWORD;
 
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-onboard-token-"));
     process.env.HOME = tempHome;
-    process.env.CLAWDBOT_STATE_DIR = tempHome;
-    process.env.CLAWDBOT_CONFIG_PATH = path.join(tempHome, "crocbot.json");
+    process.env.CROCBOT_STATE_DIR = tempHome;
+    process.env.CROCBOT_CONFIG_PATH = path.join(tempHome, "crocbot.json");
     vi.resetModules();
 
     const token = `sk-ant-oat01-${"a".repeat(80)}`;
@@ -80,14 +80,14 @@ describe("onboard (non-interactive): token auth", () => {
     } finally {
       await fs.rm(tempHome, { recursive: true, force: true });
       process.env.HOME = prev.home;
-      process.env.CLAWDBOT_STATE_DIR = prev.stateDir;
-      process.env.CLAWDBOT_CONFIG_PATH = prev.configPath;
-      process.env.CLAWDBOT_SKIP_CHANNELS = prev.skipChannels;
-      process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = prev.skipGmail;
-      process.env.CLAWDBOT_SKIP_CRON = prev.skipCron;
-      process.env.CLAWDBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
-      process.env.CLAWDBOT_GATEWAY_TOKEN = prev.token;
-      process.env.CLAWDBOT_GATEWAY_PASSWORD = prev.password;
+      process.env.CROCBOT_STATE_DIR = prev.stateDir;
+      process.env.CROCBOT_CONFIG_PATH = prev.configPath;
+      process.env.CROCBOT_SKIP_CHANNELS = prev.skipChannels;
+      process.env.CROCBOT_SKIP_GMAIL_WATCHER = prev.skipGmail;
+      process.env.CROCBOT_SKIP_CRON = prev.skipCron;
+      process.env.CROCBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
+      process.env.CROCBOT_GATEWAY_TOKEN = prev.token;
+      process.env.CROCBOT_GATEWAY_PASSWORD = prev.password;
     }
   }, 60_000);
 });

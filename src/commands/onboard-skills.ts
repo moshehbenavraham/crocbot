@@ -156,7 +156,7 @@ export async function setupSkills(
         runtime.log(
           `Tip: run \`${formatCliCommand("crocbot doctor")}\` to review skills + requirements.`,
         );
-        runtime.log("Docs: https://docs.molt.bot/skills");
+        runtime.log("Docs: https://docs.github.com/moshehbenavraham/crocbot/skills");
       }
     }
   }

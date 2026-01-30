@@ -144,7 +144,7 @@ describe("resolveUserPath", () => {
   });
 
   it("expands ~/ to home dir", () => {
-    expect(resolveUserPath("~/clawd")).toBe(path.resolve(os.homedir(), "clawd"));
+    expect(resolveUserPath("~/croc")).toBe(path.resolve(os.homedir(), "croc"));
   });
 
   it("resolves relative paths", () => {

@@ -35,7 +35,7 @@ The CLI supports Anthropic OAuth (PKCE flow):
 crocbot auth login --provider anthropic
 ```
 
-This opens the browser for OAuth and writes credentials to `~/.clawdbot/credentials/oauth.json`.
+This opens the browser for OAuth and writes credentials to `~/.crocbot/credentials/oauth.json`.
 
 ### API Keys
 
@@ -57,7 +57,7 @@ See [Telegram setup](/channels/telegram) for full details.
 
 ## Agent bootstrap ritual
 
-On the first agent run, crocbot bootstraps a workspace (default `~/clawd`):
+On the first agent run, crocbot bootstraps a workspace (default `~/croc`):
 
 - Seeds `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`
 - Runs a short Q&A ritual (one question at a time)
@@ -69,7 +69,7 @@ On the first agent run, crocbot bootstraps a workspace (default `~/clawd`):
 When the Gateway runs on another machine, credentials and workspace files live
 **on that host**. Create:
 
-- `~/.clawdbot/credentials/oauth.json`
-- `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`
+- `~/.crocbot/credentials/oauth.json`
+- `~/.crocbot/agents/<agentId>/agent/auth-profiles.json`
 
 on the gateway host.

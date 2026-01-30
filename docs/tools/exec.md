@@ -29,7 +29,7 @@ Background sessions are scoped per agent; `process` only sees sessions from the 
 Notes:
 - `host` defaults to `sandbox`.
 - `elevated` is ignored when sandboxing is off (exec already runs on the host).
-- `gateway`/`node` approvals are controlled by `~/.clawdbot/exec-approvals.json`.
+- `gateway`/`node` approvals are controlled by `~/.crocbot/exec-approvals.json`.
 - `node` requires a paired node (companion app or headless node host).
 - If multiple nodes are available, set `exec.node` or `tools.exec.node` to select one.
 - On non-Windows hosts, exec uses `SHELL` when set; if `SHELL` is `fish`, it prefers `bash` (or `sh`)

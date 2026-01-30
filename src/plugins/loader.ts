@@ -209,7 +209,7 @@ export function loadcrocbotPlugins(options: PluginLoadOptions = {}): PluginRegis
     ...(pluginSdkAlias
       ? {
           alias: {
-            "clawdbot/plugin-sdk": pluginSdkAlias,
+            "crocbot/plugin-sdk": pluginSdkAlias,
             "crocbot/plugin-sdk": pluginSdkAlias,
           },
         }

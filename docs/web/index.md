@@ -84,7 +84,7 @@ Open:
   gateway: {
     bind: "loopback",
     tailscale: { mode: "funnel" },
-    auth: { mode: "password" } // or CLAWDBOT_GATEWAY_PASSWORD
+    auth: { mode: "password" } // or CROCBOT_GATEWAY_PASSWORD
   }
 }
 ```

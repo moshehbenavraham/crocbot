@@ -43,15 +43,15 @@ crocbot gateway uninstall
 3) Delete state + config:
 
 ```bash
-rm -rf "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}"
+rm -rf "${CROCBOT_STATE_DIR:-$HOME/.crocbot}"
 ```
 
-If you set `CLAWDBOT_CONFIG_PATH` to a custom location outside the state dir, delete that file too.
+If you set `CROCBOT_CONFIG_PATH` to a custom location outside the state dir, delete that file too.
 
 4) Delete your workspace (optional, removes agent files):
 
 ```bash
-rm -rf ~/clawd
+rm -rf ~/croc
 ```
 
 5) Remove the CLI install (pick the one you used):
@@ -69,7 +69,7 @@ rm -rf /Applications/crocbot.app
 ```
 
 Notes:
-- If you used profiles (`--profile` / `CLAWDBOT_PROFILE`), repeat step 3 for each state dir (defaults are `~/.clawdbot-<profile>`).
+- If you used profiles (`--profile` / `CROCBOT_PROFILE`), repeat step 3 for each state dir (defaults are `~/.crocbot-<profile>`).
 - In remote mode, the state dir lives on the **gateway host**, so run steps 1-4 there too.
 
 ## Manual service removal (CLI not installed)
@@ -78,14 +78,14 @@ Use this if the gateway service keeps running but `crocbot` is missing.
 
 ### macOS (launchd)
 
-Default label is `com.clawdbot.gateway` (or `com.clawdbot.<profile>`):
+Default label is `com.crocbot.gateway` (or `com.crocbot.<profile>`):
 
 ```bash
-launchctl bootout gui/$UID/com.clawdbot.gateway
-rm -f ~/Library/LaunchAgents/com.clawdbot.gateway.plist
+launchctl bootout gui/$UID/com.crocbot.gateway
+rm -f ~/Library/LaunchAgents/com.crocbot.gateway.plist
 ```
 
-If you used a profile, replace the label and plist name with `com.clawdbot.<profile>`.
+If you used a profile, replace the label and plist name with `com.crocbot.<profile>`.
 
 ### Linux (systemd user unit)
 
@@ -104,16 +104,16 @@ The task script lives under your state dir.
 
 ```powershell
 schtasks /Delete /F /TN "crocbot Gateway"
-Remove-Item -Force "$env:USERPROFILE\.clawdbot\gateway.cmd"
+Remove-Item -Force "$env:USERPROFILE\.crocbot\gateway.cmd"
 ```
 
-If you used a profile, delete the matching task name and `~\.clawdbot-<profile>\gateway.cmd`.
+If you used a profile, delete the matching task name and `~\.crocbot-<profile>\gateway.cmd`.
 
 ## Normal install vs source checkout
 
 ### Normal install (install.sh / npm / pnpm / bun)
 
-If you used `https://molt.bot/install.sh` or `install.ps1`, the CLI was installed with `npm install -g crocbot@latest`.
+If you used `https://github.com/moshehbenavraham/crocbot/install.sh` or `install.ps1`, the CLI was installed with `npm install -g crocbot@latest`.
 Remove it with `npm rm -g crocbot` (or `pnpm remove -g` / `bun remove -g` if you installed that way).
 
 ### Source checkout (git clone)

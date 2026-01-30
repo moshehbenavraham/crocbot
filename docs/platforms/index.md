@@ -9,27 +9,29 @@ read_when:
 crocbot core is written in TypeScript. **Node is the recommended runtime**.
 Bun is not recommended for the Gateway.
 
-## Choose your OS
+## Deployment Paths
+
+crocbot supports two deployment paths:
+
+1. **Local (Docker Compose)** - For development and testing
+2. **Coolify (VPS)** - For production deployment
+
+See [Deployment](/deployment) for full setup instructions.
+
+## Operating Systems
 
 - Windows: [Windows (WSL2)](/platforms/windows)
 - Linux: [Linux](/platforms/linux)
+- Raspberry Pi: [Raspberry Pi](/platforms/raspberry-pi)
 
-## VPS & hosting
-
-- VPS hub: [VPS hosting](/vps)
-- Fly.io: [Fly.io](/platforms/fly)
-- Hetzner (Docker): [Hetzner](/platforms/hetzner)
-- GCP (Compute Engine): [GCP](/platforms/gcp)
-- exe.dev (VM + HTTPS proxy): [exe.dev](/platforms/exe-dev)
-
-## Common links
+## Common Links
 
 - Install guide: [Getting Started](/start/getting-started)
 - Gateway runbook: [Gateway](/gateway)
 - Gateway configuration: [Configuration](/gateway/configuration)
 - Service status: `crocbot gateway status`
 
-## Gateway service install (CLI)
+## Gateway Service Install (CLI)
 
 Use one of these (all supported):
 

@@ -9,10 +9,10 @@ import {
 } from "./paths.js";
 
 describe("oauth paths", () => {
-  it("prefers CLAWDBOT_OAUTH_DIR over CLAWDBOT_STATE_DIR", () => {
+  it("prefers CROCBOT_OAUTH_DIR over CROCBOT_STATE_DIR", () => {
     const env = {
-      CLAWDBOT_OAUTH_DIR: "/custom/oauth",
-      CLAWDBOT_STATE_DIR: "/custom/state",
+      CROCBOT_OAUTH_DIR: "/custom/oauth",
+      CROCBOT_STATE_DIR: "/custom/state",
     } as NodeJS.ProcessEnv;
 
     expect(resolveOAuthDir(env, "/custom/state")).toBe(path.resolve("/custom/oauth"));
@@ -21,9 +21,9 @@ describe("oauth paths", () => {
     );
   });
 
-  it("derives oauth path from CLAWDBOT_STATE_DIR when unset", () => {
+  it("derives oauth path from CROCBOT_STATE_DIR when unset", () => {
     const env = {
-      CLAWDBOT_STATE_DIR: "/custom/state",
+      CROCBOT_STATE_DIR: "/custom/state",
     } as NodeJS.ProcessEnv;
 
     expect(resolveOAuthDir(env, "/custom/state")).toBe(path.join("/custom/state", "credentials"));
@@ -37,7 +37,7 @@ describe("state + config path candidates", () => {
   it("prefers crocbot_STATE_DIR over legacy state dir env", () => {
     const env = {
       crocbot_STATE_DIR: "/new/state",
-      CLAWDBOT_STATE_DIR: "/legacy/state",
+      CROCBOT_STATE_DIR: "/legacy/state",
     } as NodeJS.ProcessEnv;
 
     expect(resolveStateDir(env, () => "/home/test")).toBe(path.resolve("/new/state"));
@@ -47,6 +47,6 @@ describe("state + config path candidates", () => {
     const home = "/home/test";
     const candidates = resolveDefaultConfigCandidates({} as NodeJS.ProcessEnv, () => home);
     expect(candidates[0]).toBe(path.join(home, ".crocbot", "crocbot.json"));
-    expect(candidates[1]).toBe(path.join(home, ".clawdbot", "crocbot.json"));
+    expect(candidates[1]).toBe(path.join(home, ".crocbot", "crocbot.json"));
   });
 });

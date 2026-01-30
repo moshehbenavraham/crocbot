@@ -280,9 +280,9 @@ TRASH
       --skip-health
 
     # Assert config + workspace scaffolding.
-    workspace_dir="$HOME/clawd"
-    config_path="$HOME/.clawdbot/crocbot.json"
-    sessions_dir="$HOME/.clawdbot/agents/main/sessions"
+    workspace_dir="$HOME/croc"
+    config_path="$HOME/.crocbot/crocbot.json"
+    sessions_dir="$HOME/.crocbot/agents/main/sessions"
 
     assert_file "$config_path"
     assert_dir "$sessions_dir"
@@ -352,7 +352,7 @@ NODE
       --skip-skills \
       --skip-health
 
-    config_path="$HOME/.clawdbot/crocbot.json"
+    config_path="$HOME/.crocbot/crocbot.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -386,9 +386,9 @@ NODE
     local home_dir
     home_dir="$(make_home reset-config)"
     export HOME="$home_dir"
-    mkdir -p "$HOME/.clawdbot"
+    mkdir -p "$HOME/.crocbot"
     # Seed a remote config to exercise reset path.
-    cat > "$HOME/.clawdbot/crocbot.json" <<'"'"'JSON'"'"'
+    cat > "$HOME/.crocbot/crocbot.json" <<'"'"'JSON'"'"'
 {
   "agents": { "defaults": { "workspace": "/root/old" } },
   "gateway": {
@@ -410,7 +410,7 @@ JSON
       --skip-ui \
       --skip-health
 
-    config_path="$HOME/.clawdbot/crocbot.json"
+    config_path="$HOME/.crocbot/crocbot.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -443,7 +443,7 @@ NODE
     # Channels-only configure flow.
     run_wizard_cmd channels "$home_dir" "node dist/index.js configure --section channels" send_channels_flow
 
-    config_path="$HOME/.clawdbot/crocbot.json"
+    config_path="$HOME/.crocbot/crocbot.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -481,9 +481,9 @@ NODE
     local home_dir
     home_dir="$(make_home skills)"
     export HOME="$home_dir"
-    mkdir -p "$HOME/.clawdbot"
+    mkdir -p "$HOME/.crocbot"
     # Seed skills config to ensure it survives the wizard.
-    cat > "$HOME/.clawdbot/crocbot.json" <<'"'"'JSON'"'"'
+    cat > "$HOME/.crocbot/crocbot.json" <<'"'"'JSON'"'"'
 {
   "skills": {
     "allowBundled": ["__none__"],
@@ -494,7 +494,7 @@ JSON
 
     run_wizard_cmd skills "$home_dir" "node dist/index.js configure --section skills" send_skills_flow
 
-    config_path="$HOME/.clawdbot/crocbot.json"
+    config_path="$HOME/.crocbot/crocbot.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'

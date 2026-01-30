@@ -18,7 +18,7 @@ Use these hubs to discover every page, including deep dives and reference docs t
 - [Help](/help)
 - [Configuration](/gateway/configuration)
 - [Configuration examples](/gateway/configuration-examples)
-- [crocbot assistant (Clawd)](/start/clawd)
+- [crocbot assistant (Croc)](/start/croc)
 - [Showcase](/start/showcase)
 - [Lore](/start/lore)
 
@@ -126,7 +126,7 @@ Use these hubs to discover every page, including deep dives and reference docs t
 ## Workspace + templates
 
 - [Skills](/tools/skills)
-- [ClawdHub](/tools/clawdhub)
+- [CrocHub](/tools/crochub)
 - [Skills config](/tools/skills-config)
 - [Default AGENTS](/reference/AGENTS.default)
 - [Templates: AGENTS](/reference/templates/AGENTS)

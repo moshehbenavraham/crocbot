@@ -18,8 +18,8 @@ async function withLaunchctlStub(
   run: (context: { env: Record<string, string | undefined>; logPath: string }) => Promise<void>,
 ) {
   const originalPath = process.env.PATH;
-  const originalLogPath = process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;
-  const originalListOutput = process.env.CLAWDBOT_TEST_LAUNCHCTL_LIST_OUTPUT;
+  const originalLogPath = process.env.CROCBOT_TEST_LAUNCHCTL_LOG;
+  const originalListOutput = process.env.CROCBOT_TEST_LAUNCHCTL_LIST_OUTPUT;
 
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-launchctl-test-"));
   try {
@@ -35,12 +35,12 @@ async function withLaunchctlStub(
       [
         'import fs from "node:fs";',
         "const args = process.argv.slice(2);",
-        "const logPath = process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;",
+        "const logPath = process.env.CROCBOT_TEST_LAUNCHCTL_LOG;",
         "if (logPath) {",
         '  fs.appendFileSync(logPath, JSON.stringify(args) + "\\n", "utf8");',
         "}",
         'if (args[0] === "list") {',
-        '  const output = process.env.CLAWDBOT_TEST_LAUNCHCTL_LIST_OUTPUT || "";',
+        '  const output = process.env.CROCBOT_TEST_LAUNCHCTL_LIST_OUTPUT || "";',
         "  process.stdout.write(output);",
         "}",
         "process.exit(0);",
@@ -61,28 +61,28 @@ async function withLaunchctlStub(
       await fs.chmod(shPath, 0o755);
     }
 
-    process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG = logPath;
-    process.env.CLAWDBOT_TEST_LAUNCHCTL_LIST_OUTPUT = options.listOutput ?? "";
+    process.env.CROCBOT_TEST_LAUNCHCTL_LOG = logPath;
+    process.env.CROCBOT_TEST_LAUNCHCTL_LIST_OUTPUT = options.listOutput ?? "";
     process.env.PATH = `${binDir}${path.delimiter}${originalPath ?? ""}`;
 
     await run({
       env: {
         HOME: homeDir,
-        CLAWDBOT_PROFILE: "default",
+        CROCBOT_PROFILE: "default",
       },
       logPath,
     });
   } finally {
     process.env.PATH = originalPath;
     if (originalLogPath === undefined) {
-      delete process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;
+      delete process.env.CROCBOT_TEST_LAUNCHCTL_LOG;
     } else {
-      process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG = originalLogPath;
+      process.env.CROCBOT_TEST_LAUNCHCTL_LOG = originalLogPath;
     }
     if (originalListOutput === undefined) {
-      delete process.env.CLAWDBOT_TEST_LAUNCHCTL_LIST_OUTPUT;
+      delete process.env.CROCBOT_TEST_LAUNCHCTL_LIST_OUTPUT;
     } else {
-      process.env.CLAWDBOT_TEST_LAUNCHCTL_LIST_OUTPUT = originalListOutput;
+      process.env.CROCBOT_TEST_LAUNCHCTL_LIST_OUTPUT = originalListOutput;
     }
     await fs.rm(tmpDir, { recursive: true, force: true });
   }
@@ -107,7 +107,7 @@ describe("launchd runtime parsing", () => {
 
 describe("launchctl list detection", () => {
   it("detects the resolved label in launchctl list", async () => {
-    await withLaunchctlStub({ listOutput: "123 0 com.clawdbot.gateway\n" }, async ({ env }) => {
+    await withLaunchctlStub({ listOutput: "123 0 com.crocbot.gateway\n" }, async ({ env }) => {
       const listed = await isLaunchAgentListed({ env });
       expect(listed).toBe(true);
     });
@@ -133,7 +133,7 @@ describe("launchd bootstrap repair", () => {
         .map((line) => JSON.parse(line) as string[]);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-      const label = "com.clawdbot.gateway";
+      const label = "com.crocbot.gateway";
       const plistPath = resolveLaunchAgentPlistPath(env);
 
       expect(calls).toContainEqual(["bootstrap", domain, plistPath]);
@@ -145,7 +145,7 @@ describe("launchd bootstrap repair", () => {
 describe("launchd install", () => {
   it("enables service before bootstrap (clears persisted disabled state)", async () => {
     const originalPath = process.env.PATH;
-    const originalLogPath = process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;
+    const originalLogPath = process.env.CROCBOT_TEST_LAUNCHCTL_LOG;
 
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-launchctl-test-"));
     try {
@@ -160,7 +160,7 @@ describe("launchd install", () => {
         stubJsPath,
         [
           'import fs from "node:fs";',
-          "const logPath = process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;",
+          "const logPath = process.env.CROCBOT_TEST_LAUNCHCTL_LOG;",
           "if (logPath) {",
           '  fs.appendFileSync(logPath, JSON.stringify(process.argv.slice(2)) + "\\n", "utf8");',
           "}",
@@ -182,12 +182,12 @@ describe("launchd install", () => {
         await fs.chmod(shPath, 0o755);
       }
 
-      process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG = logPath;
+      process.env.CROCBOT_TEST_LAUNCHCTL_LOG = logPath;
       process.env.PATH = `${binDir}${path.delimiter}${originalPath ?? ""}`;
 
       const env: Record<string, string | undefined> = {
         HOME: homeDir,
-        CLAWDBOT_PROFILE: "default",
+        CROCBOT_PROFILE: "default",
       };
       await installLaunchAgent({
         env,
@@ -201,7 +201,7 @@ describe("launchd install", () => {
         .map((line) => JSON.parse(line) as string[]);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-      const label = "com.clawdbot.gateway";
+      const label = "com.crocbot.gateway";
       const plistPath = resolveLaunchAgentPlistPath(env);
       const serviceId = `${domain}/${label}`;
 
@@ -218,9 +218,9 @@ describe("launchd install", () => {
     } finally {
       process.env.PATH = originalPath;
       if (originalLogPath === undefined) {
-        delete process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG;
+        delete process.env.CROCBOT_TEST_LAUNCHCTL_LOG;
       } else {
-        process.env.CLAWDBOT_TEST_LAUNCHCTL_LOG = originalLogPath;
+        process.env.CROCBOT_TEST_LAUNCHCTL_LOG = originalLogPath;
       }
       await fs.rm(tmpDir, { recursive: true, force: true });
     }
@@ -228,77 +228,77 @@ describe("launchd install", () => {
 });
 
 describe("resolveLaunchAgentPlistPath", () => {
-  it("uses default label when CLAWDBOT_PROFILE is default", () => {
-    const env = { HOME: "/Users/test", CLAWDBOT_PROFILE: "default" };
+  it("uses default label when CROCBOT_PROFILE is default", () => {
+    const env = { HOME: "/Users/test", CROCBOT_PROFILE: "default" };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.gateway.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.gateway.plist",
     );
   });
 
-  it("uses default label when CLAWDBOT_PROFILE is unset", () => {
+  it("uses default label when CROCBOT_PROFILE is unset", () => {
     const env = { HOME: "/Users/test" };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.gateway.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.gateway.plist",
     );
   });
 
-  it("uses profile-specific label when CLAWDBOT_PROFILE is set to a custom value", () => {
-    const env = { HOME: "/Users/test", CLAWDBOT_PROFILE: "jbphoenix" };
+  it("uses profile-specific label when CROCBOT_PROFILE is set to a custom value", () => {
+    const env = { HOME: "/Users/test", CROCBOT_PROFILE: "jbphoenix" };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.jbphoenix.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.jbphoenix.plist",
     );
   });
 
-  it("prefers CLAWDBOT_LAUNCHD_LABEL over CLAWDBOT_PROFILE", () => {
+  it("prefers CROCBOT_LAUNCHD_LABEL over CROCBOT_PROFILE", () => {
     const env = {
       HOME: "/Users/test",
-      CLAWDBOT_PROFILE: "jbphoenix",
-      CLAWDBOT_LAUNCHD_LABEL: "com.custom.label",
+      CROCBOT_PROFILE: "jbphoenix",
+      CROCBOT_LAUNCHD_LABEL: "com.custom.label",
     };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
       "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     );
   });
 
-  it("trims whitespace from CLAWDBOT_LAUNCHD_LABEL", () => {
+  it("trims whitespace from CROCBOT_LAUNCHD_LABEL", () => {
     const env = {
       HOME: "/Users/test",
-      CLAWDBOT_LAUNCHD_LABEL: "  com.custom.label  ",
+      CROCBOT_LAUNCHD_LABEL: "  com.custom.label  ",
     };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
       "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     );
   });
 
-  it("ignores empty CLAWDBOT_LAUNCHD_LABEL and falls back to profile", () => {
+  it("ignores empty CROCBOT_LAUNCHD_LABEL and falls back to profile", () => {
     const env = {
       HOME: "/Users/test",
-      CLAWDBOT_PROFILE: "myprofile",
-      CLAWDBOT_LAUNCHD_LABEL: "   ",
+      CROCBOT_PROFILE: "myprofile",
+      CROCBOT_LAUNCHD_LABEL: "   ",
     };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.myprofile.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.myprofile.plist",
     );
   });
 
   it("handles case-insensitive 'Default' profile", () => {
-    const env = { HOME: "/Users/test", CLAWDBOT_PROFILE: "Default" };
+    const env = { HOME: "/Users/test", CROCBOT_PROFILE: "Default" };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.gateway.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.gateway.plist",
     );
   });
 
   it("handles case-insensitive 'DEFAULT' profile", () => {
-    const env = { HOME: "/Users/test", CLAWDBOT_PROFILE: "DEFAULT" };
+    const env = { HOME: "/Users/test", CROCBOT_PROFILE: "DEFAULT" };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.gateway.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.gateway.plist",
     );
   });
 
-  it("trims whitespace from CLAWDBOT_PROFILE", () => {
-    const env = { HOME: "/Users/test", CLAWDBOT_PROFILE: "  myprofile  " };
+  it("trims whitespace from CROCBOT_PROFILE", () => {
+    const env = { HOME: "/Users/test", CROCBOT_PROFILE: "  myprofile  " };
     expect(resolveLaunchAgentPlistPath(env)).toBe(
-      "/Users/test/Library/LaunchAgents/com.clawdbot.myprofile.plist",
+      "/Users/test/Library/LaunchAgents/com.crocbot.myprofile.plist",
     );
   });
 });

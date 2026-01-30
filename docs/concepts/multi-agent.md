@@ -15,12 +15,12 @@ An **agent** is a fully scoped brain with its own:
 
 - **Workspace** (files, AGENTS.md/SOUL.md/USER.md, local notes, persona rules).
 - **State directory** (`agentDir`) for auth profiles, model registry, and per-agent config.
-- **Session store** (chat history + routing state) under `~/.clawdbot/agents/<agentId>/sessions`.
+- **Session store** (chat history + routing state) under `~/.crocbot/agents/<agentId>/sessions`.
 
 Auth profiles are **per-agent**. Each agent reads from its own:
 
 ```
-~/.clawdbot/agents/<agentId>/agent/auth-profiles.json
+~/.crocbot/agents/<agentId>/agent/auth-profiles.json
 ```
 
 Main agent credentials are **not** shared automatically. Never reuse `agentDir`
@@ -28,7 +28,7 @@ across agents (it causes auth/session collisions). If you want to share creds,
 copy `auth-profiles.json` into the other agent's `agentDir`.
 
 Skills are per-agent via each workspace's `skills/` folder, with shared skills
-available from `~/.clawdbot/skills`. See [Skills: per-agent vs shared](/tools/skills#per-agent-vs-shared-skills).
+available from `~/.crocbot/skills`. See [Skills: per-agent vs shared](/tools/skills#per-agent-vs-shared-skills).
 
 The Gateway can host **one agent** (default) or **many agents** side-by-side.
 
@@ -39,11 +39,11 @@ reach other host locations unless sandboxing is enabled. See
 
 ## Paths (quick map)
 
-- Config: `~/.clawdbot/crocbot.json` (or `CLAWDBOT_CONFIG_PATH`)
-- State dir: `~/.clawdbot` (or `CLAWDBOT_STATE_DIR`)
-- Workspace: `~/clawd` (or `~/clawd-<agentId>`)
-- Agent dir: `~/.clawdbot/agents/<agentId>/agent` (or `agents.list[].agentDir`)
-- Sessions: `~/.clawdbot/agents/<agentId>/sessions`
+- Config: `~/.crocbot/crocbot.json` (or `CROCBOT_CONFIG_PATH`)
+- State dir: `~/.crocbot` (or `CROCBOT_STATE_DIR`)
+- Workspace: `~/croc` (or `~/croc-<agentId>`)
+- Agent dir: `~/.crocbot/agents/<agentId>/agent` (or `agents.list[].agentDir`)
+- Sessions: `~/.crocbot/agents/<agentId>/sessions`
 
 ### Single-agent mode (default)
 
@@ -51,8 +51,8 @@ If you do nothing, crocbot runs a single agent:
 
 - `agentId` defaults to **`main`**.
 - Sessions are keyed as `agent:main:<mainKey>`.
-- Workspace defaults to `~/clawd` (or `~/clawd-<profile>` when `CLAWDBOT_PROFILE` is set).
-- State defaults to `~/.clawdbot/agents/main/agent`.
+- Workspace defaults to `~/croc` (or `~/croc-<profile>` when `CROCBOT_PROFILE` is set).
+- State defaults to `~/.crocbot/agents/main/agent`.
 
 ## Agent helper
 
@@ -92,8 +92,8 @@ Example:
 {
   agents: {
     list: [
-      { id: "alex", workspace: "~/clawd-alex" },
-      { id: "mia", workspace: "~/clawd-mia" }
+      { id: "alex", workspace: "~/croc-alex" },
+      { id: "mia", workspace: "~/croc-mia" }
     ]
   },
   bindings: [
@@ -137,7 +137,7 @@ multiple bots without mixing sessions.
 
 ## Example: two Telegram bots -> two agents
 
-`~/.clawdbot/crocbot.json` (JSON5):
+`~/.crocbot/crocbot.json` (JSON5):
 
 ```js
 {
@@ -147,14 +147,14 @@ multiple bots without mixing sessions.
         id: "home",
         default: true,
         name: "Home",
-        workspace: "~/clawd-home",
-        agentDir: "~/.clawdbot/agents/home/agent",
+        workspace: "~/croc-home",
+        agentDir: "~/.crocbot/agents/home/agent",
       },
       {
         id: "work",
         name: "Work",
-        workspace: "~/clawd-work",
-        agentDir: "~/.clawdbot/agents/work/agent",
+        workspace: "~/croc-work",
+        agentDir: "~/.crocbot/agents/work/agent",
       },
     ],
   },
@@ -209,13 +209,13 @@ Split by account: route one Telegram bot to a fast everyday agent and another to
       {
         id: "chat",
         name: "Everyday",
-        workspace: "~/clawd-chat",
+        workspace: "~/croc-chat",
         model: "anthropic/claude-sonnet-4-5"
       },
       {
         id: "opus",
         name: "Deep Work",
-        workspace: "~/clawd-opus",
+        workspace: "~/croc-opus",
         model: "anthropic/claude-opus-4-5"
       }
     ]
@@ -239,8 +239,8 @@ Keep Telegram on the fast agent, but route one DM to Opus:
 {
   agents: {
     list: [
-      { id: "chat", name: "Everyday", workspace: "~/clawd-chat", model: "anthropic/claude-sonnet-4-5" },
-      { id: "opus", name: "Deep Work", workspace: "~/clawd-opus", model: "anthropic/claude-opus-4-5" }
+      { id: "chat", name: "Everyday", workspace: "~/croc-chat", model: "anthropic/claude-sonnet-4-5" },
+      { id: "opus", name: "Deep Work", workspace: "~/croc-opus", model: "anthropic/claude-opus-4-5" }
     ]
   },
   bindings: [
@@ -264,7 +264,7 @@ and a tighter tool policy:
       {
         id: "family",
         name: "Family",
-        workspace: "~/clawd-family",
+        workspace: "~/croc-family",
         identity: { name: "Family Bot" },
         groupChat: {
           mentionPatterns: ["@family", "@familybot", "@Family Bot"]
@@ -308,7 +308,7 @@ Starting with v2026.1.6, each agent can have its own sandbox and tool restrictio
     list: [
       {
         id: "personal",
-        workspace: "~/clawd-personal",
+        workspace: "~/croc-personal",
         sandbox: {
           mode: "off",  // No sandbox for personal agent
         },
@@ -316,7 +316,7 @@ Starting with v2026.1.6, each agent can have its own sandbox and tool restrictio
       },
       {
         id: "family",
-        workspace: "~/clawd-family",
+        workspace: "~/croc-family",
         sandbox: {
           mode: "all",     // Always sandboxed
           scope: "agent",  // One container per agent

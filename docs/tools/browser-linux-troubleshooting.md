@@ -9,7 +9,7 @@ read_when: "Browser control fails on Linux, especially with snap Chromium"
 
 crocbot's browser control server fails to launch Chrome/Brave/Edge/Chromium with the error:
 ```
-{"error":"Error: Failed to start Chrome CDP on port 18800 for profile \"clawd\"."}
+{"error":"Error: Failed to start Chrome CDP on port 18800 for profile \"croc\"."}
 ```
 
 ### Root Cause
@@ -34,7 +34,7 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 sudo apt --fix-broken install -y  # if there are dependency errors
 ```
 
-Then update your crocbot config (`~/.clawdbot/crocbot.json`):
+Then update your crocbot config (`~/.crocbot/crocbot.json`):
 
 ```json
 {
@@ -67,19 +67,19 @@ If you must use snap Chromium, configure crocbot to attach to a manually-started
 ```bash
 chromium-browser --headless --no-sandbox --disable-gpu \
   --remote-debugging-port=18800 \
-  --user-data-dir=$HOME/.clawdbot/browser/clawd/user-data \
+  --user-data-dir=$HOME/.crocbot/browser/croc/user-data \
   about:blank &
 ```
 
 3. Optionally create a systemd user service to auto-start Chrome:
 ```ini
-# ~/.config/systemd/user/clawd-browser.service
+# ~/.config/systemd/user/croc-browser.service
 [Unit]
-Description=Clawd Browser (Chrome CDP)
+Description=Croc Browser (Chrome CDP)
 After=network.target
 
 [Service]
-ExecStart=/snap/bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-port=18800 --user-data-dir=%h/.clawdbot/browser/clawd/user-data about:blank
+ExecStart=/snap/bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-port=18800 --user-data-dir=%h/.crocbot/browser/croc/user-data about:blank
 Restart=on-failure
 RestartSec=5
 
@@ -87,7 +87,7 @@ RestartSec=5
 WantedBy=default.target
 ```
 
-Enable with: `systemctl --user enable --now clawd-browser.service`
+Enable with: `systemctl --user enable --now croc-browser.service`
 
 ### Verifying the Browser Works
 
@@ -119,11 +119,11 @@ You’re using the `chrome` profile (extension relay). It expects the crocbot
 browser extension to be attached to a live tab.
 
 Fix options:
-1. **Use the managed browser:** `crocbot browser start --browser-profile clawd`
-   (or set `browser.defaultProfile: "clawd"`).
+1. **Use the managed browser:** `crocbot browser start --browser-profile croc`
+   (or set `browser.defaultProfile: "croc"`).
 2. **Use the extension relay:** install the extension, open a tab, and click the
    crocbot extension icon to attach it.
 
 Notes:
 - The `chrome` profile uses your **system default Chromium browser** when possible.
-- Local `clawd` profiles auto-assign `cdpPort`/`cdpUrl`; only set those for remote CDP.
+- Local `croc` profiles auto-assign `cdpPort`/`cdpUrl`; only set those for remote CDP.

@@ -4,7 +4,7 @@ import path from "node:path";
 import { CHANNEL_IDS } from "../../channels/registry.js";
 import { STATE_DIR } from "../../config/config.js";
 
-export const DEFAULT_SANDBOX_WORKSPACE_ROOT = path.join(os.homedir(), ".clawdbot", "sandboxes");
+export const DEFAULT_SANDBOX_WORKSPACE_ROOT = path.join(os.homedir(), ".crocbot", "sandboxes");
 
 export const DEFAULT_SANDBOX_IMAGE = "crocbot-sandbox:bookworm-slim";
 export const DEFAULT_SANDBOX_CONTAINER_PREFIX = "crocbot-sbx-";
@@ -48,7 +48,7 @@ export const DEFAULT_SANDBOX_BROWSER_AUTOSTART_TIMEOUT_MS = 12_000;
 
 export const SANDBOX_AGENT_WORKSPACE_MOUNT = "/agent";
 
-const resolvedSandboxStateDir = STATE_DIR ?? path.join(os.homedir(), ".clawdbot");
+const resolvedSandboxStateDir = STATE_DIR ?? path.join(os.homedir(), ".crocbot");
 export const SANDBOX_STATE_DIR = path.join(resolvedSandboxStateDir, "sandbox");
 export const SANDBOX_REGISTRY_PATH = path.join(SANDBOX_STATE_DIR, "containers.json");
 export const SANDBOX_BROWSER_REGISTRY_PATH = path.join(SANDBOX_STATE_DIR, "browsers.json");

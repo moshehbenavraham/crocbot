@@ -30,7 +30,7 @@ Defaults:
 
 ## API key
 
-Set `OPENAI_API_KEY`, or configure it in `~/.clawdbot/crocbot.json`:
+Set `OPENAI_API_KEY`, or configure it in `~/.crocbot/crocbot.json`:
 
 ```json5
 {

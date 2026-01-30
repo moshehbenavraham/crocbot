@@ -11,7 +11,7 @@ crocbot runs a single embedded agent runtime derived from **p-mono**.
 
 crocbot uses a single agent workspace directory (`agents.defaults.workspace`) as the agent’s **only** working directory (`cwd`) for tools and context.
 
-Recommended: use `crocbot setup` to create `~/.clawdbot/crocbot.json` if missing and initialize the workspace files.
+Recommended: use `crocbot setup` to create `~/.crocbot/crocbot.json` if missing and initialize the workspace files.
 
 Full workspace layout + backup guide: [Agent workspace](/concepts/agent-workspace)
 
@@ -54,7 +54,7 @@ guidance for how *you* want them used.
 
 crocbot loads skills from three locations (workspace wins on name conflict):
 - Bundled (shipped with the install)
-- Managed/local: `~/.clawdbot/skills`
+- Managed/local: `~/.crocbot/skills`
 - Workspace: `<workspace>/skills`
 
 Skills can be gated by config/env (see `skills` in [Gateway configuration](/gateway/configuration)).
@@ -69,7 +69,7 @@ crocbot reuses pieces of the p-mono codebase (models/tools), but **session manag
 ## Sessions
 
 Session transcripts are stored as JSONL at:
-- `~/.clawdbot/agents/<agentId>/sessions/<SessionId>.jsonl`
+- `~/.crocbot/agents/<agentId>/sessions/<SessionId>.jsonl`
 
 The session ID is stable and chosen by crocbot.
 Legacy Pi/Tau session folders are **not** read.

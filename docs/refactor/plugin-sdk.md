@@ -28,7 +28,7 @@ Contents (examples):
 - Docs link helper: `formatDocsLink`.
 
 Delivery:
-- Publish as `@clawdbot/plugin-sdk` (or export from core under `clawdbot/plugin-sdk`).
+- Publish as `@crocbot/plugin-sdk` (or export from core under `crocbot/plugin-sdk`).
 - Semver with explicit stability guarantees.
 
 ### 2) Plugin Runtime (execution surface, injected)
@@ -136,7 +136,7 @@ Notes:
 ## Migration plan (phased, safe)
 
 ### Phase 0: scaffolding
-- Introduce `@clawdbot/plugin-sdk`.
+- Introduce `@crocbot/plugin-sdk`.
 - Add `api.runtime` to `crocbotPluginApi` with the surface above.
 - Maintain existing imports during a transition window (deprecation warnings).
 

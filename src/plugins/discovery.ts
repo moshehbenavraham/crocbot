@@ -306,7 +306,7 @@ export function discovercrocbotPlugins(params: {
   }
   if (workspaceDir) {
     const workspaceRoot = resolveUserPath(workspaceDir);
-    const workspaceExt = path.join(workspaceRoot, ".clawdbot", "extensions");
+    const workspaceExt = path.join(workspaceRoot, ".crocbot", "extensions");
     discoverInDirectory({
       dir: workspaceExt,
       origin: "workspace",

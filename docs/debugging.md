@@ -50,7 +50,7 @@ on each restart.
 Use the dev profile to isolate state and spin up a safe, disposable setup for
 debugging. There are **two** `--dev` flags:
 
-- **Global `--dev` (profile):** isolates state under `~/.clawdbot-dev` and
+- **Global `--dev` (profile):** isolates state under `~/.crocbot-dev` and
   defaults the gateway port to `19001` (derived ports shift with it).
 - **`gateway --dev`: tells the Gateway to auto-create a default config +
   workspace** when missing (and skip BOOTSTRAP.md).
@@ -59,7 +59,7 @@ Recommended flow (dev profile + dev bootstrap):
 
 ```bash
 pnpm gateway:dev
-CLAWDBOT_PROFILE=dev crocbot tui
+CROCBOT_PROFILE=dev crocbot tui
 ```
 
 If you don’t have a global install yet, run the CLI via `pnpm crocbot ...`.
@@ -67,10 +67,10 @@ If you don’t have a global install yet, run the CLI via `pnpm crocbot ...`.
 What this does:
 
 1) **Profile isolation** (global `--dev`)
-   - `CLAWDBOT_PROFILE=dev`
-   - `CLAWDBOT_STATE_DIR=~/.clawdbot-dev`
-   - `CLAWDBOT_CONFIG_PATH=~/.clawdbot-dev/crocbot.json`
-   - `CLAWDBOT_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
+   - `CROCBOT_PROFILE=dev`
+   - `CROCBOT_STATE_DIR=~/.crocbot-dev`
+   - `CROCBOT_CONFIG_PATH=~/.crocbot-dev/crocbot.json`
+   - `CROCBOT_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
 
 2) **Dev bootstrap** (`gateway --dev`)
    - Writes a minimal config if missing (`gateway.mode=local`, bind loopback).
@@ -79,7 +79,7 @@ What this does:
    - Seeds the workspace files if missing:
      `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`.
    - Default identity: **C3‑PO** (protocol droid).
-   - Skips channel providers in dev mode (`CLAWDBOT_SKIP_CHANNELS=1`).
+   - Skips channel providers in dev mode (`CROCBOT_SKIP_CHANNELS=1`).
 
 Reset flow (fresh start):
 
@@ -91,7 +91,7 @@ Note: `--dev` is a **global** profile flag and gets eaten by some runners.
 If you need to spell it out, use the env var form:
 
 ```bash
-CLAWDBOT_PROFILE=dev crocbot gateway --dev --reset
+CROCBOT_PROFILE=dev crocbot gateway --dev --reset
 ```
 
 `--reset` wipes config, credentials, sessions, and the dev workspace (using
@@ -118,19 +118,19 @@ pnpm gateway:watch --force --raw-stream
 Optional path override:
 
 ```bash
-pnpm gateway:watch --force --raw-stream --raw-stream-path ~/.clawdbot/logs/raw-stream.jsonl
+pnpm gateway:watch --force --raw-stream --raw-stream-path ~/.crocbot/logs/raw-stream.jsonl
 ```
 
 Equivalent env vars:
 
 ```bash
-CLAWDBOT_RAW_STREAM=1
-CLAWDBOT_RAW_STREAM_PATH=~/.clawdbot/logs/raw-stream.jsonl
+CROCBOT_RAW_STREAM=1
+CROCBOT_RAW_STREAM_PATH=~/.crocbot/logs/raw-stream.jsonl
 ```
 
 Default file:
 
-`~/.clawdbot/logs/raw-stream.jsonl`
+`~/.crocbot/logs/raw-stream.jsonl`
 
 ## Raw chunk logging (pi-mono)
 

@@ -7,8 +7,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { resolvecrocbotAgentDir } from "./agent-paths.js";
 
 describe("resolvecrocbotAgentDir", () => {
-  const previousStateDir = process.env.CLAWDBOT_STATE_DIR;
-  const previousAgentDir = process.env.CLAWDBOT_AGENT_DIR;
+  const previousStateDir = process.env.CROCBOT_STATE_DIR;
+  const previousAgentDir = process.env.CROCBOT_AGENT_DIR;
   const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
   let tempStateDir: string | null = null;
 
@@ -18,14 +18,14 @@ describe("resolvecrocbotAgentDir", () => {
       tempStateDir = null;
     }
     if (previousStateDir === undefined) {
-      delete process.env.CLAWDBOT_STATE_DIR;
+      delete process.env.CROCBOT_STATE_DIR;
     } else {
-      process.env.CLAWDBOT_STATE_DIR = previousStateDir;
+      process.env.CROCBOT_STATE_DIR = previousStateDir;
     }
     if (previousAgentDir === undefined) {
-      delete process.env.CLAWDBOT_AGENT_DIR;
+      delete process.env.CROCBOT_AGENT_DIR;
     } else {
-      process.env.CLAWDBOT_AGENT_DIR = previousAgentDir;
+      process.env.CROCBOT_AGENT_DIR = previousAgentDir;
     }
     if (previousPiAgentDir === undefined) {
       delete process.env.PI_CODING_AGENT_DIR;
@@ -36,8 +36,8 @@ describe("resolvecrocbotAgentDir", () => {
 
   it("defaults to the multi-agent path when no overrides are set", async () => {
     tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-agent-"));
-    process.env.CLAWDBOT_STATE_DIR = tempStateDir;
-    delete process.env.CLAWDBOT_AGENT_DIR;
+    process.env.CROCBOT_STATE_DIR = tempStateDir;
+    delete process.env.CROCBOT_AGENT_DIR;
     delete process.env.PI_CODING_AGENT_DIR;
 
     const resolved = resolvecrocbotAgentDir();
@@ -45,10 +45,10 @@ describe("resolvecrocbotAgentDir", () => {
     expect(resolved).toBe(path.join(tempStateDir, "agents", "main", "agent"));
   });
 
-  it("honors CLAWDBOT_AGENT_DIR overrides", async () => {
+  it("honors CROCBOT_AGENT_DIR overrides", async () => {
     tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-agent-"));
     const override = path.join(tempStateDir, "agent");
-    process.env.CLAWDBOT_AGENT_DIR = override;
+    process.env.CROCBOT_AGENT_DIR = override;
     delete process.env.PI_CODING_AGENT_DIR;
 
     const resolved = resolvecrocbotAgentDir();

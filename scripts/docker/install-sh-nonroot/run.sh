@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTALL_URL="${CLAWDBOT_INSTALL_URL:-https://molt.bot/install.sh}"
+INSTALL_URL="${CROCBOT_INSTALL_URL:-https://github.com/moshehbenavraham/crocbot/install.sh}"
 DEFAULT_PACKAGE="crocbot"
-if [[ -z "${CLAWDBOT_INSTALL_PACKAGE:-}" && "$INSTALL_URL" == *"clawd.bot"* ]]; then
-  DEFAULT_PACKAGE="clawdbot"
+if [[ -z "${CROCBOT_INSTALL_PACKAGE:-}" && "$INSTALL_URL" == *"croc.bot"* ]]; then
+  DEFAULT_PACKAGE="crocbot"
 fi
-PACKAGE_NAME="${CLAWDBOT_INSTALL_PACKAGE:-$DEFAULT_PACKAGE}"
+PACKAGE_NAME="${CROCBOT_INSTALL_PACKAGE:-$DEFAULT_PACKAGE}"
 if [[ "$PACKAGE_NAME" == "crocbot" ]]; then
-  ALT_PACKAGE_NAME="clawdbot"
+  ALT_PACKAGE_NAME="crocbot"
 else
   ALT_PACKAGE_NAME="crocbot"
 fi
@@ -28,7 +28,7 @@ export PATH="$HOME/.npm-global/bin:$PATH"
 echo "==> Verify git installed"
 command -v git >/dev/null
 
-EXPECTED_VERSION="${CLAWDBOT_INSTALL_EXPECT_VERSION:-}"
+EXPECTED_VERSION="${CROCBOT_INSTALL_EXPECT_VERSION:-}"
 if [[ -n "$EXPECTED_VERSION" ]]; then
   LATEST_VERSION="$EXPECTED_VERSION"
 else

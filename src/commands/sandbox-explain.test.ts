@@ -36,7 +36,10 @@ describe("sandbox explain command", () => {
 
     const out = logs.join("");
     const parsed = JSON.parse(out);
-    expect(parsed).toHaveProperty("docsUrl", "https://docs.molt.bot/sandbox");
+    expect(parsed).toHaveProperty(
+      "docsUrl",
+      "https://docs.github.com/moshehbenavraham/crocbot/sandbox",
+    );
     expect(parsed).toHaveProperty("sandbox.mode", "all");
     expect(parsed).toHaveProperty("sandbox.tools.sources.allow.source");
     expect(Array.isArray(parsed.fixIt)).toBe(true);

@@ -228,7 +228,7 @@ describe("gateway-cli coverage", () => {
   });
 
   it("uses env/config port when --port is omitted", async () => {
-    await withEnvOverride({ CLAWDBOT_GATEWAY_PORT: "19001" }, async () => {
+    await withEnvOverride({ CROCBOT_GATEWAY_PORT: "19001" }, async () => {
       runtimeLogs.length = 0;
       runtimeErrors.length = 0;
       startGatewayServer.mockClear();

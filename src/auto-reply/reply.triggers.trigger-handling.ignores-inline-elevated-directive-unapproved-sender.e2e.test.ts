@@ -77,7 +77,7 @@ function makeCfg(home: string) {
     agents: {
       defaults: {
         model: "anthropic/claude-opus-4-5",
-        workspace: join(home, "clawd"),
+        workspace: join(home, "croc"),
       },
     },
     channels: {
@@ -107,7 +107,7 @@ describe("trigger handling", () => {
         agents: {
           defaults: {
             model: "anthropic/claude-opus-4-5",
-            workspace: join(home, "clawd"),
+            workspace: join(home, "croc"),
           },
         },
         tools: {
@@ -145,7 +145,7 @@ describe("trigger handling", () => {
         agents: {
           defaults: {
             model: "anthropic/claude-opus-4-5",
-            workspace: join(home, "clawd"),
+            workspace: join(home, "croc"),
           },
         },
         tools: { elevated: { allowFrom: { discord: ["steipete"] } } },
@@ -180,7 +180,7 @@ describe("trigger handling", () => {
         agents: {
           defaults: {
             model: "anthropic/claude-opus-4-5",
-            workspace: join(home, "clawd"),
+            workspace: join(home, "croc"),
           },
         },
         tools: {

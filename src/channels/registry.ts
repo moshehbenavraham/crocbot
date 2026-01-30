@@ -14,7 +14,7 @@ export const DEFAULT_CHAT_CHANNEL: ChatChannelId = "telegram";
 
 export type ChatChannelMeta = ChannelMeta;
 
-const WEBSITE_URL = "https://molt.bot";
+const WEBSITE_URL = "https://github.com/moshehbenavraham/crocbot";
 
 const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
   telegram: {

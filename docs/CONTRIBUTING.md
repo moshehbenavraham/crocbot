@@ -1,9 +1,9 @@
 # Contributing to crocbot
 
-Welcome to the lobster tank!
+Welcome to the swamp! Cold-blooded patience, chrome-laced synapses.
 
 ## Quick Links
-- **GitHub:** https://github.com/crocbot/crocbot
+- **GitHub:** https://github.com/moshehbenavraham/crocbot
 - **X/Twitter:** [@steipete](https://x.com/steipete) / [@crocbot](https://x.com/crocbot)
 
 ## Maintainers
@@ -19,8 +19,8 @@ Welcome to the lobster tank!
 
 ## How to Contribute
 1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/crocbot/crocbot/discussions)
-3. **Questions** → [GitHub Discussions](https://github.com/crocbot/crocbot/discussions)
+2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/moshehbenavraham/crocbot/discussions)
+3. **Questions** → [GitHub Discussions](https://github.com/moshehbenavraham/crocbot/discussions)
 
 ## Before You PR
 - Test locally with your crocbot instance
@@ -48,4 +48,4 @@ We are currently prioritizing:
 - **Skills**: Expanding the library of bundled skills and improving the Skill Creation developer experience.
 - **Performance**: Optimizing token usage and compaction logic.
 
-Check the [GitHub Issues](https://github.com/crocbot/crocbot/issues) for "good first issue" labels!
+Check the [GitHub Issues](https://github.com/moshehbenavraham/crocbot/issues) for "good first issue" labels!

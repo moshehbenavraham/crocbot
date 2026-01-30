@@ -108,7 +108,7 @@ function findOtherStateDirs(stateDir: string): string[] {
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (entry.name.startsWith(".")) continue;
-      const candidate = path.resolve(root, entry.name, ".clawdbot");
+      const candidate = path.resolve(root, entry.name, ".crocbot");
       if (candidate === resolvedState) continue;
       if (existsDir(candidate)) found.push(candidate);
     }
@@ -126,7 +126,7 @@ export async function noteStateIntegrity(
   const env = process.env;
   const homedir = os.homedir;
   const stateDir = resolveStateDir(env, homedir);
-  const defaultStateDir = path.join(homedir(), ".clawdbot");
+  const defaultStateDir = path.join(homedir(), ".crocbot");
   const oauthDir = resolveOAuthDir(env, stateDir);
   const agentId = resolveDefaultAgentId(cfg);
   const sessionsDir = resolveSessionTranscriptsDirForAgent(agentId, env, homedir);
@@ -354,7 +354,7 @@ export function noteWorkspaceBackupTip(workspaceDir: string) {
   note(
     [
       "- Tip: back up the workspace in a private git repo (GitHub or GitLab).",
-      "- Keep ~/.clawdbot out of git; it contains credentials and session history.",
+      "- Keep ~/.crocbot out of git; it contains credentials and session history.",
       "- Details: /concepts/agent-workspace#git-backup-recommended",
     ].join("\n"),
     "Workspace",

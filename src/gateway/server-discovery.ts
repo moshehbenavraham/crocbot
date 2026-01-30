@@ -14,7 +14,7 @@ export async function resolveTailnetDnsHint(opts?: {
   enabled?: boolean;
 }): Promise<string | undefined> {
   const env = opts?.env ?? process.env;
-  const envRaw = env.CLAWDBOT_TAILNET_DNS?.trim();
+  const envRaw = env.CROCBOT_TAILNET_DNS?.trim();
   const envValue = envRaw && envRaw.length > 0 ? envRaw.replace(/\.$/, "") : "";
   if (envValue) return envValue;
   if (opts?.enabled === false) return undefined;

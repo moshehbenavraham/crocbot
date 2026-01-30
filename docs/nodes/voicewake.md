@@ -16,12 +16,12 @@ crocbot treats **wake words as a single global list** owned by the **Gateway**.
 
 Wake words are stored on the gateway machine at:
 
-- `~/.clawdbot/settings/voicewake.json`
+- `~/.crocbot/settings/voicewake.json`
 
 Shape:
 
 ```json
-{ "triggers": ["clawd", "claude", "computer"], "updatedAtMs": 1730000000000 }
+{ "triggers": ["croc", "claude", "computer"], "updatedAtMs": 1730000000000 }
 ```
 
 ## Protocol

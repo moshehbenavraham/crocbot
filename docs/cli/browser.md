@@ -26,15 +26,15 @@ Related:
 
 ```bash
 crocbot browser --browser-profile chrome tabs
-crocbot browser --browser-profile clawd start
-crocbot browser --browser-profile clawd open https://example.com
-crocbot browser --browser-profile clawd snapshot
+crocbot browser --browser-profile croc start
+crocbot browser --browser-profile croc open https://example.com
+crocbot browser --browser-profile croc snapshot
 ```
 
 ## Profiles
 
 Profiles are named browser routing configs. In practice:
-- `clawd`: launches/attaches to a dedicated crocbot-managed Chrome instance (isolated user data dir).
+- `croc`: launches/attaches to a dedicated crocbot-managed Chrome instance (isolated user data dir).
 - `chrome`: controls your existing Chrome tab(s) via the Chrome extension relay.
 
 ```bash
@@ -53,7 +53,7 @@ crocbot browser --browser-profile work tabs
 
 ```bash
 crocbot browser tabs
-crocbot browser open https://docs.molt.bot
+crocbot browser open https://docs.github.com/moshehbenavraham/crocbot
 crocbot browser focus <targetId>
 crocbot browser close <targetId>
 ```

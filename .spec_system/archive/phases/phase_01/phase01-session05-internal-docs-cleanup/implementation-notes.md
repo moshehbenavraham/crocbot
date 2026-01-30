@@ -47,7 +47,7 @@
 **Files to DELETE**: None identified - no dedicated files for removed channels
 **Files to UPDATE**: All 132 files with stale references need inline cleanup
 **Assets to DELETE**:
-- `docs/whatsapp-clawd.jpg` - WhatsApp screenshot
+- `docs/whatsapp-croc.jpg` - WhatsApp screenshot
 - `docs/assets/showcase/ios-testflight.jpg` - iOS TestFlight screenshot
 
 ---

@@ -9,7 +9,7 @@ read_when:
 The workspace is the agent's home. It is the only working directory used for
 file tools and for workspace context. Keep it private and treat it as memory.
 
-This is separate from `~/.clawdbot/`, which stores config, credentials, and
+This is separate from `~/.crocbot/`, which stores config, credentials, and
 sessions.
 
 **Important:** the workspace is the **default cwd**, not a hard sandbox. Tools
@@ -17,19 +17,19 @@ resolve relative paths against the workspace, but absolute paths can still reach
 elsewhere on the host unless sandboxing is enabled. If you need isolation, use
 [`agents.defaults.sandbox`](/gateway/sandboxing) (and/or per‑agent sandbox config).
 When sandboxing is enabled and `workspaceAccess` is not `"rw"`, tools operate
-inside a sandbox workspace under `~/.clawdbot/sandboxes`, not your host workspace.
+inside a sandbox workspace under `~/.crocbot/sandboxes`, not your host workspace.
 
 ## Default location
 
-- Default: `~/clawd`
-- If `CLAWDBOT_PROFILE` is set and not `"default"`, the default becomes
-  `~/clawd-<profile>`.
-- Override in `~/.clawdbot/crocbot.json`:
+- Default: `~/croc`
+- If `CROCBOT_PROFILE` is set and not `"default"`, the default becomes
+  `~/croc-<profile>`.
+- Override in `~/.crocbot/crocbot.json`:
 
 ```json5
 {
   agent: {
-    workspace: "~/clawd"
+    workspace: "~/croc"
   }
 }
 ```
@@ -120,12 +120,12 @@ files.
 
 ## What is NOT in the workspace
 
-These live under `~/.clawdbot/` and should NOT be committed to the workspace repo:
+These live under `~/.crocbot/` and should NOT be committed to the workspace repo:
 
-- `~/.clawdbot/crocbot.json` (config)
-- `~/.clawdbot/credentials/` (OAuth tokens, API keys)
-- `~/.clawdbot/agents/<agentId>/sessions/` (session transcripts + metadata)
-- `~/.clawdbot/skills/` (managed skills)
+- `~/.crocbot/crocbot.json` (config)
+- `~/.crocbot/credentials/` (OAuth tokens, API keys)
+- `~/.crocbot/agents/<agentId>/sessions/` (session transcripts + metadata)
+- `~/.crocbot/skills/` (managed skills)
 
 If you need to migrate sessions or config, copy them separately and keep them
 out of version control.
@@ -144,7 +144,7 @@ If git is installed, brand-new workspaces are initialized automatically. If this
 workspace is not already a repo, run:
 
 ```bash
-cd ~/clawd
+cd ~/croc
 git init
 git add AGENTS.md SOUL.md TOOLS.md IDENTITY.md USER.md HEARTBEAT.md memory/
 git commit -m "Add agent workspace"
@@ -169,7 +169,7 @@ Option B: GitHub CLI (`gh`)
 
 ```bash
 gh auth login
-gh repo create clawd-workspace --private --source . --remote origin --push
+gh repo create croc-workspace --private --source . --remote origin --push
 ```
 
 Option C: GitLab web UI
@@ -199,11 +199,11 @@ git push
 Even in a private repo, avoid storing secrets in the workspace:
 
 - API keys, OAuth tokens, passwords, or private credentials.
-- Anything under `~/.clawdbot/`.
+- Anything under `~/.crocbot/`.
 - Raw dumps of chats or sensitive attachments.
 
 If you must store sensitive references, use placeholders and keep the real
-secret elsewhere (password manager, environment variables, or `~/.clawdbot/`).
+secret elsewhere (password manager, environment variables, or `~/.crocbot/`).
 
 Suggested `.gitignore` starter:
 
@@ -217,10 +217,10 @@ Suggested `.gitignore` starter:
 
 ## Moving the workspace to a new machine
 
-1. Clone the repo to the desired path (default `~/clawd`).
-2. Set `agents.defaults.workspace` to that path in `~/.clawdbot/crocbot.json`.
+1. Clone the repo to the desired path (default `~/croc`).
+2. Set `agents.defaults.workspace` to that path in `~/.crocbot/crocbot.json`.
 3. Run `crocbot setup --workspace <path>` to seed any missing files.
-4. If you need sessions, copy `~/.clawdbot/agents/<agentId>/sessions/` from the
+4. If you need sessions, copy `~/.crocbot/agents/<agentId>/sessions/` from the
    old machine separately.
 
 ## Advanced notes

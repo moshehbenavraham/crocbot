@@ -1,7 +1,7 @@
 ---
 name: soul-evil
 description: "Swap SOUL.md with SOUL_EVIL.md during a purge window or by random chance"
-homepage: https://docs.molt.bot/hooks/soul-evil
+homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks/soul-evil
 metadata:
   {
     "crocbot":
@@ -31,7 +31,7 @@ You can change the filename via hook config.
 
 ## Configuration
 
-Add this to your config (`~/.clawdbot/crocbot.json`):
+Add this to your config (`~/.crocbot/crocbot.json`):
 
 ```json
 {

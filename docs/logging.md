@@ -24,7 +24,7 @@ By default, the Gateway writes a rolling log file under:
 
 The date uses the gateway host's local timezone.
 
-You can override this in `~/.clawdbot/crocbot.json`:
+You can override this in `~/.crocbot/crocbot.json`:
 
 ```json
 {
@@ -132,7 +132,7 @@ Console formatting is controlled by `logging.consoleStyle`.
 
 ## Configuring logging
 
-All logging configuration lives under `logging` in `~/.clawdbot/crocbot.json`.
+All logging configuration lives under `logging` in `~/.crocbot/crocbot.json`.
 
 ```json
 {
@@ -268,7 +268,7 @@ Flags are case-insensitive and support wildcards (e.g. `telegram.*` or `*`).
 Env override (one-off):
 
 ```
-CLAWDBOT_DIAGNOSTICS=telegram.http,telegram.payload
+CROCBOT_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Notes:

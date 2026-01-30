@@ -81,7 +81,7 @@ crocbot is a lean CLI + Gateway for AI chat on Telegram. It provides a single co
 
 ## Configuration
 
-Configuration stored in `~/.clawdbot/`:
+Configuration stored in `~/.crocbot/`:
 - `config.toml` - Main configuration
 - `credentials/` - Provider credentials
 - `sessions/` - Agent session data

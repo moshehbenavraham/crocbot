@@ -165,7 +165,7 @@ Replying to a bot message counts as an implicit mention (when the channel suppor
       {
         id: "main",
         groupChat: {
-          mentionPatterns: ["@clawd", "crocbot"],
+          mentionPatterns: ["@croc", "crocbot"],
           historyLimit: 50
         }
       }

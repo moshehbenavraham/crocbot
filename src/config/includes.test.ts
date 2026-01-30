@@ -11,7 +11,7 @@ import {
 
 const ROOT_DIR = path.parse(process.cwd()).root;
 const CONFIG_DIR = path.join(ROOT_DIR, "config");
-const ETC_CLAWDBOT_DIR = path.join(ROOT_DIR, "etc", "crocbot");
+const ETC_CROCBOT_DIR = path.join(ROOT_DIR, "etc", "crocbot");
 const SHARED_DIR = path.join(ROOT_DIR, "shared");
 
 const DEFAULT_BASE_PATH = path.join(CONFIG_DIR, "crocbot.json");
@@ -21,7 +21,7 @@ function configPath(...parts: string[]) {
 }
 
 function etccrocbotPath(...parts: string[]) {
-  return path.join(ETC_CLAWDBOT_DIR, ...parts);
+  return path.join(ETC_CROCBOT_DIR, ...parts);
 }
 
 function sharedPath(...parts: string[]) {

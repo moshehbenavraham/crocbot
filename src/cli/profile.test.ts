@@ -55,26 +55,26 @@ describe("applyCliProfileEnv", () => {
       env,
       homedir: () => "/home/peter",
     });
-    const expectedStateDir = path.join("/home/peter", ".clawdbot-dev");
-    expect(env.CLAWDBOT_PROFILE).toBe("dev");
-    expect(env.CLAWDBOT_STATE_DIR).toBe(expectedStateDir);
-    expect(env.CLAWDBOT_CONFIG_PATH).toBe(path.join(expectedStateDir, "crocbot.json"));
-    expect(env.CLAWDBOT_GATEWAY_PORT).toBe("19001");
+    const expectedStateDir = path.join("/home/peter", ".crocbot-dev");
+    expect(env.CROCBOT_PROFILE).toBe("dev");
+    expect(env.CROCBOT_STATE_DIR).toBe(expectedStateDir);
+    expect(env.CROCBOT_CONFIG_PATH).toBe(path.join(expectedStateDir, "crocbot.json"));
+    expect(env.CROCBOT_GATEWAY_PORT).toBe("19001");
   });
 
   it("does not override explicit env values", () => {
     const env: Record<string, string | undefined> = {
-      CLAWDBOT_STATE_DIR: "/custom",
-      CLAWDBOT_GATEWAY_PORT: "19099",
+      CROCBOT_STATE_DIR: "/custom",
+      CROCBOT_GATEWAY_PORT: "19099",
     };
     applyCliProfileEnv({
       profile: "dev",
       env,
       homedir: () => "/home/peter",
     });
-    expect(env.CLAWDBOT_STATE_DIR).toBe("/custom");
-    expect(env.CLAWDBOT_GATEWAY_PORT).toBe("19099");
-    expect(env.CLAWDBOT_CONFIG_PATH).toBe(path.join("/custom", "crocbot.json"));
+    expect(env.CROCBOT_STATE_DIR).toBe("/custom");
+    expect(env.CROCBOT_GATEWAY_PORT).toBe("19099");
+    expect(env.CROCBOT_CONFIG_PATH).toBe(path.join("/custom", "crocbot.json"));
   });
 });
 
@@ -84,55 +84,53 @@ describe("formatCliCommand", () => {
   });
 
   it("returns command unchanged when profile is default", () => {
-    expect(formatCliCommand("crocbot doctor --fix", { CLAWDBOT_PROFILE: "default" })).toBe(
+    expect(formatCliCommand("crocbot doctor --fix", { CROCBOT_PROFILE: "default" })).toBe(
       "crocbot doctor --fix",
     );
   });
 
   it("returns command unchanged when profile is Default (case-insensitive)", () => {
-    expect(formatCliCommand("crocbot doctor --fix", { CLAWDBOT_PROFILE: "Default" })).toBe(
+    expect(formatCliCommand("crocbot doctor --fix", { CROCBOT_PROFILE: "Default" })).toBe(
       "crocbot doctor --fix",
     );
   });
 
   it("returns command unchanged when profile is invalid", () => {
-    expect(formatCliCommand("crocbot doctor --fix", { CLAWDBOT_PROFILE: "bad profile" })).toBe(
+    expect(formatCliCommand("crocbot doctor --fix", { CROCBOT_PROFILE: "bad profile" })).toBe(
       "crocbot doctor --fix",
     );
   });
 
   it("returns command unchanged when --profile is already present", () => {
     expect(
-      formatCliCommand("crocbot --profile work doctor --fix", { CLAWDBOT_PROFILE: "work" }),
+      formatCliCommand("crocbot --profile work doctor --fix", { CROCBOT_PROFILE: "work" }),
     ).toBe("crocbot --profile work doctor --fix");
   });
 
   it("returns command unchanged when --dev is already present", () => {
-    expect(formatCliCommand("crocbot --dev doctor", { CLAWDBOT_PROFILE: "dev" })).toBe(
+    expect(formatCliCommand("crocbot --dev doctor", { CROCBOT_PROFILE: "dev" })).toBe(
       "crocbot --dev doctor",
     );
   });
 
   it("inserts --profile flag when profile is set", () => {
-    expect(formatCliCommand("crocbot doctor --fix", { CLAWDBOT_PROFILE: "work" })).toBe(
+    expect(formatCliCommand("crocbot doctor --fix", { CROCBOT_PROFILE: "work" })).toBe(
       "crocbot --profile work doctor --fix",
     );
   });
 
   it("trims whitespace from profile", () => {
-    expect(formatCliCommand("crocbot doctor --fix", { CLAWDBOT_PROFILE: "  jbclawd  " })).toBe(
-      "crocbot --profile jbclawd doctor --fix",
+    expect(formatCliCommand("crocbot doctor --fix", { CROCBOT_PROFILE: "  jbcroc  " })).toBe(
+      "crocbot --profile jbcroc doctor --fix",
     );
   });
 
   it("handles command with no args after crocbot", () => {
-    expect(formatCliCommand("crocbot", { CLAWDBOT_PROFILE: "test" })).toBe(
-      "crocbot --profile test",
-    );
+    expect(formatCliCommand("crocbot", { CROCBOT_PROFILE: "test" })).toBe("crocbot --profile test");
   });
 
   it("handles pnpm wrapper", () => {
-    expect(formatCliCommand("pnpm crocbot doctor", { CLAWDBOT_PROFILE: "work" })).toBe(
+    expect(formatCliCommand("pnpm crocbot doctor", { CROCBOT_PROFILE: "work" })).toBe(
       "pnpm crocbot --profile work doctor",
     );
   });

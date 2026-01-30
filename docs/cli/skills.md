@@ -12,7 +12,7 @@ Inspect skills (bundled + workspace + managed overrides) and see what’s eligib
 Related:
 - Skills system: [Skills](/tools/skills)
 - Skills config: [Skills config](/tools/skills-config)
-- ClawdHub installs: [ClawdHub](/tools/clawdhub)
+- CrocHub installs: [CrocHub](/tools/crochub)
 
 ## Commands
 

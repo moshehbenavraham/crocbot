@@ -134,7 +134,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
       );
       defaultRuntime.error(
         errorText(
-          `Fix: rerun \`${formatCliCommand("crocbot gateway install --force")}\` from the same --profile / CLAWDBOT_STATE_DIR you expect.`,
+          `Fix: rerun \`${formatCliCommand("crocbot gateway install --force")}\` from the same --profile / CROCBOT_STATE_DIR you expect.`,
         ),
       );
     }
@@ -230,7 +230,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
 
   if (service.runtime?.cachedLabel) {
     const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
-    const labelValue = resolveGatewayLaunchAgentLabel(env.CLAWDBOT_PROFILE);
+    const labelValue = resolveGatewayLaunchAgentLabel(env.CROCBOT_PROFILE);
     defaultRuntime.error(
       errorText(
         `LaunchAgent label cached but plist missing. Clear with: launchctl bootout gui/$UID/${labelValue}`,
@@ -273,7 +273,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     }
     if (process.platform === "linux") {
       const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
-      const unit = resolveGatewaySystemdServiceName(env.CLAWDBOT_PROFILE);
+      const unit = resolveGatewaySystemdServiceName(env.CROCBOT_PROFILE);
       defaultRuntime.error(
         errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`),
       );
@@ -322,5 +322,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
   }
 
   defaultRuntime.log(`${label("Troubles:")} run ${formatCliCommand("crocbot status")}`);
-  defaultRuntime.log(`${label("Troubleshooting:")} https://docs.molt.bot/troubleshooting`);
+  defaultRuntime.log(
+    `${label("Troubleshooting:")} https://docs.github.com/moshehbenavraham/crocbot/troubleshooting`,
+  );
 }

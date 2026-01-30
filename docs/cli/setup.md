@@ -7,7 +7,7 @@ read_when:
 
 # `crocbot setup`
 
-Initialize `~/.clawdbot/crocbot.json` and the agent workspace.
+Initialize `~/.crocbot/crocbot.json` and the agent workspace.
 
 Related:
 - Getting started: [Getting started](/start/getting-started)
@@ -17,7 +17,7 @@ Related:
 
 ```bash
 crocbot setup
-crocbot setup --workspace ~/clawd
+crocbot setup --workspace ~/croc
 ```
 
 To run the wizard via setup:

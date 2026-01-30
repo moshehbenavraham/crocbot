@@ -1,19 +1,42 @@
+# crocbot Docker Compose - Local Testing
+#
+# Usage:
+#   1. Quick start:  ./scripts/docker-setup.sh
+#   2. Manual:       docker compose up -d crocbot-gateway
+#   3. CLI access:   docker compose run --rm crocbot-cli <command>
+#
+# Environment variables (set in .env or export):
+#   CROCBOT_CONFIG_DIR     - Host path for config (default: ~/.crocbot)
+#   CROCBOT_WORKSPACE_DIR  - Host path for workspace (default: ~/croc)
+#   CROCBOT_GATEWAY_PORT   - Gateway HTTP port (default: 18789)
+#   CROCBOT_GATEWAY_TOKEN  - Gateway auth token (required for non-loopback)
+#   ANTHROPIC_API_KEY       - Anthropic API key for Claude models
+#   TELEGRAM_BOT_TOKEN      - Telegram bot token (optional)
+#
+# See docs/install/docker.md for full documentation.
+
 services:
   crocbot-gateway:
-    image: ${CLAWDBOT_IMAGE:-crocbot:local}
+    image: ${CROCBOT_IMAGE:-crocbot:local}
+    container_name: crocbot-gateway
     environment:
       HOME: /home/node
       TERM: xterm-256color
-      CLAWDBOT_GATEWAY_TOKEN: ${CLAWDBOT_GATEWAY_TOKEN}
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
+      NODE_ENV: ${NODE_ENV:-development}
+      CROCBOT_GATEWAY_TOKEN: ${CROCBOT_GATEWAY_TOKEN}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
     volumes:
-      - ${CLAWDBOT_CONFIG_DIR}:/home/node/.clawdbot
-      - ${CLAWDBOT_WORKSPACE_DIR}:/home/node/clawd
+      - ${CROCBOT_CONFIG_DIR:-~/.crocbot}:/home/node/.crocbot
+      - ${CROCBOT_WORKSPACE_DIR:-~/croc}:/home/node/croc
     ports:
-      - "${CLAWDBOT_GATEWAY_PORT:-18789}:18789"
-      - "${CLAWDBOT_BRIDGE_PORT:-18790}:18790"
+      - "${CROCBOT_GATEWAY_PORT:-18789}:18789"
+      - "${CROCBOT_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
     healthcheck:
@@ -28,24 +51,31 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${CLAWDBOT_GATEWAY_BIND:-lan}",
+        "${CROCBOT_GATEWAY_BIND:-lan}",
         "--port",
-        "${CLAWDBOT_GATEWAY_PORT:-18789}"
+        "${CROCBOT_GATEWAY_PORT:-18789}"
       ]
 
   crocbot-cli:
-    image: ${CLAWDBOT_IMAGE:-crocbot:local}
+    image: ${CROCBOT_IMAGE:-crocbot:local}
+    container_name: crocbot-cli
     environment:
       HOME: /home/node
       TERM: xterm-256color
       BROWSER: echo
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
     volumes:
-      - ${CLAWDBOT_CONFIG_DIR}:/home/node/.clawdbot
-      - ${CLAWDBOT_WORKSPACE_DIR}:/home/node/clawd
+      - ${CROCBOT_CONFIG_DIR:-~/.crocbot}:/home/node/.crocbot
+      - ${CROCBOT_WORKSPACE_DIR:-~/croc}:/home/node/croc
     stdin_open: true
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
+    profiles:
+      - cli

@@ -55,14 +55,14 @@ This is why localhost URLs don't work - the node receives the Tailscale hostname
 
 ## Configuration
 
-In `~/.clawdbot/crocbot.json`:
+In `~/.crocbot/crocbot.json`:
 
 ```json
 {
   "canvasHost": {
     "enabled": true,
     "port": 18793,
-    "root": "/Users/you/clawd/canvas",
+    "root": "/Users/you/croc/canvas",
     "liveReload": true
   },
   "gateway": {
@@ -84,10 +84,10 @@ Great for development!
 
 ### 1. Create HTML content
 
-Place files in the canvas root directory (default `~/clawd/canvas/`):
+Place files in the canvas root directory (default `~/croc/canvas/`):
 
 ```bash
-cat > ~/clawd/canvas/my-game.html << 'HTML'
+cat > ~/croc/canvas/my-game.html << 'HTML'
 <!DOCTYPE html>
 <html>
 <head><title>My Game</title></head>
@@ -102,7 +102,7 @@ HTML
 
 Check how your gateway is bound:
 ```bash
-cat ~/.clawdbot/crocbot.json | jq '.gateway.bind'
+cat ~/.crocbot/crocbot.json | jq '.gateway.bind'
 ```
 
 Then construct the URL:
@@ -148,7 +148,7 @@ canvas action:hide node:<node-id>
 **Cause:** URL mismatch between server bind and node expectation.
 
 **Debug steps:**
-1. Check server bind: `cat ~/.clawdbot/crocbot.json | jq '.gateway.bind'`
+1. Check server bind: `cat ~/.crocbot/crocbot.json | jq '.gateway.bind'`
 2. Check what port canvas is on: `lsof -i :18793`
 3. Test URL directly: `curl http://<hostname>:18793/__crocbot__/canvas/<file>.html`
 
@@ -174,8 +174,8 @@ If live reload isn't working:
 The canvas host serves from `/__crocbot__/canvas/` prefix:
 
 ```
-http://<host>:18793/__crocbot__/canvas/index.html  → ~/clawd/canvas/index.html
-http://<host>:18793/__crocbot__/canvas/games/snake.html → ~/clawd/canvas/games/snake.html
+http://<host>:18793/__crocbot__/canvas/index.html  → ~/croc/canvas/index.html
+http://<host>:18793/__crocbot__/canvas/games/snake.html → ~/croc/canvas/games/snake.html
 ```
 
 The `/__crocbot__/canvas/` prefix is defined by `CANVAS_HOST_PATH` constant.

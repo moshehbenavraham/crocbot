@@ -40,7 +40,7 @@ Supported keys:
 - `seed`, `normalize`, `lang`, `output_format`, `latency_tier`
 - `once`
 
-## Config (`~/.clawdbot/crocbot.json`)
+## Config (`~/.crocbot/crocbot.json`)
 ```json5
 {
   "talk": {

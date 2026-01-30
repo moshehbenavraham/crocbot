@@ -20,7 +20,7 @@ Successfully removed all native application code (macOS, iOS, Android) from the 
 | `apps/android/` | Android Kotlin app | ~120 |
 | `apps/ios/` | iOS Swift app | ~200 |
 | `apps/macos/` | macOS Swift app | ~200 |
-| `apps/shared/` | Shared Swift libraries (ClawdbotKit) | ~24 |
+| `apps/shared/` | Shared Swift libraries (CrocbotKit) | ~24 |
 | `src/macos/` | macOS TypeScript helpers | 4 |
 
 **Total Deleted**: ~548 files

@@ -6,7 +6,7 @@ import { withEnvOverride, withTempHome } from "./test-helpers.js";
 describe("config env vars", () => {
   it("applies env vars from env block when missing", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".clawdbot");
+      const configDir = path.join(home, ".crocbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
         path.join(configDir, "crocbot.json"),
@@ -30,7 +30,7 @@ describe("config env vars", () => {
 
   it("does not override existing env vars", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".clawdbot");
+      const configDir = path.join(home, ".crocbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
         path.join(configDir, "crocbot.json"),
@@ -54,7 +54,7 @@ describe("config env vars", () => {
 
   it("applies env vars from env.vars when missing", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".clawdbot");
+      const configDir = path.join(home, ".crocbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
         path.join(configDir, "crocbot.json"),

@@ -60,7 +60,7 @@ export async function buildGatewayInstallPlan(params: {
     token: params.token,
     launchdLabel:
       process.platform === "darwin"
-        ? resolveGatewayLaunchAgentLabel(params.env.CLAWDBOT_PROFILE)
+        ? resolveGatewayLaunchAgentLabel(params.env.CROCBOT_PROFILE)
         : undefined,
   });
 

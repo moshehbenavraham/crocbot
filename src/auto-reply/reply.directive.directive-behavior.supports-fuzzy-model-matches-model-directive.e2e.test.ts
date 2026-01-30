@@ -27,8 +27,8 @@ async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
     },
     {
       env: {
-        CLAWDBOT_AGENT_DIR: (home) => path.join(home, ".clawdbot", "agent"),
-        PI_CODING_AGENT_DIR: (home) => path.join(home, ".clawdbot", "agent"),
+        CROCBOT_AGENT_DIR: (home) => path.join(home, ".crocbot", "agent"),
+        PI_CODING_AGENT_DIR: (home) => path.join(home, ".crocbot", "agent"),
       },
       prefix: "crocbot-reply-",
     },
@@ -72,7 +72,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "anthropic/claude-opus-4-5" },
-              workspace: path.join(home, "clawd"),
+              workspace: path.join(home, "croc"),
               models: {
                 "anthropic/claude-opus-4-5": {},
                 "moonshot/kimi-k2-0905-preview": {},
@@ -120,7 +120,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "anthropic/claude-opus-4-5" },
-              workspace: path.join(home, "clawd"),
+              workspace: path.join(home, "croc"),
               models: {
                 "anthropic/claude-opus-4-5": {},
                 "moonshot/kimi-k2-0905-preview": {},
@@ -163,7 +163,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "anthropic/claude-opus-4-5" },
-              workspace: path.join(home, "clawd"),
+              workspace: path.join(home, "croc"),
               models: {
                 "anthropic/claude-opus-4-5": {},
                 "moonshot/kimi-k2-0905-preview": {},
@@ -206,7 +206,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "minimax/MiniMax-M2.1" },
-              workspace: path.join(home, "clawd"),
+              workspace: path.join(home, "croc"),
               models: {
                 "minimax/MiniMax-M2.1": {},
                 "minimax/MiniMax-M2.1-lightning": {},
@@ -251,7 +251,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "minimax/MiniMax-M2.1" },
-              workspace: path.join(home, "clawd"),
+              workspace: path.join(home, "croc"),
               models: {
                 "minimax/MiniMax-M2.1": {},
                 "minimax/MiniMax-M2.1-lightning": {},

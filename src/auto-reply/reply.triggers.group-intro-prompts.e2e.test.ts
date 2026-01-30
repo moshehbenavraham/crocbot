@@ -64,7 +64,7 @@ vi.mock("../web/session.js", () => webMocks);
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
   return withTempHomeBase(
     async (home) => {
-      await mkdir(join(home, ".clawdbot", "agents", "main", "sessions"), { recursive: true });
+      await mkdir(join(home, ".crocbot", "agents", "main", "sessions"), { recursive: true });
       vi.mocked(runEmbeddedPiAgent).mockClear();
       vi.mocked(abortEmbeddedPiRun).mockClear();
       return await fn(home);
@@ -78,7 +78,7 @@ function makeCfg(home: string) {
     agents: {
       defaults: {
         model: "anthropic/claude-opus-4-5",
-        workspace: join(home, "clawd"),
+        workspace: join(home, "croc"),
       },
     },
     channels: {

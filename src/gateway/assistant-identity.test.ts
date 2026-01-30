@@ -34,11 +34,11 @@ describe("resolveAssistantIdentity avatar normalization", () => {
     const cfg: crocbotConfig = {
       ui: {
         assistant: {
-          avatar: "avatars/clawd.png",
+          avatar: "avatars/croc.png",
         },
       },
     };
 
-    expect(resolveAssistantIdentity({ cfg, workspaceDir: "" }).avatar).toBe("avatars/clawd.png");
+    expect(resolveAssistantIdentity({ cfg, workspaceDir: "" }).avatar).toBe("avatars/croc.png");
   });
 });

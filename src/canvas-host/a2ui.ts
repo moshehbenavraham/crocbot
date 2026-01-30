@@ -132,8 +132,8 @@ export function injectCanvasLiveReload(html: string): string {
   globalThis.crocbot.sendUserAction = sendUserAction;
   globalThis.crocbotPostMessage = postToNode;
   globalThis.crocbotSendUserAction = sendUserAction;
-  globalThis.clawdbotPostMessage = postToNode;
-  globalThis.clawdbotSendUserAction = sendUserAction;
+  globalThis.crocbotPostMessage = postToNode;
+  globalThis.crocbotSendUserAction = sendUserAction;
 
   try {
     const proto = location.protocol === "https:" ? "wss" : "ws";

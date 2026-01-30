@@ -1,20 +1,20 @@
 ---
-summary: "ClawdHub guide: public skills registry + CLI workflows"
+summary: "CrocHub guide: public skills registry + CLI workflows"
 read_when:
-  - Introducing ClawdHub to new users
+  - Introducing CrocHub to new users
   - Installing, searching, or publishing skills
-  - Explaining ClawdHub CLI flags and sync behavior
+  - Explaining CrocHub CLI flags and sync behavior
 ---
 
-# ClawdHub
+# CrocHub
 
-ClawdHub is the **public skill registry for crocbot**. It is a free service: all skills are public, open, and visible to everyone for sharing and reuse. A skill is just a folder with a `SKILL.md` file (plus supporting text files). You can browse skills in the web app or use the CLI to search, install, update, and publish skills.
+CrocHub is the **public skill registry for crocbot**. It is a free service: all skills are public, open, and visible to everyone for sharing and reuse. A skill is just a folder with a `SKILL.md` file (plus supporting text files). You can browse skills in the web app or use the CLI to search, install, update, and publish skills.
 
-Site: [clawdhub.com](https://clawdhub.com)
+Site: [crochub.com](https://crochub.com)
 
 ## Who this is for (beginner-friendly)
 
-If you want to add new capabilities to your crocbot agent, ClawdHub is the easiest way to find and install skills. You do not need to know how the backend works. You can:
+If you want to add new capabilities to your crocbot agent, CrocHub is the easiest way to find and install skills. You do not need to know how the backend works. You can:
 
 - Search for skills by plain language.
 - Install a skill into your workspace.
@@ -25,9 +25,9 @@ If you want to add new capabilities to your crocbot agent, ClawdHub is the easie
 
 1) Install the CLI (see next section).
 2) Search for something you need:
-   - `clawdhub search "calendar"`
+   - `crochub search "calendar"`
 3) Install a skill:
-   - `clawdhub install <skill-slug>`
+   - `crochub install <skill-slug>`
 4) Start a new crocbot session so it picks up the new skill.
 
 ## Install the CLI
@@ -35,16 +35,16 @@ If you want to add new capabilities to your crocbot agent, ClawdHub is the easie
 Pick one:
 
 ```bash
-npm i -g clawdhub
+npm i -g crochub
 ```
 
 ```bash
-pnpm add -g clawdhub
+pnpm add -g crochub
 ```
 
 ## How it fits into crocbot
 
-By default, the CLI installs skills into `./skills` under your current working directory. If a crocbot workspace is configured, `clawdhub` falls back to that workspace unless you override `--workdir` (or `CLAWDHUB_WORKDIR`). crocbot loads workspace skills from `<workspace>/skills` and will pick them up in the **next** session. If you already use `~/.clawdbot/skills` or bundled skills, workspace skills take precedence.
+By default, the CLI installs skills into `./skills` under your current working directory. If a crocbot workspace is configured, `crochub` falls back to that workspace unless you override `--workdir` (or `CROCHUB_WORKDIR`). crocbot loads workspace skills from `<workspace>/skills` and will pick them up in the **next** session. If you already use `~/.crocbot/skills` or bundled skills, workspace skills take precedence.
 
 For more detail on how skills are loaded, shared, and gated, see
 [Skills](/tools/skills).
@@ -72,9 +72,9 @@ Global options (apply to all commands):
 
 Auth:
 
-- `clawdhub login` (browser flow) or `clawdhub login --token <token>`
-- `clawdhub logout`
-- `clawdhub whoami`
+- `crochub login` (browser flow) or `crochub login --token <token>`
+- `crochub logout`
+- `crochub whoami`
 
 Options:
 
@@ -84,29 +84,29 @@ Options:
 
 Search:
 
-- `clawdhub search "query"`
+- `crochub search "query"`
 - `--limit <n>`: Max results.
 
 Install:
 
-- `clawdhub install <slug>`
+- `crochub install <slug>`
 - `--version <version>`: Install a specific version.
 - `--force`: Overwrite if the folder already exists.
 
 Update:
 
-- `clawdhub update <slug>`
-- `clawdhub update --all`
+- `crochub update <slug>`
+- `crochub update --all`
 - `--version <version>`: Update to a specific version (single slug only).
 - `--force`: Overwrite when local files do not match any published version.
 
 List:
 
-- `clawdhub list` (reads `.clawdhub/lock.json`)
+- `crochub list` (reads `.crochub/lock.json`)
 
 Publish:
 
-- `clawdhub publish <path>`
+- `crochub publish <path>`
 - `--slug <slug>`: Skill slug.
 - `--name <name>`: Display name.
 - `--version <version>`: Semver version.
@@ -115,12 +115,12 @@ Publish:
 
 Delete/undelete (owner/admin only):
 
-- `clawdhub delete <slug> --yes`
-- `clawdhub undelete <slug> --yes`
+- `crochub delete <slug> --yes`
+- `crochub undelete <slug> --yes`
 
 Sync (scan local skills + publish new/updated):
 
-- `clawdhub sync`
+- `crochub sync`
 - `--root <dir...>`: Extra scan roots.
 - `--all`: Upload everything without prompts.
 - `--dry-run`: Show what would be uploaded.
@@ -134,19 +134,19 @@ Sync (scan local skills + publish new/updated):
 ### Search for skills
 
 ```bash
-clawdhub search "postgres backups"
+crochub search "postgres backups"
 ```
 
 ### Download new skills
 
 ```bash
-clawdhub install my-skill-pack
+crochub install my-skill-pack
 ```
 
 ### Update installed skills
 
 ```bash
-clawdhub update --all
+crochub update --all
 ```
 
 ### Back up your skills (publish or sync)
@@ -154,13 +154,13 @@ clawdhub update --all
 For a single skill folder:
 
 ```bash
-clawdhub publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
+crochub publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
 ```
 
 To scan and back up many skills at once:
 
 ```bash
-clawdhub sync --all
+crochub sync --all
 ```
 
 ## Advanced details (technical)
@@ -177,25 +177,25 @@ Updates compare the local skill contents to registry versions using a content ha
 
 ### Sync scanning and fallback roots
 
-`clawdhub sync` scans your current workdir first. If no skills are found, it falls back to known legacy locations (for example `~/crocbot/skills` and `~/.clawdbot/skills`). This is designed to find older skill installs without extra flags.
+`crochub sync` scans your current workdir first. If no skills are found, it falls back to known legacy locations (for example `~/crocbot/skills` and `~/.crocbot/skills`). This is designed to find older skill installs without extra flags.
 
 ### Storage and lockfile
 
-- Installed skills are recorded in `.clawdhub/lock.json` under your workdir.
-- Auth tokens are stored in the ClawdHub CLI config file (override via `CLAWDHUB_CONFIG_PATH`).
+- Installed skills are recorded in `.crochub/lock.json` under your workdir.
+- Auth tokens are stored in the CrocHub CLI config file (override via `CROCHUB_CONFIG_PATH`).
 
 ### Telemetry (install counts)
 
-When you run `clawdhub sync` while logged in, the CLI sends a minimal snapshot to compute install counts. You can disable this entirely:
+When you run `crochub sync` while logged in, the CLI sends a minimal snapshot to compute install counts. You can disable this entirely:
 
 ```bash
-export CLAWDHUB_DISABLE_TELEMETRY=1
+export CROCHUB_DISABLE_TELEMETRY=1
 ```
 
 ## Environment variables
 
-- `CLAWDHUB_SITE`: Override the site URL.
-- `CLAWDHUB_REGISTRY`: Override the registry API URL.
-- `CLAWDHUB_CONFIG_PATH`: Override where the CLI stores the token/config.
-- `CLAWDHUB_WORKDIR`: Override the default workdir.
-- `CLAWDHUB_DISABLE_TELEMETRY=1`: Disable telemetry on `sync`.
+- `CROCHUB_SITE`: Override the site URL.
+- `CROCHUB_REGISTRY`: Override the registry API URL.
+- `CROCHUB_CONFIG_PATH`: Override where the CLI stores the token/config.
+- `CROCHUB_WORKDIR`: Override the default workdir.
+- `CROCHUB_DISABLE_TELEMETRY=1`: Disable telemetry on `sync`.

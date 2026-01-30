@@ -42,8 +42,8 @@ describe("security fix", () => {
 
     const env = {
       ...process.env,
-      CLAWDBOT_STATE_DIR: stateDir,
-      CLAWDBOT_CONFIG_PATH: "",
+      CROCBOT_STATE_DIR: stateDir,
+      CROCBOT_CONFIG_PATH: "",
     };
 
     const res = await fixSecurityFootguns({ env });
@@ -79,8 +79,8 @@ describe("security fix", () => {
 
     const env = {
       ...process.env,
-      CLAWDBOT_STATE_DIR: stateDir,
-      CLAWDBOT_CONFIG_PATH: "",
+      CROCBOT_STATE_DIR: stateDir,
+      CROCBOT_CONFIG_PATH: "",
     };
 
     const res = await fixSecurityFootguns({ env });
@@ -127,8 +127,8 @@ describe("security fix", () => {
 
     const env = {
       ...process.env,
-      CLAWDBOT_STATE_DIR: stateDir,
-      CLAWDBOT_CONFIG_PATH: "",
+      CROCBOT_STATE_DIR: stateDir,
+      CROCBOT_CONFIG_PATH: "",
     };
 
     const res = await fixSecurityFootguns({ env });

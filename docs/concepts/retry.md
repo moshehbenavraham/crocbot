@@ -25,7 +25,7 @@ read_when:
 - Markdown parse errors are not retried; they fall back to plain text.
 
 ## Configuration
-Set retry policy per provider in `~/.clawdbot/crocbot.json`:
+Set retry policy per provider in `~/.crocbot/crocbot.json`:
 
 ```json5
 {

@@ -1,4 +1,4 @@
-# Pre-commit hooks for clawdbot
+# Pre-commit hooks for crocbot
 # Install: prek install
 # Run manually: prek run --all-files
 #
@@ -67,7 +67,7 @@ repos:
     hooks:
       - id: zizmor
         args: [--persona=regular, --min-severity=medium, --min-confidence=medium]
-        exclude: '^(vendor/|Swabble/)'
+        exclude: '^vendor/'
 
   # Project checks (same commands as CI)
   - repo: local

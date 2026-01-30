@@ -9,8 +9,8 @@ read_when:
 Most setups should use one Gateway because a single Gateway can handle multiple messaging connections and agents. If you need stronger isolation or redundancy (e.g., a rescue bot), run separate Gateways with isolated profiles/ports.
 
 ## Isolation checklist (required)
-- `CLAWDBOT_CONFIG_PATH` — per-instance config file
-- `CLAWDBOT_STATE_DIR` — per-instance sessions, creds, caches
+- `CROCBOT_CONFIG_PATH` — per-instance config file
+- `CROCBOT_STATE_DIR` — per-instance sessions, creds, caches
 - `agents.defaults.workspace` — per-instance workspace root
 - `gateway.port` (or `--port`) — unique per instance
 - Derived ports (browser/canvas) must not overlap
@@ -19,7 +19,7 @@ If these are shared, you will hit config races and port conflicts.
 
 ## Recommended: profiles (`--profile`)
 
-Profiles auto-scope `CLAWDBOT_STATE_DIR` + `CLAWDBOT_CONFIG_PATH` and suffix service names.
+Profiles auto-scope `CROCBOT_STATE_DIR` + `CROCBOT_CONFIG_PATH` and suffix service names.
 
 ```bash
 # main
@@ -71,7 +71,7 @@ crocbot --profile rescue gateway install
 
 ## Port mapping (derived)
 
-Base port = `gateway.port` (or `CLAWDBOT_GATEWAY_PORT` / `--port`).
+Base port = `gateway.port` (or `CROCBOT_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
 - `canvasHost.port = base + 4`
@@ -89,12 +89,12 @@ If you override any of these in config or env, you must keep them unique per ins
 ## Manual env example
 
 ```bash
-CLAWDBOT_CONFIG_PATH=~/.clawdbot/main.json \
-CLAWDBOT_STATE_DIR=~/.clawdbot-main \
+CROCBOT_CONFIG_PATH=~/.crocbot/main.json \
+CROCBOT_STATE_DIR=~/.crocbot-main \
 crocbot gateway --port 18789
 
-CLAWDBOT_CONFIG_PATH=~/.clawdbot/rescue.json \
-CLAWDBOT_STATE_DIR=~/.clawdbot-rescue \
+CROCBOT_CONFIG_PATH=~/.crocbot/rescue.json \
+CROCBOT_STATE_DIR=~/.crocbot-rescue \
 crocbot gateway --port 19001
 ```
 

@@ -21,7 +21,8 @@ export function registerAcpCli(program: Command) {
     .option("--verbose, -v", "Verbose logging to stderr", false)
     .addHelpText(
       "after",
-      () => `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/acp", "docs.molt.bot/cli/acp")}\n`,
+      () =>
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/acp", "docs.github.com/moshehbenavraham/crocbot/cli/acp")}\n`,
     )
     .action((opts) => {
       try {

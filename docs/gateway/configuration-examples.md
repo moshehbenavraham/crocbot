@@ -14,23 +14,23 @@ Examples below are aligned with the current config schema. For the exhaustive re
 ### Absolute minimum
 ```json5
 {
-  agent: { workspace: "~/clawd" },
+  agent: { workspace: "~/croc" },
   channels: { telegram: { allowFrom: ["123456789"] } }
 }
 ```
 
-Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
+Save to `~/.crocbot/crocbot.json` and you can DM the bot from that chat ID.
 
 ### Recommended starter
 ```json5
 {
   identity: {
-    name: "Clawd",
+    name: "Croc",
     theme: "helpful assistant",
-    emoji: "🦞"
+    emoji: "🐊"
   },
   agent: {
-    workspace: "~/clawd",
+    workspace: "~/croc",
     model: { primary: "anthropic/claude-sonnet-4-5" }
   },
   channels: {
@@ -103,7 +103,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
   // Routing + queue
   routing: {
     groupChat: {
-      mentionPatterns: ["@clawd", "crocbot"],
+      mentionPatterns: ["@croc", "crocbot"],
       historyLimit: 50
     },
     queue: {
@@ -151,7 +151,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
       telegram: { mode: "idle", idleMinutes: 10080 }
     },
     resetTriggers: ["/new", "/reset"],
-    store: "~/.clawdbot/agents/default/sessions/sessions.json",
+    store: "~/.crocbot/agents/default/sessions/sessions.json",
     typingIntervalSeconds: 5,
     sendPolicy: {
       default: "allow",
@@ -177,7 +177,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
   // Agent runtime
   agents: {
     defaults: {
-      workspace: "~/clawd",
+      workspace: "~/croc",
       userTimezone: "America/Chicago",
       model: {
         primary: "anthropic/claude-sonnet-4-5",
@@ -229,7 +229,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
       sandbox: {
         mode: "non-main",
         perSession: true,
-        workspaceRoot: "~/.clawdbot/sandboxes",
+        workspaceRoot: "~/.crocbot/sandboxes",
         docker: {
           image: "crocbot-sandbox:bookworm-slim",
           workdir: "/workspace",
@@ -291,7 +291,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
   // Cron jobs
   cron: {
     enabled: true,
-    store: "~/.clawdbot/cron/cron.json",
+    store: "~/.crocbot/cron/cron.json",
     maxConcurrentRuns: 2
   },
 
@@ -301,7 +301,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
     path: "/hooks",
     token: "shared-secret",
     presets: ["gmail"],
-    transformsDir: "~/.clawdbot/hooks",
+    transformsDir: "~/.crocbot/hooks",
     mappings: [
       {
         id: "gmail-hook",
@@ -377,7 +377,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
 ### Telegram bot setup
 ```json5
 {
-  agent: { workspace: "~/clawd" },
+  agent: { workspace: "~/croc" },
   channels: {
     telegram: {
       enabled: true,
@@ -408,7 +408,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
     }
   },
   agent: {
-    workspace: "~/clawd",
+    workspace: "~/croc",
     model: {
       primary: "anthropic/claude-sonnet-4-5",
       fallbacks: ["anthropic/claude-opus-4-5"]
@@ -446,7 +446,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
     }
   },
   agent: {
-    workspace: "~/clawd",
+    workspace: "~/croc",
     model: {
       primary: "anthropic/claude-opus-4-5",
       fallbacks: ["minimax/MiniMax-M2.1"]
@@ -463,7 +463,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
     theme: "professional assistant"
   },
   agent: {
-    workspace: "~/work-clawd",
+    workspace: "~/work-croc",
     elevated: { enabled: false }
   },
   channels: {
@@ -483,7 +483,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
 ```json5
 {
   agent: {
-    workspace: "~/clawd",
+    workspace: "~/croc",
     model: { primary: "lmstudio/minimax-m2.1-gs32" }
   },
   models: {

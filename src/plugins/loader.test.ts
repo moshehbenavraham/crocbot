@@ -9,7 +9,7 @@ import { loadcrocbotPlugins } from "./loader.js";
 type TempPlugin = { dir: string; file: string; id: string };
 
 const tempDirs: string[] = [];
-const prevBundledDir = process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR;
+const prevBundledDir = process.env.CROCBOT_BUNDLED_PLUGINS_DIR;
 const EMPTY_PLUGIN_SCHEMA = { type: "object", additionalProperties: false, properties: {} };
 
 function makeTempDir() {
@@ -53,9 +53,9 @@ afterEach(() => {
     }
   }
   if (prevBundledDir === undefined) {
-    delete process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.CROCBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = prevBundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = prevBundledDir;
   }
 });
 
@@ -68,7 +68,7 @@ describe("loadcrocbotPlugins", () => {
       dir: bundledDir,
       filename: "bundled.ts",
     });
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
     const registry = loadcrocbotPlugins({
       cache: false,
@@ -125,7 +125,7 @@ describe("loadcrocbotPlugins", () => {
       dir: bundledDir,
       filename: "telegram.ts",
     });
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
     const registry = loadcrocbotPlugins({
       cache: false,
@@ -152,7 +152,7 @@ describe("loadcrocbotPlugins", () => {
       dir: bundledDir,
       filename: "memory-core.ts",
     });
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
     const registry = loadcrocbotPlugins({
       cache: false,
@@ -191,7 +191,7 @@ describe("loadcrocbotPlugins", () => {
       filename: "index.ts",
     });
 
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
     const registry = loadcrocbotPlugins({
       cache: false,
@@ -211,7 +211,7 @@ describe("loadcrocbotPlugins", () => {
     expect(memory?.version).toBe("1.2.3");
   });
   it("loads plugins from config paths", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "allowed",
       body: `export default { id: "allowed", register(api) { api.registerGatewayMethod("allowed.ping", ({ respond }) => respond(true, { ok: true })); } };`,
@@ -234,7 +234,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("denylist disables plugins even if allowed", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "blocked",
       body: `export default { id: "blocked", register() {} };`,
@@ -257,7 +257,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("fails fast on invalid plugin config", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "configurable",
       body: `export default { id: "configurable", register() {} };`,
@@ -284,7 +284,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("registers channel plugins", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "channel-demo",
       body: `export default { id: "channel-demo", register(api) {
@@ -325,7 +325,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("registers http handlers", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "http-demo",
       body: `export default { id: "http-demo", register(api) {
@@ -351,7 +351,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("registers http routes", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "http-route-demo",
       body: `export default { id: "http-route-demo", register(api) {
@@ -378,7 +378,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("respects explicit disable in config", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "config-disable",
       body: `export default { id: "config-disable", register() {} };`,
@@ -401,7 +401,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("enforces memory slot selection", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const memoryA = writePlugin({
       id: "memory-a",
       body: `export default { id: "memory-a", kind: "memory", register() {} };`,
@@ -428,7 +428,7 @@ describe("loadcrocbotPlugins", () => {
   });
 
   it("disables memory plugins when slot is none", () => {
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const memory = writePlugin({
       id: "memory-off",
       body: `export default { id: "memory-off", kind: "memory", register() {} };`,
@@ -456,7 +456,7 @@ describe("loadcrocbotPlugins", () => {
       dir: bundledDir,
       filename: "shadow.js",
     });
-    process.env.CLAWDBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.CROCBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
     const override = writePlugin({
       id: "shadow",

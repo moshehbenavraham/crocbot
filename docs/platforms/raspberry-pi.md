@@ -110,13 +110,13 @@ sudo sysctl -p
 ### Option A: Standard Install (Recommended)
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 ### Option B: Hackable Install (For tinkering)
 
 ```bash
-git clone https://github.com/crocbot/crocbot.git
+git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 npm install
 npm run build

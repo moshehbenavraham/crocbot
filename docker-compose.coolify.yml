@@ -1,0 +1,83 @@
+# crocbot Docker Compose - Coolify Production Deployment
+#
+# This file is optimized for Coolify VPS deployment.
+#
+# Coolify Setup:
+#   1. Create a new service in Coolify
+#   2. Choose "Docker Compose" as the build method
+#   3. Point to this file: docker-compose.coolify.yml
+#   4. Set environment variables in Coolify's UI
+#   5. Configure domain/SSL in Coolify
+#
+# Required Environment Variables (set in Coolify UI):
+#   CROCBOT_GATEWAY_TOKEN  - Gateway auth token (generate with: openssl rand -hex 32)
+#   ANTHROPIC_API_KEY       - Anthropic API key for Claude models
+#
+# Optional Environment Variables:
+#   SETUP_PASSWORD          - Password for /setup wizard
+#   TELEGRAM_BOT_TOKEN      - Telegram bot token
+#   DISCORD_BOT_TOKEN       - Discord bot token
+#   OPENAI_API_KEY          - OpenAI API key (fallback models)
+#
+# Volume: Coolify auto-manages persistent storage at /data
+
+services:
+  crocbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crocbot
+    environment:
+      NODE_ENV: production
+      HOME: /home/node
+      TERM: xterm-256color
+      # State directory on persistent volume
+      CROCBOT_STATE_DIR: /data
+      CROCBOT_WORKSPACE_DIR: /data/workspace
+      # Gateway configuration
+      CROCBOT_GATEWAY_TOKEN: ${CROCBOT_GATEWAY_TOKEN}
+      CROCBOT_GATEWAY_BIND: lan
+      # API keys (set in Coolify UI)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      # Channel tokens (set in Coolify UI)
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Setup wizard password
+      SETUP_PASSWORD: ${SETUP_PASSWORD:-}
+      # Memory optimization
+      NODE_OPTIONS: "--max-old-space-size=1536"
+    volumes:
+      - crocbot-data:/data
+    ports:
+      - "8080:8080"
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--allow-unconfigured",
+        "--bind",
+        "lan",
+        "--port",
+        "8080"
+      ]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+
+volumes:
+  crocbot-data:
+    driver: local

@@ -95,15 +95,15 @@ export function loadShellEnvFallback(opts: ShellEnvFallbackOptions): ShellEnvFal
 }
 
 export function shouldEnableShellEnvFallback(env: NodeJS.ProcessEnv): boolean {
-  return isTruthyEnvValue(env.CLAWDBOT_LOAD_SHELL_ENV);
+  return isTruthyEnvValue(env.CROCBOT_LOAD_SHELL_ENV);
 }
 
 export function shouldDeferShellEnvFallback(env: NodeJS.ProcessEnv): boolean {
-  return isTruthyEnvValue(env.CLAWDBOT_DEFER_SHELL_ENV_FALLBACK);
+  return isTruthyEnvValue(env.CROCBOT_DEFER_SHELL_ENV_FALLBACK);
 }
 
 export function resolveShellEnvFallbackTimeoutMs(env: NodeJS.ProcessEnv): number {
-  const raw = env.CLAWDBOT_SHELL_ENV_TIMEOUT_MS?.trim();
+  const raw = env.CROCBOT_SHELL_ENV_TIMEOUT_MS?.trim();
   if (!raw) return DEFAULT_TIMEOUT_MS;
   const parsed = Number.parseInt(raw, 10);
   if (!Number.isFinite(parsed)) return DEFAULT_TIMEOUT_MS;

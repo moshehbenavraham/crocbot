@@ -85,7 +85,7 @@ Details:
   Source: crocbot-bundled
   Path: /path/to/crocbot/hooks/bundled/session-memory/HOOK.md
   Handler: /path/to/crocbot/hooks/bundled/session-memory/handler.ts
-  Homepage: https://docs.molt.bot/hooks#session-memory
+  Homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#session-memory
   Events: command:new
 
 Requirements:
@@ -119,7 +119,7 @@ Not ready: 0
 crocbot hooks enable <name>
 ```
 
-Enable a specific hook by adding it to your config (`~/.clawdbot/config.json`).
+Enable a specific hook by adding it to your config (`~/.crocbot/config.json`).
 
 **Note:** Hooks managed by plugins show `plugin:<id>` in `crocbot hooks list` and
 can’t be enabled/disabled here. Enable/disable the plugin instead.
@@ -182,7 +182,7 @@ crocbot hooks install <path-or-spec>
 Install a hook pack from a local folder/archive or npm.
 
 **What it does:**
-- Copies the hook pack into `~/.clawdbot/hooks/<id>`
+- Copies the hook pack into `~/.crocbot/hooks/<id>`
 - Enables the installed hooks in `hooks.internal.entries.*`
 - Records the install under `hooks.internal.installs`
 
@@ -232,7 +232,7 @@ Saves session context to memory when you issue `/new`.
 crocbot hooks enable session-memory
 ```
 
-**Output:** `~/clawd/memory/YYYY-MM-DD-slug.md`
+**Output:** `~/croc/memory/YYYY-MM-DD-slug.md`
 
 **See:** [session-memory documentation](/hooks#session-memory)
 
@@ -246,19 +246,19 @@ Logs all command events to a centralized audit file.
 crocbot hooks enable command-logger
 ```
 
-**Output:** `~/.clawdbot/logs/commands.log`
+**Output:** `~/.crocbot/logs/commands.log`
 
 **View logs:**
 
 ```bash
 # Recent commands
-tail -n 20 ~/.clawdbot/logs/commands.log
+tail -n 20 ~/.crocbot/logs/commands.log
 
 # Pretty-print
-cat ~/.clawdbot/logs/commands.log | jq .
+cat ~/.crocbot/logs/commands.log | jq .
 
 # Filter by action
-grep '"action":"new"' ~/.clawdbot/logs/commands.log | jq .
+grep '"action":"new"' ~/.crocbot/logs/commands.log | jq .
 ```
 
 **See:** [command-logger documentation](/hooks#command-logger)

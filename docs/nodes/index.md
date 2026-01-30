@@ -45,7 +45,7 @@ forwards `exec` calls to the **node host** when `host=node` is selected.
 ### What runs where
 - **Gateway host**: receives messages, runs the model, routes tool calls.
 - **Node host**: executes `system.run`/`system.which` on the node machine.
-- **Approvals**: enforced on the node host via `~/.clawdbot/exec-approvals.json`.
+- **Approvals**: enforced on the node host via `~/.crocbot/exec-approvals.json`.
 
 ### Start a node host (foreground)
 
@@ -73,7 +73,7 @@ crocbot nodes list
 ```
 
 Naming options:
-- `--display-name` on `crocbot node run` / `crocbot node install` (persists in `~/.clawdbot/node.json` on the node).
+- `--display-name` on `crocbot node run` / `crocbot node install` (persists in `~/.crocbot/node.json` on the node).
 - `crocbot nodes rename --node <id|name|ip> --name "Build Node"` (gateway override).
 
 ### Allowlist the commands
@@ -85,7 +85,7 @@ crocbot approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
 crocbot approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
 ```
 
-Approvals live on the node host at `~/.clawdbot/exec-approvals.json`.
+Approvals live on the node host at `~/.crocbot/exec-approvals.json`.
 
 ### Point exec at the node
 
@@ -223,7 +223,7 @@ Notes:
 - `system.run` returns stdout/stderr/exit code in the payload.
 - `system.run` supports `--cwd`, `--env KEY=VAL`, `--command-timeout`, and `--needs-screen-recording`.
 - `system.notify` supports `--priority <passive|active|timeSensitive>` and `--delivery <system|overlay|auto>`.
-- On headless node host, `system.run` is gated by exec approvals (`~/.clawdbot/exec-approvals.json`).
+- On headless node host, `system.run` is gated by exec approvals (`~/.crocbot/exec-approvals.json`).
 
 ## Exec node binding
 
@@ -268,7 +268,7 @@ crocbot node run --host <gateway-host> --port 18789
 
 Notes:
 - Pairing is still required (the Gateway will show a node approval prompt).
-- The node host stores its node id, token, display name, and gateway connection info in `~/.clawdbot/node.json`.
-- Exec approvals are enforced locally via `~/.clawdbot/exec-approvals.json`
+- The node host stores its node id, token, display name, and gateway connection info in `~/.crocbot/node.json`.
+- Exec approvals are enforced locally via `~/.crocbot/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).
 - Add `--tls` / `--tls-fingerprint` when the Gateway WS uses TLS.

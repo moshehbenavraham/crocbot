@@ -62,7 +62,7 @@ Update all documentation to reflect the stripped-down, Telegram-only VPS deploym
 
 ### Technologies/Patterns
 - Markdown documentation
-- Mintlify docs hosting (docs.molt.bot)
+- Mintlify docs hosting (docs.github.com/moshehbenavraham/crocbot)
 - Internal doc links: root-relative, no `.md`/`.mdx` extensions
 
 ### Potential Challenges

@@ -23,8 +23,8 @@ crocbot doctor --deep
 
 Notes:
 - Interactive prompts (like keychain/OAuth fixes) only run when stdin is a TTY and `--non-interactive` is **not** set. Headless runs (cron, Telegram, no terminal) will skip prompts.
-- `--fix` (alias for `--repair`) writes a backup to `~/.clawdbot/crocbot.json.bak` and drops unknown config keys, listing each removal.
+- `--fix` (alias for `--repair`) writes a backup to `~/.crocbot/crocbot.json.bak` and drops unknown config keys, listing each removal.
 
 ## Environment overrides
 
-If you set environment variables like `CLAWDBOT_GATEWAY_TOKEN` or `CLAWDBOT_GATEWAY_PASSWORD`, those values override your config file and can cause persistent "unauthorized" errors. Check and clear these if needed.
+If you set environment variables like `CROCBOT_GATEWAY_TOKEN` or `CROCBOT_GATEWAY_PASSWORD`, those values override your config file and can cause persistent "unauthorized" errors. Check and clear these if needed.

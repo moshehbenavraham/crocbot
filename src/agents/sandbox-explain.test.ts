@@ -16,7 +16,7 @@ describe("sandbox explain helpers", () => {
         list: [
           {
             id: "work",
-            workspace: "~/clawd-work",
+            workspace: "~/croc-work",
             tools: { sandbox: { tools: { allow: ["write"] } } },
           },
         ],
@@ -44,7 +44,7 @@ describe("sandbox explain helpers", () => {
         list: [
           {
             id: "work",
-            workspace: "~/clawd-work",
+            workspace: "~/croc-work",
             tools: {
               sandbox: { tools: { allow: ["group:memory", "group:fs"] } },
             },

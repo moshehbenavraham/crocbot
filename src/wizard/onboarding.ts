@@ -70,7 +70,7 @@ async function requireRiskAcknowledgement(params: {
       "crocbot security audit --deep",
       "crocbot security audit --fix",
       "",
-      "Must read: https://docs.molt.bot/gateway/security",
+      "Must read: https://docs.github.com/moshehbenavraham/crocbot/gateway/security",
     ].join("\n"),
     "Security",
   );
@@ -103,7 +103,7 @@ export async function runOnboardingWizard(
         [
           ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
           "",
-          "Docs: https://docs.molt.bot/gateway/configuration",
+          "Docs: https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration",
         ].join("\n"),
         "Config issues",
       );
@@ -278,8 +278,8 @@ export async function runOnboardingWizard(
   const localUrl = `ws://127.0.0.1:${localPort}`;
   const localProbe = await probeGatewayReachable({
     url: localUrl,
-    token: baseConfig.gateway?.auth?.token ?? process.env.CLAWDBOT_GATEWAY_TOKEN,
-    password: baseConfig.gateway?.auth?.password ?? process.env.CLAWDBOT_GATEWAY_PASSWORD,
+    token: baseConfig.gateway?.auth?.token ?? process.env.CROCBOT_GATEWAY_TOKEN,
+    password: baseConfig.gateway?.auth?.password ?? process.env.CROCBOT_GATEWAY_PASSWORD,
   });
   const remoteUrl = baseConfig.gateway?.remote?.url?.trim() ?? "";
   const remoteProbe = remoteUrl

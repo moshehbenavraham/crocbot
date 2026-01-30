@@ -92,7 +92,7 @@ export function registerGatewayCli(program: Command) {
       .addHelpText(
         "after",
         () =>
-          `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "docs.molt.bot/cli/gateway")}\n`,
+          `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "docs.github.com/moshehbenavraham/crocbot/cli/gateway")}\n`,
       ),
   );
 

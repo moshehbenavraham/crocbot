@@ -16,16 +16,16 @@ Related:
 
 ```bash
 crocbot agents list
-crocbot agents add work --workspace ~/clawd-work
-crocbot agents set-identity --workspace ~/clawd --from-identity
-crocbot agents set-identity --agent main --avatar avatars/clawd.png
+crocbot agents add work --workspace ~/croc-work
+crocbot agents set-identity --workspace ~/croc --from-identity
+crocbot agents set-identity --agent main --avatar avatars/croc.png
 crocbot agents delete work
 ```
 
 ## Identity files
 
 Each agent workspace can include an `IDENTITY.md` at the workspace root:
-- Example path: `~/clawd/IDENTITY.md`
+- Example path: `~/croc/IDENTITY.md`
 - `set-identity --from-identity` reads from the workspace root (or an explicit `--identity-file`)
 
 Avatar paths resolve relative to the workspace root.
@@ -41,13 +41,13 @@ Avatar paths resolve relative to the workspace root.
 Load from `IDENTITY.md`:
 
 ```bash
-crocbot agents set-identity --workspace ~/clawd --from-identity
+crocbot agents set-identity --workspace ~/croc --from-identity
 ```
 
 Override fields explicitly:
 
 ```bash
-crocbot agents set-identity --agent main --name "Clawd" --emoji "🦞" --avatar avatars/clawd.png
+crocbot agents set-identity --agent main --name "Croc" --emoji "🐊" --avatar avatars/croc.png
 ```
 
 Config sample:
@@ -59,10 +59,10 @@ Config sample:
       {
         id: "main",
         identity: {
-          name: "Clawd",
-          theme: "space lobster",
-          emoji: "🦞",
-          avatar: "avatars/clawd.png"
+          name: "Croc",
+          theme: "chrome crocodile",
+          emoji: "🐊",
+          avatar: "avatars/croc.png"
         }
       }
     ]

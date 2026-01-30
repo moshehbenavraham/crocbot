@@ -8,7 +8,7 @@ read_when:
 
 # Nix Installation
 
-The recommended way to run crocbot with Nix is via **[nix-crocbot](https://github.com/crocbot/nix-crocbot)** — a batteries-included Home Manager module.
+The recommended way to run crocbot with Nix is via **[nix-crocbot](https://github.com/moshehbenavraham/nix-crocbot)** — a batteries-included Home Manager module.
 
 ## Quick Start
 
@@ -29,7 +29,7 @@ What I need you to do:
 Reference the nix-crocbot README for module options.
 ```
 
-> **📦 Full guide: [github.com/crocbot/nix-crocbot](https://github.com/crocbot/nix-crocbot)**
+> **📦 Full guide: [github.com/crocbot/nix-crocbot](https://github.com/moshehbenavraham/nix-crocbot)**
 >
 > The nix-crocbot repo is the source of truth for Nix installation. This page is just a quick overview.
 
@@ -44,28 +44,28 @@ Reference the nix-crocbot README for module options.
 
 ## Nix Mode Runtime Behavior
 
-When `CLAWDBOT_NIX_MODE=1` is set (automatic with nix-crocbot):
+When `CROCBOT_NIX_MODE=1` is set (automatic with nix-crocbot):
 
 crocbot supports a **Nix mode** that makes configuration deterministic and disables auto-install flows.
 Enable it by exporting:
 
 ```bash
-CLAWDBOT_NIX_MODE=1
+CROCBOT_NIX_MODE=1
 ```
 
 On macOS, the GUI app does not automatically inherit shell env vars. You can
 also enable Nix mode via defaults:
 
 ```bash
-defaults write com.clawdbot.mac crocbot.nixMode -bool true
+defaults write com.crocbot.mac crocbot.nixMode -bool true
 ```
 
 ### Config + state paths
 
-crocbot reads JSON5 config from `CLAWDBOT_CONFIG_PATH` and stores mutable data in `CLAWDBOT_STATE_DIR`.
+crocbot reads JSON5 config from `CROCBOT_CONFIG_PATH` and stores mutable data in `CROCBOT_STATE_DIR`.
 
-- `CLAWDBOT_STATE_DIR` (default: `~/.clawdbot`)
-- `CLAWDBOT_CONFIG_PATH` (default: `$CLAWDBOT_STATE_DIR/crocbot.json`)
+- `CROCBOT_STATE_DIR` (default: `~/.crocbot`)
+- `CROCBOT_CONFIG_PATH` (default: `$CROCBOT_STATE_DIR/crocbot.json`)
 
 When running under Nix, set these explicitly to Nix-managed locations so runtime state and config
 stay out of the immutable store.
@@ -84,12 +84,12 @@ The macOS packaging flow expects a stable Info.plist template at:
 apps/macos/Sources/crocbot/Resources/Info.plist
 ```
 
-[`scripts/package-mac-app.sh`](https://github.com/crocbot/crocbot/blob/main/scripts/package-mac-app.sh) copies this template into the app bundle and patches dynamic fields
+[`scripts/package-mac-app.sh`](https://github.com/moshehbenavraham/crocbot/blob/main/scripts/package-mac-app.sh) copies this template into the app bundle and patches dynamic fields
 (bundle ID, version/build, Git SHA, Sparkle keys). This keeps the plist deterministic for SwiftPM
 packaging and Nix builds (which do not rely on a full Xcode toolchain).
 
 ## Related
 
-- [nix-crocbot](https://github.com/crocbot/nix-crocbot) — full setup guide
+- [nix-crocbot](https://github.com/moshehbenavraham/nix-crocbot) — full setup guide
 - [Wizard](/start/wizard) — non-Nix CLI setup
 - [Docker](/install/docker) — containerized setup

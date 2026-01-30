@@ -23,7 +23,7 @@ nav:
   - title: "Home"
     url: "/"
   - title: "crocbot Assistant"
-    url: "/start/clawd/"
+    url: "/start/croc/"
   - title: "Gateway"
     url: "/gateway/"
   - title: "Remote"

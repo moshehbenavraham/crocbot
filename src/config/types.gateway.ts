@@ -36,7 +36,7 @@ export type DiscoveryConfig = {
 
 export type CanvasHostConfig = {
   enabled?: boolean;
-  /** Directory to serve (default: ~/clawd/canvas). */
+  /** Directory to serve (default: ~/croc/canvas). */
   root?: string;
   /** HTTP port to listen on (default: 18793). */
   port?: number;

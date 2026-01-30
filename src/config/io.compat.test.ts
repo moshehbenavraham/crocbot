@@ -14,7 +14,7 @@ async function withTempHome(run: (home: string) => Promise<void>): Promise<void>
   }
 }
 
-async function writeConfig(home: string, dirname: ".crocbot" | ".clawdbot", port: number) {
+async function writeConfig(home: string, dirname: ".crocbot" | ".crocbot", port: number) {
   const dir = path.join(home, dirname);
   await fs.mkdir(dir, { recursive: true });
   const configPath = path.join(dir, "crocbot.json");
@@ -26,7 +26,7 @@ describe("config io compat (new + legacy folders)", () => {
   it("prefers ~/.crocbot/crocbot.json when both configs exist", async () => {
     await withTempHome(async (home) => {
       const newConfigPath = await writeConfig(home, ".crocbot", 19001);
-      await writeConfig(home, ".clawdbot", 18789);
+      await writeConfig(home, ".crocbot", 18789);
 
       const io = createConfigIO({
         env: {} as NodeJS.ProcessEnv,
@@ -37,9 +37,9 @@ describe("config io compat (new + legacy folders)", () => {
     });
   });
 
-  it("falls back to ~/.clawdbot/crocbot.json when only legacy exists", async () => {
+  it("falls back to ~/.crocbot/crocbot.json when only legacy exists", async () => {
     await withTempHome(async (home) => {
-      const legacyConfigPath = await writeConfig(home, ".clawdbot", 20001);
+      const legacyConfigPath = await writeConfig(home, ".crocbot", 20001);
 
       const io = createConfigIO({
         env: {} as NodeJS.ProcessEnv,
@@ -54,10 +54,10 @@ describe("config io compat (new + legacy folders)", () => {
   it("honors explicit legacy config path env override", async () => {
     await withTempHome(async (home) => {
       const newConfigPath = await writeConfig(home, ".crocbot", 19002);
-      const legacyConfigPath = await writeConfig(home, ".clawdbot", 20002);
+      const legacyConfigPath = await writeConfig(home, ".crocbot", 20002);
 
       const io = createConfigIO({
-        env: { CLAWDBOT_CONFIG_PATH: legacyConfigPath } as NodeJS.ProcessEnv,
+        env: { CROCBOT_CONFIG_PATH: legacyConfigPath } as NodeJS.ProcessEnv,
         homedir: () => home,
       });
 

@@ -17,8 +17,8 @@ function isBun(): boolean {
 
 function prefersSips(): boolean {
   return (
-    process.env.CLAWDBOT_IMAGE_BACKEND === "sips" ||
-    (process.env.CLAWDBOT_IMAGE_BACKEND !== "sharp" && isBun() && process.platform === "darwin")
+    process.env.CROCBOT_IMAGE_BACKEND === "sips" ||
+    (process.env.CROCBOT_IMAGE_BACKEND !== "sharp" && isBun() && process.platform === "darwin")
   );
 }
 

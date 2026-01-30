@@ -76,7 +76,7 @@ Example:
 {
   agents: {
     list: [
-      { id: "support", name: "Support", workspace: "~/clawd-support" }
+      { id: "support", name: "Support", workspace: "~/croc-support" }
     ]
   },
   bindings: [
@@ -87,9 +87,9 @@ Example:
 
 ## Session storage
 
-Session stores live under the state directory (default `~/.clawdbot`):
+Session stores live under the state directory (default `~/.crocbot`):
 
-- `~/.clawdbot/agents/<agentId>/sessions/sessions.json`
+- `~/.crocbot/agents/<agentId>/sessions/sessions.json`
 - JSONL transcripts live alongside the store
 
 You can override the store path via `session.store` and `{agentId}` templating.

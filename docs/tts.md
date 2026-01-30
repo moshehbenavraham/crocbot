@@ -159,7 +159,7 @@ Full schema is in [Gateway configuration](/gateway/configuration).
       auto: "always",
       maxTextLength: 4000,
       timeoutMs: 30000,
-      prefsPath: "~/.clawdbot/settings/tts.json"
+      prefsPath: "~/.crocbot/settings/tts.json"
     }
   }
 }
@@ -291,7 +291,7 @@ Optional allowlist (disable specific overrides while keeping tags enabled):
 ## Per-user preferences
 
 Slash commands write local overrides to `prefsPath` (default:
-`~/.clawdbot/settings/tts.json`, override with `CLAWDBOT_TTS_PREFS` or
+`~/.crocbot/settings/tts.json`, override with `CROCBOT_TTS_PREFS` or
 `messages.tts.prefsPath`).
 
 Stored fields:

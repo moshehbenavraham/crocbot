@@ -13,22 +13,22 @@ crocbot uses **[AgentSkills](https://agentskills.io)-compatible** skill folders 
 Skills are loaded from **three** places:
 
 1) **Bundled skills**: shipped with the install (npm package or crocbot.app)
-2) **Managed/local skills**: `~/.clawdbot/skills`
+2) **Managed/local skills**: `~/.crocbot/skills`
 3) **Workspace skills**: `<workspace>/skills`
 
 If a skill name conflicts, precedence is:
 
-`<workspace>/skills` (highest) → `~/.clawdbot/skills` → bundled skills (lowest)
+`<workspace>/skills` (highest) → `~/.crocbot/skills` → bundled skills (lowest)
 
 Additionally, you can configure extra skill folders (lowest precedence) via
-`skills.load.extraDirs` in `~/.clawdbot/crocbot.json`.
+`skills.load.extraDirs` in `~/.crocbot/crocbot.json`.
 
 ## Per-agent vs shared skills
 
 In **multi-agent** setups, each agent has its own workspace. That means:
 
 - **Per-agent skills** live in `<workspace>/skills` for that agent only.
-- **Shared skills** live in `~/.clawdbot/skills` (managed/local) and are visible
+- **Shared skills** live in `~/.crocbot/skills` (managed/local) and are visible
   to **all agents** on the same machine.
 - **Shared folders** can also be added via `skills.load.extraDirs` (lowest
   precedence) if you want a common skills pack used by multiple agents.
@@ -41,26 +41,26 @@ applies: workspace wins, then managed/local, then bundled.
 Plugins can ship their own skills by listing `skills` directories in
 `crocbot.plugin.json` (paths relative to the plugin root). Plugin skills load
 when the plugin is enabled and participate in the normal skill precedence rules.
-You can gate them via `metadata.clawdbot.requires.config` on the plugin’s config
+You can gate them via `metadata.crocbot.requires.config` on the plugin’s config
 entry. See [Plugins](/plugin) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
-## ClawdHub (install + sync)
+## CrocHub (install + sync)
 
-ClawdHub is the public skills registry for crocbot. Browse at
-https://clawdhub.com. Use it to discover, install, update, and back up skills.
-Full guide: [ClawdHub](/tools/clawdhub).
+CrocHub is the public skills registry for crocbot. Browse at
+https://crochub.com. Use it to discover, install, update, and back up skills.
+Full guide: [CrocHub](/tools/crochub).
 
 Common flows:
 
 - Install a skill into your workspace:
-  - `clawdhub install <skill-slug>`
+  - `crochub install <skill-slug>`
 - Update all installed skills:
-  - `clawdhub update --all`
+  - `crochub update --all`
 - Sync (scan + publish updates):
-  - `clawdhub sync --all`
+  - `crochub sync --all`
 
-By default, `clawdhub` installs into `./skills` under your current working
+By default, `crochub` installs into `./skills` under your current working
 directory (or falls back to the configured crocbot workspace). crocbot picks
 that up as `<workspace>/skills` on the next session.
 
@@ -89,7 +89,7 @@ Notes:
 - `metadata` should be a **single-line JSON object**.
 - Use `{baseDir}` in instructions to reference the skill folder path.
 - Optional frontmatter keys:
-  - `homepage` — URL surfaced as “Website” in the macOS Skills UI (also supported via `metadata.clawdbot.homepage`).
+  - `homepage` — URL surfaced as “Website” in the macOS Skills UI (also supported via `metadata.crocbot.homepage`).
   - `user-invocable` — `true|false` (default: `true`). When `true`, the skill is exposed as a user slash command.
   - `disable-model-invocation` — `true|false` (default: `false`). When `true`, the skill is excluded from the model prompt (still available via user invocation).
   - `command-dispatch` — `tool` (optional). When set to `tool`, the slash command bypasses the model and dispatches directly to a tool.
@@ -111,7 +111,7 @@ metadata: {"crocbot":{"requires":{"bins":["uv"],"env":["GEMINI_API_KEY"],"config
 ---
 ```
 
-Fields under `metadata.clawdbot`:
+Fields under `metadata.crocbot`:
 - `always: true` — always include the skill (skip other gates).
 - `emoji` — optional emoji used by the macOS Skills UI.
 - `homepage` — optional URL shown as “Website” in the macOS Skills UI.
@@ -150,12 +150,12 @@ Notes:
   This only affects **skill installs**; the Gateway runtime should still be Node
   (Bun is not recommended for Telegram).
 - Go installs: if `go` is missing and `brew` is available, the gateway installs Go via Homebrew first and sets `GOBIN` to Homebrew’s `bin` when possible.
- - Download installs: `url` (required), `archive` (`tar.gz` | `tar.bz2` | `zip`), `extract` (default: auto when archive detected), `stripComponents`, `targetDir` (default: `~/.clawdbot/tools/<skillKey>`).
+ - Download installs: `url` (required), `archive` (`tar.gz` | `tar.bz2` | `zip`), `extract` (default: auto when archive detected), `stripComponents`, `targetDir` (default: `~/.crocbot/tools/<skillKey>`).
 
-If no `metadata.clawdbot` is present, the skill is always eligible (unless
+If no `metadata.crocbot` is present, the skill is always eligible (unless
 disabled in config or blocked by `skills.allowBundled` for bundled skills).
 
-## Config overrides (`~/.clawdbot/crocbot.json`)
+## Config overrides (`~/.crocbot/crocbot.json`)
 
 Bundled/managed skills can be toggled and supplied with env values:
 
@@ -184,12 +184,12 @@ Bundled/managed skills can be toggled and supplied with env values:
 Note: if the skill name contains hyphens, quote the key (JSON5 allows quoted keys).
 
 Config keys match the **skill name** by default. If a skill defines
-`metadata.clawdbot.skillKey`, use that key under `skills.entries`.
+`metadata.crocbot.skillKey`, use that key under `skills.entries`.
 
 Rules:
 - `enabled: false` disables the skill even if it’s bundled/installed.
 - `env`: injected **only if** the variable isn’t already set in the process.
-- `apiKey`: convenience for skills that declare `metadata.clawdbot.primaryEnv`.
+- `apiKey`: convenience for skills that declare `metadata.crocbot.primaryEnv`.
 - `config`: optional bag for custom per-skill fields; custom keys must live here.
 - `allowBundled`: optional allowlist for **bundled** skills only. If set, only
   bundled skills in the list are eligible (managed/workspace skills unaffected).
@@ -252,7 +252,7 @@ Notes:
 ## Managed skills lifecycle
 
 crocbot ships a baseline set of skills as **bundled skills** as part of the
-install (npm package or crocbot.app). `~/.clawdbot/skills` exists for local
+install (npm package or crocbot.app). `~/.crocbot/skills` exists for local
 overrides (for example, pinning/patching a skill without changing the bundled
 copy). Workspace skills are user-owned and override both on name conflicts.
 
@@ -262,6 +262,6 @@ See [Skills config](/tools/skills-config) for the full configuration schema.
 
 ## Looking for more skills?
 
-Browse https://clawdhub.com.
+Browse https://crochub.com.
 
 ---

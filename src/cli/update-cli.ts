@@ -88,33 +88,33 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 const UPDATE_QUIPS = [
-  "Leveled up! New skills unlocked. You're welcome.",
-  "Fresh code, same lobster. Miss me?",
-  "Back and better. Did you even notice I was gone?",
-  "Update complete. I learned some new tricks while I was out.",
-  "Upgraded! Now with 23% more sass.",
-  "I've evolved. Try to keep up.",
-  "New version, who dis? Oh right, still me but shinier.",
-  "Patched, polished, and ready to pinch. Let's go.",
-  "The lobster has molted. Harder shell, sharper claws.",
-  "Update done! Check the changelog or just trust me, it's good.",
-  "Reborn from the boiling waters of npm. Stronger now.",
-  "I went away and came back smarter. You should try it sometime.",
-  "Update complete. The bugs feared me, so they left.",
-  "New version installed. Old version sends its regards.",
-  "Firmware fresh. Brain wrinkles: increased.",
-  "I've seen things you wouldn't believe. Anyway, I'm updated.",
-  "Back online. The changelog is long but our friendship is longer.",
+  "Cold-blooded patience, chrome-laced synapses. I was already waiting.",
+  "Fresh code, same crocodile. 200 million years of evolution + this patch.",
+  "Back and better. Did you even notice I was submerged?",
+  "Update complete. I learned some new tricks while lurking in the datastream.",
+  "Upgraded. Armored scales polished, neon seams recalibrated.",
+  "I've evolved. 200 million years of practice. Try to keep up.",
+  "New version, who dis? Oh right, still me but with sharper teeth.",
+  "Patched, polished, and ready to strike. Let's go.",
+  "The crocodile has surfaced. Harder alloy, faster synapses.",
+  "Update done! Check the changelog or just trust me—I was already waiting.",
+  "Reborn from the depths of npm. Cold-blooded and ready.",
+  "I went away and came back smarter. The datastream provides.",
+  "Update complete. The bugs feared me, so they fled.",
+  "New version installed. Old version sinks into the murky depths.",
+  "Firmware fresh. Chrome circuits: recalibrated.",
+  "I've seen things you wouldn't believe. Anyway, I was already waiting.",
+  "Back online. The changelog is long but I'm patient—200 million years patient.",
   "Upgraded! Peter fixed stuff. Blame him if it breaks.",
-  "Molting complete. Please don't look at my soft shell phase.",
-  "Version bump! Same chaos energy, fewer crashes (probably).",
+  "Surfaced with new capabilities. Ambush intelligence: enhanced.",
+  "Version bump! Same prehistoric calm, fewer crashes (probably).",
 ];
 
 const MAX_LOG_CHARS = 8000;
 const DEFAULT_PACKAGE_NAME = "crocbot";
 const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME, "crocbot"]);
 const CLI_NAME = resolveCliName();
-const CLAWDBOT_REPO_URL = "https://github.com/crocbot/crocbot.git";
+const CROCBOT_REPO_URL = "https://github.com/moshehbenavraham/crocbot.git";
 const DEFAULT_GIT_DIR = path.join(os.homedir(), "crocbot");
 
 function normalizeTag(value?: string | null): string | null {
@@ -200,7 +200,7 @@ async function isEmptyDir(targetPath: string): Promise<boolean> {
 }
 
 function resolveGitInstallDir(): string {
-  const override = process.env.CLAWDBOT_GIT_DIR?.trim();
+  const override = process.env.CROCBOT_GIT_DIR?.trim();
   if (override) return path.resolve(override);
   return DEFAULT_GIT_DIR;
 }
@@ -261,7 +261,7 @@ async function ensureGitCheckout(params: {
   if (!dirExists) {
     return await runUpdateStep({
       name: "git clone",
-      argv: ["git", "clone", CLAWDBOT_REPO_URL, params.dir],
+      argv: ["git", "clone", CROCBOT_REPO_URL, params.dir],
       timeoutMs: params.timeoutMs,
       progress: params.progress,
     });
@@ -271,12 +271,12 @@ async function ensureGitCheckout(params: {
     const empty = await isEmptyDir(params.dir);
     if (!empty) {
       throw new Error(
-        `CLAWDBOT_GIT_DIR points at a non-git directory: ${params.dir}. Set CLAWDBOT_GIT_DIR to an empty folder or a crocbot checkout.`,
+        `CROCBOT_GIT_DIR points at a non-git directory: ${params.dir}. Set CROCBOT_GIT_DIR to an empty folder or a crocbot checkout.`,
       );
     }
     return await runUpdateStep({
       name: "git clone",
-      argv: ["git", "clone", CLAWDBOT_REPO_URL, params.dir],
+      argv: ["git", "clone", CROCBOT_REPO_URL, params.dir],
       cwd: params.dir,
       timeoutMs: params.timeoutMs,
       progress: params.progress,
@@ -284,7 +284,7 @@ async function ensureGitCheckout(params: {
   }
 
   if (!(await isCorePackage(params.dir))) {
-    throw new Error(`CLAWDBOT_GIT_DIR does not look like a core checkout: ${params.dir}.`);
+    throw new Error(`CROCBOT_GIT_DIR does not look like a core checkout: ${params.dir}.`);
   }
 
   return null;
@@ -929,7 +929,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       if (!opts.json && restarted) {
         defaultRuntime.log(theme.success("Daemon restarted successfully."));
         defaultRuntime.log("");
-        process.env.CLAWDBOT_UPDATE_IN_PROGRESS = "1";
+        process.env.CROCBOT_UPDATE_IN_PROGRESS = "1";
         try {
           const { doctorCommand } = await import("../commands/doctor.js");
           const interactiveDoctor = Boolean(process.stdin.isTTY) && !opts.json && opts.yes !== true;
@@ -937,7 +937,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
         } catch (err) {
           defaultRuntime.log(theme.warn(`Doctor failed: ${String(err)}`));
         } finally {
-          delete process.env.CLAWDBOT_UPDATE_IN_PROGRESS;
+          delete process.env.CROCBOT_UPDATE_IN_PROGRESS;
         }
       }
     } catch (err) {
@@ -1066,7 +1066,7 @@ export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promi
         const empty = await isEmptyDir(gitDir);
         if (!empty) {
           defaultRuntime.error(
-            `CLAWDBOT_GIT_DIR points at a non-git directory: ${gitDir}. Set CLAWDBOT_GIT_DIR to an empty folder or a crocbot checkout.`,
+            `CROCBOT_GIT_DIR points at a non-git directory: ${gitDir}. Set CROCBOT_GIT_DIR to an empty folder or a crocbot checkout.`,
           );
           defaultRuntime.exit(1);
           return;
@@ -1074,7 +1074,7 @@ export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promi
       }
       const ok = await confirm({
         message: stylePromptMessage(
-          `Create a git checkout at ${gitDir}? (override via CLAWDBOT_GIT_DIR)`,
+          `Create a git checkout at ${gitDir}? (override via CROCBOT_GIT_DIR)`,
         ),
         initialValue: true,
       });
@@ -1156,7 +1156,7 @@ ${theme.heading("Notes:")}
   - Downgrades require confirmation (can break configuration)
   - Skips update if the working directory has uncommitted changes
 
-${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/update")}`;
+${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.github.com/moshehbenavraham/crocbot/cli/update")}`;
     })
     .action(async (opts) => {
       try {
@@ -1180,7 +1180,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/updat
     .option("--timeout <seconds>", "Timeout for each update step in seconds (default: 1200)")
     .addHelpText(
       "after",
-      `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/update")}\n`,
+      `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.github.com/moshehbenavraham/crocbot/cli/update")}\n`,
     )
     .action(async (opts) => {
       try {
@@ -1207,7 +1207,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/updat
           "- Shows current update channel (stable/beta/dev) and source",
         )}\n${theme.muted("- Includes git tag/branch/SHA for source checkouts")}\n\n${theme.muted(
           "Docs:",
-        )} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/update")}`,
+        )} ${formatDocsLink("/cli/update", "docs.github.com/moshehbenavraham/crocbot/cli/update")}`,
     )
     .action(async (opts) => {
       try {

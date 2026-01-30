@@ -11,7 +11,7 @@ Use tmux only when you need an interactive TTY. Prefer exec background mode for 
 ## Quickstart (isolated socket, exec tool)
 
 ```bash
-SOCKET_DIR="${CLAWDBOT_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/crocbot-tmux-sockets}"
+SOCKET_DIR="${CROCBOT_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/crocbot-tmux-sockets}"
 mkdir -p "$SOCKET_DIR"
 SOCKET="$SOCKET_DIR/crocbot.sock"
 SESSION=crocbot-python
@@ -31,8 +31,8 @@ To monitor:
 
 ## Socket convention
 
-- Use `CLAWDBOT_TMUX_SOCKET_DIR` (default `${TMPDIR:-/tmp}/crocbot-tmux-sockets`).
-- Default socket path: `"$CLAWDBOT_TMUX_SOCKET_DIR/crocbot.sock"`.
+- Use `CROCBOT_TMUX_SOCKET_DIR` (default `${TMPDIR:-/tmp}/crocbot-tmux-sockets`).
+- Default socket path: `"$CROCBOT_TMUX_SOCKET_DIR/crocbot.sock"`.
 
 ## Targeting panes and naming
 
@@ -43,7 +43,7 @@ To monitor:
 ## Finding sessions
 
 - List sessions on your socket: `{baseDir}/scripts/find-sessions.sh -S "$SOCKET"`.
-- Scan all sockets: `{baseDir}/scripts/find-sessions.sh --all` (uses `CLAWDBOT_TMUX_SOCKET_DIR`).
+- Scan all sockets: `{baseDir}/scripts/find-sessions.sh --all` (uses `CROCBOT_TMUX_SOCKET_DIR`).
 
 ## Sending input safely
 

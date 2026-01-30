@@ -143,7 +143,7 @@ export function resolveAgentWorkspaceDir(cfg: crocbotConfig, agentId: string) {
     if (fallback) return resolveUserPath(fallback);
     return DEFAULT_AGENT_WORKSPACE_DIR;
   }
-  return path.join(os.homedir(), `clawd-${id}`);
+  return path.join(os.homedir(), `croc-${id}`);
 }
 
 export function resolveAgentDir(cfg: crocbotConfig, agentId: string) {

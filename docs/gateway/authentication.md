@@ -26,10 +26,10 @@ crocbot models status
 ```
 
 3) If the Gateway runs under systemd/launchd, prefer putting the key in
-`~/.clawdbot/.env` so the daemon can read it:
+`~/.crocbot/.env` so the daemon can read it:
 
 ```bash
-cat >> ~/.clawdbot/.env <<'EOF'
+cat >> ~/.crocbot/.env <<'EOF'
 ANTHROPIC_API_KEY=...
 EOF
 ```
@@ -45,7 +45,7 @@ If you’d rather not manage env vars yourself, the onboarding wizard can store
 API keys for daemon use: `crocbot onboard`.
 
 See [Help](/help) for details on env inheritance (`env.shellEnv`,
-`~/.clawdbot/.env`, systemd/launchd).
+`~/.crocbot/.env`, systemd/launchd).
 
 ## Anthropic: setup-token (subscription auth)
 

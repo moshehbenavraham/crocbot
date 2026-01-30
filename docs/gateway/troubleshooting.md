@@ -25,7 +25,7 @@ Quick triage commands (in order):
 | `crocbot gateway status` | Supervisor state (launchd/systemd/schtasks), runtime PID/exit, last gateway error | When the service “looks loaded” but nothing runs |
 | `crocbot logs --follow` | Live logs (best signal for runtime issues) | When you need the actual failure reason |
 
-**Sharing output:** prefer `crocbot status --all` (it redacts tokens). If you paste `crocbot status`, consider setting `CLAWDBOT_SHOW_SECRETS=0` first (token previews).
+**Sharing output:** prefer `crocbot status --all` (it redacts tokens). If you paste `crocbot status`, consider setting `CROCBOT_SHOW_SECRETS=0` first (token previews).
 
 See also: [Health checks](/gateway/health) and [Logging](/logging).
 
@@ -106,7 +106,7 @@ Doctor/service will show runtime state (PID/last exit) and log hints.
 **Logs:**
 - Preferred: `crocbot logs --follow`
 - File logs (always): `/tmp/crocbot/crocbot-YYYY-MM-DD.log` (or your configured `logging.file`)
-- LaunchAgent (if installed): `$CLAWDBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
+- LaunchAgent (if installed): `$CROCBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
 - Linux systemd (if installed): `journalctl --user -u crocbot-gateway[-<profile>].service -n 200 --no-pager`
 - Windows: `schtasks /Query /TN "crocbot Gateway (<profile>)" /V /FO LIST`
 
@@ -158,7 +158,7 @@ The gateway service runs with a **minimal PATH** to avoid shell/manager cruft:
 
 This intentionally excludes version managers (nvm/fnm/volta/asdf) and package
 managers (pnpm/npm) because the service does not load your shell init. Runtime
-variables like `DISPLAY` should live in `~/.clawdbot/.env` (loaded early by the
+variables like `DISPLAY` should live in `~/.crocbot/.env` (loaded early by the
 gateway).
 Exec runs on `host=gateway` merge your login-shell `PATH` into the exec environment,
 so missing tools usually mean your shell init isn’t exporting them (or set
@@ -194,14 +194,14 @@ the Gateway likely refused to bind.
 - If you set `gateway.mode=remote`, the **CLI defaults** to a remote URL. The service can still be running locally, but your CLI may be probing the wrong place. Use `crocbot gateway status` to see the service’s resolved port + probe target (or pass `--url`).
 - `crocbot gateway status` and `crocbot doctor` surface the **last gateway error** from logs when the service looks running but the port is closed.
 - Non-loopback binds (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) require auth:
-  `gateway.auth.token` (or `CLAWDBOT_GATEWAY_TOKEN`).
+  `gateway.auth.token` (or `CROCBOT_GATEWAY_TOKEN`).
 - `gateway.remote.token` is for remote CLI calls only; it does **not** enable local auth.
 - `gateway.token` is ignored; use `gateway.auth.token`.
 
 **If `crocbot gateway status` shows a config mismatch**
 - `Config (cli): ...` and `Config (service): ...` should normally match.
 - If they don’t, you’re almost certainly editing one config while the service is running another.
-- Fix: rerun `crocbot gateway install --force` from the same `--profile` / `CLAWDBOT_STATE_DIR` you want the service to use.
+- Fix: rerun `crocbot gateway install --force` from the same `--profile` / `CROCBOT_STATE_DIR` you want the service to use.
 
 **If `crocbot gateway status` reports service config issues**
 - The supervisor config (launchd/systemd/schtasks) is missing current defaults.
@@ -209,7 +209,7 @@ the Gateway likely refused to bind.
 
 **If `Last gateway error:` mentions “refusing to bind … without auth”**
 - You set `gateway.bind` to a non-loopback mode (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) but didn’t configure auth.
-- Fix: set `gateway.auth.mode` + `gateway.auth.token` (or export `CLAWDBOT_GATEWAY_TOKEN`) and restart the service.
+- Fix: set `gateway.auth.mode` + `gateway.auth.token` (or export `CROCBOT_GATEWAY_TOKEN`) and restart the service.
 
 **If `crocbot gateway status` says `bind=tailnet` but no tailnet interface was found**
 - The gateway tried to bind to a Tailscale IP (100.64.0.0/10) but none were detected on the host.
@@ -242,7 +242,7 @@ only one workspace is active.
 
 ### Main chat running in a sandbox workspace
 
-Symptoms: `pwd` or file tools show `~/.clawdbot/sandboxes/...` even though you
+Symptoms: `pwd` or file tools show `~/.crocbot/sandboxes/...` even though you
 expected the host workspace.
 
 **Why:** `agents.defaults.sandbox.mode: "non-main"` keys off `session.mainKey` (default `"main"`).
@@ -291,7 +291,7 @@ Look for `AllowFrom: ...` in the output.
 # The message must match mentionPatterns or explicit mentions; defaults live in channel groups/guilds.
 # Multi-agent: `agents.list[].groupChat.mentionPatterns` overrides global patterns.
 grep -n "agents\\|groupChat\\|mentionPatterns\\|channels\\.telegram\\.groups" \
-  "${CLAWDBOT_CONFIG_PATH:-$HOME/.clawdbot/crocbot.json}"
+  "${CROCBOT_CONFIG_PATH:-$HOME/.crocbot/crocbot.json}"
 ```
 
 **Check 3:** Check the logs
@@ -324,14 +324,14 @@ crocbot logs --follow | grep "pairing request"
 In some cases, when you send an image with ONLY a mention (no other text), mention metadata may not be included.
 
 **Workaround:** Add some text with the mention:
-- ❌ `@clawd` + image
-- ✅ `@clawd check this` + image
+- ❌ `@croc` + image
+- ✅ `@croc check this` + image
 
 ### Session Not Resuming
 
 **Check 1:** Is the session file there?
 ```bash
-ls -la ~/.clawdbot/agents/<agentId>/sessions/
+ls -la ~/.crocbot/agents/<agentId>/sessions/
 ```
 
 **Check 2:** Is the reset window too short?
@@ -385,7 +385,7 @@ If you're logged out / unlinked:
 
 ```bash
 crocbot channels logout
-trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}/credentials" # if logout can't cleanly remove everything
+trash "${CROCBOT_STATE_DIR:-$HOME/.crocbot}/credentials" # if logout can't cleanly remove everything
 crocbot channels login --verbose
 ```
 
@@ -474,12 +474,12 @@ upgrades in place and rewrites the gateway service to point at the new install.
 
 Switch **to git install**:
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash -s -- --install-method git --no-onboard
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --install-method git --no-onboard
 ```
 
 Switch **to npm global**:
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 Notes:
@@ -562,7 +562,7 @@ Get verbose logging:
 
 ```bash
 # Turn on trace logging in config:
-#   ${CLAWDBOT_CONFIG_PATH:-$HOME/.clawdbot/crocbot.json} -> { logging: { level: "trace" } }
+#   ${CROCBOT_CONFIG_PATH:-$HOME/.crocbot/crocbot.json} -> { logging: { level: "trace" } }
 #
 # Then run verbose commands to mirror debug output to stdout:
 crocbot gateway --verbose
@@ -575,9 +575,9 @@ crocbot channels login --verbose
 |-----|----------|
 | Gateway file logs (structured) | `/tmp/crocbot/crocbot-YYYY-MM-DD.log` (or `logging.file`) |
 | Gateway service logs (supervisor) | Linux: `journalctl --user -u crocbot-gateway[-<profile>].service -n 200 --no-pager` |
-| Session files | `$CLAWDBOT_STATE_DIR/agents/<agentId>/sessions/` |
-| Media cache | `$CLAWDBOT_STATE_DIR/media/` |
-| Credentials | `$CLAWDBOT_STATE_DIR/credentials/` |
+| Session files | `$CROCBOT_STATE_DIR/agents/<agentId>/sessions/` |
+| Media cache | `$CROCBOT_STATE_DIR/media/` |
+| Credentials | `$CROCBOT_STATE_DIR/credentials/` |
 
 ## Health Check
 
@@ -610,7 +610,7 @@ crocbot gateway stop
 # If you installed a service and want a clean install:
 # crocbot gateway uninstall
 
-trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}"
+trash "${CROCBOT_STATE_DIR:-$HOME/.crocbot}"
 crocbot channels login         # re-authenticate
 crocbot gateway restart           # or: crocbot gateway
 ```

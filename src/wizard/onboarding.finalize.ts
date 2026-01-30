@@ -214,8 +214,8 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       await prompter.note(
         [
           "Docs:",
-          "https://docs.molt.bot/gateway/health",
-          "https://docs.molt.bot/gateway/troubleshooting",
+          "https://docs.github.com/moshehbenavraham/crocbot/gateway/health",
+          "https://docs.github.com/moshehbenavraham/crocbot/gateway/troubleshooting",
         ].join("\n"),
         "Health check help",
       );
@@ -277,7 +277,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       tokenParam ? `Web UI (with token): ${authedUrl}` : undefined,
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
-      "Docs: https://docs.molt.bot/web/control-ui",
+      "Docs: https://docs.github.com/moshehbenavraham/crocbot/web/control-ui",
     ]
       .filter(Boolean)
       .join("\n"),
@@ -305,7 +305,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     await prompter.note(
       [
         "Gateway token: shared auth for the Gateway + Control UI.",
-        "Stored in: ~/.clawdbot/crocbot.json (gateway.auth.token) or CLAWDBOT_GATEWAY_TOKEN.",
+        "Stored in: ~/.crocbot/crocbot.json (gateway.auth.token) or CROCBOT_GATEWAY_TOKEN.",
         "Web UI stores a copy in this browser's localStorage (crocbot.control.settings.v1).",
         `Get the tokenized link anytime: ${formatCliCommand("crocbot dashboard --no-open")}`,
       ].join("\n"),
@@ -383,14 +383,15 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   }
 
   await prompter.note(
-    ["Back up your agent workspace.", "Docs: https://docs.molt.bot/concepts/agent-workspace"].join(
-      "\n",
-    ),
+    [
+      "Back up your agent workspace.",
+      "Docs: https://docs.github.com/moshehbenavraham/crocbot/concepts/agent-workspace",
+    ].join("\n"),
     "Workspace backup",
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.molt.bot/security",
+    "Running agents on your computer is risky — harden your setup: https://docs.github.com/moshehbenavraham/crocbot/security",
     "Security",
   );
 
@@ -443,7 +444,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           webSearchKey
             ? "API key: stored in config (tools.web.search.apiKey)."
             : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.molt.bot/tools/web",
+          "Docs: https://docs.github.com/moshehbenavraham/crocbot/tools/web",
         ].join("\n")
       : [
           "If you want your agent to be able to search the web, you’ll need an API key.",
@@ -455,13 +456,13 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           "- Enable web_search and paste your Brave Search API key",
           "",
           "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.molt.bot/tools/web",
+          "Docs: https://docs.github.com/moshehbenavraham/crocbot/tools/web",
         ].join("\n"),
     "Web search (optional)",
   );
 
   await prompter.note(
-    'What now: https://molt.bot/showcase ("What People Are Building").',
+    'What now: https://github.com/moshehbenavraham/crocbot/showcase ("What People Are Building").',
     "What now",
   );
 

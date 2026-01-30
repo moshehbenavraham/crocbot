@@ -177,7 +177,7 @@ In group `-1001234567890` with agents `["alfred", "baerbel"]`:
 ```
 Session: agent:alfred:telegram:group:-1001234567890
 History: [user message, alfred's previous responses]
-Workspace: /home/user/clawd-alfred/
+Workspace: /home/user/croc-alfred/
 Tools: read, write, exec
 ```
 
@@ -185,7 +185,7 @@ Tools: read, write, exec
 ```
 Session: agent:baerbel:telegram:group:-1001234567890
 History: [user message, baerbel's previous responses]
-Workspace: /home/user/clawd-baerbel/
+Workspace: /home/user/croc-baerbel/
 Tools: read only
 ```
 
@@ -286,7 +286,7 @@ Broadcast groups work alongside existing routing:
 
 **Debug:**
 ```bash
-tail -f ~/.clawdbot/logs/gateway.log | grep broadcast
+tail -f ~/.crocbot/logs/gateway.log | grep broadcast
 ```
 
 ### Only One Agent Responding

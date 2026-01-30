@@ -87,7 +87,7 @@ Returns `details.json` containing the parsed JSON (and validates against
 ## Example: Lobster workflow step
 
 ```lobster
-clawd.invoke --tool llm-task --action json --args-json '{
+croc.invoke --tool llm-task --action json --args-json '{
   "prompt": "Given the input email, return intent and draft.",
   "input": {
     "subject": "Hello",

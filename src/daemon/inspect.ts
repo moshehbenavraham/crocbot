@@ -31,7 +31,7 @@ const execFileAsync = promisify(execFile);
 export function renderGatewayServiceCleanupHints(
   env: Record<string, string | undefined> = process.env as Record<string, string | undefined>,
 ): string[] {
-  const profile = env.CLAWDBOT_PROFILE;
+  const profile = env.CROCBOT_PROFILE;
   switch (process.platform) {
     case "darwin": {
       const label = resolveGatewayLaunchAgentLabel(profile);
@@ -78,7 +78,7 @@ function iscrocbotGatewayLaunchdService(label: string, contents: string): boolea
   if (hasGatewayServiceMarker(contents)) return true;
   const lowerContents = contents.toLowerCase();
   if (!lowerContents.includes("gateway")) return false;
-  return label.startsWith("com.clawdbot.");
+  return label.startsWith("com.crocbot.");
 }
 
 function iscrocbotGatewaySystemdService(name: string, contents: string): boolean {

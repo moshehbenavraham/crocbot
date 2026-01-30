@@ -197,4 +197,4 @@ Session `phase00-session04-simplify-build` completed successfully.
 2. Remove entirely
 
 **Chosen**: Option 2 - Remove entirely
-**Rationale**: The workflows were specific to macOS app updates and Clawdbot syncing. Not relevant for the stripped-down Telegram-only deployment.
+**Rationale**: The workflows were specific to macOS app updates and Crocbot syncing. Not relevant for the stripped-down Telegram-only deployment.

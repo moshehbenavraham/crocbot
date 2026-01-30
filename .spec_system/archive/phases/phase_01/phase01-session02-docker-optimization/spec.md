@@ -135,7 +135,7 @@ The Dockerfile will use a two-stage build pattern:
 ### Key Considerations
 - The current Dockerfile installs Bun for build scripts, but Bun should not be in the runtime image
 - UI build currently uses `pnpm ui:install && pnpm ui:build` which may need adjustment
-- The `CLAWDBOT_A2UI_SKIP_MISSING=1` flag suggests optional A2UI bundling
+- The `CROCBOT_A2UI_SKIP_MISSING=1` flag suggests optional A2UI bundling
 - Current base `node:22-bookworm` is ~400MB; `node:22-slim` is ~70MB
 
 ### Potential Challenges

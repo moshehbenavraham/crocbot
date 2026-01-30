@@ -61,7 +61,7 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 
 - Removed 4 obsolete Dependabot ecosystem configurations (~64 lines)
   - `/apps/macos` (Swift) - removed native app directory
-  - `/apps/shared/ClawdbotKit` (Swift) - removed shared library directory
+  - `/apps/shared/CrocbotKit` (Swift) - removed shared library directory
   - `/Swabble` (Swift) - removed Swift package directory
   - `/apps/android` (Gradle) - removed Android app directory
 - Reviewed all 6 GitHub Actions workflows - no obsolete platform references found

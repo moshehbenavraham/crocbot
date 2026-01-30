@@ -158,7 +158,7 @@ const testConfigRoot = {
 
 export const setTestConfigRoot = (root: string) => {
   testConfigRoot.value = root;
-  process.env.CLAWDBOT_CONFIG_PATH = path.join(root, "crocbot.json");
+  process.env.CROCBOT_CONFIG_PATH = path.join(root, "crocbot.json");
 };
 
 export const testTailnetIPv4 = hoisted.testTailnetIPv4;
@@ -353,7 +353,7 @@ vi.mock("../config/config.js", async () => {
           : {};
       const defaults = {
         model: { primary: "anthropic/claude-opus-4-5" },
-        workspace: path.join(os.tmpdir(), "clawd-gateway-test"),
+        workspace: path.join(os.tmpdir(), "croc-gateway-test"),
         ...fileDefaults,
         ...testState.agentConfig,
       };
@@ -492,5 +492,5 @@ vi.mock("../cli/deps.js", async () => {
   };
 });
 
-process.env.CLAWDBOT_SKIP_CHANNELS = "1";
-process.env.CLAWDBOT_SKIP_CRON = "1";
+process.env.CROCBOT_SKIP_CHANNELS = "1";
+process.env.CROCBOT_SKIP_CRON = "1";

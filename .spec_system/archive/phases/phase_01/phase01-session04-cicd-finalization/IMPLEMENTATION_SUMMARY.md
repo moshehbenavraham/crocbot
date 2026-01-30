@@ -88,7 +88,7 @@ Items for Session 05 (Internal Docs Cleanup):
 | Directory | Ecosystem | Reason |
 |-----------|-----------|--------|
 | `/apps/macos` | Swift | macOS app removed in Phase 00 Session 01 |
-| `/apps/shared/ClawdbotKit` | Swift | Shared Swift library removed in Phase 00 Session 01 |
+| `/apps/shared/CrocbotKit` | Swift | Shared Swift library removed in Phase 00 Session 01 |
 | `/Swabble` | Swift | Swift package removed in Phase 00 Session 01 |
 | `/apps/android` | Gradle | Android app removed in Phase 00 Session 01 |
 

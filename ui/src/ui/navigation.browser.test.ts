@@ -22,14 +22,14 @@ beforeEach(() => {
   crocbotApp.prototype.connect = () => {
     // no-op: avoid real gateway WS connections in browser tests
   };
-  window.__CLAWDBOT_CONTROL_UI_BASE_PATH__ = undefined;
+  window.__CROCBOT_CONTROL_UI_BASE_PATH__ = undefined;
   localStorage.clear();
   document.body.innerHTML = "";
 });
 
 afterEach(() => {
   crocbotApp.prototype.connect = originalConnect;
-  window.__CLAWDBOT_CONTROL_UI_BASE_PATH__ = undefined;
+  window.__CROCBOT_CONTROL_UI_BASE_PATH__ = undefined;
   localStorage.clear();
   document.body.innerHTML = "";
 });
@@ -62,7 +62,7 @@ describe("control UI routing", () => {
   });
 
   it("honors explicit base path overrides", async () => {
-    window.__CLAWDBOT_CONTROL_UI_BASE_PATH__ = "/crocbot";
+    window.__CROCBOT_CONTROL_UI_BASE_PATH__ = "/crocbot";
     const app = mountApp("/crocbot/sessions");
     await app.updateComplete;
 

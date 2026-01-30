@@ -154,7 +154,7 @@ export const crocbotSchema = z
               .object({
                 cdpPort: z.number().int().min(1).max(65535).optional(),
                 cdpUrl: z.string().optional(),
-                driver: z.union([z.literal("clawd"), z.literal("extension")]).optional(),
+                driver: z.union([z.literal("croc"), z.literal("extension")]).optional(),
                 color: HexColorSchema,
               })
               .strict()

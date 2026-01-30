@@ -14,10 +14,10 @@ RUN corepack enable
 WORKDIR /app
 
 # Optional: Install additional apt packages if needed for build
-ARG CLAWDBOT_DOCKER_APT_PACKAGES=""
-RUN if [ -n "$CLAWDBOT_DOCKER_APT_PACKAGES" ]; then \
+ARG CROCBOT_DOCKER_APT_PACKAGES=""
+RUN if [ -n "$CROCBOT_DOCKER_APT_PACKAGES" ]; then \
       apt-get update && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $CLAWDBOT_DOCKER_APT_PACKAGES && \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $CROCBOT_DOCKER_APT_PACKAGES && \
       apt-get clean && \
       rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*; \
     fi
@@ -40,8 +40,8 @@ COPY assets ./assets
 COPY skills ./skills
 
 # Layer 4: Build TypeScript and UI
-ENV CLAWDBOT_A2UI_SKIP_MISSING=1
-ENV CLAWDBOT_PREFER_PNPM=1
+ENV CROCBOT_A2UI_SKIP_MISSING=1
+ENV CROCBOT_PREFER_PNPM=1
 RUN pnpm build
 RUN pnpm ui:install
 RUN pnpm ui:build
@@ -105,7 +105,7 @@ COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/skills ./skills
 
 # Create directories for runtime
-RUN mkdir -p /home/node/.clawdbot /home/node/clawd && \
+RUN mkdir -p /home/node/.crocbot /home/node/croc && \
     chown -R node:node /home/node /app
 
 # Set production environment

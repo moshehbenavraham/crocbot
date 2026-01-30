@@ -31,10 +31,10 @@ import { GatewayClient } from "./client.js";
 import { renderCatNoncePngBase64 } from "./live-image-probe.js";
 import { startGatewayServer } from "./server.js";
 
-const LIVE = isTruthyEnvValue(process.env.LIVE) || isTruthyEnvValue(process.env.CLAWDBOT_LIVE_TEST);
-const GATEWAY_LIVE = isTruthyEnvValue(process.env.CLAWDBOT_LIVE_GATEWAY);
-const ZAI_FALLBACK = isTruthyEnvValue(process.env.CLAWDBOT_LIVE_GATEWAY_ZAI_FALLBACK);
-const PROVIDERS = parseFilter(process.env.CLAWDBOT_LIVE_GATEWAY_PROVIDERS);
+const LIVE = isTruthyEnvValue(process.env.LIVE) || isTruthyEnvValue(process.env.CROCBOT_LIVE_TEST);
+const GATEWAY_LIVE = isTruthyEnvValue(process.env.CROCBOT_LIVE_GATEWAY);
+const ZAI_FALLBACK = isTruthyEnvValue(process.env.CROCBOT_LIVE_GATEWAY_ZAI_FALLBACK);
+const PROVIDERS = parseFilter(process.env.CROCBOT_LIVE_GATEWAY_PROVIDERS);
 const THINKING_LEVEL = "high";
 const THINKING_TAG_RE = /<\s*\/?\s*(?:think(?:ing)?|thought|antthinking)\s*>/i;
 const FINAL_TAG_RE = /<\s*\/?\s*final\s*>/i;
@@ -436,26 +436,26 @@ function buildMinimaxProviderOverride(params: {
 
 async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   const previous = {
-    configPath: process.env.CLAWDBOT_CONFIG_PATH,
-    token: process.env.CLAWDBOT_GATEWAY_TOKEN,
-    skipChannels: process.env.CLAWDBOT_SKIP_CHANNELS,
-    skipGmail: process.env.CLAWDBOT_SKIP_GMAIL_WATCHER,
-    skipCron: process.env.CLAWDBOT_SKIP_CRON,
-    skipCanvas: process.env.CLAWDBOT_SKIP_CANVAS_HOST,
-    agentDir: process.env.CLAWDBOT_AGENT_DIR,
+    configPath: process.env.CROCBOT_CONFIG_PATH,
+    token: process.env.CROCBOT_GATEWAY_TOKEN,
+    skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
+    skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
+    skipCron: process.env.CROCBOT_SKIP_CRON,
+    skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
+    agentDir: process.env.CROCBOT_AGENT_DIR,
     piAgentDir: process.env.PI_CODING_AGENT_DIR,
-    stateDir: process.env.CLAWDBOT_STATE_DIR,
+    stateDir: process.env.CROCBOT_STATE_DIR,
   };
   let tempAgentDir: string | undefined;
   let tempStateDir: string | undefined;
 
-  process.env.CLAWDBOT_SKIP_CHANNELS = "1";
-  process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = "1";
-  process.env.CLAWDBOT_SKIP_CRON = "1";
-  process.env.CLAWDBOT_SKIP_CANVAS_HOST = "1";
+  process.env.CROCBOT_SKIP_CHANNELS = "1";
+  process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
+  process.env.CROCBOT_SKIP_CRON = "1";
+  process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 
   const token = `test-${randomUUID()}`;
-  process.env.CLAWDBOT_GATEWAY_TOKEN = token;
+  process.env.CROCBOT_GATEWAY_TOKEN = token;
   const agentId = "dev";
 
   const hostAgentDir = resolvecrocbotAgentDir();
@@ -472,21 +472,21 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     usageStats: hostStore.usageStats ? { ...hostStore.usageStats } : undefined,
   };
   tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-live-state-"));
-  process.env.CLAWDBOT_STATE_DIR = tempStateDir;
+  process.env.CROCBOT_STATE_DIR = tempStateDir;
   tempAgentDir = path.join(tempStateDir, "agents", DEFAULT_AGENT_ID, "agent");
   saveAuthProfileStore(sanitizedStore, tempAgentDir);
   const tempSessionAgentDir = path.join(tempStateDir, "agents", agentId, "agent");
   if (tempSessionAgentDir !== tempAgentDir) {
     saveAuthProfileStore(sanitizedStore, tempSessionAgentDir);
   }
-  process.env.CLAWDBOT_AGENT_DIR = tempAgentDir;
+  process.env.CROCBOT_AGENT_DIR = tempAgentDir;
   process.env.PI_CODING_AGENT_DIR = tempAgentDir;
 
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, agentId);
   await fs.mkdir(workspaceDir, { recursive: true });
   const nonceA = randomUUID();
   const nonceB = randomUUID();
-  const toolProbePath = path.join(workspaceDir, `.clawdbot-live-tool-probe.${nonceA}.txt`);
+  const toolProbePath = path.join(workspaceDir, `.crocbot-live-tool-probe.${nonceA}.txt`);
   await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
   const agentDir = resolvecrocbotAgentDir();
@@ -502,7 +502,7 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-live-"));
   const tempConfigPath = path.join(tempDir, "crocbot.json");
   await fs.writeFile(tempConfigPath, `${JSON.stringify(nextCfg, null, 2)}\n`);
-  process.env.CLAWDBOT_CONFIG_PATH = tempConfigPath;
+  process.env.CROCBOT_CONFIG_PATH = tempConfigPath;
 
   await ensurecrocbotModelsJson(nextCfg);
 
@@ -940,15 +940,15 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
       await fs.rm(tempStateDir, { recursive: true, force: true });
     }
 
-    process.env.CLAWDBOT_CONFIG_PATH = previous.configPath;
-    process.env.CLAWDBOT_GATEWAY_TOKEN = previous.token;
-    process.env.CLAWDBOT_SKIP_CHANNELS = previous.skipChannels;
-    process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
-    process.env.CLAWDBOT_SKIP_CRON = previous.skipCron;
-    process.env.CLAWDBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
-    process.env.CLAWDBOT_AGENT_DIR = previous.agentDir;
+    process.env.CROCBOT_CONFIG_PATH = previous.configPath;
+    process.env.CROCBOT_GATEWAY_TOKEN = previous.token;
+    process.env.CROCBOT_SKIP_CHANNELS = previous.skipChannels;
+    process.env.CROCBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
+    process.env.CROCBOT_SKIP_CRON = previous.skipCron;
+    process.env.CROCBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
+    process.env.CROCBOT_AGENT_DIR = previous.agentDir;
     process.env.PI_CODING_AGENT_DIR = previous.piAgentDir;
-    process.env.CLAWDBOT_STATE_DIR = previous.stateDir;
+    process.env.CROCBOT_STATE_DIR = previous.stateDir;
   }
 }
 
@@ -967,7 +967,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       const modelRegistry = discoverModels(authStorage, agentDir);
       const all = modelRegistry.getAll() as Array<Model<Api>>;
 
-      const rawModels = process.env.CLAWDBOT_LIVE_GATEWAY_MODELS?.trim();
+      const rawModels = process.env.CROCBOT_LIVE_GATEWAY_MODELS?.trim();
       const useModern = !rawModels || rawModels === "modern" || rawModels === "all";
       const useExplicit = Boolean(rawModels) && !useModern;
       const filter = useExplicit ? parseFilter(rawModels) : null;
@@ -1044,21 +1044,21 @@ describeLive("gateway live (dev agent, profile keys)", () => {
   it("z.ai fallback handles anthropic tool history", async () => {
     if (!ZAI_FALLBACK) return;
     const previous = {
-      configPath: process.env.CLAWDBOT_CONFIG_PATH,
-      token: process.env.CLAWDBOT_GATEWAY_TOKEN,
-      skipChannels: process.env.CLAWDBOT_SKIP_CHANNELS,
-      skipGmail: process.env.CLAWDBOT_SKIP_GMAIL_WATCHER,
-      skipCron: process.env.CLAWDBOT_SKIP_CRON,
-      skipCanvas: process.env.CLAWDBOT_SKIP_CANVAS_HOST,
+      configPath: process.env.CROCBOT_CONFIG_PATH,
+      token: process.env.CROCBOT_GATEWAY_TOKEN,
+      skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
+      skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
+      skipCron: process.env.CROCBOT_SKIP_CRON,
+      skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
     };
 
-    process.env.CLAWDBOT_SKIP_CHANNELS = "1";
-    process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = "1";
-    process.env.CLAWDBOT_SKIP_CRON = "1";
-    process.env.CLAWDBOT_SKIP_CANVAS_HOST = "1";
+    process.env.CROCBOT_SKIP_CHANNELS = "1";
+    process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
+    process.env.CROCBOT_SKIP_CRON = "1";
+    process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 
     const token = `test-${randomUUID()}`;
-    process.env.CLAWDBOT_GATEWAY_TOKEN = token;
+    process.env.CROCBOT_GATEWAY_TOKEN = token;
 
     const cfg = loadConfig();
     await ensurecrocbotModelsJson(cfg);
@@ -1082,7 +1082,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     await fs.mkdir(workspaceDir, { recursive: true });
     const nonceA = randomUUID();
     const nonceB = randomUUID();
-    const toolProbePath = path.join(workspaceDir, `.clawdbot-live-zai-fallback.${nonceA}.txt`);
+    const toolProbePath = path.join(workspaceDir, `.crocbot-live-zai-fallback.${nonceA}.txt`);
     await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
     const port = await getFreeGatewayPort();
@@ -1173,12 +1173,12 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       await server.close({ reason: "live test complete" });
       await fs.rm(toolProbePath, { force: true });
 
-      process.env.CLAWDBOT_CONFIG_PATH = previous.configPath;
-      process.env.CLAWDBOT_GATEWAY_TOKEN = previous.token;
-      process.env.CLAWDBOT_SKIP_CHANNELS = previous.skipChannels;
-      process.env.CLAWDBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
-      process.env.CLAWDBOT_SKIP_CRON = previous.skipCron;
-      process.env.CLAWDBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
+      process.env.CROCBOT_CONFIG_PATH = previous.configPath;
+      process.env.CROCBOT_GATEWAY_TOKEN = previous.token;
+      process.env.CROCBOT_SKIP_CHANNELS = previous.skipChannels;
+      process.env.CROCBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
+      process.env.CROCBOT_SKIP_CRON = previous.skipCron;
+      process.env.CROCBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
     }
   }, 180_000);
 });

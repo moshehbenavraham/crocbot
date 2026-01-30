@@ -1,6 +1,6 @@
 import type { crocbotConfig } from "../config/config.js";
 
-const DIAGNOSTICS_ENV = "CLAWDBOT_DIAGNOSTICS";
+const DIAGNOSTICS_ENV = "CROCBOT_DIAGNOSTICS";
 
 function normalizeFlag(value: string): string {
   return value.trim().toLowerCase();

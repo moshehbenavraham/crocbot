@@ -22,7 +22,7 @@ crocbot gateway --force
 # dev loop (auto-reload on TS changes):
 pnpm gateway:watch
 ```
-- Config hot reload watches `~/.clawdbot/crocbot.json` (or `CLAWDBOT_CONFIG_PATH`).
+- Config hot reload watches `~/.crocbot/crocbot.json` (or `CROCBOT_CONFIG_PATH`).
   - Default mode: `gateway.reload.mode="hybrid"` (hot-apply safe changes, restart on critical).
   - Hot reload uses in-process restart via **SIGUSR1** when needed.
   - Disable with `gateway.reload.mode="off"`.
@@ -31,15 +31,15 @@ pnpm gateway:watch
   - OpenAI Chat Completions (HTTP): [`/v1/chat/completions`](/gateway/openai-http-api).
   - OpenResponses (HTTP): [`/v1/responses`](/gateway/openresponses-http-api).
   - Tools Invoke (HTTP): [`/tools/invoke`](/gateway/tools-invoke-http-api).
-- Starts a Canvas file server by default on `canvasHost.port` (default `18793`), serving `http://<gateway-host>:18793/__crocbot__/canvas/` from `~/clawd/canvas`. Disable with `canvasHost.enabled=false` or `CLAWDBOT_SKIP_CANVAS_HOST=1`.
+- Starts a Canvas file server by default on `canvasHost.port` (default `18793`), serving `http://<gateway-host>:18793/__crocbot__/canvas/` from `~/croc/canvas`. Disable with `canvasHost.enabled=false` or `CROCBOT_SKIP_CANVAS_HOST=1`.
 - Logs to stdout; use launchd/systemd to keep it alive and rotate logs.
 - Pass `--verbose` to mirror debug logging (handshakes, req/res, events) from the log file into stdio when troubleshooting.
 - `--force` uses `lsof` to find listeners on the chosen port, sends SIGTERM, logs what it killed, then starts the gateway (fails fast if `lsof` is missing).
 - If you run under a supervisor (launchd/systemd/mac app child-process mode), a stop/restart typically sends **SIGTERM**; older builds may surface this as `pnpm` `ELIFECYCLE` exit code **143** (SIGTERM), which is a normal shutdown, not a crash.
 - **SIGUSR1** triggers an in-process restart when authorized (gateway tool/config apply/update, or enable `commands.restart` for manual restarts).
-- Gateway auth is required by default: set `gateway.auth.token` (or `CLAWDBOT_GATEWAY_TOKEN`) or `gateway.auth.password`. Clients must send `connect.params.auth.token/password` unless using Tailscale Serve identity.
+- Gateway auth is required by default: set `gateway.auth.token` (or `CROCBOT_GATEWAY_TOKEN`) or `gateway.auth.password`. Clients must send `connect.params.auth.token/password` unless using Tailscale Serve identity.
 - The wizard now generates a token by default, even on loopback.
-- Port precedence: `--port` > `CLAWDBOT_GATEWAY_PORT` > `gateway.port` > default `18789`.
+- Port precedence: `--port` > `CROCBOT_GATEWAY_PORT` > `gateway.port` > default `18789`.
 
 ## Remote access
 - Tailscale/VPN preferred; otherwise SSH tunnel:
@@ -59,9 +59,9 @@ Service names are profile-aware:
 - Linux: `crocbot-gateway-<profile>.service`
 
 Install metadata is embedded in the service config:
-- `CLAWDBOT_SERVICE_MARKER=crocbot`
-- `CLAWDBOT_SERVICE_KIND=gateway`
-- `CLAWDBOT_SERVICE_VERSION=<version>`
+- `CROCBOT_SERVICE_MARKER=crocbot`
+- `CROCBOT_SERVICE_KIND=gateway`
+- `CROCBOT_SERVICE_VERSION=<version>`
 
 Rescue-Bot Pattern: keep a second Gateway isolated with its own profile, state dir, workspace, and base port spacing. Full guide: [Rescue-bot guide](/gateway/multiple-gateways#rescue-bot-guide).
 
@@ -78,23 +78,23 @@ crocbot --dev health
 ```
 
 Defaults (can be overridden via env/flags/config):
-- `CLAWDBOT_STATE_DIR=~/.clawdbot-dev`
-- `CLAWDBOT_CONFIG_PATH=~/.clawdbot-dev/crocbot.json`
-- `CLAWDBOT_GATEWAY_PORT=19001` (Gateway WS + HTTP)
+- `CROCBOT_STATE_DIR=~/.crocbot-dev`
+- `CROCBOT_CONFIG_PATH=~/.crocbot-dev/crocbot.json`
+- `CROCBOT_GATEWAY_PORT=19001` (Gateway WS + HTTP)
 - browser control service port = `19003` (derived: `gateway.port+2`, loopback only)
 - `canvasHost.port=19005` (derived: `gateway.port+4`)
-- `agents.defaults.workspace` default becomes `~/clawd-dev` when you run `setup`/`onboard` under `--dev`.
+- `agents.defaults.workspace` default becomes `~/croc-dev` when you run `setup`/`onboard` under `--dev`.
 
 Derived ports (rules of thumb):
-- Base port = `gateway.port` (or `CLAWDBOT_GATEWAY_PORT` / `--port`)
+- Base port = `gateway.port` (or `CROCBOT_GATEWAY_PORT` / `--port`)
 - browser control service port = base + 2 (loopback only)
-- `canvasHost.port = base + 4` (or `CLAWDBOT_CANVAS_HOST_PORT` / config override)
+- `canvasHost.port = base + 4` (or `CROCBOT_CANVAS_HOST_PORT` / config override)
 - Browser profile CDP ports auto-allocate from `browser.controlPort + 9 .. + 108` (persisted per profile).
 
 Checklist per instance:
 - unique `gateway.port`
-- unique `CLAWDBOT_CONFIG_PATH`
-- unique `CLAWDBOT_STATE_DIR`
+- unique `CROCBOT_CONFIG_PATH`
+- unique `CROCBOT_STATE_DIR`
 - unique `agents.defaults.workspace`
 - separate Telegram accounts (if using multiple)
 
@@ -106,8 +106,8 @@ crocbot --profile rescue gateway install
 
 Example:
 ```bash
-CLAWDBOT_CONFIG_PATH=~/.clawdbot/a.json CLAWDBOT_STATE_DIR=~/.clawdbot-a crocbot gateway --port 19001
-CLAWDBOT_CONFIG_PATH=~/.clawdbot/b.json CLAWDBOT_STATE_DIR=~/.clawdbot-b crocbot gateway --port 19002
+CROCBOT_CONFIG_PATH=~/.crocbot/a.json CROCBOT_STATE_DIR=~/.crocbot-a crocbot gateway --port 19001
+CROCBOT_CONFIG_PATH=~/.crocbot/b.json CROCBOT_STATE_DIR=~/.crocbot-b crocbot gateway --port 19002
 ```
 
 ## Protocol (operator view)
@@ -179,8 +179,8 @@ See also: [Presence](/concepts/presence) for how presence is produced/deduped an
   - StandardOut/Err: file paths or `syslog`
 - On failure, launchd restarts; fatal misconfig should keep exiting so the operator notices.
 - LaunchAgents are per-user and require a logged-in session; for headless setups use a custom LaunchDaemon (not shipped).
-  - `crocbot gateway install` writes `~/Library/LaunchAgents/com.clawdbot.gateway.plist`
-    (or `com.clawdbot.<profile>.plist`).
+  - `crocbot gateway install` writes `~/Library/LaunchAgents/com.crocbot.gateway.plist`
+    (or `com.crocbot.<profile>.plist`).
   - `crocbot doctor` audits the LaunchAgent config and can update it to current defaults.
 
 ## Gateway service management (CLI)
@@ -211,11 +211,11 @@ Notes:
 
 Bundled mac app:
 - crocbot.app can bundle a Node-based gateway relay and install a per-user LaunchAgent labeled
-  `com.clawdbot.gateway` (or `com.clawdbot.<profile>`).
-- To stop it cleanly, use `crocbot gateway stop` (or `launchctl bootout gui/$UID/com.clawdbot.gateway`).
-- To restart, use `crocbot gateway restart` (or `launchctl kickstart -k gui/$UID/com.clawdbot.gateway`).
+  `com.crocbot.gateway` (or `com.crocbot.<profile>`).
+- To stop it cleanly, use `crocbot gateway stop` (or `launchctl bootout gui/$UID/com.crocbot.gateway`).
+- To restart, use `crocbot gateway restart` (or `launchctl kickstart -k gui/$UID/com.crocbot.gateway`).
   - `launchctl` only works if the LaunchAgent is installed; otherwise use `crocbot gateway install` first.
-  - Replace the label with `com.clawdbot.<profile>` when running a named profile.
+  - Replace the label with `com.crocbot.<profile>` when running a named profile.
 
 ## Supervision (systemd user unit)
 crocbot installs a **systemd user service** by default on Linux/WSL2. We
@@ -237,7 +237,7 @@ Wants=network-online.target
 ExecStart=/usr/local/bin/crocbot gateway --port 18789
 Restart=always
 RestartSec=5
-Environment=CLAWDBOT_GATEWAY_TOKEN=
+Environment=CROCBOT_GATEWAY_TOKEN=
 WorkingDirectory=/home/youruser
 
 [Install]

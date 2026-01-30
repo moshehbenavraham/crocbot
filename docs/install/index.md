@@ -12,13 +12,13 @@ Use the installer unless you have a reason not to. It sets up the CLI and runs o
 ## Quick install (recommended)
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 Windows (PowerShell):
 
 ```powershell
-iwr -useb https://molt.bot/install.ps1 | iex
+iwr -useb https://github.com/moshehbenavraham/crocbot/install.ps1 | iex
 ```
 
 Next step (if you skipped onboarding):
@@ -40,13 +40,13 @@ crocbot onboard --install-daemon
 Installs `crocbot` globally via npm and runs onboarding.
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 Installer flags:
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash -s -- --help
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --help
 ```
 
 Details: [Installer internals](/install/installer).
@@ -54,7 +54,7 @@ Details: [Installer internals](/install/installer).
 Non-interactive (skip onboarding):
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash -s -- --no-onboard
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --no-onboard
 ```
 
 ### 2) Global install (manual)
@@ -88,7 +88,7 @@ crocbot onboard --install-daemon
 ### 3) From source (contributors/dev)
 
 ```bash
-git clone https://github.com/crocbot/crocbot.git
+git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
@@ -123,10 +123,10 @@ The installer supports two methods:
 
 ```bash
 # Explicit npm
-curl -fsSL https://molt.bot/install.sh | bash -s -- --install-method npm
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --install-method npm
 
 # Install from GitHub (source checkout)
-curl -fsSL https://molt.bot/install.sh | bash -s -- --install-method git
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --install-method git
 ```
 
 Common flags:
@@ -142,12 +142,12 @@ Common flags:
 
 Equivalent env vars (useful for automation):
 
-- `CLAWDBOT_INSTALL_METHOD=git|npm`
-- `CLAWDBOT_GIT_DIR=...`
-- `CLAWDBOT_GIT_UPDATE=0|1`
-- `CLAWDBOT_NO_PROMPT=1`
-- `CLAWDBOT_DRY_RUN=1`
-- `CLAWDBOT_NO_ONBOARD=1`
+- `CROCBOT_INSTALL_METHOD=git|npm`
+- `CROCBOT_GIT_DIR=...`
+- `CROCBOT_GIT_UPDATE=0|1`
+- `CROCBOT_NO_PROMPT=1`
+- `CROCBOT_DRY_RUN=1`
+- `CROCBOT_NO_ONBOARD=1`
 - `SHARP_IGNORE_GLOBAL_LIBVIPS=0|1` (default: `1`; avoids `sharp` building against system libvips)
 
 ## Troubleshooting: `crocbot` not found (PATH)

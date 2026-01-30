@@ -10,7 +10,7 @@ read_when:
 Last updated: 2026-01-01
 
 ## TL;DR
-- **Tailoring lives outside the repo:** `~/clawd` (workspace) + `~/.clawdbot/crocbot.json` (config).
+- **Tailoring lives outside the repo:** `~/croc` (workspace) + `~/.crocbot/crocbot.json` (config).
 - **Stable workflow:** install the macOS app; let it run the bundled Gateway.
 - **Bleeding edge workflow:** run the Gateway yourself via `pnpm gateway:watch`, then let the macOS app attach in Local mode.
 
@@ -23,8 +23,8 @@ Last updated: 2026-01-01
 
 If you want “100% tailored to me” *and* easy updates, keep your customization in:
 
-- **Config:** `~/.clawdbot/crocbot.json` (JSON/JSON5-ish)
-- **Workspace:** `~/clawd` (skills, prompts, memories; make it a private git repo)
+- **Config:** `~/.crocbot/crocbot.json` (JSON/JSON5-ish)
+- **Workspace:** `~/croc` (skills, prompts, memories; make it a private git repo)
 
 Bootstrap once:
 
@@ -100,8 +100,8 @@ crocbot health
 ### Common footguns
 - **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep app + CLI on the same port.
 - **Where state lives:**
-  - Credentials: `~/.clawdbot/credentials/`
-  - Sessions: `~/.clawdbot/agents/<agentId>/sessions/`
+  - Credentials: `~/.crocbot/credentials/`
+  - Sessions: `~/.crocbot/agents/<agentId>/sessions/`
   - Logs: `/tmp/crocbot/`
 
 ## Credential storage map
@@ -109,14 +109,14 @@ crocbot health
 Use this when debugging auth or deciding what to back up:
 
 - **Telegram bot token**: config/env or `channels.telegram.tokenFile`
-- **Pairing allowlists**: `~/.clawdbot/credentials/<channel>-allowFrom.json`
-- **Model auth profiles**: `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`
-- **Legacy OAuth import**: `~/.clawdbot/credentials/oauth.json`
+- **Pairing allowlists**: `~/.crocbot/credentials/<channel>-allowFrom.json`
+- **Model auth profiles**: `~/.crocbot/agents/<agentId>/agent/auth-profiles.json`
+- **Legacy OAuth import**: `~/.crocbot/credentials/oauth.json`
 More detail: [Security](/gateway/security#credential-storage-map).
 
 ## Updating (without wrecking your setup)
 
-- Keep `~/clawd` and `~/.clawdbot/` as “your stuff”; don’t put personal prompts/config into the `crocbot` repo.
+- Keep `~/croc` and `~/.crocbot/` as “your stuff”; don’t put personal prompts/config into the `crocbot` repo.
 - Updating source: `git pull` + `pnpm install` (when lockfile changed) + keep using `pnpm gateway:watch`.
 
 ## Linux (systemd user service)
@@ -137,4 +137,4 @@ user service (no lingering needed). See [Gateway runbook](/gateway) for the syst
 - [Gateway runbook](/gateway) (flags, supervision, ports)
 - [Gateway configuration](/gateway/configuration) (config schema + examples)
 - [Telegram](/channels/telegram) (reply tags + replyToMode settings)
-- [crocbot assistant setup](/start/clawd)
+- [crocbot assistant setup](/start/croc)

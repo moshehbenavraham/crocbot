@@ -68,13 +68,13 @@ describe("Agent-specific sandbox config", () => {
           sandbox: {
             mode: "all",
             scope: "agent",
-            workspaceRoot: "~/.clawdbot/sandboxes", // Global default
+            workspaceRoot: "~/.crocbot/sandboxes", // Global default
           },
         },
         list: [
           {
             id: "isolated",
-            workspace: "~/clawd-isolated",
+            workspace: "~/croc-isolated",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -108,14 +108,14 @@ describe("Agent-specific sandbox config", () => {
         list: [
           {
             id: "main",
-            workspace: "~/clawd",
+            workspace: "~/croc",
             sandbox: {
               mode: "off", // main: no sandbox
             },
           },
           {
             id: "family",
-            workspace: "~/clawd-family",
+            workspace: "~/croc-family",
             sandbox: {
               mode: "all", // family: always sandbox
               scope: "agent",
@@ -156,7 +156,7 @@ describe("Agent-specific sandbox config", () => {
         list: [
           {
             id: "restricted",
-            workspace: "~/clawd-restricted",
+            workspace: "~/croc-restricted",
             sandbox: {
               mode: "all",
               scope: "agent",

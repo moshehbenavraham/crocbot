@@ -38,7 +38,7 @@ Supported channels: `telegram`.
 
 ### Where the state lives
 
-Stored under `~/.clawdbot/credentials/`:
+Stored under `~/.crocbot/credentials/`:
 - Pending requests: `<channel>-pairing.json`
 - Approved allowlist store: `<channel>-allowFrom.json`
 
@@ -60,7 +60,7 @@ crocbot devices reject <requestId>
 
 ### Where the state lives
 
-Stored under `~/.clawdbot/devices/`:
+Stored under `~/.crocbot/devices/`:
 - `pending.json` (short-lived; pending requests expire)
 - `paired.json` (paired devices + tokens)
 

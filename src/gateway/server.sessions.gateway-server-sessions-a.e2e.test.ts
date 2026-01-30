@@ -48,16 +48,16 @@ let port = 0;
 let previousToken: string | undefined;
 
 beforeAll(async () => {
-  previousToken = process.env.CLAWDBOT_GATEWAY_TOKEN;
-  delete process.env.CLAWDBOT_GATEWAY_TOKEN;
+  previousToken = process.env.CROCBOT_GATEWAY_TOKEN;
+  delete process.env.CROCBOT_GATEWAY_TOKEN;
   port = await getFreePort();
   server = await startGatewayServer(port);
 });
 
 afterAll(async () => {
   await server.close();
-  if (previousToken === undefined) delete process.env.CLAWDBOT_GATEWAY_TOKEN;
-  else process.env.CLAWDBOT_GATEWAY_TOKEN = previousToken;
+  if (previousToken === undefined) delete process.env.CROCBOT_GATEWAY_TOKEN;
+  else process.env.CROCBOT_GATEWAY_TOKEN = previousToken;
 });
 
 const openClient = async (opts?: Parameters<typeof connectOk>[1]) => {

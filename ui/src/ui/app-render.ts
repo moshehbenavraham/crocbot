@@ -129,7 +129,7 @@ export function renderApp(state: AppViewState) {
           </button>
           <div class="brand">
             <div class="brand-logo">
-              <img src="https://mintcdn.com/clawdhub/4rYvG-uuZrMK_URE/assets/pixel-lobster.svg?fit=max&auto=format&n=4rYvG-uuZrMK_URE&q=85&s=da2032e9eac3b5d9bfe7eb96ca6a8a26" alt="crocbot" />
+              <img src="https://mintcdn.com/crochub/4rYvG-uuZrMK_URE/assets/pixel-lobster.svg?fit=max&auto=format&n=4rYvG-uuZrMK_URE&q=85&s=da2032e9eac3b5d9bfe7eb96ca6a8a26" alt="crocbot" />
             </div>
             <div class="brand-text">
               <div class="brand-title">crocbot</div>
@@ -180,7 +180,7 @@ export function renderApp(state: AppViewState) {
           <div class="nav-group__items">
             <a
               class="nav-item nav-item--external"
-              href="https://docs.molt.bot"
+              href="https://docs.github.com/moshehbenavraham/crocbot"
               target="_blank"
               rel="noreferrer"
               title="Docs (opens in new tab)"

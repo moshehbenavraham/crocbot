@@ -19,11 +19,11 @@ describe("gateway tool", () => {
   it("schedules SIGUSR1 restart", async () => {
     vi.useFakeTimers();
     const kill = vi.spyOn(process, "kill").mockImplementation(() => true);
-    const previousStateDir = process.env.CLAWDBOT_STATE_DIR;
-    const previousProfile = process.env.CLAWDBOT_PROFILE;
+    const previousStateDir = process.env.CROCBOT_STATE_DIR;
+    const previousProfile = process.env.CROCBOT_PROFILE;
     const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-test-"));
-    process.env.CLAWDBOT_STATE_DIR = stateDir;
-    process.env.CLAWDBOT_PROFILE = "isolated";
+    process.env.CROCBOT_STATE_DIR = stateDir;
+    process.env.CROCBOT_PROFILE = "isolated";
 
     try {
       const tool = createcrocbotTools({
@@ -60,14 +60,14 @@ describe("gateway tool", () => {
       kill.mockRestore();
       vi.useRealTimers();
       if (previousStateDir === undefined) {
-        delete process.env.CLAWDBOT_STATE_DIR;
+        delete process.env.CROCBOT_STATE_DIR;
       } else {
-        process.env.CLAWDBOT_STATE_DIR = previousStateDir;
+        process.env.CROCBOT_STATE_DIR = previousStateDir;
       }
       if (previousProfile === undefined) {
-        delete process.env.CLAWDBOT_PROFILE;
+        delete process.env.CROCBOT_PROFILE;
       } else {
-        process.env.CLAWDBOT_PROFILE = previousProfile;
+        process.env.CROCBOT_PROFILE = previousProfile;
       }
     }
   });
@@ -80,7 +80,7 @@ describe("gateway tool", () => {
     expect(tool).toBeDefined();
     if (!tool) throw new Error("missing gateway tool");
 
-    const raw = '{\n  agents: { defaults: { workspace: "~/clawd" } }\n}\n';
+    const raw = '{\n  agents: { defaults: { workspace: "~/croc" } }\n}\n';
     await tool.execute("call2", {
       action: "config.apply",
       raw,

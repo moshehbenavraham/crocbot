@@ -40,7 +40,7 @@ Simplified the build system and CI pipelines after the bulk removal work complet
 ## Technical Decisions
 
 1. **Keep checks-macos CI job**: The job tests CLI/gateway behavior on macOS, which is still a supported platform. Cross-platform testing catches edge cases.
-2. **Remove .agent directory**: Contained macOS app update workflows specific to Clawdbot syncing - not relevant for stripped-down Telegram-only deployment.
+2. **Remove .agent directory**: Contained macOS app update workflows specific to Crocbot syncing - not relevant for stripped-down Telegram-only deployment.
 3. **Defer documentation updates**: References to deleted scripts in CLAUDE.md and AGENTS.md will be cleaned up in Session 08 (documentation).
 
 ---

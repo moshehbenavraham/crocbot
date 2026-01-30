@@ -16,7 +16,7 @@ Short guide to verify channel connectivity without guessing.
 - Logs: tail `/tmp/crocbot/crocbot-*.log` and filter for relevant channel events.
 
 ## Deep diagnostics
-- Session store: `ls -l ~/.clawdbot/agents/<agentId>/sessions/sessions.json` (path can be overridden in config). Count and recent recipients are surfaced via `status`.
+- Session store: `ls -l ~/.crocbot/agents/<agentId>/sessions/sessions.json` (path can be overridden in config). Count and recent recipients are surfaced via `status`.
 - Relink flow: `crocbot channels logout && crocbot channels login --verbose` when authentication issues appear in logs.
 
 ## When something fails

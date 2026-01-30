@@ -413,7 +413,7 @@ Stickers are processed through the AI's vision capabilities to generate descript
 2. **Cache storage:** The description is saved along with the sticker's file ID, emoji, and set name.
 3. **Subsequent encounters:** When the same sticker is seen again, the cached description is used directly. The image is not sent to the AI.
 
-**Cache location:** `~/.clawdbot/telegram/sticker-cache.json`
+**Cache location:** `~/.crocbot/telegram/sticker-cache.json`
 
 **Cache entry format:**
 ```json

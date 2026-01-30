@@ -137,7 +137,7 @@ The CI/CD system uses GitHub Actions with the following workflow structure:
 ## 8. Implementation Notes
 
 ### Key Considerations
-- Dependabot currently monitors 5 directories: root npm, github-actions, apps/macos, apps/shared/ClawdbotKit, Swabble (Swift), and apps/android (Gradle)
+- Dependabot currently monitors 5 directories: root npm, github-actions, apps/macos, apps/shared/CrocbotKit, Swabble (Swift), and apps/android (Gradle)
 - The Swift and Gradle directories no longer exist after Phase 00 session 01 (native app removal)
 - Labeler.yml only references current paths (telegram, gateway, cli, etc.) - appears clean
 - CI workflows use Blacksmith runners for faster builds

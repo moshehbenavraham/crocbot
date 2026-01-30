@@ -8,7 +8,7 @@ read_when:
 
 # Chrome extension (browser relay)
 
-The crocbot Chrome extension lets the agent control your **existing Chrome tabs** (your normal Chrome window) instead of launching a separate clawd-managed Chrome profile.
+The crocbot Chrome extension lets the agent control your **existing Chrome tabs** (your normal Chrome window) instead of launching a separate croc-managed Chrome profile.
 
 Attach/detach happens via a **single Chrome toolbar button**.
 
@@ -154,7 +154,7 @@ This is powerful and risky. Treat it like giving the model “hands on your brow
   - click/type/navigate in that tab
   - read page content
   - access whatever the tab’s logged-in session can access
-- **This is not isolated** like the dedicated clawd-managed profile.
+- **This is not isolated** like the dedicated croc-managed profile.
   - If you attach to your daily-driver profile/tab, you’re granting access to that account state.
 
 Recommendations:

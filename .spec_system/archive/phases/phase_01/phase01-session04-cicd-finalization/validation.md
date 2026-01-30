@@ -159,7 +159,7 @@ Session `phase01-session04-cicd-finalization` has been successfully validated:
 ### Key Changes Made
 - `.github/dependabot.yml`: Removed 4 obsolete ecosystem configurations (~64 lines)
   - `/apps/macos` (Swift)
-  - `/apps/shared/ClawdbotKit` (Swift)
+  - `/apps/shared/CrocbotKit` (Swift)
   - `/Swabble` (Swift)
   - `/apps/android` (Gradle)
 

@@ -53,8 +53,8 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Global flags
 
-- `--dev`: isolate state under `~/.clawdbot-dev` and shift default ports.
-- `--profile <name>`: isolate state under `~/.clawdbot-<name>`.
+- `--dev`: isolate state under `~/.crocbot-dev` and shift default ports.
+- `--profile <name>`: isolate state under `~/.crocbot-<name>`.
 - `--no-color`: disable ANSI colors.
 - `--update`: shorthand for `crocbot update` (source installs only).
 - `-V`, `--version`, `-v`: print version and exit.
@@ -69,7 +69,7 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Color palette
 
-crocbot uses a lobster palette for CLI output.
+crocbot uses a crocodile palette for CLI output.
 
 - `accent` (#FF5A2D): headings, labels, primary highlights.
 - `accentBright` (#FF7A3D): command names, emphasis.
@@ -80,7 +80,7 @@ crocbot uses a lobster palette for CLI output.
 - `error` (#E23D2D): errors, failures.
 - `muted` (#8B7F77): de-emphasis, metadata.
 
-Palette source of truth: `src/terminal/palette.ts` (aka “lobster seam”).
+Palette source of truth: `src/terminal/palette.ts` (aka "croc seam").
 
 ## Command tree
 
@@ -279,7 +279,7 @@ Highlights:
 Initialize config + workspace.
 
 Options:
-- `--workspace <dir>`: agent workspace path (default `~/clawd`).
+- `--workspace <dir>`: agent workspace path (default `~/croc`).
 - `--wizard`: run the onboarding wizard.
 - `--non-interactive`: run wizard without prompts.
 - `--mode <local|remote>`: wizard mode.
@@ -413,7 +413,7 @@ Options:
 - `--json`: output JSON (no styling).
 - `-v`, `--verbose`: include missing requirements detail.
 
-Tip: use `npx clawdhub` to search, install, and sync skills.
+Tip: use `npx crochub` to search, install, and sync skills.
 
 ### `pairing`
 Approve DM pairing requests across channels.

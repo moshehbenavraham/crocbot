@@ -51,7 +51,7 @@ Scan system services for extra gateway installs (launchd/systemd/schtasks).
 If you want to review changes before writing, open the config file first:
 
 ```bash
-cat ~/.clawdbot/crocbot.json
+cat ~/.crocbot/crocbot.json
 ```
 
 ## What it does (summary)
@@ -97,7 +97,7 @@ you to run `crocbot doctor`.
 Doctor will:
 - Explain which legacy keys were found.
 - Show the migration it applied.
-- Rewrite `~/.clawdbot/crocbot.json` with the updated schema.
+- Rewrite `~/.crocbot/crocbot.json` with the updated schema.
 
 The Gateway also auto-runs doctor migrations on startup when it detects a
 legacy config format, so stale configs are repaired without manual intervention.
@@ -127,9 +127,9 @@ remove the override and restore per-model API routing + costs.
 ### 3) Legacy state migrations (disk layout)
 Doctor can migrate older on-disk layouts into the current structure:
 - Sessions store + transcripts:
-  - from `~/.clawdbot/sessions/` to `~/.clawdbot/agents/<agentId>/sessions/`
+  - from `~/.crocbot/sessions/` to `~/.crocbot/agents/<agentId>/sessions/`
 - Agent dir:
-  - from `~/.clawdbot/agent/` to `~/.clawdbot/agents/<agentId>/agent/`
+  - from `~/.crocbot/agent/` to `~/.crocbot/agents/<agentId>/agent/`
 These migrations are best-effort and idempotent; doctor will emit warnings when
 it leaves any legacy folders behind as backups. The Gateway/CLI also auto-migrates
 the legacy sessions + agent dir on startup so history/auth/models land in the
@@ -150,12 +150,12 @@ Doctor checks:
   transcript files.
 - **Main session “1-line JSONL”**: flags when the main transcript has only one
   line (history is not accumulating).
-- **Multiple state dirs**: warns when multiple `~/.clawdbot` folders exist across
-  home directories or when `CLAWDBOT_STATE_DIR` points elsewhere (history can
+- **Multiple state dirs**: warns when multiple `~/.crocbot` folders exist across
+  home directories or when `CROCBOT_STATE_DIR` points elsewhere (history can
   split between installs).
 - **Remote mode reminder**: if `gateway.mode=remote`, doctor reminds you to run
   it on the remote host (the state lives there).
-- **Config file permissions**: warns if `~/.clawdbot/crocbot.json` is
+- **Config file permissions**: warns if `~/.crocbot/crocbot.json` is
   group/world readable and offers to tighten to `600`.
 
 ### 5) Model auth health (OAuth expiry)

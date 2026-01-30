@@ -71,7 +71,7 @@ With the tunnel up:
 - `crocbot health` and `crocbot status --deep` now reach the remote gateway via `ws://127.0.0.1:18789`.
 - `crocbot gateway {status,health,send,agent,call}` can also target the forwarded URL via `--url` when needed.
 
-Note: replace `18789` with your configured `gateway.port` (or `--port`/`CLAWDBOT_GATEWAY_PORT`).
+Note: replace `18789` with your configured `gateway.port` (or `--port`/`CROCBOT_GATEWAY_PORT`).
 
 ## CLI remote defaults
 

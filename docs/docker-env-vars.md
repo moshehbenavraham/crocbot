@@ -6,18 +6,18 @@ This document describes the environment variables used when running crocbot in D
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CLAWDBOT_GATEWAY_TOKEN` | Authentication token for the gateway API | `your-secure-token` |
+| `CROCBOT_GATEWAY_TOKEN` | Authentication token for the gateway API | `your-secure-token` |
 
 ## Optional Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAWDBOT_GATEWAY_PORT` | `18789` | Port for the gateway HTTP/WebSocket server |
-| `CLAWDBOT_GATEWAY_BIND` | `lan` | Network binding: `loopback`, `lan`, or `all` |
-| `CLAWDBOT_BRIDGE_PORT` | `18790` | Port for the bridge service |
-| `CLAWDBOT_CONFIG_DIR` | - | Host path to mount at `/home/node/.clawdbot` |
-| `CLAWDBOT_WORKSPACE_DIR` | - | Host path to mount at `/home/node/clawd` |
-| `CLAWDBOT_IMAGE` | `crocbot:local` | Docker image to use |
+| `CROCBOT_GATEWAY_PORT` | `18789` | Port for the gateway HTTP/WebSocket server |
+| `CROCBOT_GATEWAY_BIND` | `lan` | Network binding: `loopback`, `lan`, or `all` |
+| `CROCBOT_BRIDGE_PORT` | `18790` | Port for the bridge service |
+| `CROCBOT_CONFIG_DIR` | - | Host path to mount at `/home/node/.crocbot` |
+| `CROCBOT_WORKSPACE_DIR` | - | Host path to mount at `/home/node/croc` |
+| `CROCBOT_IMAGE` | `crocbot:local` | Docker image to use |
 | `NODE_ENV` | `production` | Node.js environment (set in Dockerfile) |
 | `HOME` | `/home/node` | Home directory (set in compose) |
 | `TERM` | `xterm-256color` | Terminal type (set in compose) |
@@ -38,15 +38,15 @@ Create a `.env` file in the same directory as `docker-compose.yml`:
 
 ```bash
 # Required
-CLAWDBOT_GATEWAY_TOKEN=your-secure-token-here
+CROCBOT_GATEWAY_TOKEN=your-secure-token-here
 
 # Paths (adjust for your system)
-CLAWDBOT_CONFIG_DIR=/path/to/.clawdbot
-CLAWDBOT_WORKSPACE_DIR=/path/to/workspace
+CROCBOT_CONFIG_DIR=/path/to/.crocbot
+CROCBOT_WORKSPACE_DIR=/path/to/workspace
 
 # Optional overrides
-CLAWDBOT_GATEWAY_PORT=18789
-CLAWDBOT_GATEWAY_BIND=lan
+CROCBOT_GATEWAY_PORT=18789
+CROCBOT_GATEWAY_BIND=lan
 ```
 
 Then run:
@@ -61,9 +61,9 @@ docker-compose up -d
 docker run -d \
   --name crocbot-gateway \
   -p 18789:18789 \
-  -e CLAWDBOT_GATEWAY_TOKEN=your-token \
-  -v /path/to/.clawdbot:/home/node/.clawdbot \
-  -v /path/to/workspace:/home/node/clawd \
+  -e CROCBOT_GATEWAY_TOKEN=your-token \
+  -v /path/to/.crocbot:/home/node/.crocbot \
+  -v /path/to/workspace:/home/node/croc \
   crocbot:local \
   node dist/index.js gateway --bind lan --port 18789
 ```
@@ -74,12 +74,12 @@ These ARG variables can be passed during `docker build`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAWDBOT_DOCKER_APT_PACKAGES` | (empty) | Additional apt packages to install |
+| `CROCBOT_DOCKER_APT_PACKAGES` | (empty) | Additional apt packages to install |
 
 Example:
 
 ```bash
-docker build --build-arg CLAWDBOT_DOCKER_APT_PACKAGES="vim" -t crocbot:custom .
+docker build --build-arg CROCBOT_DOCKER_APT_PACKAGES="vim" -t crocbot:custom .
 ```
 
 ## First-Time Setup
@@ -89,14 +89,14 @@ Before running the gateway for the first time, you need to configure it:
 1. Run the setup wizard (interactive):
    ```bash
    docker run -it --rm \
-     -v /path/to/.clawdbot:/home/node/.clawdbot \
+     -v /path/to/.crocbot:/home/node/.crocbot \
      crocbot:local node dist/index.js setup
    ```
 
 2. Or set `gateway.mode=local` in configuration to skip setup validation:
    ```bash
    docker run --rm \
-     -v /path/to/.clawdbot:/home/node/.clawdbot \
+     -v /path/to/.crocbot:/home/node/.crocbot \
      crocbot:local node dist/index.js config set gateway.mode local
    ```
 
@@ -106,5 +106,5 @@ For testing without configuration, add `--allow-unconfigured` to the command.
 
 - Never commit `.env` files containing real tokens to version control
 - Use Docker secrets or a secrets manager in production
-- The `CLAWDBOT_GATEWAY_TOKEN` should be a strong, unique value
+- The `CROCBOT_GATEWAY_TOKEN` should be a strong, unique value
 - Container runs as non-root `node` user for security

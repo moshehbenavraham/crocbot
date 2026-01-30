@@ -8,7 +8,7 @@ read_when:
 
 # Ansible Installation
 
-The recommended way to deploy crocbot to production servers is via **[crocbot-ansible](https://github.com/crocbot/crocbot-ansible)** — an automated installer with security-first architecture.
+The recommended way to deploy crocbot to production servers is via **[crocbot-ansible](https://github.com/moshehbenavraham/crocbot-ansible)** — an automated installer with security-first architecture.
 
 ## Quick Start
 
@@ -18,7 +18,7 @@ One-command install:
 curl -fsSL https://raw.githubusercontent.com/crocbot/crocbot-ansible/main/install.sh | bash
 ```
 
-> **📦 Full guide: [github.com/crocbot/crocbot-ansible](https://github.com/crocbot/crocbot-ansible)**
+> **📦 Full guide: [github.com/crocbot/crocbot-ansible](https://github.com/moshehbenavraham/crocbot-ansible)**
 >
 > The crocbot-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
 
@@ -117,7 +117,7 @@ If you prefer manual control over the automation:
 sudo apt update && sudo apt install -y ansible git
 
 # 2. Clone repository
-git clone https://github.com/crocbot/crocbot-ansible.git
+git clone https://github.com/moshehbenavraham/crocbot-ansible.git
 cd crocbot-ansible
 
 # 3. Install Ansible collections
@@ -193,13 +193,13 @@ crocbot channels login
 ## Advanced Configuration
 
 For detailed security architecture and troubleshooting:
-- [Security Architecture](https://github.com/crocbot/crocbot-ansible/blob/main/docs/security.md)
-- [Technical Details](https://github.com/crocbot/crocbot-ansible/blob/main/docs/architecture.md)
-- [Troubleshooting Guide](https://github.com/crocbot/crocbot-ansible/blob/main/docs/troubleshooting.md)
+- [Security Architecture](https://github.com/moshehbenavraham/crocbot-ansible/blob/main/docs/security.md)
+- [Technical Details](https://github.com/moshehbenavraham/crocbot-ansible/blob/main/docs/architecture.md)
+- [Troubleshooting Guide](https://github.com/moshehbenavraham/crocbot-ansible/blob/main/docs/troubleshooting.md)
 
 ## Related
 
-- [crocbot-ansible](https://github.com/crocbot/crocbot-ansible) — full deployment guide
+- [crocbot-ansible](https://github.com/moshehbenavraham/crocbot-ansible) — full deployment guide
 - [Docker](/install/docker) — containerized gateway setup
 - [Sandboxing](/gateway/sandboxing) — agent sandbox configuration
 - [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) — per-agent isolation

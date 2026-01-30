@@ -26,7 +26,7 @@ describe("multi-agent agentDir validation", () => {
 
   it("throws on shared agentDir during loadConfig()", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".clawdbot");
+      const configDir = path.join(home, ".crocbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
         path.join(configDir, "crocbot.json"),
@@ -34,8 +34,8 @@ describe("multi-agent agentDir validation", () => {
           {
             agents: {
               list: [
-                { id: "a", agentDir: "~/.clawdbot/agents/shared/agent" },
-                { id: "b", agentDir: "~/.clawdbot/agents/shared/agent" },
+                { id: "a", agentDir: "~/.crocbot/agents/shared/agent" },
+                { id: "b", agentDir: "~/.crocbot/agents/shared/agent" },
               ],
             },
             bindings: [{ agentId: "a", match: { channel: "telegram" } }],

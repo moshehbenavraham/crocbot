@@ -44,13 +44,13 @@ crocbot dns setup --apply
 
 This installs CoreDNS and configures it to:
 - listen on port 53 only on the gateway’s Tailscale interfaces
-- serve `crocbot.internal.` from `~/.clawdbot/dns/crocbot.internal.db`
+- serve `crocbot.internal.` from `~/.crocbot/dns/crocbot.internal.db`
 
 Validate from a tailnet‑connected machine:
 
 ```bash
 dns-sd -B _crocbot-gw._tcp crocbot.internal.
-dig @<TAILNET_IPV4> -p 53 _crocbot-gw._tcp.clawdbot.internal PTR +short
+dig @<TAILNET_IPV4> -p 53 _crocbot-gw._tcp.crocbot.internal PTR +short
 ```
 
 ### Tailscale DNS settings
@@ -69,7 +69,7 @@ The Gateway WS port (default `18789`) binds to loopback by default. For LAN/tail
 access, bind explicitly and keep auth enabled.
 
 For tailnet‑only setups:
-- Set `gateway.bind: "tailnet"` in `~/.clawdbot/crocbot.json`.
+- Set `gateway.bind: "tailnet"` in `~/.crocbot/crocbot.json`.
 - Restart the Gateway.
 
 ## What advertises
@@ -141,11 +141,11 @@ sequences (e.g. spaces become `\032`).
 
 ## Disabling / configuration
 
-- `CLAWDBOT_DISABLE_BONJOUR=1` disables advertising.
-- `gateway.bind` in `~/.clawdbot/crocbot.json` controls the Gateway bind mode.
-- `CLAWDBOT_SSH_PORT` overrides the SSH port advertised in TXT.
-- `CLAWDBOT_TAILNET_DNS` publishes a MagicDNS hint in TXT.
-- `CLAWDBOT_CLI_PATH` overrides the advertised CLI path.
+- `CROCBOT_DISABLE_BONJOUR=1` disables advertising.
+- `gateway.bind` in `~/.crocbot/crocbot.json` controls the Gateway bind mode.
+- `CROCBOT_SSH_PORT` overrides the SSH port advertised in TXT.
+- `CROCBOT_TAILNET_DNS` publishes a MagicDNS hint in TXT.
+- `CROCBOT_CLI_PATH` overrides the advertised CLI path.
 
 ## Related docs
 

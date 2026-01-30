@@ -54,8 +54,8 @@ crocbot persists sessions in two layers:
 
 Per agent, on the Gateway host:
 
-- Store: `~/.clawdbot/agents/<agentId>/sessions/sessions.json`
-- Transcripts: `~/.clawdbot/agents/<agentId>/sessions/<sessionId>.jsonl`
+- Store: `~/.crocbot/agents/<agentId>/sessions/sessions.json`
+- Transcripts: `~/.crocbot/agents/<agentId>/sessions/<sessionId>.jsonl`
   - Telegram topic sessions: `.../<sessionId>-topic-<threadId>.jsonl`
 
 crocbot resolves these via `src/config/sessions.ts`.

@@ -12,7 +12,7 @@ const ciWorkers = isWindows ? 2 : 3;
 export default defineConfig({
   resolve: {
     alias: {
-      "clawdbot/plugin-sdk": path.join(repoRoot, "src", "plugin-sdk", "index.ts"),
+      "crocbot/plugin-sdk": path.join(repoRoot, "src", "plugin-sdk", "index.ts"),
     },
   },
   test: {

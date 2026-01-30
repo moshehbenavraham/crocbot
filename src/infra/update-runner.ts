@@ -692,7 +692,7 @@ export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<
         "crocbot doctor",
         managerScriptArgs(manager, "crocbot", ["doctor", "--non-interactive"]),
         gitRoot,
-        { CLAWDBOT_UPDATE_IN_PROGRESS: "1" },
+        { CROCBOT_UPDATE_IN_PROGRESS: "1" },
       ),
     );
     steps.push(doctorStep);

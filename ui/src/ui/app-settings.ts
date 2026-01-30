@@ -181,7 +181,7 @@ export async function refreshActiveTab(host: SettingsHost) {
 
 export function inferBasePath() {
   if (typeof window === "undefined") return "";
-  const configured = window.__CLAWDBOT_CONTROL_UI_BASE_PATH__;
+  const configured = window.__CROCBOT_CONTROL_UI_BASE_PATH__;
   if (typeof configured === "string" && configured.trim()) {
     return normalizeBasePath(configured);
   }

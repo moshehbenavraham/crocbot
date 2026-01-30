@@ -26,7 +26,7 @@ uv run {baseDir}/scripts/generate_image.py --prompt "combine these into one scen
 
 API key
 - `GEMINI_API_KEY` env var
-- Or set `skills."nano-banana-pro".apiKey` / `skills."nano-banana-pro".env.GEMINI_API_KEY` in `~/.clawdbot/crocbot.json`
+- Or set `skills."nano-banana-pro".apiKey` / `skills."nano-banana-pro".env.GEMINI_API_KEY` in `~/.crocbot/crocbot.json`
 
 Notes
 - Resolutions: `1K` (default), `2K`, `4K`.

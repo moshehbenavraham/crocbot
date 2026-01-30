@@ -36,7 +36,7 @@ stay consistent across channels.
 Input Markdown:
 
 ```markdown
-Hello **world** — see [docs](https://docs.molt.bot).
+Hello **world** — see [docs](https://docs.github.com/moshehbenavraham/crocbot).
 ```
 
 IR (schematic):
@@ -48,7 +48,7 @@ IR (schematic):
     { "start": 6, "end": 11, "style": "bold" }
   ],
   "links": [
-    { "start": 19, "end": 23, "href": "https://docs.molt.bot" }
+    { "start": 19, "end": 23, "href": "https://docs.github.com/moshehbenavraham/crocbot" }
   ]
 }
 ```

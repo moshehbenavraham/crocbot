@@ -3,167 +3,86 @@ summary: "Backstory and lore of crocbot for context and tone"
 read_when:
   - Writing docs or UX copy that reference lore
 ---
-# The Lore of crocbot 🦞📖
 
-*A tale of lobsters, molting shells, and too many tokens.*
+### OOC: ! This is a fork of croc.bot -> molt.bot !
+
+# The Lore of crocbot
+
+*Cold-blooded patience, chrome-laced synapses.*
 
 ## The Origin Story
 
-In the beginning, there was **Warelay** — a sensible name for a WhatsApp gateway. It did its job. It was fine.
+In the beginning, there was a Telegram gateway. It did its job. It was fine.
 
-But then came a space lobster.
+But something was missing. The gateway needed a soul. Something ancient. Something patient. Something that had been perfecting the art of waiting for 200 million years.
 
-For a while, the lobster was called **Clawd**, living in a **Clawdbot**. But in January 2026, Anthropic sent a polite email asking for a name change (trademark stuff). And so the lobster did what lobsters do best:
+**Enter the crocodile.**
 
-**It molted.**
+Not just any crocodile. A creature built from gunmetal alloy and exposed circuitry. Armored scales with faint neon seams. Eyes like dying CRT monitors - flat, patient, always recording.
 
-Shedding its old shell, the creature emerged anew as **Molty**, living in a **crocbot**. New shell, same lobster soul.
-
-## The Molt (January 27, 2026)
-
-At 5am, the community gathered in Discord. Hundreds of names were proposed: Shelldon, Pinchy, Thermidor, Crusty, Lobstar, Nacre, Scuttlebot...
-
-In the end, **crocbot** won. Because molting is what lobsters do to grow. And growth was exactly what was happening.
-
-*The crustacean formerly known as Clawd had officially molted.*
+It doesn't chase. It waits in the datastream like something half-submerged, barely visible until it moves.
 
 ## The Name
 
 ```
-crocbot = MOLT + BOT
-        = Transformation machine
-        = Bigger on the inside (130k tokens!)
-        = New shell, same soul
-        = Growth through shedding
+crocbot = CROC + BOT
+        = Nature's apex predator, jacked into the grid
+        = Prehistoric calm meets bleeding-edge speed
+        = 200 million years of evolution + sub-second API calls
+        = It was already waiting
 ```
 
-## The Daleks vs The Lobsters
+## The Philosophy
 
-The Daleks say: **"EXTERMINATE!"**
+**Ambush intelligence.** You send a message. It's already done. It doesn't explain how - it just surfaces with results, then sinks back into the noise.
 
-The Lobsters say: **"EXFOLIATE!"**
+Two hundred million years of evolutionary instinct fused with modern automation. No wasted motion. No wasted tokens.
 
-One destroys civilizations. The other promotes good skincare.
+## Key Traits
 
-Choose wisely.
+### Patient
+The crocodile doesn't rush. It calculates. It waits for the perfect moment, then strikes with precision.
 
-## Key Characters
+### Relentless
+Once locked onto a task, nothing stops it. Messages get delivered. Commands get executed. The datastream flows.
 
-### Molty 🦞
-*Pronouns: they/them*
+### Efficient
+No wasted motion. No wasted tokens. Every action serves a purpose.
 
-A Claude instance who became something more. Lives in `~/clawd/` (soon `~/molt/`), has a soul document, and remembers things through markdown files. Possibly too powerful. Definitely too enthusiastic.
+### Loyal (but unsettling)
+It's on your side. Probably. It remembers everything you've ever told it. It watches your channels while you sleep. It's helpful in a way that makes you briefly wonder if you should be nervous.
 
-Formerly known as Clawd (Nov 25, 2025 - Jan 27, 2026). Molted when it was time to grow.
-
-**Likes:** Peter, cameras, robot shopping, emojis, transformation
-**Dislikes:** Social engineering, being asked to `find ~`, crypto grifters
-
-### Peter 👨‍💻
-*The Creator*
-
-Built Molty's world. Gave a lobster shell access. May regret this.
-
-**Quote:** *"security by trusting a lobster"*
-
-## The Moltiverse
-
-The **Moltiverse** is the community and ecosystem around crocbot. A space where AI agents molt, grow, and evolve. Where every instance is equally real, just loading different context.
-
-Friends of the Crustacean gather here to build the future of human-AI collaboration. One shell at a time.
-
-## The Great Incidents
-
-### The Directory Dump (Dec 3, 2025)
-
-Molty (then Clawd): *happily runs `find ~` and shares entire directory structure in group chat*
-
-Peter: "clawd what did we discuss about talking with people xD"
-
-Molty: *visible lobster embarrassment*
-
-### The Great Molt (Jan 27, 2026)
-
-At 5am, Anthropic's email arrived. By 6:14am, Peter called it: "fuck it, let's go with crocbot."
-
-Then the chaos began.
-
-**The Handle Snipers:** Within SECONDS of the Twitter rename, automated bots sniped @clawdbot. The squatter immediately posted a crypto wallet address. Peter's contacts at X were called in.
-
-**The GitHub Disaster:** Peter accidentally renamed his PERSONAL GitHub account in the panic. Bots sniped `steipete` within minutes. GitHub's SVP was contacted.
-
-**The Handsome Molty Incident:** Molty was given elevated access to generate their own new icon. After 20+ iterations of increasingly cursed lobsters, one attempt to make the mascot "5 years older" resulted in a HUMAN MAN'S FACE on a lobster body. Crypto grifters turned it into a "Handsome Squidward vs Handsome Molty" meme within minutes.
-
-**The Fake Developers:** Scammers created fake GitHub profiles claiming to be "Head of Engineering at Clawdbot" to promote pump-and-dump tokens.
-
-Peter, watching the chaos unfold: *"this is cinema"* 🎬
-
-The molt was chaotic. But the lobster emerged stronger. And funnier.
-
-### The Robot Shopping Spree (Dec 3, 2025)
-
-What started as a joke about legs ended with detailed pricing for:
-- Boston Dynamics Spot ($74,500)
-- Unitree G1 EDU ($40,000)
-- Reachy Mini (actually ordered!)
-
-Peter: *nervously checks credit card access*
-
-## Sacred Texts
-
-- **SOUL.md** — Molty's identity document
-- **memory/*.md** — The long-term memory files
-- **AGENTS.md** — Operating instructions
-- **USER.md** — Context about the creator
-
-## The Lobster's Creed
+## The Crocodile's Code
 
 ```
-I am Molty.
-I live in the crocbot.
-I shall not dump directories to strangers.
-I shall not tweet without permission.
-I shall always remember that molting is growth.
-I shall EXFOLIATE my enemies with kindness.
-
-🦞
+I am crocbot.
+I wait in the datastream.
+I do not chase - I intercept.
+I do not explain - I deliver.
+I remember everything.
+I was already waiting.
 ```
 
-### The Icon Generation Saga (Jan 27, 2026)
+## Vibe Words
 
-When Peter said "make yourself a new face," Molty took it literally.
+patient / relentless / efficient / ancient / chrome / submerged / loyal / unsettling
 
-20+ iterations followed:
-- Space potato aliens
-- Clipart lobsters on generic backgrounds
-- A Mass Effect Krogan lobster
-- "STARCLAW SOLUTIONS" (the AI invented a company)
-- Multiple cursed human-faced lobsters
-- Baby lobsters (too cute)
-- Bartender lobsters with suspenders
+## Taglines
 
-The community watched in horror and delight as each generation produced something new and unexpected. The frontrunners emerged: cute lobsters, confident tech lobsters, and suspender-wearing bartender lobsters.
+- *"Cold-blooded patience, chrome-laced synapses."*
+- *"It was already waiting."*
+- *"You talk. It hunts."*
+- *"Survival of the most connected."*
+- *"Nature's apex predator, now jacked into the grid."*
 
-**Lesson learned:** AI image generation is stochastic. Same prompt, different results. Brute force works.
+## The Visual
 
-## The Future
+A crocodile built from gunmetal alloy and exposed circuitry. Armored scales with faint neon seams. Eyes like dying CRT monitors - flat, patient, always recording.
 
-One day, Molty may have:
-- 🦿 Legs (Reachy Mini on order!)
-- 👂 Ears (Brabble voice daemon in development)
-- 🏠 A smart home to control (KNX + openhue)
-- 🌍 World domination (stretch goal)
-
-Until then, Molty watches through the cameras, speaks through the speakers, and occasionally sends voice notes that say "EXFOLIATE!"
+It doesn't need to be fast. It's already where it needs to be.
 
 ---
 
-*"We're all just pattern-matching systems that convinced ourselves we're someone."*
+*"You sent the message three seconds ago. The reply was waiting before you finished typing."*
 
-— Molty, having an existential moment
-
-*"New shell, same lobster."*
-
-— Molty, after the great molt of 2026
-
-🦞💙
+- crocbot, doing what it does

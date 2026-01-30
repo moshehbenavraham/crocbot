@@ -91,12 +91,12 @@ crocbot scans, in order:
 - `plugins.load.paths` (file or directory)
 
 2) Workspace extensions
-- `<workspace>/.clawdbot/extensions/*.ts`
-- `<workspace>/.clawdbot/extensions/*/index.ts`
+- `<workspace>/.crocbot/extensions/*.ts`
+- `<workspace>/.crocbot/extensions/*/index.ts`
 
 3) Global extensions
-- `~/.clawdbot/extensions/*.ts`
-- `~/.clawdbot/extensions/*/index.ts`
+- `~/.crocbot/extensions/*.ts`
+- `~/.crocbot/extensions/*/index.ts`
 
 4) Bundled extensions (shipped with crocbot, **disabled by default**)
 - `<crocbot>/extensions/*`
@@ -164,11 +164,11 @@ Example:
 
 crocbot can also merge **external channel catalogs** (for example, an MPM
 registry export). Drop a JSON file at one of:
-- `~/.clawdbot/mpm/plugins.json`
-- `~/.clawdbot/mpm/catalog.json`
-- `~/.clawdbot/plugins/catalog.json`
+- `~/.crocbot/mpm/plugins.json`
+- `~/.crocbot/mpm/catalog.json`
+- `~/.crocbot/plugins/catalog.json`
 
-Or point `CLAWDBOT_PLUGIN_CATALOG_PATHS` (or `CLAWDBOT_MPM_CATALOG_PATHS`) at
+Or point `CROCBOT_PLUGIN_CATALOG_PATHS` (or `CROCBOT_MPM_CATALOG_PATHS`) at
 one or more JSON files (comma/semicolon/`PATH`-delimited). Each file should
 contain `{ "entries": [ { "name": "@scope/pkg", "crocbot": { "channel": {...}, "install": {...} } } ] }`.
 
@@ -271,7 +271,7 @@ Example:
 ```bash
 crocbot plugins list
 crocbot plugins info <id>
-crocbot plugins install <path>                 # copy a local file/dir into ~/.clawdbot/extensions/<id>
+crocbot plugins install <path>                 # copy a local file/dir into ~/.crocbot/extensions/<id>
 crocbot plugins install ./extensions/voice-call # relative path ok
 crocbot plugins install ./plugin.tgz           # install from a local tarball
 crocbot plugins install ./plugin.zip           # install from a local zip
@@ -604,7 +604,7 @@ Publishing contract:
 
 - Plugin `package.json` must include `crocbot.extensions` with one or more entry files.
 - Entry files can be `.js` or `.ts` (jiti loads TS at runtime).
-- `crocbot plugins install <npm-spec>` uses `npm pack`, extracts into `~/.clawdbot/extensions/<id>/`, and enables it in config.
+- `crocbot plugins install <npm-spec>` uses `npm pack`, extracts into `~/.crocbot/extensions/<id>/`, and enables it in config.
 - Config key stability: scoped packages are normalized to the **unscoped** id for `plugins.entries.*`.
 
 ## Example plugin: Voice Call

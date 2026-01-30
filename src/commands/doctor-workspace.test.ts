@@ -7,7 +7,7 @@ import { detectLegacyWorkspaceDirs } from "./doctor-workspace.js";
 describe("detectLegacyWorkspaceDirs", () => {
   it("ignores ~/crocbot when it doesn't look like a workspace (e.g. install dir)", () => {
     const home = "/home/user";
-    const workspaceDir = "/home/user/clawd";
+    const workspaceDir = "/home/user/croc";
     const candidate = path.join(home, "crocbot");
 
     const detection = detectLegacyWorkspaceDirs({
@@ -22,7 +22,7 @@ describe("detectLegacyWorkspaceDirs", () => {
 
   it("flags ~/crocbot when it contains workspace markers", () => {
     const home = "/home/user";
-    const workspaceDir = "/home/user/clawd";
+    const workspaceDir = "/home/user/croc";
     const candidate = path.join(home, "crocbot");
     const agentsPath = path.join(candidate, "AGENTS.md");
 

@@ -19,7 +19,7 @@ Note: `agents.list[].groupChat.mentionPatterns` is the main way to configure men
 - Group system prompt: on the first turn of a group session (and whenever `/activation` changes the mode) we inject a short blurb into the system prompt like `You are replying inside the Telegram group "<title>". Activation: trigger-only … Address the specific sender noted in the message context.` If metadata isn't available we still tell the agent it's a group chat.
 
 ## Config example (Telegram)
-Add a `groupChat` block to `~/.clawdbot/crocbot.json` so display-name pings work:
+Add a `groupChat` block to `~/.crocbot/crocbot.json` so display-name pings work:
 
 ```json5
 {
@@ -74,5 +74,5 @@ Only the owner (from `channels.telegram.allowFrom`) can change this. Send `/stat
 ## Known considerations
 - Heartbeats are intentionally skipped for groups to avoid noisy broadcasts.
 - Echo suppression uses the combined batch string; if you send identical text twice without mentions, only the first will get a response.
-- Session store entries will appear as `agent:<agentId>:telegram:group:<chatId>` in the session store (`~/.clawdbot/agents/<agentId>/sessions/sessions.json` by default); a missing entry just means the group hasn't triggered a run yet.
+- Session store entries will appear as `agent:<agentId>:telegram:group:<chatId>` in the session store (`~/.crocbot/agents/<agentId>/sessions/sessions.json` by default); a missing entry just means the group hasn't triggered a run yet.
 - Typing indicators in groups follow `agents.defaults.typingMode` (default: `message` when unmentioned).

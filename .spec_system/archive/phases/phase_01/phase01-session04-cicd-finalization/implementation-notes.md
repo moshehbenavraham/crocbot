@@ -54,7 +54,7 @@
 
 **Notes**:
 - Removed Swift ecosystem for `/apps/macos`
-- Removed Swift ecosystem for `/apps/shared/ClawdbotKit`
+- Removed Swift ecosystem for `/apps/shared/CrocbotKit`
 - Removed Swift ecosystem for `/Swabble`
 - Removed Gradle ecosystem for `/apps/android`
 - Dependabot now only monitors: npm (root) and github-actions
@@ -75,7 +75,7 @@ All 6 workflow files reviewed - no obsolete references found:
 - `docker-release.yml`: Clean - multi-arch Docker builds, production ready
 - `install-smoke.yml`: Clean - tests shell installers for current codebase
 - `workflow-sanity.yml`: Clean - YAML tab detection, language-agnostic
-- `auto-response.yml`: Clean - Clawdhub skill reference appropriate
+- `auto-response.yml`: Clean - Crochub skill reference appropriate
 
 ---
 

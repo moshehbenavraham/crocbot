@@ -223,25 +223,25 @@ describe("buildServiceEnvironment", () => {
     } else {
       expect(env.PATH).toContain("/usr/bin");
     }
-    expect(env.CLAWDBOT_GATEWAY_PORT).toBe("18789");
-    expect(env.CLAWDBOT_GATEWAY_TOKEN).toBe("secret");
-    expect(env.CLAWDBOT_SERVICE_MARKER).toBe("crocbot");
-    expect(env.CLAWDBOT_SERVICE_KIND).toBe("gateway");
-    expect(typeof env.CLAWDBOT_SERVICE_VERSION).toBe("string");
-    expect(env.CLAWDBOT_SYSTEMD_UNIT).toBe("crocbot-gateway.service");
+    expect(env.CROCBOT_GATEWAY_PORT).toBe("18789");
+    expect(env.CROCBOT_GATEWAY_TOKEN).toBe("secret");
+    expect(env.CROCBOT_SERVICE_MARKER).toBe("crocbot");
+    expect(env.CROCBOT_SERVICE_KIND).toBe("gateway");
+    expect(typeof env.CROCBOT_SERVICE_VERSION).toBe("string");
+    expect(env.CROCBOT_SYSTEMD_UNIT).toBe("crocbot-gateway.service");
     if (process.platform === "darwin") {
-      expect(env.CLAWDBOT_LAUNCHD_LABEL).toBe("com.clawdbot.gateway");
+      expect(env.CROCBOT_LAUNCHD_LABEL).toBe("com.crocbot.gateway");
     }
   });
 
   it("uses profile-specific unit and label", () => {
     const env = buildServiceEnvironment({
-      env: { HOME: "/home/user", CLAWDBOT_PROFILE: "work" },
+      env: { HOME: "/home/user", CROCBOT_PROFILE: "work" },
       port: 18789,
     });
-    expect(env.CLAWDBOT_SYSTEMD_UNIT).toBe("crocbot-gateway-work.service");
+    expect(env.CROCBOT_SYSTEMD_UNIT).toBe("crocbot-gateway-work.service");
     if (process.platform === "darwin") {
-      expect(env.CLAWDBOT_LAUNCHD_LABEL).toBe("com.clawdbot.work");
+      expect(env.CROCBOT_LAUNCHD_LABEL).toBe("com.crocbot.work");
     }
   });
 });

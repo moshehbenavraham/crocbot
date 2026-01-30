@@ -43,7 +43,7 @@ Verify prerequisites and establish baseline.
 Remove obsolete package ecosystem configurations.
 
 - [x] T003 [S0104] [P] Remove Swift ecosystem for `/apps/macos` (`.github/dependabot.yml`)
-- [x] T004 [S0104] [P] Remove Swift ecosystem for `/apps/shared/ClawdbotKit` (`.github/dependabot.yml`)
+- [x] T004 [S0104] [P] Remove Swift ecosystem for `/apps/shared/CrocbotKit` (`.github/dependabot.yml`)
 - [x] T005 [S0104] [P] Remove Swift ecosystem for `/Swabble` (`.github/dependabot.yml`)
 - [x] T006 [S0104] [P] Remove Gradle ecosystem for `/apps/android` (`.github/dependabot.yml`)
 
@@ -108,7 +108,7 @@ Before marking session complete:
 
 **dependabot.yml**: Contains 4 obsolete ecosystem configs targeting removed directories:
 - `/apps/macos` (Swift) - removed in phase00-session01
-- `/apps/shared/ClawdbotKit` (Swift) - removed in phase00-session01
+- `/apps/shared/CrocbotKit` (Swift) - removed in phase00-session01
 - `/Swabble` (Swift) - removed in phase00-session01
 - `/apps/android` (Gradle) - removed in phase00-session01
 

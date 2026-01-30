@@ -3,12 +3,12 @@ summary: "Top-level overview of crocbot, features, and purpose"
 read_when:
   - Introducing crocbot to newcomers
 ---
-# crocbot 🦞
+# crocbot 🐊
 
-> *"EXFOLIATE! EXFOLIATE!"* — A space lobster, probably
+> *"Cold-blooded patience, chrome-laced synapses."* — The crocodile in the datastream
 
 <p align="center">
-  <img src="whatsapp-clawd.jpg" alt="crocbot" width="420" />
+  <img src="whatsapp-croc.jpg" alt="crocbot" width="420" />
 </p>
 
 <p align="center">
@@ -17,14 +17,14 @@ read_when:
 </p>
 
 <p align="center">
-  <a href="https://github.com/crocbot/crocbot">GitHub</a> ·
-  <a href="https://github.com/crocbot/crocbot/releases">Releases</a> ·
+  <a href="https://github.com/moshehbenavraham/crocbot">GitHub</a> ·
+  <a href="https://github.com/moshehbenavraham/crocbot/releases">Releases</a> ·
   <a href="/">Docs</a> ·
-  <a href="/start/clawd">crocbot assistant setup</a>
+  <a href="/start/croc">crocbot assistant setup</a>
 </p>
 
 crocbot bridges Telegram (Bot API / grammY) to coding agents like [Pi](https://github.com/badlogic/pi-mono).
-crocbot also powers [Clawd](https://clawd.me), the space-lobster assistant.
+crocbot also powers [Croc](https://croc.me), the chrome crocodile assistant.
 
 ## Start here
 
@@ -103,7 +103,7 @@ Switching between npm and git installs later is easy: install the other flavor a
 From source (development):
 
 ```bash
-git clone https://github.com/crocbot/crocbot.git
+git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
@@ -116,8 +116,8 @@ If you don’t have a global install yet, run the onboarding step via `pnpm croc
 Multi-instance quickstart (optional):
 
 ```bash
-CLAWDBOT_CONFIG_PATH=~/.clawdbot/a.json \
-CLAWDBOT_STATE_DIR=~/.clawdbot-a \
+CROCBOT_CONFIG_PATH=~/.crocbot/a.json \
+CROCBOT_STATE_DIR=~/.crocbot-a \
 crocbot gateway --port 19001
 ```
 
@@ -129,7 +129,7 @@ crocbot message send --target +15555550123 --message "Hello from crocbot"
 
 ## Configuration (optional)
 
-Config lives at `~/.clawdbot/crocbot.json`.
+Config lives at `~/.crocbot/crocbot.json`.
 
 - If you **do nothing**, crocbot uses the bundled Pi binary in RPC mode with per-sender sessions.
 - If you want to lock it down, start with `channels.telegram.allowFrom` and (for groups) mention rules.
@@ -145,7 +145,7 @@ Example:
       groups: { "*": { requireMention: true } }
     }
   },
-  messages: { groupChat: { mentionPatterns: ["@clawd"] } }
+  messages: { groupChat: { mentionPatterns: ["@croc"] } }
 }
 ```
 
@@ -161,7 +161,7 @@ Example:
   - [Updating / rollback](/install/updating)
   - [Pairing (DM + nodes)](/start/pairing)
   - [Nix mode](/install/nix)
-  - [crocbot assistant setup (Clawd)](/start/clawd)
+  - [crocbot assistant setup (Croc)](/start/croc)
   - [Skills](/tools/skills)
   - [Skills config](/tools/skills-config)
   - [Workspace templates](/reference/templates/AGENTS)
@@ -192,7 +192,7 @@ Example:
 
 ## The name
 
-**crocbot = CLAW + TARDIS** — because every space lobster needs a time-and-space machine.
+**crocbot = CROC + BOT** — Nature's apex predator, jacked into the grid. 200 million years of evolution + sub-second API calls.
 
 ---
 
@@ -200,9 +200,9 @@ Example:
 
 ## Credits
 
-- **Peter Steinberger** ([@steipete](https://twitter.com/steipete)) — Creator, lobster whisperer
+- **Peter Steinberger** ([@steipete](https://twitter.com/steipete)) — Creator, crocodile whisperer
 - **Mario Zechner** ([@badlogicc](https://twitter.com/badlogicgames)) — Pi creator, security pen-tester
-- **Clawd** — The space lobster who demanded a better name
+- **Croc** — The chrome crocodile who was already waiting
 
 ## Core Contributors
 
@@ -211,7 +211,7 @@ Example:
 
 ## License
 
-MIT — Free as a lobster in the ocean 🦞
+MIT — Patient as a crocodile in the datastream 🐊
 
 ---
 

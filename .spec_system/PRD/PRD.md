@@ -50,7 +50,7 @@ The current codebase supports multiple channels (Discord, Slack, Signal, iMessag
 - CLI interface fully functional (`crocbot config`, `crocbot gateway`, `crocbot channels`)
 - Telegram channel connects, receives messages, and responds
 - Gateway runs in Docker container with minimal footprint
-- Configuration stored in `~/.clawdbot/` as expected
+- Configuration stored in `~/.crocbot/` as expected
 - `crocbot doctor` validates installation
 - `crocbot channels status` shows only Telegram
 
@@ -72,7 +72,7 @@ The current codebase supports multiple channels (Discord, Slack, Signal, iMessag
 - Node.js 22+ required
 - Must retain grammy, @grammyjs/runner, @grammyjs/transformer-throttler for Telegram
 - Must work with pnpm (production) and bun (development)
-- Existing `~/.clawdbot/` configuration structure must be preserved
+- Existing `~/.crocbot/` configuration structure must be preserved
 - Must pass existing Telegram-related tests after stripping
 
 ## Phases

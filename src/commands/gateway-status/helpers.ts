@@ -145,8 +145,8 @@ export function resolveAuthForTarget(
     };
   }
 
-  const envToken = process.env.CLAWDBOT_GATEWAY_TOKEN?.trim() || "";
-  const envPassword = process.env.CLAWDBOT_GATEWAY_PASSWORD?.trim() || "";
+  const envToken = process.env.CROCBOT_GATEWAY_TOKEN?.trim() || "";
+  const envPassword = process.env.CROCBOT_GATEWAY_PASSWORD?.trim() || "";
   const cfgToken =
     typeof cfg.gateway?.auth?.token === "string" ? cfg.gateway.auth.token.trim() : "";
   const cfgPassword =

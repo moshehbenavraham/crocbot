@@ -16,14 +16,14 @@ detects existing installs, upgrades in place, and runs `crocbot doctor` when
 needed.
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 Notes:
 - Add `--no-onboard` if you don’t want the onboarding wizard to run again.
 - For **source installs**, use:
   ```bash
-  curl -fsSL https://molt.bot/install.sh | bash -s -- --install-method git --no-onboard
+  curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash -s -- --install-method git --no-onboard
   ```
   The installer will `git pull --rebase` **only** if the repo is clean.
 - For **global installs**, the script uses `npm install -g crocbot@latest` under the hood.
@@ -34,9 +34,9 @@ Notes:
 - Know how you installed: **global** (npm/pnpm) vs **from source** (git clone).
 - Know how your Gateway is running: **foreground terminal** vs **supervised service** (launchd/systemd).
 - Snapshot your tailoring:
-  - Config: `~/.clawdbot/crocbot.json`
-  - Credentials: `~/.clawdbot/credentials/`
-  - Workspace: `~/clawd`
+  - Config: `~/.crocbot/crocbot.json`
+  - Credentials: `~/.crocbot/credentials/`
+  - Workspace: `~/croc`
 
 ## Update (global install)
 
@@ -125,7 +125,7 @@ crocbot health
 ```
 
 Notes:
-- `pnpm build` matters when you run the packaged `crocbot` binary ([`dist/entry.js`](https://github.com/crocbot/crocbot/blob/main/dist/entry.js)) or use Node to run `dist/`.
+- `pnpm build` matters when you run the packaged `crocbot` binary ([`dist/entry.js`](https://github.com/moshehbenavraham/crocbot/blob/main/dist/entry.js)) or use Node to run `dist/`.
 - If you run from a repo checkout without a global install, use `pnpm crocbot ...` for CLI commands.
 - If you run directly from TypeScript (`pnpm crocbot ...`), a rebuild is usually unnecessary, but **config migrations still apply** → run doctor.
 - Switching between global and git installs is easy: install the other flavor, then run `crocbot doctor` so the gateway service entrypoint is rewritten to the current install.
@@ -158,7 +158,7 @@ crocbot logs --follow
 ```
 
 If you’re supervised:
-- macOS launchd (app-bundled LaunchAgent): `launchctl kickstart -k gui/$UID/com.clawdbot.gateway` (use `com.clawdbot.<profile>` if set)
+- macOS launchd (app-bundled LaunchAgent): `launchctl kickstart -k gui/$UID/com.crocbot.gateway` (use `com.crocbot.<profile>` if set)
 - Linux systemd user service: `systemctl --user restart crocbot-gateway[-<profile>].service`
 - Windows (WSL2): `systemctl --user restart crocbot-gateway[-<profile>].service`
   - `launchctl`/`systemctl` only work if the service is installed; otherwise run `crocbot gateway install`.

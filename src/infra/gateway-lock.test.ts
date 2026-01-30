@@ -17,8 +17,8 @@ async function makeEnv() {
   return {
     env: {
       ...process.env,
-      CLAWDBOT_STATE_DIR: dir,
-      CLAWDBOT_CONFIG_PATH: configPath,
+      CROCBOT_STATE_DIR: dir,
+      CROCBOT_CONFIG_PATH: configPath,
     },
     cleanup: async () => {
       await fs.rm(dir, { recursive: true, force: true });

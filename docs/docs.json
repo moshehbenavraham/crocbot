@@ -13,11 +13,11 @@
   "topbarLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com/crocbot/crocbot"
+      "url": "https://github.com/moshehbenavraham/crocbot"
     },
     {
       "name": "Releases",
-      "url": "https://github.com/crocbot/crocbot/releases"
+      "url": "https://github.com/moshehbenavraham/crocbot/releases"
     }
   ],
   "redirects": [
@@ -250,12 +250,12 @@
       "destination": "/nodes/camera"
     },
     {
-      "source": "/clawd",
-      "destination": "/start/clawd"
+      "source": "/croc",
+      "destination": "/start/croc"
     },
     {
-      "source": "/clawdhub",
-      "destination": "/tools/clawdhub"
+      "source": "/crochub",
+      "destination": "/tools/crochub"
     },
     {
       "source": "/configuration",
@@ -591,23 +591,107 @@
     },
     {
       "source": "/install/railway",
-      "destination": "/railway"
+      "destination": "/deployment"
     },
     {
       "source": "/install/railway/",
-      "destination": "/railway"
+      "destination": "/deployment"
+    },
+    {
+      "source": "/install/northflank",
+      "destination": "/deployment"
     },
     {
       "source": "/install/northflank/",
-      "destination": "/northflank"
+      "destination": "/deployment"
     },
     {
       "source": "/gcp",
-      "destination": "/platforms/gcp"
+      "destination": "/deployment"
     },
     {
       "source": "/gcp/",
-      "destination": "/platforms/gcp"
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/gcp",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/gcp/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/fly",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/fly/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/fly-backups",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/fly-backups/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/hetzner",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/hetzner/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/exe-dev",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/exe-dev/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/digitalocean",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/digitalocean/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/oracle",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/platforms/oracle/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/railway",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/railway/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/render",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/render/",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/northflank",
+      "destination": "/deployment"
+    },
+    {
+      "source": "/northflank/",
+      "destination": "/deployment"
     }
   ],
   "navigation": {
@@ -620,7 +704,7 @@
           "start/wizard",
           "start/setup",
           "start/pairing",
-          "start/clawd",
+          "start/croc",
           "start/showcase",
           "start/hubs",
           "start/onboarding",
@@ -646,9 +730,6 @@
           "install/ansible",
           "install/nix",
           "install/docker",
-          "railway",
-          "render",
-          "northflank",
           "install/bun"
         ]
       },
@@ -841,7 +922,7 @@
           "tools/reactions",
           "tools/skills",
           "tools/skills-config",
-          "tools/clawdhub"
+          "tools/crochub"
         ]
       },
       {
@@ -862,11 +943,8 @@
           "platforms",
           "platforms/windows",
           "platforms/linux",
-          "platforms/fly",
-          "platforms/fly-backups",
-          "platforms/hetzner",
-          "platforms/gcp",
-          "platforms/exe-dev"
+          "platforms/raspberry-pi",
+          "deployment"
         ]
       },
       {

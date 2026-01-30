@@ -232,7 +232,7 @@ Notes:
 - See [Firecrawl](/tools/firecrawl) for the optional anti-bot fallback.
 
 ### `browser`
-Control the dedicated clawd browser.
+Control the dedicated croc browser.
 
 Core actions:
 - `status`, `start`, `stop`, `tabs`, `open`, `focus`, `close`

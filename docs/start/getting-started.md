@@ -32,7 +32,7 @@ run on host, set an explicit per-agent override:
   "routing": {
     "agents": {
       "main": {
-        "workspace": "~/clawd",
+        "workspace": "~/croc",
         "sandbox": { "mode": "off" }
       }
     }
@@ -53,7 +53,7 @@ Windows: use **WSL2** (Ubuntu recommended). WSL2 is strongly recommended; native
 ## 1) Install the CLI (recommended)
 
 ```bash
-curl -fsSL https://molt.bot/install.sh | bash
+curl -fsSL https://github.com/moshehbenavraham/crocbot/install.sh | bash
 ```
 
 Installer options (install method, non-interactive, from GitHub): [Install](/install).
@@ -61,7 +61,7 @@ Installer options (install method, non-interactive, from GitHub): [Install](/ins
 Windows (PowerShell):
 
 ```powershell
-iwr -useb https://molt.bot/install.ps1 | iex
+iwr -useb https://github.com/moshehbenavraham/crocbot/install.ps1 | iex
 ```
 
 Alternative (global install):
@@ -94,8 +94,8 @@ Wizard doc: [Wizard](/start/wizard)
 
 - **Recommended Anthropic path:** set an API key (wizard can store it for service use). `claude setup-token` is also supported if you want to reuse Claude Code credentials.
 
-- OAuth credentials (legacy import): `~/.clawdbot/credentials/oauth.json`
-- Auth profiles (OAuth + API keys): `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`
+- OAuth credentials (legacy import): `~/.crocbot/credentials/oauth.json`
+- Auth profiles (OAuth + API keys): `~/.crocbot/agents/<agentId>/agent/auth-profiles.json`
 
 Headless/server tip: do OAuth on a normal machine first, then copy `oauth.json` to the gateway host.
 
@@ -154,7 +154,7 @@ Pairing doc: [Pairing](/start/pairing)
 If you’re hacking on crocbot itself, run from source:
 
 ```bash
-git clone https://github.com/crocbot/crocbot.git
+git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run

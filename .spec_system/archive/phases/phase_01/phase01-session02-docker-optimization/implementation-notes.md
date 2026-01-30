@@ -75,7 +75,7 @@
 **Notes**:
 - Startup time to healthy: ~2.2 seconds
 - Already meets target of under 10 seconds
-- Gateway requires: CLAWDBOT_GATEWAY_TOKEN and --bind lan for container testing
+- Gateway requires: CROCBOT_GATEWAY_TOKEN and --bind lan for container testing
 
 ---
 

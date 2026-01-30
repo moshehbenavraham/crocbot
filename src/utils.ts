@@ -215,9 +215,9 @@ export function resolveConfigDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const override = env.CLAWDBOT_STATE_DIR?.trim();
+  const override = env.CROCBOT_STATE_DIR?.trim();
   if (override) return resolveUserPath(override);
-  return path.join(homedir(), ".clawdbot");
+  return path.join(homedir(), ".crocbot");
 }
 
 export function resolveHomeDir(): string | undefined {
@@ -273,5 +273,5 @@ export function formatTerminalLink(
   return `\u001b]8;;${safeUrl}\u0007${safeLabel}\u001b]8;;\u0007`;
 }
 
-// Configuration root; can be overridden via CLAWDBOT_STATE_DIR.
+// Configuration root; can be overridden via CROCBOT_STATE_DIR.
 export const CONFIG_DIR = resolveConfigDir();

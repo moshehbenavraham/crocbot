@@ -48,7 +48,7 @@ function mockConfig(
       defaults: {
         model: { primary: "anthropic/claude-opus-4-5" },
         models: { "anthropic/claude-opus-4-5": {} },
-        workspace: path.join(home, "clawd"),
+        workspace: path.join(home, "croc"),
         ...agentOverrides,
       },
       list: agentsList,

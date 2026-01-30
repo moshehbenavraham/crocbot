@@ -68,7 +68,7 @@ ${formatHelpExamples([
   ],
 ])}
 
-${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.molt.bot/cli/agent")}`,
+${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.github.com/moshehbenavraham/crocbot/cli/agent")}`,
     )
     .action(async (opts) => {
       const verboseLevel = typeof opts.verbose === "string" ? opts.verbose.toLowerCase() : "";
@@ -86,7 +86,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.molt.bot/cli/agent"
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/agents", "docs.molt.bot/cli/agents")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/agents", "docs.github.com/moshehbenavraham/crocbot/cli/agents")}\n`,
     );
 
   agents
@@ -155,11 +155,11 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.molt.bot/cli/agent"
         `
 ${theme.heading("Examples:")}
 ${formatHelpExamples([
-  ['crocbot agents set-identity --agent main --name "Clawd" --emoji "🦞"', "Set name + emoji."],
-  ["crocbot agents set-identity --agent main --avatar avatars/clawd.png", "Set avatar path."],
-  ["crocbot agents set-identity --workspace ~/clawd --from-identity", "Load from IDENTITY.md."],
+  ['crocbot agents set-identity --agent main --name "Croc" --emoji "🐊"', "Set name + emoji."],
+  ["crocbot agents set-identity --agent main --avatar avatars/croc.png", "Set avatar path."],
+  ["crocbot agents set-identity --workspace ~/croc --from-identity", "Load from IDENTITY.md."],
   [
-    "crocbot agents set-identity --identity-file ~/clawd/IDENTITY.md --agent main",
+    "crocbot agents set-identity --identity-file ~/croc/IDENTITY.md --agent main",
     "Use a specific IDENTITY.md.",
   ],
 ])}

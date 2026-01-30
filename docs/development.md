@@ -18,7 +18,7 @@
 ## Setup
 
 ```bash
-git clone https://github.com/crocbot/crocbot.git
+git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 
 pnpm install
@@ -65,7 +65,7 @@ pnpm test:coverage
 pnpm test:watch
 
 # Live tests (requires real API keys)
-CLAWDBOT_LIVE_TEST=1 pnpm test:live
+CROCBOT_LIVE_TEST=1 pnpm test:live
 ```
 
 ### Test Coverage

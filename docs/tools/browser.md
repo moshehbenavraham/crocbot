@@ -2,11 +2,11 @@
 summary: "Integrated browser control service + action commands"
 read_when:
   - Adding agent-controlled browser automation
-  - Debugging why clawd is interfering with your own Chrome
+  - Debugging why croc is interfering with your own Chrome
   - Implementing browser settings + lifecycle in the macOS app
 ---
 
-# Browser (clawd-managed)
+# Browser (croc-managed)
 
 crocbot can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
 It is isolated from your personal browser and is managed through a small local
@@ -14,17 +14,17 @@ control service inside the Gateway (loopback only).
 
 Beginner view:
 - Think of it as a **separate, agent-only browser**.
-- The `clawd` profile does **not** touch your personal browser profile.
+- The `croc` profile does **not** touch your personal browser profile.
 - The agent can **open tabs, read pages, click, and type** in a safe lane.
 - The default `chrome` profile uses the **system default Chromium browser** via the
-  extension relay; switch to `clawd` for the isolated managed browser.
+  extension relay; switch to `croc` for the isolated managed browser.
 
 ## What you get
 
-- A separate browser profile named **clawd** (orange accent by default).
+- A separate browser profile named **croc** (orange accent by default).
 - Deterministic tab control (list/open/focus/close).
 - Agent actions (click/type/drag/select), snapshots, screenshots, PDFs.
-- Optional multi-profile support (`clawd`, `work`, `remote`, ...).
+- Optional multi-profile support (`croc`, `work`, `remote`, ...).
 
 This browser is **not** your daily driver. It is a safe, isolated surface for
 agent automation and verification.
@@ -32,26 +32,26 @@ agent automation and verification.
 ## Quick start
 
 ```bash
-crocbot browser --browser-profile clawd status
-crocbot browser --browser-profile clawd start
-crocbot browser --browser-profile clawd open https://example.com
-crocbot browser --browser-profile clawd snapshot
+crocbot browser --browser-profile croc status
+crocbot browser --browser-profile croc start
+crocbot browser --browser-profile croc open https://example.com
+crocbot browser --browser-profile croc snapshot
 ```
 
 If you get “Browser disabled”, enable it in config (see below) and restart the
 Gateway.
 
-## Profiles: `clawd` vs `chrome`
+## Profiles: `croc` vs `chrome`
 
-- `clawd`: managed, isolated browser (no extension required).
+- `croc`: managed, isolated browser (no extension required).
 - `chrome`: extension relay to your **system browser** (requires the crocbot
   extension to be attached to a tab).
 
-Set `browser.defaultProfile: "clawd"` if you want managed mode by default.
+Set `browser.defaultProfile: "croc"` if you want managed mode by default.
 
 ## Configuration
 
-Browser settings live in `~/.clawdbot/crocbot.json`.
+Browser settings live in `~/.crocbot/crocbot.json`.
 
 ```json5
 {
@@ -67,7 +67,7 @@ Browser settings live in `~/.clawdbot/crocbot.json`.
     attachOnly: false,
     executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     profiles: {
-      clawd: { cdpPort: 18800, color: "#FF4500" },
+      croc: { cdpPort: 18800, color: "#FF4500" },
       work: { cdpPort: 18801, color: "#0066CC" },
       remote: { cdpUrl: "http://10.0.0.42:9222", color: "#00AA00" }
     }
@@ -78,16 +78,16 @@ Browser settings live in `~/.clawdbot/crocbot.json`.
 Notes:
 - The browser control service binds to loopback on a port derived from `gateway.port`
   (default: `18791`, which is gateway + 2). The relay uses the next port (`18792`).
-- If you override the Gateway port (`gateway.port` or `CLAWDBOT_GATEWAY_PORT`),
+- If you override the Gateway port (`gateway.port` or `CROCBOT_GATEWAY_PORT`),
   the derived browser ports shift to stay in the same “family”.
 - `cdpUrl` defaults to the relay port when unset.
 - `remoteCdpTimeoutMs` applies to remote (non-loopback) CDP reachability checks.
 - `remoteCdpHandshakeTimeoutMs` applies to remote CDP WebSocket reachability checks.
 - `attachOnly: true` means “never launch a local browser; only attach if it is already running.”
 - `color` + per-profile `color` tint the browser UI so you can see which profile is active.
-- Default profile is `chrome` (extension relay). Use `defaultProfile: "clawd"` for the managed browser.
+- Default profile is `chrome` (extension relay). Use `defaultProfile: "croc"` for the managed browser.
 - Auto-detect order: system default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
-- Local `clawd` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
+- Local `croc` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
 
 ## Use Brave (or another Chromium-based browser)
 
@@ -194,12 +194,12 @@ Remote CDP tips:
 ## Profiles (multi-browser)
 
 crocbot supports multiple named profiles (routing configs). Profiles can be:
-- **clawd-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
+- **croc-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
 - **remote**: an explicit CDP URL (Chromium-based browser running elsewhere)
 - **extension relay**: your existing Chrome tab(s) via the local relay + Chrome extension
 
 Defaults:
-- The `clawd` profile is auto-created if missing.
+- The `croc` profile is auto-created if missing.
 - The `chrome` profile is built-in for the Chrome extension relay (points at `http://127.0.0.1:18792` by default).
 - Local CDP ports allocate from **18800–18899** by default.
 - Deleting a profile moves its local data directory to Trash.
@@ -208,7 +208,7 @@ All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`
 
 ## Chrome extension relay (use your existing Chrome)
 
-crocbot can also drive **your existing Chrome tabs** (no separate “clawd” Chrome instance) via a local CDP relay + a Chrome extension.
+crocbot can also drive **your existing Chrome tabs** (no separate “croc” Chrome instance) via a local CDP relay + a Chrome extension.
 
 Full guide: [Chrome extension](/tools/chrome-extension)
 
@@ -302,7 +302,7 @@ All endpoints accept `?profile=<name>`.
 
 Some features (navigate/act/AI snapshot/role snapshot, element screenshots, PDF) require
 Playwright. If Playwright isn’t installed, those endpoints return a clear 501
-error. ARIA snapshots and basic screenshots still work for clawd-managed Chrome.
+error. ARIA snapshots and basic screenshots still work for croc-managed Chrome.
 For the Chrome extension relay driver, ARIA snapshots and screenshots require Playwright.
 
 If you see `Playwright is not available in this gateway build`, install the full
@@ -406,7 +406,7 @@ Notes:
   - `--format ai` (default when Playwright is installed): returns an AI snapshot with numeric refs (`aria-ref="<n>"`).
   - `--format aria`: returns the accessibility tree (no refs; inspection only).
   - `--efficient` (or `--mode efficient`): compact role snapshot preset (interactive + compact + depth + lower maxChars).
-  - Config default (tool/CLI only): set `browser.snapshotDefaults.mode: "efficient"` to use efficient snapshots when the caller does not pass a mode (see [Gateway configuration](/gateway/configuration#browser-clawd-managed-browser)).
+  - Config default (tool/CLI only): set `browser.snapshotDefaults.mode: "efficient"` to use efficient snapshots when the caller does not pass a mode (see [Gateway configuration](/gateway/configuration#browser-croc-managed-browser)).
   - Role snapshot options (`--interactive`, `--compact`, `--depth`, `--selector`) force a role-based snapshot with refs like `ref=e12`.
   - `--frame "<iframe selector>"` scopes role snapshots to an iframe (pairs with role refs like `e12`).
   - `--interactive` outputs a flat, easy-to-pick list of interactive elements (best for driving actions).
@@ -504,7 +504,7 @@ These are useful for “make the site behave like X” workflows:
 
 ## Security & privacy
 
-- The clawd browser profile may contain logged-in sessions; treat it as sensitive.
+- The croc browser profile may contain logged-in sessions; treat it as sensitive.
 - `browser act kind=evaluate` / `crocbot browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
@@ -527,7 +527,7 @@ How it maps:
 - `browser act` uses the snapshot `ref` IDs to click/type/drag/select.
 - `browser screenshot` captures pixels (full page or element).
 - `browser` accepts:
-  - `profile` to choose a named browser profile (clawd, chrome, or remote CDP).
+  - `profile` to choose a named browser profile (croc, chrome, or remote CDP).
   - `target` (`sandbox` | `host` | `node`) to select where the browser lives.
   - In sandboxed sessions, `target: "host"` requires `agents.defaults.sandbox.browser.allowHostControl=true`.
   - If `target` is omitted: sandboxed sessions default to `sandbox`, non-sandbox sessions default to `host`.

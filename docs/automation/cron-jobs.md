@@ -17,7 +17,7 @@ cron is the mechanism.
 
 ## TL;DR
 - Cron runs **inside the Gateway** (not inside the model).
-- Jobs persist under `~/.clawdbot/cron/` so restarts don’t lose schedules.
+- Jobs persist under `~/.crocbot/cron/` so restarts don’t lose schedules.
 - Two execution styles:
   - **Main session**: enqueue a system event, then run on the next heartbeat.
   - **Isolated**: run a dedicated agent turn in `cron:<jobId>`, optionally deliver output.
@@ -150,8 +150,8 @@ Prefixed targets like `telegram:...` / `telegram:group:...` are also accepted:
 - `telegram:group:-1001234567890:topic:123`
 
 ## Storage & history
-- Job store: `~/.clawdbot/cron/jobs.json` (Gateway-managed JSON).
-- Run history: `~/.clawdbot/cron/runs/<jobId>.jsonl` (JSONL, auto-pruned).
+- Job store: `~/.crocbot/cron/jobs.json` (Gateway-managed JSON).
+- Run history: `~/.crocbot/cron/runs/<jobId>.jsonl` (JSONL, auto-pruned).
 - Override store path: `cron.store` in config.
 
 ## Configuration
@@ -160,7 +160,7 @@ Prefixed targets like `telegram:...` / `telegram:group:...` are also accepted:
 {
   cron: {
     enabled: true, // default true
-    store: "~/.clawdbot/cron/jobs.json",
+    store: "~/.crocbot/cron/jobs.json",
     maxConcurrentRuns: 1 // default 1
   }
 }
@@ -168,7 +168,7 @@ Prefixed targets like `telegram:...` / `telegram:group:...` are also accepted:
 
 Disable cron entirely:
 - `cron.enabled: false` (config)
-- `CLAWDBOT_SKIP_CRON=1` (env)
+- `CROCBOT_SKIP_CRON=1` (env)
 
 ## CLI quickstart
 
@@ -275,7 +275,7 @@ For immediate system events without a job, use [`crocbot system event`](/cli/sys
 ## Troubleshooting
 
 ### “Nothing runs”
-- Check cron is enabled: `cron.enabled` and `CLAWDBOT_SKIP_CRON`.
+- Check cron is enabled: `cron.enabled` and `CROCBOT_SKIP_CRON`.
 - Check the Gateway is running continuously (cron runs inside the Gateway process).
 - For `cron` schedules: confirm timezone (`--tz`) vs the host timezone.
 

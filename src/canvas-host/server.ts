@@ -103,25 +103,25 @@ function defaultIndexHTML() {
       window.webkit &&
       window.webkit.messageHandlers &&
       (window.webkit.messageHandlers.crocbotCanvasA2UIAction ||
-        window.webkit.messageHandlers.clawdbotCanvasA2UIAction)
+        window.webkit.messageHandlers.crocbotCanvasA2UIAction)
     );
   const hasAndroid = () =>
     !!(
       (window.crocbotCanvasA2UIAction &&
         typeof window.crocbotCanvasA2UIAction.postMessage === "function") ||
-      (window.clawdbotCanvasA2UIAction &&
-        typeof window.clawdbotCanvasA2UIAction.postMessage === "function")
+      (window.crocbotCanvasA2UIAction &&
+        typeof window.crocbotCanvasA2UIAction.postMessage === "function")
     );
-  const legacySend = typeof window.clawdbotSendUserAction === "function" ? window.clawdbotSendUserAction : undefined;
+  const legacySend = typeof window.crocbotSendUserAction === "function" ? window.crocbotSendUserAction : undefined;
   if (!window.crocbotSendUserAction && legacySend) {
     window.crocbotSendUserAction = legacySend;
   }
-  if (!window.clawdbotSendUserAction && typeof window.crocbotSendUserAction === "function") {
-    window.clawdbotSendUserAction = window.crocbotSendUserAction;
+  if (!window.crocbotSendUserAction && typeof window.crocbotSendUserAction === "function") {
+    window.crocbotSendUserAction = window.crocbotSendUserAction;
   }
   const hasHelper = () =>
     typeof window.crocbotSendUserAction === "function" ||
-    typeof window.clawdbotSendUserAction === "function";
+    typeof window.crocbotSendUserAction === "function";
   statusEl.innerHTML =
     "Bridge: " +
     (hasHelper() ? "<span class='ok'>ready</span>" : "<span class='bad'>missing</span>") +
@@ -141,7 +141,7 @@ function defaultIndexHTML() {
     const sendUserAction =
       typeof window.crocbotSendUserAction === "function"
         ? window.crocbotSendUserAction
-        : window.clawdbotSendUserAction;
+        : window.crocbotSendUserAction;
     const ok = sendUserAction({
       name,
       surfaceId: "main",
@@ -199,7 +199,7 @@ async function resolveFilePath(rootReal: string, urlPath: string) {
 }
 
 function isDisabledByEnv() {
-  if (isTruthyEnvValue(process.env.CLAWDBOT_SKIP_CANVAS_HOST)) return true;
+  if (isTruthyEnvValue(process.env.CROCBOT_SKIP_CANVAS_HOST)) return true;
   if (process.env.NODE_ENV === "test") return true;
   if (process.env.VITEST) return true;
   return false;
@@ -242,7 +242,7 @@ export async function createCanvasHostHandler(
     };
   }
 
-  const rootDir = resolveUserPath(opts.rootDir ?? path.join(os.homedir(), "clawd", "canvas"));
+  const rootDir = resolveUserPath(opts.rootDir ?? path.join(os.homedir(), "croc", "canvas"));
   const rootReal = await prepareCanvasRoot(rootDir);
 
   const liveReload = opts.liveReload !== false;

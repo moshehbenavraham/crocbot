@@ -56,11 +56,11 @@ describe("sessions", () => {
       buildGroupDisplayName({
         provider: "discord",
         groupChannel: "#general",
-        space: "friends-of-clawd",
+        space: "friends-of-croc",
         id: "123",
         key: "discord:group:123",
       }),
-    ).toBe("discord:friends-of-clawd#general");
+    ).toBe("discord:friends-of-croc#general");
   });
 
   it("collapses direct chats to main by default", () => {
@@ -359,17 +359,17 @@ describe("sessions", () => {
     expect(entry.lastProvider).toBeUndefined();
   });
 
-  it("derives session transcripts dir from CLAWDBOT_STATE_DIR", () => {
+  it("derives session transcripts dir from CROCBOT_STATE_DIR", () => {
     const dir = resolveSessionTranscriptsDir(
-      { CLAWDBOT_STATE_DIR: "/custom/state" } as NodeJS.ProcessEnv,
+      { CROCBOT_STATE_DIR: "/custom/state" } as NodeJS.ProcessEnv,
       () => "/home/ignored",
     );
     expect(dir).toBe(path.join(path.resolve("/custom/state"), "agents", "main", "sessions"));
   });
 
   it("includes topic ids in session transcript filenames", () => {
-    const prev = process.env.CLAWDBOT_STATE_DIR;
-    process.env.CLAWDBOT_STATE_DIR = "/custom/state";
+    const prev = process.env.CROCBOT_STATE_DIR;
+    process.env.CROCBOT_STATE_DIR = "/custom/state";
     try {
       const sessionFile = resolveSessionTranscriptPath("sess-1", "main", 123);
       expect(sessionFile).toBe(
@@ -383,16 +383,16 @@ describe("sessions", () => {
       );
     } finally {
       if (prev === undefined) {
-        delete process.env.CLAWDBOT_STATE_DIR;
+        delete process.env.CROCBOT_STATE_DIR;
       } else {
-        process.env.CLAWDBOT_STATE_DIR = prev;
+        process.env.CROCBOT_STATE_DIR = prev;
       }
     }
   });
 
   it("uses agent id when resolving session file fallback paths", () => {
-    const prev = process.env.CLAWDBOT_STATE_DIR;
-    process.env.CLAWDBOT_STATE_DIR = "/custom/state";
+    const prev = process.env.CROCBOT_STATE_DIR;
+    process.env.CROCBOT_STATE_DIR = "/custom/state";
     try {
       const sessionFile = resolveSessionFilePath("sess-2", undefined, {
         agentId: "codex",
@@ -402,9 +402,9 @@ describe("sessions", () => {
       );
     } finally {
       if (prev === undefined) {
-        delete process.env.CLAWDBOT_STATE_DIR;
+        delete process.env.CROCBOT_STATE_DIR;
       } else {
-        process.env.CLAWDBOT_STATE_DIR = prev;
+        process.env.CROCBOT_STATE_DIR = prev;
       }
     }
   });

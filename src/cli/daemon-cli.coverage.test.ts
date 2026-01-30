@@ -81,36 +81,36 @@ vi.mock("./progress.js", () => ({
 
 describe("daemon-cli coverage", () => {
   const originalEnv = {
-    CLAWDBOT_STATE_DIR: process.env.CLAWDBOT_STATE_DIR,
-    CLAWDBOT_CONFIG_PATH: process.env.CLAWDBOT_CONFIG_PATH,
-    CLAWDBOT_GATEWAY_PORT: process.env.CLAWDBOT_GATEWAY_PORT,
-    CLAWDBOT_PROFILE: process.env.CLAWDBOT_PROFILE,
+    CROCBOT_STATE_DIR: process.env.CROCBOT_STATE_DIR,
+    CROCBOT_CONFIG_PATH: process.env.CROCBOT_CONFIG_PATH,
+    CROCBOT_GATEWAY_PORT: process.env.CROCBOT_GATEWAY_PORT,
+    CROCBOT_PROFILE: process.env.CROCBOT_PROFILE,
   };
 
   beforeEach(() => {
-    process.env.CLAWDBOT_STATE_DIR = "/tmp/crocbot-cli-state";
-    process.env.CLAWDBOT_CONFIG_PATH = "/tmp/crocbot-cli-state/crocbot.json";
-    delete process.env.CLAWDBOT_GATEWAY_PORT;
-    delete process.env.CLAWDBOT_PROFILE;
+    process.env.CROCBOT_STATE_DIR = "/tmp/crocbot-cli-state";
+    process.env.CROCBOT_CONFIG_PATH = "/tmp/crocbot-cli-state/crocbot.json";
+    delete process.env.CROCBOT_GATEWAY_PORT;
+    delete process.env.CROCBOT_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
   });
 
   afterEach(() => {
-    if (originalEnv.CLAWDBOT_STATE_DIR !== undefined)
-      process.env.CLAWDBOT_STATE_DIR = originalEnv.CLAWDBOT_STATE_DIR;
-    else delete process.env.CLAWDBOT_STATE_DIR;
+    if (originalEnv.CROCBOT_STATE_DIR !== undefined)
+      process.env.CROCBOT_STATE_DIR = originalEnv.CROCBOT_STATE_DIR;
+    else delete process.env.CROCBOT_STATE_DIR;
 
-    if (originalEnv.CLAWDBOT_CONFIG_PATH !== undefined)
-      process.env.CLAWDBOT_CONFIG_PATH = originalEnv.CLAWDBOT_CONFIG_PATH;
-    else delete process.env.CLAWDBOT_CONFIG_PATH;
+    if (originalEnv.CROCBOT_CONFIG_PATH !== undefined)
+      process.env.CROCBOT_CONFIG_PATH = originalEnv.CROCBOT_CONFIG_PATH;
+    else delete process.env.CROCBOT_CONFIG_PATH;
 
-    if (originalEnv.CLAWDBOT_GATEWAY_PORT !== undefined)
-      process.env.CLAWDBOT_GATEWAY_PORT = originalEnv.CLAWDBOT_GATEWAY_PORT;
-    else delete process.env.CLAWDBOT_GATEWAY_PORT;
+    if (originalEnv.CROCBOT_GATEWAY_PORT !== undefined)
+      process.env.CROCBOT_GATEWAY_PORT = originalEnv.CROCBOT_GATEWAY_PORT;
+    else delete process.env.CROCBOT_GATEWAY_PORT;
 
-    if (originalEnv.CLAWDBOT_PROFILE !== undefined)
-      process.env.CLAWDBOT_PROFILE = originalEnv.CLAWDBOT_PROFILE;
-    else delete process.env.CLAWDBOT_PROFILE;
+    if (originalEnv.CROCBOT_PROFILE !== undefined)
+      process.env.CROCBOT_PROFILE = originalEnv.CROCBOT_PROFILE;
+    else delete process.env.CROCBOT_PROFILE;
   });
 
   it("probes gateway status by default", async () => {
@@ -140,12 +140,12 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        CLAWDBOT_PROFILE: "dev",
-        CLAWDBOT_STATE_DIR: "/tmp/crocbot-daemon-state",
-        CLAWDBOT_CONFIG_PATH: "/tmp/crocbot-daemon-state/crocbot.json",
-        CLAWDBOT_GATEWAY_PORT: "19001",
+        CROCBOT_PROFILE: "dev",
+        CROCBOT_STATE_DIR: "/tmp/crocbot-daemon-state",
+        CROCBOT_CONFIG_PATH: "/tmp/crocbot-daemon-state/crocbot.json",
+        CROCBOT_GATEWAY_PORT: "19001",
       },
-      sourcePath: "/tmp/com.clawdbot.gateway.plist",
+      sourcePath: "/tmp/com.crocbot.gateway.plist",
     });
 
     const { registerDaemonCli } = await import("./daemon-cli.js");

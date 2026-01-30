@@ -69,7 +69,7 @@ export function printWizardHeader(runtime: RuntimeEnv) {
     "█░░░░░█░░░░░█████░█░█░█░█░░█░████░░█░░░█░░█░",
     "█░░░░░█░░░░░█░░░█░█░█░█░█░░█░█░░█░░█░░░█░░█░",
     "░████░█████░█░░░█░░█░█░░███░░████░░░███░░░█░",
-    "              🦞 FRESH DAILY 🦞",
+    "           🐊 IT WAS ALREADY WAITING 🐊",
   ].join("\n");
   runtime.log(header);
 }
@@ -177,8 +177,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     authedUrl,
     "Docs:",
-    "https://docs.molt.bot/gateway/remote",
-    "https://docs.molt.bot/web/control-ui",
+    "https://docs.github.com/moshehbenavraham/crocbot/gateway/remote",
+    "https://docs.github.com/moshehbenavraham/crocbot/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

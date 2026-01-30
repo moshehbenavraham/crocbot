@@ -13,9 +13,9 @@ crocbot pulls environment variables from multiple sources. The rule is **never o
 
 1) **Process environment** (what the Gateway process already has from the parent shell/daemon).
 2) **`.env` in the current working directory** (dotenv default; does not override).
-3) **Global `.env`** at `~/.clawdbot/.env` (aka `$CLAWDBOT_STATE_DIR/.env`; does not override).
-4) **Config `env` block** in `~/.clawdbot/crocbot.json` (applied only if missing).
-5) **Optional login-shell import** (`env.shellEnv.enabled` or `CLAWDBOT_LOAD_SHELL_ENV=1`), applied only for missing expected keys.
+3) **Global `.env`** at `~/.crocbot/.env` (aka `$CROCBOT_STATE_DIR/.env`; does not override).
+4) **Config `env` block** in `~/.crocbot/crocbot.json` (applied only if missing).
+5) **Optional login-shell import** (`env.shellEnv.enabled` or `CROCBOT_LOAD_SHELL_ENV=1`), applied only for missing expected keys.
 
 If the config file is missing entirely, step 4 is skipped; shell import still runs if enabled.
 
@@ -50,8 +50,8 @@ Two equivalent ways to set inline env vars (both are non-overriding):
 ```
 
 Env var equivalents:
-- `CLAWDBOT_LOAD_SHELL_ENV=1`
-- `CLAWDBOT_SHELL_ENV_TIMEOUT_MS=15000`
+- `CROCBOT_LOAD_SHELL_ENV=1`
+- `CROCBOT_SHELL_ENV_TIMEOUT_MS=15000`
 
 ## Env var substitution in config
 

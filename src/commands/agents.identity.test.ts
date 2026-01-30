@@ -55,10 +55,10 @@ describe("agents set-identity command", () => {
     await fs.writeFile(
       path.join(workspace, "IDENTITY.md"),
       [
-        "- Name: Clawd",
+        "- Name: Croc",
         "- Creature: helpful sloth",
         "- Emoji: :)",
-        "- Avatar: avatars/clawd.png",
+        "- Avatar: avatars/croc.png",
         "",
       ].join("\n"),
       "utf-8",
@@ -84,10 +84,10 @@ describe("agents set-identity command", () => {
     };
     const main = written.agents?.list?.find((entry) => entry.id === "main");
     expect(main?.identity).toEqual({
-      name: "Clawd",
+      name: "Croc",
       theme: "helpful sloth",
       emoji: ":)",
-      avatar: "avatars/clawd.png",
+      avatar: "avatars/croc.png",
     });
   });
 
@@ -123,10 +123,10 @@ describe("agents set-identity command", () => {
     await fs.writeFile(
       path.join(workspace, "IDENTITY.md"),
       [
-        "- Name: Clawd",
-        "- Theme: space lobster",
+        "- Name: Croc",
+        "- Theme: chrome crocodile",
         "- Emoji: :)",
-        "- Avatar: avatars/clawd.png",
+        "- Avatar: avatars/croc.png",
         "",
       ].join("\n"),
       "utf-8",
@@ -142,7 +142,7 @@ describe("agents set-identity command", () => {
         workspace,
         fromIdentity: true,
         name: "Nova",
-        emoji: "🦞",
+        emoji: "🐊",
         avatar: "https://example.com/override.png",
       },
       runtime,
@@ -154,8 +154,8 @@ describe("agents set-identity command", () => {
     const main = written.agents?.list?.find((entry) => entry.id === "main");
     expect(main?.identity).toEqual({
       name: "Nova",
-      theme: "space lobster",
-      emoji: "🦞",
+      theme: "chrome crocodile",
+      emoji: "🐊",
       avatar: "https://example.com/override.png",
     });
   });
