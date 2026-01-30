@@ -33,7 +33,7 @@ describe("channel plugin registry", () => {
 
   it("sorts channel plugins by configured order", () => {
     const registry = createTestRegistry(
-      ["slack", "telegram", "signal"].map((id) => ({
+      ["msteams", "telegram", "matrix"].map((id) => ({
         pluginId: id,
         plugin: createPlugin(id),
         source: "test",
@@ -41,6 +41,7 @@ describe("channel plugin registry", () => {
     );
     setActivePluginRegistry(registry);
     const pluginIds = listChannelPlugins().map((plugin) => plugin.id);
-    expect(pluginIds).toEqual(["telegram", "slack", "signal"]);
+    // Telegram should come first (priority channel), then others in registry order
+    expect(pluginIds).toEqual(["telegram", "matrix", "msteams"]);
   });
 });

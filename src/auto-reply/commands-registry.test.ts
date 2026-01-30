@@ -126,21 +126,14 @@ describe("commands registry", () => {
     expect(
       shouldHandleTextCommands({
         cfg,
-        surface: "discord",
+        surface: "telegram",
         commandSource: "text",
       }),
     ).toBe(false);
     expect(
       shouldHandleTextCommands({
         cfg,
-        surface: "whatsapp",
-        commandSource: "text",
-      }),
-    ).toBe(true);
-    expect(
-      shouldHandleTextCommands({
-        cfg,
-        surface: "discord",
+        surface: "telegram",
         commandSource: "native",
       }),
     ).toBe(true);

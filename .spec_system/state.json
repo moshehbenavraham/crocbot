@@ -14,7 +14,8 @@
   },
   "completed_sessions": [
     "phase00-session01-remove-native-apps",
-    "phase00-session02-remove-extensions"
+    "phase00-session02-remove-extensions",
+    "phase00-session03-remove-channels"
   ],
   "next_session_history": [
     {
@@ -50,6 +51,31 @@
     {
       "date": "2026-01-30",
       "session": "phase00-session02-remove-extensions",
+      "status": "completed"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session03-remove-channels",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session03-remove-channels",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session03-remove-channels",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session03-remove-channels",
+      "status": "validated"
+    },
+    {
+      "date": "2026-01-30",
+      "session": "phase00-session03-remove-channels",
       "status": "completed"
     }
   ]

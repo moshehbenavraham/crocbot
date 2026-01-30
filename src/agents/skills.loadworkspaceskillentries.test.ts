@@ -60,6 +60,12 @@ describe("loadWorkspaceSkillEntries", () => {
       ),
       "utf-8",
     );
+    // Plugin discovery requires an index.js entry point
+    await fs.writeFile(
+      path.join(pluginRoot, "index.js"),
+      `export default { id: "open-prose", register() {} };`,
+      "utf-8",
+    );
     await fs.writeFile(
       path.join(pluginRoot, "skills", "prose", "SKILL.md"),
       `---\nname: prose\ndescription: test\n---\n`,
@@ -97,6 +103,12 @@ describe("loadWorkspaceSkillEntries", () => {
         null,
         2,
       ),
+      "utf-8",
+    );
+    // Plugin discovery requires an index.js entry point
+    await fs.writeFile(
+      path.join(pluginRoot, "index.js"),
+      `export default { id: "open-prose", register() {} };`,
       "utf-8",
     );
     await fs.writeFile(

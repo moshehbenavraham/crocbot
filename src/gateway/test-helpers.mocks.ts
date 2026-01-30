@@ -72,11 +72,6 @@ const createStubPluginRegistry = (): PluginRegistry => ({
   typedHooks: [],
   channels: [
     {
-      pluginId: "whatsapp",
-      source: "test",
-      plugin: createStubChannelPlugin({ id: "whatsapp", label: "WhatsApp" }),
-    },
-    {
       pluginId: "telegram",
       source: "test",
       plugin: createStubChannelPlugin({
@@ -84,30 +79,6 @@ const createStubPluginRegistry = (): PluginRegistry => ({
         label: "Telegram",
         summary: { tokenSource: "none", lastProbeAt: null },
       }),
-    },
-    {
-      pluginId: "discord",
-      source: "test",
-      plugin: createStubChannelPlugin({ id: "discord", label: "Discord" }),
-    },
-    {
-      pluginId: "slack",
-      source: "test",
-      plugin: createStubChannelPlugin({ id: "slack", label: "Slack" }),
-    },
-    {
-      pluginId: "signal",
-      source: "test",
-      plugin: createStubChannelPlugin({
-        id: "signal",
-        label: "Signal",
-        summary: { lastProbeAt: null },
-      }),
-    },
-    {
-      pluginId: "imessage",
-      source: "test",
-      plugin: createStubChannelPlugin({ id: "imessage", label: "iMessage" }),
     },
     {
       pluginId: "msteams",
@@ -128,11 +99,6 @@ const createStubPluginRegistry = (): PluginRegistry => ({
       pluginId: "zalouser",
       source: "test",
       plugin: createStubChannelPlugin({ id: "zalouser", label: "Zalo Personal" }),
-    },
-    {
-      pluginId: "bluebubbles",
-      source: "test",
-      plugin: createStubChannelPlugin({ id: "bluebubbles", label: "BlueBubbles" }),
     },
   ],
   providers: [],
@@ -169,7 +135,6 @@ const hoisted = vi.hoisted(() => ({
     waitResults: new Map<string, boolean>(),
   },
   getReplyFromConfig: vi.fn().mockResolvedValue(undefined),
-  sendWhatsAppMock: vi.fn().mockResolvedValue({ messageId: "msg-1", toJid: "jid-1" }),
 }));
 
 const pluginRegistryState = {
@@ -209,7 +174,6 @@ export const testState = {
   channelsConfig: undefined as Record<string, unknown> | undefined,
   sessionStorePath: undefined as string | undefined,
   sessionConfig: undefined as Record<string, unknown> | undefined,
-  allowFrom: undefined as string[] | undefined,
   cronStorePath: undefined as string | undefined,
   cronEnabled: false as boolean | undefined,
   gatewayBind: undefined as "auto" | "lan" | "tailnet" | "loopback" | undefined,
@@ -412,18 +376,6 @@ vi.mock("../config/config.js", async () => {
           ? { ...(testState.channelsConfig as Record<string, unknown>) }
           : {};
       const mergedChannels = { ...fileChannels, ...overrideChannels };
-      if (testState.allowFrom !== undefined) {
-        const existing =
-          mergedChannels.whatsapp &&
-          typeof mergedChannels.whatsapp === "object" &&
-          !Array.isArray(mergedChannels.whatsapp)
-            ? (mergedChannels.whatsapp as Record<string, unknown>)
-            : {};
-        mergedChannels.whatsapp = {
-          ...existing,
-          allowFrom: testState.allowFrom,
-        };
-      }
       const channels = Object.keys(mergedChannels).length > 0 ? mergedChannels : undefined;
 
       const fileSession =
@@ -525,22 +477,6 @@ vi.mock("../commands/health.js", () => ({
 vi.mock("../commands/status.js", () => ({
   getStatusSummary: vi.fn().mockResolvedValue({ ok: true }),
 }));
-vi.mock("../web/outbound.js", () => ({
-  sendMessageWhatsApp: (...args: unknown[]) =>
-    (hoisted.sendWhatsAppMock as (...args: unknown[]) => unknown)(...args),
-  sendPollWhatsApp: (...args: unknown[]) =>
-    (hoisted.sendWhatsAppMock as (...args: unknown[]) => unknown)(...args),
-}));
-vi.mock("../channels/web/index.js", async () => {
-  const actual = await vi.importActual<typeof import("../channels/web/index.js")>(
-    "../channels/web/index.js",
-  );
-  return {
-    ...actual,
-    sendMessageWhatsApp: (...args: unknown[]) =>
-      (hoisted.sendWhatsAppMock as (...args: unknown[]) => unknown)(...args),
-  };
-});
 vi.mock("../commands/agent.js", () => ({
   agentCommand,
 }));
@@ -552,11 +488,7 @@ vi.mock("../cli/deps.js", async () => {
   const base = actual.createDefaultDeps();
   return {
     ...actual,
-    createDefaultDeps: () => ({
-      ...base,
-      sendMessageWhatsApp: (...args: unknown[]) =>
-        (hoisted.sendWhatsAppMock as (...args: unknown[]) => unknown)(...args),
-    }),
+    createDefaultDeps: () => base,
   };
 });
 

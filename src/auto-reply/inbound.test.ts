@@ -75,7 +75,7 @@ describe("finalizeInboundContext", () => {
       Body: "a\\nb\r\nc",
       RawBody: "raw\\nline",
       ChatType: "channel",
-      From: "whatsapp:group:123@g.us",
+      From: "telegram:group:-1001234567890",
       GroupSubject: "Test",
     };
 
@@ -94,7 +94,7 @@ describe("finalizeInboundContext", () => {
       Body: "base",
       BodyForCommands: "<media:audio>",
       CommandBody: "say hi",
-      From: "signal:+15550001111",
+      From: "telegram:+15550001111",
       ChatType: "direct",
     };
 
@@ -120,7 +120,7 @@ describe("formatInboundBodyWithSenderMeta", () => {
     const ctx: MsgContext = {
       ChatType: "group",
       SenderName: "Bob",
-      SenderId: "bob@s.whatsapp.net",
+      SenderId: "bob:123456",
       SenderE164: "+222",
     };
     expect(formatInboundBodyWithSenderMeta({ ctx, body: "[X] hi" })).toBe(
@@ -149,8 +149,8 @@ describe("formatInboundBodyWithSenderMeta", () => {
 
   it("does not append when the sender prefix follows an envelope header", () => {
     const ctx: MsgContext = { ChatType: "group", SenderName: "Alice", SenderId: "A1" };
-    expect(formatInboundBodyWithSenderMeta({ ctx, body: "[Signal Group] Alice (A1): hi" })).toBe(
-      "[Signal Group] Alice (A1): hi",
+    expect(formatInboundBodyWithSenderMeta({ ctx, body: "[Telegram Group] Alice (A1): hi" })).toBe(
+      "[Telegram Group] Alice (A1): hi",
     );
   });
 });
@@ -169,9 +169,9 @@ describe("inbound dedupe", () => {
   it("skips duplicates with the same key", () => {
     resetInboundDedupe();
     const ctx: MsgContext = {
-      Provider: "whatsapp",
-      OriginatingChannel: "whatsapp",
-      OriginatingTo: "whatsapp:+1555",
+      Provider: "telegram",
+      OriginatingChannel: "telegram",
+      OriginatingTo: "telegram:+1555",
       MessageSid: "msg-1",
     };
     expect(shouldSkipDuplicateInbound(ctx, { now: 100 })).toBe(false);
@@ -181,24 +181,24 @@ describe("inbound dedupe", () => {
   it("does not dedupe when the peer changes", () => {
     resetInboundDedupe();
     const base: MsgContext = {
-      Provider: "whatsapp",
-      OriginatingChannel: "whatsapp",
+      Provider: "telegram",
+      OriginatingChannel: "telegram",
       MessageSid: "msg-1",
     };
     expect(
-      shouldSkipDuplicateInbound({ ...base, OriginatingTo: "whatsapp:+1000" }, { now: 100 }),
+      shouldSkipDuplicateInbound({ ...base, OriginatingTo: "telegram:+1000" }, { now: 100 }),
     ).toBe(false);
     expect(
-      shouldSkipDuplicateInbound({ ...base, OriginatingTo: "whatsapp:+2000" }, { now: 200 }),
+      shouldSkipDuplicateInbound({ ...base, OriginatingTo: "telegram:+2000" }, { now: 200 }),
     ).toBe(false);
   });
 
   it("does not dedupe across session keys", () => {
     resetInboundDedupe();
     const base: MsgContext = {
-      Provider: "whatsapp",
-      OriginatingChannel: "whatsapp",
-      OriginatingTo: "whatsapp:+1555",
+      Provider: "telegram",
+      OriginatingChannel: "telegram",
+      OriginatingTo: "telegram:+1555",
       MessageSid: "msg-1",
     };
     expect(
@@ -266,18 +266,20 @@ describe("initSessionState sender meta", () => {
 
     const result = await initSessionState({
       ctx: {
-        Body: "[WhatsApp 123@g.us] ping",
+        Body: "[Telegram -1001234567890] ping",
         ChatType: "group",
         SenderName: "Bob",
         SenderE164: "+222",
-        SenderId: "222@s.whatsapp.net",
-        SessionKey: "agent:main:whatsapp:group:123@g.us",
+        SenderId: "222",
+        SessionKey: "agent:main:telegram:group:-1001234567890",
       },
       cfg,
       commandAuthorized: true,
     });
 
-    expect(result.sessionCtx.BodyStripped).toBe("[WhatsApp 123@g.us] ping\n[from: Bob (+222)]");
+    expect(result.sessionCtx.BodyStripped).toBe(
+      "[Telegram -1001234567890] ping\n[from: Bob (+222)]",
+    );
   });
 
   it("does not inject sender meta for direct chats", async () => {
@@ -287,17 +289,17 @@ describe("initSessionState sender meta", () => {
 
     const result = await initSessionState({
       ctx: {
-        Body: "[WhatsApp +1] ping",
+        Body: "[Telegram +1] ping",
         ChatType: "direct",
         SenderName: "Bob",
         SenderE164: "+222",
-        SessionKey: "agent:main:whatsapp:dm:+222",
+        SessionKey: "agent:main:telegram:dm:+222",
       },
       cfg,
       commandAuthorized: true,
     });
 
-    expect(result.sessionCtx.BodyStripped).toBe("[WhatsApp +1] ping");
+    expect(result.sessionCtx.BodyStripped).toBe("[Telegram +1] ping");
   });
 });
 
@@ -346,57 +348,25 @@ describe("mention helpers", () => {
 });
 
 describe("resolveGroupRequireMention", () => {
-  it("respects Discord guild/channel requireMention settings", () => {
+  it("respects Telegram group requireMention settings", () => {
     const cfg: crocbotConfig = {
       channels: {
-        discord: {
-          guilds: {
-            "145": {
-              requireMention: false,
-              channels: {
-                general: { allow: true },
-              },
-            },
-          },
+        telegram: {
+          groupPolicy: "open",
         },
       },
     };
     const ctx: TemplateContext = {
-      Provider: "discord",
-      From: "discord:group:123",
-      GroupChannel: "#general",
-      GroupSpace: "145",
+      Provider: "telegram",
+      From: "telegram:group:-1001234567890",
+      ChatType: "group",
     };
     const groupResolution: GroupKeyResolution = {
-      channel: "discord",
-      id: "123",
+      channel: "telegram",
+      id: "-1001234567890",
       chatType: "group",
     };
 
-    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(false);
-  });
-
-  it("respects Slack channel requireMention settings", () => {
-    const cfg: crocbotConfig = {
-      channels: {
-        slack: {
-          channels: {
-            C123: { requireMention: false },
-          },
-        },
-      },
-    };
-    const ctx: TemplateContext = {
-      Provider: "slack",
-      From: "slack:channel:C123",
-      GroupSubject: "#general",
-    };
-    const groupResolution: GroupKeyResolution = {
-      channel: "slack",
-      id: "C123",
-      chatType: "group",
-    };
-
-    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(false);
+    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(true);
   });
 });

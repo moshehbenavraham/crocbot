@@ -109,11 +109,11 @@ describe("getDmHistoryLimitFromSessionKey", () => {
     } as crocbotConfig;
     expect(getDmHistoryLimitFromSessionKey("telegram:dm:123", config)).toBe(15);
   });
-  it("returns dmHistoryLimit for whatsapp provider", () => {
+  it("returns dmHistoryLimit for msteams provider", () => {
     const config = {
-      channels: { whatsapp: { dmHistoryLimit: 20 } },
+      channels: { msteams: { dmHistoryLimit: 20 } },
     } as crocbotConfig;
-    expect(getDmHistoryLimitFromSessionKey("whatsapp:dm:123", config)).toBe(20);
+    expect(getDmHistoryLimitFromSessionKey("msteams:dm:123", config)).toBe(20);
   });
   it("returns dmHistoryLimit for agent-prefixed session keys", () => {
     const config = {
@@ -145,10 +145,12 @@ describe("getDmHistoryLimitFromSessionKey", () => {
     const config = {
       channels: {
         telegram: { dmHistoryLimit: 15 },
-        slack: { dmHistoryLimit: 10 },
+        msteams: { dmHistoryLimit: 10 },
       },
     } as crocbotConfig;
-    expect(getDmHistoryLimitFromSessionKey("agent:beta:slack:channel:c1", config)).toBeUndefined();
+    expect(
+      getDmHistoryLimitFromSessionKey("agent:beta:msteams:channel:c1", config),
+    ).toBeUndefined();
     expect(getDmHistoryLimitFromSessionKey("telegram:slash:123", config)).toBeUndefined();
   });
   it("returns undefined for unknown provider", () => {
@@ -164,13 +166,11 @@ describe("getDmHistoryLimitFromSessionKey", () => {
   it("handles all supported providers", () => {
     const providers = [
       "telegram",
-      "whatsapp",
-      "discord",
-      "slack",
-      "signal",
-      "imessage",
       "msteams",
       "nextcloud-talk",
+      "matrix",
+      "zalo",
+      "zalouser",
     ] as const;
 
     for (const provider of providers) {
@@ -183,13 +183,11 @@ describe("getDmHistoryLimitFromSessionKey", () => {
   it("handles per-DM overrides for all supported providers", () => {
     const providers = [
       "telegram",
-      "whatsapp",
-      "discord",
-      "slack",
-      "signal",
-      "imessage",
       "msteams",
       "nextcloud-talk",
+      "matrix",
+      "zalo",
+      "zalouser",
     ] as const;
 
     for (const provider of providers) {

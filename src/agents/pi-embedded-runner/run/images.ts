@@ -7,7 +7,7 @@ import type { ImageContent } from "@mariozechner/pi-ai";
 import { assertSandboxPath } from "../../sandbox-paths.js";
 import { sanitizeImageBlocks } from "../../tool-images.js";
 import { extractTextFromMessage } from "../../../tui/tui-formatters.js";
-import { loadWebMedia } from "../../../web/media.js";
+import { loadWebMedia } from "../../../media/load.js";
 import { resolveUserPath } from "../../../utils.js";
 import { log } from "../logger.js";
 

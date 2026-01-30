@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 
 import { getReplyFromConfig } from "./auto-reply/reply.js";
 import { applyTemplate } from "./auto-reply/templating.js";
-import { monitorWebChannel } from "./channel-web.js";
 import { createDefaultDeps } from "./cli/deps.js";
 import { promptYesNo } from "./cli/prompt.js";
 import { waitForever } from "./cli/wait.js";
@@ -32,7 +31,7 @@ import { formatUncaughtError } from "./infra/errors.js";
 import { installUnhandledRejectionHandler } from "./infra/unhandled-rejections.js";
 import { enableConsoleCapture } from "./logging.js";
 import { runCommandWithTimeout, runExec } from "./process/exec.js";
-import { assertWebChannel, normalizeE164, toWhatsappJid } from "./utils.js";
+import { normalizeE164 } from "./utils.js";
 
 loadDotEnv({ quiet: true });
 normalizeEnv();
@@ -49,7 +48,6 @@ import { buildProgram } from "./cli/program.js";
 const program = buildProgram();
 
 export {
-  assertWebChannel,
   applyTemplate,
   createDefaultDeps,
   deriveSessionKey,
@@ -60,7 +58,6 @@ export {
   handlePortError,
   loadConfig,
   loadSessionStore,
-  monitorWebChannel,
   normalizeE164,
   PortInUseError,
   promptYesNo,
@@ -69,7 +66,6 @@ export {
   runCommandWithTimeout,
   runExec,
   saveSessionStore,
-  toWhatsappJid,
   waitForever,
 };
 

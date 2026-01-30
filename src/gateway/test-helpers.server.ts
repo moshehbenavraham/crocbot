@@ -127,7 +127,6 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
   testState.agentsConfig = undefined;
   testState.bindingsConfig = undefined;
   testState.channelsConfig = undefined;
-  testState.allowFrom = undefined;
   testIsNixMode.value = false;
   cronIsolatedRun.mockClear();
   agentCommand.mockClear();

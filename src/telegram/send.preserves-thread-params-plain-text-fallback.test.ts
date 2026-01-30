@@ -12,7 +12,7 @@ const { loadWebMedia } = vi.hoisted(() => ({
   loadWebMedia: vi.fn(),
 }));
 
-vi.mock("../web/media.js", () => ({
+vi.mock("../media/load.js", () => ({
   loadWebMedia,
 }));
 

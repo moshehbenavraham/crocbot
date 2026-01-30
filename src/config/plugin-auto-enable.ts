@@ -9,7 +9,6 @@ import {
   listChannelPluginCatalogEntries,
 } from "../channels/plugins/catalog.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
-import { hasAnyWhatsAppAuth } from "../web/accounts.js";
 
 type PluginEnableChange = {
   pluginId: string;
@@ -76,66 +75,6 @@ function isTelegramConfigured(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boole
   return recordHasKeys(entry);
 }
 
-function isDiscordConfigured(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean {
-  if (hasNonEmptyString(env.DISCORD_BOT_TOKEN)) return true;
-  const entry = resolveChannelConfig(cfg, "discord");
-  if (!entry) return false;
-  if (hasNonEmptyString(entry.token)) return true;
-  if (accountsHaveKeys(entry.accounts, ["token"])) return true;
-  return recordHasKeys(entry);
-}
-
-function isSlackConfigured(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean {
-  if (
-    hasNonEmptyString(env.SLACK_BOT_TOKEN) ||
-    hasNonEmptyString(env.SLACK_APP_TOKEN) ||
-    hasNonEmptyString(env.SLACK_USER_TOKEN)
-  ) {
-    return true;
-  }
-  const entry = resolveChannelConfig(cfg, "slack");
-  if (!entry) return false;
-  if (
-    hasNonEmptyString(entry.botToken) ||
-    hasNonEmptyString(entry.appToken) ||
-    hasNonEmptyString(entry.userToken)
-  ) {
-    return true;
-  }
-  if (accountsHaveKeys(entry.accounts, ["botToken", "appToken", "userToken"])) return true;
-  return recordHasKeys(entry);
-}
-
-function isSignalConfigured(cfg: crocbotConfig): boolean {
-  const entry = resolveChannelConfig(cfg, "signal");
-  if (!entry) return false;
-  if (
-    hasNonEmptyString(entry.account) ||
-    hasNonEmptyString(entry.httpUrl) ||
-    hasNonEmptyString(entry.httpHost) ||
-    typeof entry.httpPort === "number" ||
-    hasNonEmptyString(entry.cliPath)
-  ) {
-    return true;
-  }
-  if (accountsHaveKeys(entry.accounts, ["account", "httpUrl", "httpHost", "cliPath"])) return true;
-  return recordHasKeys(entry);
-}
-
-function isIMessageConfigured(cfg: crocbotConfig): boolean {
-  const entry = resolveChannelConfig(cfg, "imessage");
-  if (!entry) return false;
-  if (hasNonEmptyString(entry.cliPath)) return true;
-  return recordHasKeys(entry);
-}
-
-function isWhatsAppConfigured(cfg: crocbotConfig): boolean {
-  if (hasAnyWhatsAppAuth(cfg)) return true;
-  const entry = resolveChannelConfig(cfg, "whatsapp");
-  if (!entry) return false;
-  return recordHasKeys(entry);
-}
-
 function isGenericChannelConfigured(cfg: crocbotConfig, channelId: string): boolean {
   const entry = resolveChannelConfig(cfg, channelId);
   return recordHasKeys(entry);
@@ -147,18 +86,8 @@ export function isChannelConfigured(
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
   switch (channelId) {
-    case "whatsapp":
-      return isWhatsAppConfigured(cfg);
     case "telegram":
       return isTelegramConfigured(cfg, env);
-    case "discord":
-      return isDiscordConfigured(cfg, env);
-    case "slack":
-      return isSlackConfigured(cfg, env);
-    case "signal":
-      return isSignalConfigured(cfg);
-    case "imessage":
-      return isIMessageConfigured(cfg);
     default:
       return isGenericChannelConfigured(cfg, channelId);
   }

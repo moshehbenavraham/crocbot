@@ -1,4 +1,3 @@
-import { imessageOutbound } from "../channels/plugins/outbound/imessage.js";
 import type {
   ChannelCapabilities,
   ChannelId,
@@ -6,7 +5,6 @@ import type {
   ChannelPlugin,
 } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";
-import { normalizeIMessageHandle } from "../imessage/targets.js";
 
 export const createTestRegistry = (channels: PluginRegistry["channels"] = []): PluginRegistry => ({
   plugins: [],
@@ -22,56 +20,6 @@ export const createTestRegistry = (channels: PluginRegistry["channels"] = []): P
   services: [],
   commands: [],
   diagnostics: [],
-});
-
-export const createIMessageTestPlugin = (params?: {
-  outbound?: ChannelOutboundAdapter;
-}): ChannelPlugin => ({
-  id: "imessage",
-  meta: {
-    id: "imessage",
-    label: "iMessage",
-    selectionLabel: "iMessage (imsg)",
-    docsPath: "/channels/imessage",
-    blurb: "iMessage test stub.",
-    aliases: ["imsg"],
-  },
-  capabilities: { chatTypes: ["direct", "group"], media: true },
-  config: {
-    listAccountIds: () => [],
-    resolveAccount: () => ({}),
-  },
-  status: {
-    collectStatusIssues: (accounts) =>
-      accounts.flatMap((account) => {
-        const lastError = typeof account.lastError === "string" ? account.lastError.trim() : "";
-        if (!lastError) return [];
-        return [
-          {
-            channel: "imessage",
-            accountId: account.accountId,
-            kind: "runtime",
-            message: `Channel error: ${lastError}`,
-          },
-        ];
-      }),
-  },
-  outbound: params?.outbound ?? imessageOutbound,
-  messaging: {
-    targetResolver: {
-      looksLikeId: (raw) => {
-        const trimmed = raw.trim();
-        if (!trimmed) return false;
-        if (/^(imessage:|sms:|auto:|chat_id:|chat_guid:|chat_identifier:)/i.test(trimmed)) {
-          return true;
-        }
-        if (trimmed.includes("@")) return true;
-        return /^\+?\d{3,}$/.test(trimmed);
-      },
-      hint: "<handle|chat_id:ID>",
-    },
-    normalizeTarget: (raw) => normalizeIMessageHandle(raw),
-  },
 });
 
 export const createOutboundTestPlugin = (params: {
@@ -96,3 +44,69 @@ export const createOutboundTestPlugin = (params: {
   },
   outbound: params.outbound,
 });
+
+/**
+ * Creates a generic test channel plugin for use in tests.
+ * This replaces the removed createIMessageTestPlugin.
+ */
+export const createGenericTestPlugin = (params?: {
+  id?: ChannelId;
+  outbound?: ChannelOutboundAdapter;
+  label?: string;
+  capabilities?: ChannelCapabilities;
+}): ChannelPlugin => {
+  const id = params?.id ?? "telegram";
+  const defaultOutbound: ChannelOutboundAdapter = {
+    deliveryMode: "direct",
+    sendText: async (ctx) => ({
+      channel: id,
+      messageId: `msg-${Date.now()}`,
+      to: ctx.to,
+    }),
+    sendMedia: async (ctx) => ({
+      channel: id,
+      messageId: `media-msg-${Date.now()}`,
+      to: ctx.to,
+    }),
+  };
+  return {
+    id,
+    meta: {
+      id,
+      label: params?.label ?? "Test Channel",
+      selectionLabel: params?.label ?? "Test Channel",
+      docsPath: `/channels/${id}`,
+      blurb: "Test channel stub.",
+    },
+    capabilities: params?.capabilities ?? { chatTypes: ["direct", "group"], media: true },
+    config: {
+      listAccountIds: () => [],
+      resolveAccount: () => ({}),
+    },
+    status: {
+      collectStatusIssues: (accounts) =>
+        accounts.flatMap((account) => {
+          const lastError = typeof account.lastError === "string" ? account.lastError.trim() : "";
+          if (!lastError) return [];
+          return [
+            {
+              channel: id,
+              accountId: account.accountId,
+              kind: "runtime",
+              message: `Channel error: ${lastError}`,
+            },
+          ];
+        }),
+    },
+    outbound: params?.outbound ?? defaultOutbound,
+    messaging: {
+      normalizeTarget: (raw) => raw.trim(),
+    },
+  };
+};
+
+/**
+ * Alias for backward compatibility - use createGenericTestPlugin instead
+ * @deprecated Use createGenericTestPlugin
+ */
+export const createIMessageTestPlugin = createGenericTestPlugin;

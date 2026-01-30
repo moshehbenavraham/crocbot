@@ -7,11 +7,11 @@ import {
 } from "./registry.js";
 
 describe("channel registry", () => {
-  it("normalizes aliases", () => {
-    expect(normalizeChatChannelId("imsg")).toBe("imessage");
-    expect(normalizeChatChannelId("gchat")).toBe("googlechat");
-    expect(normalizeChatChannelId("google-chat")).toBe("googlechat");
+  it("normalizes telegram and rejects unknown values", () => {
+    expect(normalizeChatChannelId("telegram")).toBe("telegram");
+    expect(normalizeChatChannelId("TELEGRAM")).toBe("telegram");
     expect(normalizeChatChannelId("web")).toBeNull();
+    expect(normalizeChatChannelId("nope")).toBeNull();
   });
 
   it("keeps Telegram first in the default order", () => {

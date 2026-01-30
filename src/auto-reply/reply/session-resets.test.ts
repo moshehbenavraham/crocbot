@@ -18,7 +18,7 @@ vi.mock("../../agents/model-catalog.js", () => ({
   ]),
 }));
 
-describe("initSessionState reset triggers in WhatsApp groups", () => {
+describe("initSessionState reset triggers in Telegram groups", () => {
   async function createStorePath(prefix: string): Promise<string> {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
     return path.join(root, "sessions.json");
@@ -38,21 +38,20 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
     });
   }
 
-  function makeCfg(params: { storePath: string; allowFrom: string[] }): crocbotConfig {
+  function makeCfg(params: { storePath: string }): crocbotConfig {
     return {
       session: { store: params.storePath, idleMinutes: 999 },
       channels: {
-        whatsapp: {
-          allowFrom: params.allowFrom,
+        telegram: {
           groupPolicy: "open",
         },
       },
     } as crocbotConfig;
   }
 
-  it("Reset trigger /new works for authorized sender in WhatsApp group", async () => {
+  it("Reset trigger /new works for authorized sender in Telegram group", async () => {
     const storePath = await createStorePath("crocbot-group-reset-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
+    const sessionKey = "agent:main:telegram:group:-1001234567890";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -60,24 +59,20 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
       sessionId: existingSessionId,
     });
 
-    const cfg = makeCfg({
-      storePath,
-      allowFrom: ["+41796666864"],
-    });
+    const cfg = makeCfg({ storePath });
 
     const groupMessageCtx = {
-      Body: `[Chat messages since your last reply - for context]\\n[WhatsApp 120363406150318674@g.us 2026-01-13T07:45Z] Someone: hello\\n\\n[Current message - respond to this]\\n[WhatsApp 120363406150318674@g.us 2026-01-13T07:45Z] Peschiño: /new\\n[from: Peschiño (+41796666864)]`,
+      Body: "/new",
       RawBody: "/new",
       CommandBody: "/new",
-      From: "120363406150318674@g.us",
-      To: "+41779241027",
+      From: "-1001234567890",
+      To: "bot:123456789",
       ChatType: "group",
       SessionKey: sessionKey,
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      SenderName: "Peschiño",
-      SenderE164: "+41796666864",
-      SenderId: "41796666864:0@s.whatsapp.net",
+      Provider: "telegram",
+      Surface: "telegram",
+      SenderName: "TestUser",
+      SenderId: "12345678",
     };
 
     const result = await initSessionState({
@@ -90,170 +85,6 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
     expect(result.isNewSession).toBe(true);
     expect(result.sessionId).not.toBe(existingSessionId);
     expect(result.bodyStripped).toBe("");
-  });
-
-  it("Reset trigger /new blocked for unauthorized sender in existing session", async () => {
-    const storePath = await createStorePath("crocbot-group-reset-unauth-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
-    const existingSessionId = "existing-session-123";
-
-    await seedSessionStore({
-      storePath,
-      sessionKey,
-      sessionId: existingSessionId,
-    });
-
-    const cfg = makeCfg({
-      storePath,
-      allowFrom: ["+41796666864"],
-    });
-
-    const groupMessageCtx = {
-      Body: `[Context]\\n[WhatsApp ...] OtherPerson: /new\\n[from: OtherPerson (+1555123456)]`,
-      RawBody: "/new",
-      CommandBody: "/new",
-      From: "120363406150318674@g.us",
-      To: "+41779241027",
-      ChatType: "group",
-      SessionKey: sessionKey,
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      SenderName: "OtherPerson",
-      SenderE164: "+1555123456",
-      SenderId: "1555123456:0@s.whatsapp.net",
-    };
-
-    const result = await initSessionState({
-      ctx: groupMessageCtx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(result.triggerBodyNormalized).toBe("/new");
-    expect(result.sessionId).toBe(existingSessionId);
-    expect(result.isNewSession).toBe(false);
-  });
-
-  it("Reset trigger works when RawBody is clean but Body has wrapped context", async () => {
-    const storePath = await createStorePath("crocbot-group-rawbody-");
-    const sessionKey = "agent:main:whatsapp:group:g1";
-    const existingSessionId = "existing-session-123";
-    await seedSessionStore({
-      storePath,
-      sessionKey,
-      sessionId: existingSessionId,
-    });
-
-    const cfg = makeCfg({
-      storePath,
-      allowFrom: ["*"],
-    });
-
-    const groupMessageCtx = {
-      Body: `[WhatsApp 120363406150318674@g.us 2026-01-13T07:45Z] Jake: /new\n[from: Jake (+1222)]`,
-      RawBody: "/new",
-      CommandBody: "/new",
-      From: "120363406150318674@g.us",
-      To: "+1111",
-      ChatType: "group",
-      SessionKey: sessionKey,
-      Provider: "whatsapp",
-      SenderE164: "+1222",
-    };
-
-    const result = await initSessionState({
-      ctx: groupMessageCtx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(result.triggerBodyNormalized).toBe("/new");
-    expect(result.isNewSession).toBe(true);
-    expect(result.sessionId).not.toBe(existingSessionId);
-    expect(result.bodyStripped).toBe("");
-  });
-
-  it("Reset trigger /new works when SenderId is LID but SenderE164 is authorized", async () => {
-    const storePath = await createStorePath("crocbot-group-reset-lid-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
-    const existingSessionId = "existing-session-123";
-    await seedSessionStore({
-      storePath,
-      sessionKey,
-      sessionId: existingSessionId,
-    });
-
-    const cfg = makeCfg({
-      storePath,
-      allowFrom: ["+41796666864"],
-    });
-
-    const groupMessageCtx = {
-      Body: `[WhatsApp 120363406150318674@g.us 2026-01-13T07:45Z] Owner: /new\n[from: Owner (+41796666864)]`,
-      RawBody: "/new",
-      CommandBody: "/new",
-      From: "120363406150318674@g.us",
-      To: "+41779241027",
-      ChatType: "group",
-      SessionKey: sessionKey,
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      SenderName: "Owner",
-      SenderE164: "+41796666864",
-      SenderId: "123@lid",
-    };
-
-    const result = await initSessionState({
-      ctx: groupMessageCtx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(result.triggerBodyNormalized).toBe("/new");
-    expect(result.isNewSession).toBe(true);
-    expect(result.sessionId).not.toBe(existingSessionId);
-    expect(result.bodyStripped).toBe("");
-  });
-
-  it("Reset trigger /new blocked when SenderId is LID but SenderE164 is unauthorized", async () => {
-    const storePath = await createStorePath("crocbot-group-reset-lid-unauth-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
-    const existingSessionId = "existing-session-123";
-    await seedSessionStore({
-      storePath,
-      sessionKey,
-      sessionId: existingSessionId,
-    });
-
-    const cfg = makeCfg({
-      storePath,
-      allowFrom: ["+41796666864"],
-    });
-
-    const groupMessageCtx = {
-      Body: `[WhatsApp 120363406150318674@g.us 2026-01-13T07:45Z] Other: /new\n[from: Other (+1555123456)]`,
-      RawBody: "/new",
-      CommandBody: "/new",
-      From: "120363406150318674@g.us",
-      To: "+41779241027",
-      ChatType: "group",
-      SessionKey: sessionKey,
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      SenderName: "Other",
-      SenderE164: "+1555123456",
-      SenderId: "123@lid",
-    };
-
-    const result = await initSessionState({
-      ctx: groupMessageCtx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(result.triggerBodyNormalized).toBe("/new");
-    expect(result.sessionId).toBe(existingSessionId);
-    expect(result.isNewSession).toBe(false);
   });
 });
 

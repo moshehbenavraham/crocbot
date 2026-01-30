@@ -6,7 +6,7 @@ import { deliverReplies } from "./delivery.js";
 
 const loadWebMedia = vi.fn();
 
-vi.mock("../../web/media.js", () => ({
+vi.mock("../../media/load.js", () => ({
   loadWebMedia: (...args: unknown[]) => loadWebMedia(...args),
 }));
 

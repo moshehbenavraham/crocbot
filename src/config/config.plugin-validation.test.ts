@@ -141,11 +141,22 @@ describe("config plugin validation", () => {
   it("accepts known plugin ids", async () => {
     await withTempHome(async (home) => {
       process.env.CLAWDBOT_STATE_DIR = path.join(home, ".clawdbot");
+      const pluginDir = path.join(home, "custom-plugin");
+      await writePluginFixture({
+        dir: pluginDir,
+        id: "custom-plugin",
+        schema: { type: "object" },
+      });
+
       vi.resetModules();
       const { validateConfigObjectWithPlugins } = await import("./config.js");
       const res = validateConfigObjectWithPlugins({
         agents: { list: [{ id: "pi" }] },
-        plugins: { enabled: false, entries: { discord: { enabled: true } } },
+        plugins: {
+          enabled: false,
+          load: { paths: [pluginDir] },
+          entries: { "custom-plugin": { enabled: true } },
+        },
       });
       expect(res.ok).toBe(true);
     });

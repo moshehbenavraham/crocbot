@@ -19,17 +19,38 @@ afterEach(() => {
 });
 
 describe("resolveCommandAuthorization", () => {
-  it("falls back from empty SenderId to SenderE164", () => {
+  it("uses SenderId when present", () => {
     const cfg = {
-      channels: { whatsapp: { allowFrom: ["+123"] } },
+      channels: { telegram: { allowFrom: ["user123"] } },
     } as crocbotConfig;
 
     const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:+999",
+      Provider: "telegram",
+      Surface: "telegram",
+      From: "telegram:chat456",
+      SenderId: "user123",
+    } as MsgContext;
+
+    const auth = resolveCommandAuthorization({
+      ctx,
+      cfg,
+      commandAuthorized: true,
+    });
+
+    expect(auth.senderId).toBe("user123");
+    expect(auth.isAuthorizedSender).toBe(true);
+  });
+
+  it("falls back to From when SenderId is empty", () => {
+    const cfg = {
+      channels: { telegram: { allowFrom: ["chat456"] } },
+    } as crocbotConfig;
+
+    const ctx = {
+      Provider: "telegram",
+      Surface: "telegram",
+      From: "telegram:chat456",
       SenderId: "",
-      SenderE164: "+123",
     } as MsgContext;
 
     const auth = resolveCommandAuthorization({
@@ -38,21 +59,21 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+123");
+    // From is normalized by stripping "telegram:" prefix
+    expect(auth.senderId).toBe("chat456");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 
-  it("falls back from whitespace SenderId to SenderE164", () => {
+  it("falls back to From when SenderId is whitespace", () => {
     const cfg = {
-      channels: { whatsapp: { allowFrom: ["+123"] } },
+      channels: { telegram: { allowFrom: ["chat456"] } },
     } as crocbotConfig;
 
     const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:+999",
+      Provider: "telegram",
+      Surface: "telegram",
+      From: "telegram:chat456",
       SenderId: "   ",
-      SenderE164: "+123",
     } as MsgContext;
 
     const auth = resolveCommandAuthorization({
@@ -61,76 +82,8 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+123");
-    expect(auth.isAuthorizedSender).toBe(true);
-  });
-
-  it("falls back to From when SenderId and SenderE164 are whitespace", () => {
-    const cfg = {
-      channels: { whatsapp: { allowFrom: ["+999"] } },
-    } as crocbotConfig;
-
-    const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:+999",
-      SenderId: "   ",
-      SenderE164: "   ",
-    } as MsgContext;
-
-    const auth = resolveCommandAuthorization({
-      ctx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(auth.senderId).toBe("+999");
-    expect(auth.isAuthorizedSender).toBe(true);
-  });
-
-  it("falls back from un-normalizable SenderId to SenderE164", () => {
-    const cfg = {
-      channels: { whatsapp: { allowFrom: ["+123"] } },
-    } as crocbotConfig;
-
-    const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:+999",
-      SenderId: "wat",
-      SenderE164: "+123",
-    } as MsgContext;
-
-    const auth = resolveCommandAuthorization({
-      ctx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(auth.senderId).toBe("+123");
-    expect(auth.isAuthorizedSender).toBe(true);
-  });
-
-  it("prefers SenderE164 when SenderId does not match allowFrom", () => {
-    const cfg = {
-      channels: { whatsapp: { allowFrom: ["+41796666864"] } },
-    } as crocbotConfig;
-
-    const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:120363401234567890@g.us",
-      SenderId: "123@lid",
-      SenderE164: "+41796666864",
-    } as MsgContext;
-
-    const auth = resolveCommandAuthorization({
-      ctx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    expect(auth.senderId).toBe("+41796666864");
+    // From is normalized by stripping "telegram:" prefix
+    expect(auth.senderId).toBe("chat456");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 });
