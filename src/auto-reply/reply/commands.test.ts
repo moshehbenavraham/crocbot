@@ -420,4 +420,3 @@ describe("handleCommands subagents", () => {
     expect(result.reply?.text).toContain("Status: done");
   });
 });
-

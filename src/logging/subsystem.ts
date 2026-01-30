@@ -4,6 +4,7 @@ import type { Logger as TsLogger } from "tslog";
 import { CHAT_CHANNEL_ORDER } from "../channels/registry.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
 import { getConsoleSettings, shouldLogSubsystemToConsole } from "./console.js";
+import { getCorrelationContext } from "./correlation.js";
 import { isVerbose } from "../globals.js";
 import { type LogLevel, levelToMinLevel } from "./levels.js";
 import { getChildLogger } from "./logger.js";
@@ -130,13 +131,24 @@ function formatConsoleLine(opts: {
   const displaySubsystem =
     opts.style === "json" ? opts.subsystem : formatSubsystemForConsole(opts.subsystem);
   if (opts.style === "json") {
-    return JSON.stringify({
+    const correlationCtx = getCorrelationContext();
+    const entry: Record<string, unknown> = {
       time: new Date().toISOString(),
       level: opts.level,
       subsystem: displaySubsystem,
-      message: opts.message,
-      ...opts.meta,
-    });
+    };
+    // Inject correlation context for JSON console output.
+    if (correlationCtx) {
+      entry.correlation_id = correlationCtx.correlationId;
+      if (correlationCtx.chatId !== undefined) entry.chat_id = correlationCtx.chatId;
+      if (correlationCtx.userId !== undefined) entry.user_id = correlationCtx.userId;
+      if (correlationCtx.messageId !== undefined) entry.message_id = correlationCtx.messageId;
+    }
+    entry.message = opts.message;
+    if (opts.meta) {
+      Object.assign(entry, opts.meta);
+    }
+    return JSON.stringify(entry);
   }
   const color = getColorForConsole();
   const prefix = `[${displaySubsystem}]`;

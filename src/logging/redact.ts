@@ -7,7 +7,7 @@ const requireConfig = createRequire(import.meta.url);
 export type RedactSensitiveMode = "off" | "tools";
 
 const DEFAULT_REDACT_MODE: RedactSensitiveMode = "tools";
-const DEFAULT_REDACT_MIN_LENGTH = 18;
+const DEFAULT_REDACT_MIN_LENGTH = 12;
 const DEFAULT_REDACT_KEEP_START = 6;
 const DEFAULT_REDACT_KEEP_END = 4;
 
@@ -33,7 +33,14 @@ const DEFAULT_REDACT_PATTERNS: string[] = [
   String.raw`\b(AIza[0-9A-Za-z\-_]{20,})\b`,
   String.raw`\b(pplx-[A-Za-z0-9_-]{10,})\b`,
   String.raw`\b(npm_[A-Za-z0-9]{10,})\b`,
+  // Telegram bot token (digits:alphanumeric).
   String.raw`\b(\d{6,}:[A-Za-z0-9_-]{20,})\b`,
+  // Phone numbers - international format with country code (+1234567890, +1 234-567-8901).
+  String.raw`(\+\d{1,4}[\s.\-]?\(?\d{1,4}\)?[\s.\-]?\d{1,4}[\s.\-]?\d{1,4}[\s.\-]?\d{0,9})`,
+  // Phone numbers - North American format without plus (10 digits with optional separators).
+  String.raw`\b(\(?[2-9]\d{2}\)?[\s.\-]?[2-9]\d{2}[\s.\-]?\d{4})\b`,
+  // Session file paths (sensitive user-specific paths).
+  String.raw`(/(?:Users|home)/[^/\s]+/\.crocbot/(?:sessions|agents)/[^\s"']+)`,
 ];
 
 type RedactOptions = {

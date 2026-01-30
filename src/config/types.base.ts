@@ -102,6 +102,8 @@ export type SessionConfig = {
 export type LoggingConfig = {
   level?: "silent" | "fatal" | "error" | "warn" | "info" | "debug" | "trace";
   file?: string;
+  /** File log format. "json" for structured output, "pretty" for human-readable. Default: "pretty". */
+  format?: "json" | "pretty";
   consoleLevel?: "silent" | "fatal" | "error" | "warn" | "info" | "debug" | "trace";
   consoleStyle?: "pretty" | "compact" | "json";
   /** Redact sensitive tokens in tool summaries. Default: "tools". */

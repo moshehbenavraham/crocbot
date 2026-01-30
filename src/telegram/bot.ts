@@ -20,6 +20,7 @@ import {
 } from "../config/group-policy.js";
 import { loadSessionStore, resolveStorePath } from "../config/sessions.js";
 import { danger, logVerbose, shouldLogVerbose } from "../globals.js";
+import { runWithCorrelationAsync } from "../logging/correlation.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { formatUncaughtError } from "../infra/errors.js";
 import { enqueueSystemEvent } from "../infra/system-events.js";
@@ -141,6 +142,20 @@ export function createTelegramBot(opts: TelegramBotOptions) {
   const bot = new Bot(opts.token, client ? { client } : undefined);
   bot.api.config.use(apiThrottler());
   bot.use(sequentialize(getTelegramSequentialKey));
+
+  // Correlation ID middleware: wraps each update in a correlation context for tracing.
+  bot.use(async (ctx, next) => {
+    const msg = ctx.message ?? ctx.update?.message ?? ctx.update?.edited_message;
+    const chatId = msg?.chat?.id ?? ctx.chat?.id;
+    const userId = msg?.from?.id ?? ctx.from?.id;
+    const messageId = msg?.message_id;
+    await runWithCorrelationAsync(() => next(), {
+      chatId: chatId !== undefined ? chatId : undefined,
+      userId: userId !== undefined ? userId : undefined,
+      messageId: messageId !== undefined ? messageId : undefined,
+    });
+  });
+
   bot.catch((err) => {
     runtime.error?.(danger(`telegram bot error: ${formatUncaughtError(err)}`));
   });

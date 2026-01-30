@@ -1,0 +1,82 @@
+# CODEOWNERS for crocbot
+#
+# This file defines code ownership for automated review requests.
+# Currently maintained as a solo project by @moshehbenavraham.
+#
+# NOTE TO FUTURE MAINTAINERS:
+# If the team expands, please review and update this file to assign
+# appropriate ownership to different areas of the codebase. Consider:
+# - Splitting ownership by feature area (e.g., CLI, agents, Telegram)
+# - Adding domain experts for specific integrations
+# - Designating infrastructure/DevOps owners for CI/CD and deployment files
+#
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @moshehbenavraham
+
+# Core source code
+/src/ @moshehbenavraham
+
+# CLI and commands
+/src/cli/ @moshehbenavraham
+/src/commands/ @moshehbenavraham
+
+# Agent system (Pi embedded runtime, auth, models)
+/src/agents/ @moshehbenavraham
+
+# Telegram integration (primary channel)
+/src/telegram/ @moshehbenavraham
+/src/channels/ @moshehbenavraham
+/src/routing/ @moshehbenavraham
+
+# Gateway and infrastructure
+/src/gateway/ @moshehbenavraham
+/src/infra/ @moshehbenavraham
+
+# Media pipeline
+/src/media/ @moshehbenavraham
+
+# Documentation
+/docs/ @moshehbenavraham
+
+# Build and CI/CD configuration
+/.github/ @moshehbenavraham
+/Dockerfile* @moshehbenavraham
+/docker-compose.yml @moshehbenavraham
+/fly.toml @moshehbenavraham
+/fly.private.toml @moshehbenavraham
+
+# Package configuration
+/package.json @moshehbenavraham
+/pnpm-lock.yaml @moshehbenavraham
+/tsconfig*.json @moshehbenavraham
+
+# Scripts and tooling
+/scripts/ @moshehbenavraham
+/git-hooks/ @moshehbenavraham
+
+# Test infrastructure
+/test/ @moshehbenavraham
+/vitest.config.ts @moshehbenavraham
+
+# UI components
+/ui/ @moshehbenavraham
+
+# Packages (workspace packages)
+/packages/ @moshehbenavraham
+
+# Skills
+/skills/ @moshehbenavraham
+
+# Spec system (development planning)
+/.spec_system/ @moshehbenavraham
+
+# Vendor dependencies
+/vendor/ @moshehbenavraham
+
+# Project configuration files
+/AGENTS.md @moshehbenavraham
+/CLAUDE.md @moshehbenavraham
+/README.md @moshehbenavraham
+/LICENSE @moshehbenavraham

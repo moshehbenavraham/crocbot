@@ -861,6 +861,7 @@
           "platforms/windows",
           "platforms/linux",
           "platforms/fly",
+          "platforms/fly-backups",
           "platforms/hetzner",
           "platforms/gcp",
           "platforms/exe-dev"
@@ -869,6 +870,9 @@
       {
         "group": "Reference & Templates",
         "pages": [
+          "ARCHITECTURE",
+          "development",
+          "deployment",
           "testing",
           "scripts",
           "reference/session-management-compaction",
@@ -884,7 +888,20 @@
           "reference/templates/IDENTITY",
           "reference/templates/SOUL",
           "reference/templates/TOOLS",
-          "reference/templates/USER"
+          "reference/templates/USER",
+          {
+            "group": "ADRs",
+            "pages": [
+              "adr/0001-telegram-only-architecture",
+              "adr/0002-multi-stage-docker-build"
+            ]
+          },
+          {
+            "group": "Runbooks",
+            "pages": [
+              "runbooks/incident-response"
+            ]
+          }
         ]
       }
     ]

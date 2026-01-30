@@ -85,6 +85,41 @@ crocbot channels logs --channel telegram
 Each line in the log file is a JSON object. The CLI and Control UI parse these
 entries to render structured output (time, level, subsystem, message).
 
+Log entries include:
+
+- `time`: ISO 8601 timestamp
+- `level`: log level (trace, debug, info, warn, error, fatal)
+- `subsystem`: component name (e.g. `gateway/channels/telegram`)
+- `message`: log message
+- `correlation_id`: request trace ID (when processing Telegram messages)
+- `chat_id`: Telegram chat ID (when available)
+- `user_id`: Telegram user ID (when available)
+- `message_id`: Telegram message ID (when available)
+
+### Correlation IDs
+
+Each Telegram message is assigned a unique 8-character correlation ID that
+propagates through the entire processing pipeline. This enables:
+
+- Tracing a single message through all related log entries
+- Filtering logs by correlation ID in log aggregation tools
+- Debugging message processing flows
+
+Example log entry with correlation context:
+
+```json
+{
+  "time": "2026-01-30T10:15:30.123Z",
+  "level": "info",
+  "subsystem": "gateway/channels/telegram",
+  "correlation_id": "a1b2c3d4",
+  "chat_id": 123456789,
+  "user_id": 987654321,
+  "message_id": 42,
+  "message": "Processing incoming message"
+}
+```
+
 ### Console output
 
 Console logs are **TTY-aware** and formatted for readability:
@@ -104,6 +139,7 @@ All logging configuration lives under `logging` in `~/.clawdbot/crocbot.json`.
   "logging": {
     "level": "info",
     "file": "/tmp/crocbot/crocbot-YYYY-MM-DD.log",
+    "format": "pretty",
     "consoleLevel": "info",
     "consoleStyle": "pretty",
     "redactSensitive": "tools",
@@ -113,6 +149,21 @@ All logging configuration lives under `logging` in `~/.clawdbot/crocbot.json`.
   }
 }
 ```
+
+### File log format
+
+`logging.format`:
+
+- `pretty`: human-readable output (default for local development)
+- `json`: structured JSON output (recommended for production)
+
+You can also set the format via environment variable:
+
+```bash
+CROCBOT_LOG_FORMAT=json crocbot gateway run
+```
+
+The environment variable takes precedence over the config file setting.
 
 ### Log levels
 
@@ -137,6 +188,15 @@ Tool summaries can redact sensitive tokens before they hit the console:
 - `logging.redactPatterns`: list of regex strings to override the default set
 
 Redaction affects **console output only** and does not alter file logs.
+
+Default redaction patterns include:
+
+- API keys and tokens (OpenAI, GitHub, Slack, Google, npm, etc.)
+- Telegram bot tokens
+- Phone numbers (international and North American formats)
+- Session file paths
+- Bearer tokens and authorization headers
+- Private keys (PEM format)
 
 ## Diagnostics + OpenTelemetry
 

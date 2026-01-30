@@ -2,163 +2,139 @@
 
 **Date**: 2026-01-30
 **Project**: crocbot
-**Audit Mode**: Phase-Focused (Phase 00 just completed)
+**Audit Mode**: Phase-Focused (Phase 01 just completed)
 
 ## Summary
 
 | Category | Required | Found | Status |
 |----------|----------|-------|--------|
 | Root files | 3 | 3 | PASS |
-| /docs/ files | 8 | 5 | PARTIAL |
-| ADRs | N/A | 0 | INFO |
-| Package READMEs | N/A | N/A | N/A |
+| /docs/ standard files | 6 | 6 | PASS |
+| ADRs | N/A | 2 | PASS |
+| Runbooks | N/A | 1 | PASS |
+| Package READMEs | N/A | 2 | INFO |
 
 ## Phase Focus
 
-**Completed Phase**: Phase 00 - Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment
-**Sessions Analyzed**: 8 sessions (remove-native-apps, remove-extensions, remove-channels, simplify-build, remove-dependencies, refactor-dead-code, remove-mobile-code, update-documentation)
+**Completed Phase**: Phase 01 - Production Hardening and Deployment
+**Sessions Analyzed**: 5 sessions
 
 ### Change Manifest (from implementation-notes.md)
 
-| Session | Summary |
-|---------|---------|
-| session01-remove-native-apps | Removed apps/android/, apps/ios/, apps/macos/, apps/shared/ |
-| session02-remove-extensions | Removed extensions/ directory |
-| session03-remove-channels | Removed Discord, Slack, Signal, iMessage, WhatsApp, Line channels |
-| session04-simplify-build | Simplified build and CI pipelines |
-| session05-remove-dependencies | Removed unused dependencies |
-| session06-refactor-dead-code | Removed dead channel code |
-| session07-remove-mobile-code | Removed mobile-specific code (pairing, Bonjour, TTS) |
-| session08-update-documentation | Updated docs for Telegram-only focus |
+| Session | Key Changes |
+|---------|-------------|
+| session01-clean-technical-debt | Removed TTS stubs, pairing code, WhatsApp config |
+| session02-docker-optimization | Multi-stage Docker build, 73% image reduction (2.61GB -> 688MB) |
+| session03-gateway-hardening | HTTP status detection, reconnection logging, memory metrics on /health |
+| session04-cicd-finalization | Removed obsolete Dependabot ecosystems (Swift, Gradle) |
+| session05-internal-docs-cleanup | Cleaned 130+ doc files for Telegram-only architecture |
 
-## Root Level Files
+## Actions Taken (This Audit)
 
-| File | Status | Notes |
-|------|--------|-------|
-| README.md | PASS | Updated for Telegram-only (comprehensive) |
-| LICENSE | PASS | MIT License present |
-| CLAUDE.md | PASS | Project instructions present |
+### Created
+- `docs/ARCHITECTURE.md` - System architecture overview with component diagram
+- `docs/development.md` - Development guide with commands and workflow
+- `docs/deployment.md` - Deployment guide for Docker and CI/CD
+- `docs/adr/0000-template.md` - ADR template for future decisions
+- `docs/adr/0001-telegram-only-architecture.md` - Documents Telegram-only architecture decision
+- `docs/adr/0002-multi-stage-docker-build.md` - Documents Docker optimization decision
+- `docs/runbooks/incident-response.md` - Incident response procedures for ops
 
-## /docs/ Directory
+### Updated
+- `docs/docs.json` - Added new documentation to navigation (ARCHITECTURE, development, deployment, ADRs, runbooks)
 
-### Present Standard Files
+### Verified (No Changes Needed)
+- `README.md` - Comprehensive, up-to-date
+- `docs/CONTRIBUTING.md` - Current
+- `LICENSE` - MIT license present
+- `docs/docker-env-vars.md` - Created in Phase 01 session 02
+- `docs/install/docker.md` - Exists and current
+- `docs/start/getting-started.md` - Exists
+- `docs/start/onboarding.md` - Exists
 
-| File | Location | Status |
-|------|----------|--------|
-| index.md | docs/index.md | PASS - Updated for Telegram-only |
-| CONTRIBUTING.md | docs/CONTRIBUTING.md | UPDATED - Removed stale maintainer subsystem ref |
-| SECURITY.md | docs/SECURITY.md | PASS |
-| architecture.md | docs/concepts/architecture.md | PASS - Telegram-only |
-| onboarding.md | docs/start/onboarding.md | PASS - CLI-only flow |
-| testing.md | docs/testing.md | PASS - Comprehensive testing guide |
+## Standard Files Verification
 
-### Missing Standard Files (monorepo standard)
+| File | Status | Location |
+|------|--------|----------|
+| README.md | PASS | Root |
+| CONTRIBUTING.md | PASS | docs/CONTRIBUTING.md |
+| LICENSE | PASS | Root |
+| ARCHITECTURE.md | PASS | docs/ARCHITECTURE.md (created) |
+| development.md | PASS | docs/development.md (created) |
+| deployment.md | PASS | docs/deployment.md (created) |
+| docker-env-vars.md | PASS | docs/docker-env-vars.md |
+| adr/ | PASS | docs/adr/ (created with 2 ADRs) |
+| runbooks/ | PASS | docs/runbooks/ (created) |
 
-| File | Location | Priority |
-|------|----------|----------|
-| ARCHITECTURE.md | docs/ARCHITECTURE.md | LOW - Exists at docs/concepts/architecture.md |
-| development.md | docs/development.md | LOW - Covered by docs/install/ and docs/testing.md |
-| environments.md | docs/environments.md | LOW - Covered by docs/environment.md |
-| deployment.md | docs/deployment.md | LOW - Covered by docs/install/docker.md |
-| CODEOWNERS | docs/CODEOWNERS | OPTIONAL |
-| adr/ | docs/adr/ | OPTIONAL |
-| runbooks/ | docs/runbooks/ | OPTIONAL |
-| api/ | docs/api/ | OPTIONAL |
+## Documentation Gaps
 
-### Existing Documentation Structure
+### Resolved in This Audit
+- Missing `docs/ARCHITECTURE.md` - Created with system overview and component diagram
+- Missing `docs/development.md` - Created with dev commands and workflow
+- Missing `docs/deployment.md` - Created with Docker and CI/CD info
+- Missing ADR directory - Created with template and 2 decision records
+- Missing runbooks directory - Created with incident response
 
-The project has a mature, custom documentation structure:
+### Deferred (Not Required)
+- `docs/CODEOWNERS` - Need team assignments from maintainers
+- `docs/environments.md` - Current `docs/environment.md` is sufficient
+- Per-package READMEs - Not needed for single-package structure
+
+## Phase 01 Documentation Summary
+
+Phase 01 focused on production hardening. Key documentation from this phase:
+
+1. **Docker documentation** (`docs/docker-env-vars.md`) - Environment variables for containers
+2. **Architecture decisions** - ADRs documenting Telegram-only and Docker optimization
+3. **Operational runbooks** - Incident response procedures
+4. **Development guide** - Commands and workflow for contributors
+5. **Deployment guide** - CI/CD and Docker deployment instructions
+
+## Quality Checks
+
+- [x] All new files ASCII-encoded
+- [x] Unix LF line endings
+- [x] No duplicate information
+- [x] Links to existing docs where appropriate
+- [x] Navigation updated in docs.json
+
+## Existing Documentation Structure
+
+The project has comprehensive documentation:
 
 ```
 docs/
 |-- index.md              # Main overview
+|-- ARCHITECTURE.md       # System architecture (NEW)
+|-- development.md        # Development guide (NEW)
+|-- deployment.md         # Deployment guide (NEW)
 |-- CONTRIBUTING.md       # Contribution guide
 |-- SECURITY.md           # Security policy
 |-- testing.md            # Testing guide
-|-- environment.md        # Environment variables
-|-- vps.md                # VPS hosting guide
-|-- start/                # Getting started
-|   |-- getting-started.md
-|   |-- onboarding.md
-|   |-- wizard.md
-|   +-- pairing.md
+|-- docker-env-vars.md    # Docker env vars (Phase 01)
+|-- start/                # Getting started guides
 |-- install/              # Installation guides
-|   |-- docker.md
-|   |-- bun.md
-|   |-- node.md
-|   +-- updating.md
 |-- gateway/              # Gateway documentation
-|   |-- configuration.md
-|   |-- security/
-|   +-- troubleshooting.md
-|-- channels/             # Channel documentation
-|   |-- telegram.md       # Only remaining channel
-|   +-- grammy.md         # grammY framework docs
-|-- concepts/             # Architecture and concepts
-|   |-- architecture.md
-|   |-- session.md
-|   +-- ...
-+-- ...
+|-- channels/             # Telegram channel docs
+|-- concepts/             # Architecture concepts
+|-- adr/                  # Decision records (NEW)
+|   |-- 0000-template.md
+|   |-- 0001-telegram-only-architecture.md
+|   +-- 0002-multi-stage-docker-build.md
++-- runbooks/             # Operational runbooks (NEW)
+    +-- incident-response.md
 ```
 
-## Actions Taken (This Audit)
+## Next Audit
 
-### Updated
-- `docs/CONTRIBUTING.md` - Updated maintainer subsystem description (was "Discord + Slack subsystem", now "Gateway + API")
-- `docs/vps.md` - Removed nodes/Mac/iOS/Android references, updated to remote access section
+Recommend re-running `/documents` after:
+- Completing the next phase
+- Adding new packages/services
+- Making architectural changes
 
-### Verified (No Changes Needed)
-- README.md (already updated in session08)
-- docs/index.md (already updated in session08)
-- docs/concepts/architecture.md (already updated in session08)
-- docs/start/onboarding.md (already updated in session08)
-- docs/SECURITY.md (general security policy)
-- docs/testing.md (comprehensive, no channel references)
-- LICENSE (MIT, no changes needed)
+---
 
-## Documentation Gaps
-
-### Remaining Stale References
-
-Per session08 implementation notes, internal docs files still contain references to removed channels/platforms. These are lower priority:
-
-- CLI documentation (`docs/cli/`)
-- Advanced concept docs (`docs/concepts/`)
-- Gateway configuration (`docs/gateway/`)
-- Tool documentation (`docs/tools/`)
-- Reference documentation (`docs/reference/`)
-
-### Recommended Future Actions
-
-1. **Optional**: Create `docs/adr/` for Architecture Decision Records
-2. **Optional**: Create `docs/runbooks/incident-response.md` for ops
-3. **Low Priority**: Clean up remaining internal docs with stale channel references
-
-## Assessment
-
-The project documentation is **comprehensive and well-organized**. The custom structure exceeds the monorepo standard in many ways:
-
-- Detailed installation guides for multiple platforms
-- Extensive gateway configuration documentation
-- Comprehensive troubleshooting guides
-- Strong security documentation
-- Excellent testing documentation
-
-The Phase 00 documentation updates (session08 + this audit) have successfully updated key user-facing documentation for the Telegram-only focus.
-
-## Technical Stack (from .spec_system/CONVENTIONS.md)
-
-| Category | Tool | Config |
-|----------|------|--------|
-| Formatter | oxfmt | `pnpm format` |
-| Linter | oxlint | `pnpm lint` |
-| Type Safety | TypeScript (strict) | tsconfig.json |
-| Testing | Vitest | vitest.config.ts |
-| Runtime | Node 22+ / Bun | scripts/run-node.mjs |
-
-## Next Steps
-
-Phase 00 is complete. Documentation is ready for production use.
+**All Phase 01 documentation requirements are now complete.**
 
 To proceed with the next phase, run:
 ```

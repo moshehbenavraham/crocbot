@@ -140,6 +140,7 @@ Additional workflows:
 | Health Probes | Fly.io / Docker | Fly: 30s interval, Docker: healthcheck |
 | Security (CI) | GitHub Actions | CodeQL, dependency-review, npm-audit (`.github/workflows/security.yml`) |
 | Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
+| Backup | Fly.io volume snapshots | Auto daily (5-day retention), manual via `fly volumes snapshots create`, docs: `docs/platforms/fly-backups.md`, script: `scripts/fly-backup.sh` |
 
 ## When In Doubt
 

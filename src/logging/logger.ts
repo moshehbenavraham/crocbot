@@ -6,6 +6,7 @@ import { Logger as TsLogger } from "tslog";
 
 import type { crocbotConfig } from "../config/types.js";
 import type { ConsoleStyle } from "./console.js";
+import { getCorrelationContext } from "./correlation.js";
 import { type LogLevel, levelToMinLevel, normalizeLogLevel } from "./levels.js";
 import { readLoggingConfig } from "./config.js";
 import { loggingState } from "./state.js";
@@ -96,7 +97,16 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
   logger.attachTransport((logObj: LogObj) => {
     try {
       const time = logObj.date?.toISOString?.() ?? new Date().toISOString();
-      const line = JSON.stringify({ ...logObj, time });
+      // Inject correlation context if available.
+      const correlationCtx = getCorrelationContext();
+      const entry: Record<string, unknown> = { ...logObj, time };
+      if (correlationCtx) {
+        entry.correlation_id = correlationCtx.correlationId;
+        if (correlationCtx.chatId !== undefined) entry.chat_id = correlationCtx.chatId;
+        if (correlationCtx.userId !== undefined) entry.user_id = correlationCtx.userId;
+        if (correlationCtx.messageId !== undefined) entry.message_id = correlationCtx.messageId;
+      }
+      const line = JSON.stringify(entry);
       fs.appendFileSync(settings.file, `${line}\n`, { encoding: "utf8" });
     } catch {
       // never block on logging failures

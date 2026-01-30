@@ -92,4 +92,52 @@ describe("redactSensitiveText", () => {
     });
     expect(output).toBe(input);
   });
+
+  it("masks international phone numbers with country code", () => {
+    const input = "Contact: +1 234-567-8901";
+    const output = redactSensitiveText(input, {
+      mode: "tools",
+      patterns: defaults,
+    });
+    expect(output).toBe("Contact: +1 234\u20268901");
+  });
+
+  it("masks phone numbers with different formats", () => {
+    const inputs = ["+44 20 7946 0958", "+972-54-123-4567", "+1.555.867.5309"];
+    for (const input of inputs) {
+      const output = redactSensitiveText(input, {
+        mode: "tools",
+        patterns: defaults,
+      });
+      expect(output).not.toBe(input);
+      expect(output).toContain("\u2026");
+    }
+  });
+
+  it("masks North American phone numbers without country code", () => {
+    const input = "Call me at (555) 867-5309";
+    const output = redactSensitiveText(input, {
+      mode: "tools",
+      patterns: defaults,
+    });
+    expect(output).not.toContain("867-5309");
+  });
+
+  it("masks session file paths", () => {
+    const input = "Session at /home/user/.crocbot/sessions/agent-123/session.json";
+    const output = redactSensitiveText(input, {
+      mode: "tools",
+      patterns: defaults,
+    });
+    expect(output).not.toContain("/home/user/.crocbot/sessions/agent-123/session.json");
+  });
+
+  it("masks macOS session file paths", () => {
+    const input = "Config: /Users/john/.crocbot/agents/main/logs.jsonl";
+    const output = redactSensitiveText(input, {
+      mode: "tools",
+      patterns: defaults,
+    });
+    expect(output).not.toContain("/Users/john/.crocbot/agents/main/logs.jsonl");
+  });
 });
