@@ -4,7 +4,7 @@
 **Sessions**: 8 (initial estimate)
 **Estimated Duration**: 16-32 hours
 
-**Progress**: 4/8 sessions (50%)
+**Progress**: 5/8 sessions (62.5%)
 
 ---
 
@@ -22,7 +22,7 @@ Transform the crocbot codebase from a multi-platform application with macOS app,
 | 02 | Remove Extensions | Complete | 15 | 2026-01-30 |
 | 03 | Remove Non-Telegram Channels | Complete | 20 | 2026-01-30 |
 | 04 | Simplify Build and CI | Complete | 20 | 2026-01-30 |
-| 05 | Remove Unused Dependencies | Not Started | ~12-18 | - |
+| 05 | Remove Unused Dependencies | Complete | 18 | 2026-01-30 |
 | 06 | Refactor Dead Channel Code | Not Started | ~18-25 | - |
 | 07 | Remove Mobile-Specific Code | Not Started | ~12-18 | - |
 | 08 | Update Documentation | Not Started | ~12-15 | - |
@@ -35,12 +35,13 @@ Transform the crocbot codebase from a multi-platform application with macOS app,
 - **Session 02: Remove Extensions** (2026-01-30) - Removed 30 packages, 547 files (extensions/)
 - **Session 03: Remove Non-Telegram Channels** (2026-01-30) - Removed 279 files across 7 channel directories, 40+ tests updated
 - **Session 04: Simplify Build and CI** (2026-01-30) - Removed 21 scripts, 3 config artifacts, updated labeler.yml and package.json
+- **Session 05: Remove Unused Dependencies** (2026-01-30) - Removed 8 dependencies (71.8 MB / 5.3% reduction), deleted orphan type file
 
 ---
 
 ## Upcoming Sessions
 
-- Session 05: Remove Unused Dependencies
+- Session 06: Refactor Dead Channel Code
 
 ---
 
