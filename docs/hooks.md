@@ -205,7 +205,7 @@ Each event includes:
     sessionEntry?: SessionEntry,
     sessionId?: string,
     sessionFile?: string,
-    commandSource?: string,    // e.g., 'whatsapp', 'telegram'
+    commandSource?: string,    // e.g., 'telegram'
     senderId?: string,
     workspaceDir?: string,
     bootstrapFiles?: WorkspaceBootstrapFile[],
@@ -305,7 +305,7 @@ crocbot hooks list
 # Enable it
 crocbot hooks enable my-hook
 
-# Restart your gateway process (menu bar app restart on macOS, or restart your dev process)
+# Restart your gateway process
 
 # Trigger the event
 # Send /new via your messaging channel
@@ -497,7 +497,7 @@ Logs all command events to a centralized audit file.
 
 ```jsonl
 {"timestamp":"2026-01-16T14:30:00.000Z","action":"new","sessionKey":"agent:main:main","senderId":"+1234567890","source":"telegram"}
-{"timestamp":"2026-01-16T15:45:22.000Z","action":"stop","sessionKey":"agent:main:main","senderId":"user@example.com","source":"whatsapp"}
+{"timestamp":"2026-01-16T15:45:22.000Z","action":"stop","sessionKey":"agent:main:main","senderId":"123456789","source":"telegram"}
 ```
 
 **View logs**:
@@ -686,10 +686,6 @@ Look for missing requirements in the output.
 Monitor gateway logs to see hook execution:
 
 ```bash
-# macOS
-./scripts/clawlog.sh -f
-
-# Other platforms
 tail -f ~/.clawdbot/gateway.log
 ```
 

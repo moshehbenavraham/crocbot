@@ -45,7 +45,7 @@ If you don’t have a global install yet, run it via `pnpm crocbot setup`.
 1) Install + launch **crocbot.app** (menu bar).
 2) Complete the onboarding/permissions checklist (TCC prompts).
 3) Ensure Gateway is **Local** and running (the app manages it).
-4) Link surfaces (example: WhatsApp):
+4) Link surfaces (example: Telegram):
 
 ```bash
 crocbot channels login
@@ -108,10 +108,7 @@ crocbot health
 
 Use this when debugging auth or deciding what to back up:
 
-- **WhatsApp**: `~/.clawdbot/credentials/whatsapp/<accountId>/creds.json`
 - **Telegram bot token**: config/env or `channels.telegram.tokenFile`
-- **Discord bot token**: config/env (token file not yet supported)
-- **Slack tokens**: config/env (`channels.slack.*`)
 - **Pairing allowlists**: `~/.clawdbot/credentials/<channel>-allowFrom.json`
 - **Model auth profiles**: `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`
 - **Legacy OAuth import**: `~/.clawdbot/credentials/oauth.json`
@@ -139,6 +136,5 @@ user service (no lingering needed). See [Gateway runbook](/gateway) for the syst
 
 - [Gateway runbook](/gateway) (flags, supervision, ports)
 - [Gateway configuration](/gateway/configuration) (config schema + examples)
-- [Discord](/channels/discord) and [Telegram](/channels/telegram) (reply tags + replyToMode settings)
+- [Telegram](/channels/telegram) (reply tags + replyToMode settings)
 - [crocbot assistant setup](/start/clawd)
-- [macOS app](/platforms/macos) (gateway lifecycle)

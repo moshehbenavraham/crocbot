@@ -5,14 +5,14 @@ description: Deploy crocbot on Fly.io
 
 # Fly.io Deployment
 
-**Goal:** crocbot Gateway running on a [Fly.io](https://fly.io) machine with persistent storage, automatic HTTPS, and Discord/channel access.
+**Goal:** crocbot Gateway running on a [Fly.io](https://fly.io) machine with persistent storage, automatic HTTPS, and Telegram channel access.
 
 ## What you need
 
 - [flyctl CLI](https://fly.io/docs/hands-on/install-flyctl/) installed
 - Fly.io account (free tier works)
 - Model auth: Anthropic API key (or other provider keys)
-- Channel credentials: Discord bot token, Telegram token, etc.
+- Channel credentials: Telegram bot token
 
 ## Beginner quick path
 
@@ -100,7 +100,7 @@ fly secrets set OPENAI_API_KEY=sk-...
 fly secrets set GOOGLE_API_KEY=...
 
 # Channel tokens
-fly secrets set DISCORD_BOT_TOKEN=MTQ...
+fly secrets set TELEGRAM_BOT_TOKEN=123456:ABC...
 ```
 
 **Notes:**
@@ -125,7 +125,7 @@ fly logs
 You should see:
 ```
 [gateway] listening on ws://0.0.0.0:3000 (PID xxx)
-[discord] logged in to discord as xxx
+[telegram] connected
 ```
 
 ## 5) Create config file
@@ -165,19 +165,12 @@ cat > /data/crocbot.json << 'EOF'
   "bindings": [
     {
       "agentId": "main",
-      "match": { "channel": "discord" }
+      "match": { "channel": "telegram" }
     }
   ],
   "channels": {
-    "discord": {
-      "enabled": true,
-      "groupPolicy": "allowlist",
-      "guilds": {
-        "YOUR_GUILD_ID": {
-          "channels": { "general": { "allow": true } },
-          "requireMention": false
-        }
-      }
+    "telegram": {
+      "enabled": true
     }
   },
   "gateway": {
@@ -193,11 +186,11 @@ EOF
 
 **Note:** With `CLAWDBOT_STATE_DIR=/data`, the config path is `/data/crocbot.json`.
 
-**Note:** The Discord token can come from either:
-- Environment variable: `DISCORD_BOT_TOKEN` (recommended for secrets)
-- Config file: `channels.discord.token`
+**Note:** The Telegram token can come from either:
+- Environment variable: `TELEGRAM_BOT_TOKEN` (recommended for secrets)
+- Config file: `channels.telegram.token`
 
-If using env var, no need to add token to config. The gateway reads `DISCORD_BOT_TOKEN` automatically.
+If using env var, no need to add token to config. The gateway reads `TELEGRAM_BOT_TOKEN` automatically.
 
 Restart to apply:
 ```bash
@@ -452,9 +445,8 @@ The ngrok tunnel runs inside the container and provides a public webhook URL wit
 
 - Fly.io uses **x86 architecture** (not ARM)
 - The Dockerfile is compatible with both architectures
-- For WhatsApp/Telegram onboarding, use `fly ssh console`
+- For Telegram onboarding, use `fly ssh console`
 - Persistent data lives on the volume at `/data`
-- Signal requires Java + signal-cli; use a custom image and keep memory at 2GB+.
 
 ## Cost
 

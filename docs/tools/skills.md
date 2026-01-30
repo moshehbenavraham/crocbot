@@ -148,7 +148,7 @@ Notes:
 - Installer specs can include `os: ["darwin"|"linux"|"win32"]` to filter options by platform.
 - Node installs honor `skills.install.nodeManager` in `crocbot.json` (default: npm; options: npm/pnpm/yarn/bun).
   This only affects **skill installs**; the Gateway runtime should still be Node
-  (Bun is not recommended for WhatsApp/Telegram).
+  (Bun is not recommended for Telegram).
 - Go installs: if `go` is missing and `brew` is available, the gateway installs Go via Homebrew first and sets `GOBIN` to Homebrew’s `bin` when possible.
  - Download installs: `url` (required), `archive` (`tar.gz` | `tar.bz2` | `zip`), `extract` (default: auto when archive detected), `stripComponents`, `targetDir` (default: `~/.clawdbot/tools/<skillKey>`).
 

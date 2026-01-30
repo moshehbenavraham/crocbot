@@ -9,9 +9,8 @@ read_when:
 # Gateway protocol (WebSocket)
 
 The Gateway WS protocol is the **single control plane + node transport** for
-crocbot. All clients (CLI, web UI, macOS app, iOS/Android nodes, headless
-nodes) connect over WebSocket and declare their **role** + **scope** at
-handshake time.
+crocbot. All clients (CLI, web UI, headless nodes) connect over WebSocket and
+declare their **role** + **scope** at handshake time.
 
 ## Transport
 
@@ -99,9 +98,9 @@ When a device token is issued, `hello-ok` also includes:
     "minProtocol": 3,
     "maxProtocol": 3,
     "client": {
-      "id": "ios-node",
+      "id": "node-client",
       "version": "1.2.3",
-      "platform": "ios",
+      "platform": "linux",
       "mode": "node"
     },
     "role": "node",
@@ -111,7 +110,7 @@ When a device token is issued, `hello-ok` also includes:
     "permissions": { "camera.capture": true, "screen.record": false },
     "auth": { "token": "…" },
     "locale": "en-US",
-    "userAgent": "crocbot-ios/1.2.3",
+    "userAgent": "crocbot-node/1.2.3",
     "device": {
       "id": "device_fingerprint",
       "publicKey": "…",

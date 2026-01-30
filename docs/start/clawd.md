@@ -6,25 +6,25 @@ read_when:
 ---
 # Building a personal assistant with crocbot (Clawd-style)
 
-crocbot is a WhatsApp + Telegram + Discord + iMessage gateway for **Pi** agents. Plugins add Mattermost. This guide is the "personal assistant" setup: one dedicated WhatsApp number that behaves like your always-on agent.
+crocbot is a Telegram gateway for **Pi** agents. This guide is the "personal assistant" setup: a dedicated Telegram bot that behaves like your always-on agent.
 
 ## ⚠️ Safety first
 
-You’re putting an agent in a position to:
+You're putting an agent in a position to:
 - run commands on your machine (depending on your Pi tool setup)
 - read/write files in your workspace
-- send messages back out via WhatsApp/Telegram/Discord/Mattermost (plugin)
+- send messages back out via Telegram
 
 Start conservative:
-- Always set `channels.whatsapp.allowFrom` (never run open-to-the-world on your personal Mac).
-- Use a dedicated WhatsApp number for the assistant.
+- Always set `channels.telegram.allowFrom` (never run open-to-the-world on your personal Mac).
+- Use a dedicated Telegram bot for the assistant.
 - Heartbeats now default to every 30 minutes. Disable until you trust the setup by setting `agents.defaults.heartbeat.every: "0m"`.
 
 ## Prerequisites
 
 - Node **22+**
 - crocbot available on PATH (recommended: global install)
-- A second phone number (SIM/eSIM/prepaid) for the assistant
+- A Telegram bot token (from @BotFather)
 
 ```bash
 npm install -g crocbot@latest
@@ -42,30 +42,30 @@ pnpm build
 pnpm link --global
 ```
 
-## The two-phone setup (recommended)
+## The Telegram bot setup (recommended)
 
 You want this:
 
 ```
-Your Phone (personal)          Second Phone (assistant)
-┌─────────────────┐           ┌─────────────────┐
-│  Your WhatsApp  │  ──────▶  │  Assistant WA   │
-│  +1-555-YOU     │  message  │  +1-555-CLAWD   │
-└─────────────────┘           └────────┬────────┘
-                                       │ linked via QR
-                                       ▼
-                              ┌─────────────────┐
-                              │  Your Mac       │
-                              │  (crocbot)      │
-                              │    Pi agent     │
-                              └─────────────────┘
+Your Phone (personal)
+┌─────────────────┐
+│  Your Telegram  │  ──────▶  @YourAssistantBot
+│  @your_user     │  message  (Telegram Bot)
+└─────────────────┘                  │
+                                     │ bot token
+                                     ▼
+                            ┌─────────────────┐
+                            │  Your Mac       │
+                            │  (crocbot)      │
+                            │    Pi agent     │
+                            └─────────────────┘
 ```
 
-If you link your personal WhatsApp to crocbot, every message to you becomes “agent input”. That’s rarely what you want.
+Create a dedicated bot via @BotFather so only messages to that bot become "agent input".
 
 ## 5-minute quick start
 
-1) Pair WhatsApp Web (shows QR; scan with the assistant phone):
+1) Configure your Telegram bot token:
 
 ```bash
 crocbot channels login
@@ -81,11 +81,11 @@ crocbot gateway --port 18789
 
 ```json5
 {
-  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+  channels: { telegram: { allowFrom: ["@your_telegram_username"] } }
 }
 ```
 
-Now message the assistant number from your allowlisted phone.
+Now message your bot from your allowlisted Telegram account.
 
 When onboarding finishes, we auto-open the dashboard with your gateway token and print the tokenized link. To reopen later: `crocbot dashboard`.
 
@@ -145,8 +145,8 @@ Example:
     heartbeat: { every: "0m" }
   },
   channels: {
-    whatsapp: {
-      allowFrom: ["+15555550123"],
+    telegram: {
+      allowFrom: ["@your_telegram_username"],
       groups: {
         "*": { requireMention: true }
       }
@@ -216,7 +216,7 @@ crocbot extracts these and sends them as media alongside the text.
 ```bash
 crocbot status          # local status (creds, sessions, queued events)
 crocbot status --all    # full diagnosis (read-only, pasteable)
-crocbot status --deep   # adds gateway health probes (Telegram + Discord)
+crocbot status --deep   # adds gateway health probes (Telegram)
 crocbot health --json   # gateway health snapshot (WS)
 ```
 
@@ -227,9 +227,6 @@ Logs live under `/tmp/crocbot/` (default: `crocbot-YYYY-MM-DD.log`).
 - WebChat: [WebChat](/web/webchat)
 - Gateway ops: [Gateway runbook](/gateway)
 - Cron + wakeups: [Cron jobs](/automation/cron-jobs)
-- macOS menu bar companion: [crocbot macOS app](/platforms/macos)
-- iOS node app: [iOS app](/platforms/ios)
-- Android node app: [Android app](/platforms/android)
 - Windows status: [Windows (WSL2)](/platforms/windows)
 - Linux status: [Linux app](/platforms/linux)
 - Security: [Security](/gateway/security)

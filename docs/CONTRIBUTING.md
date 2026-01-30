@@ -4,7 +4,6 @@ Welcome to the lobster tank!
 
 ## Quick Links
 - **GitHub:** https://github.com/crocbot/crocbot
-- **Discord:** https://discord.gg/qkhbAGHRBT
 - **X/Twitter:** [@steipete](https://x.com/steipete) / [@crocbot](https://x.com/crocbot)
 
 ## Maintainers
@@ -20,8 +19,8 @@ Welcome to the lobster tank!
 
 ## How to Contribute
 1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/crocbot/crocbot/discussions) or ask in Discord first
-3. **Questions** → Discord #setup-help
+2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/crocbot/crocbot/discussions)
+3. **Questions** → [GitHub Discussions](https://github.com/crocbot/crocbot/discussions)
 
 ## Before You PR
 - Test locally with your crocbot instance

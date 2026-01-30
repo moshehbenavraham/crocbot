@@ -123,8 +123,8 @@ Example: two agents, only the second agent runs heartbeats.
         id: "ops",
         heartbeat: {
           every: "1h",
-          target: "whatsapp",
-          to: "+15551234567",
+          target: "telegram",
+          to: "123456789",
           prompt: "Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK."
         }
       }
@@ -144,17 +144,17 @@ Example: two agents, only the second agent runs heartbeats.
   - Session key formats: see [Sessions](/concepts/session) and [Groups](/concepts/groups).
 - `target`:
   - `last` (default): deliver to the last used external channel.
-  - explicit channel: `whatsapp` / `telegram` / `discord` / `googlechat` / `slack` / `msteams` / `signal` / `imessage`.
+  - explicit channel: `telegram`.
   - `none`: run the heartbeat but **do not deliver** externally.
-- `to`: optional recipient override (channel-specific id, e.g. E.164 for WhatsApp or a Telegram chat id).
+- `to`: optional recipient override (channel-specific id, e.g. a Telegram chat id).
 - `prompt`: overrides the default prompt body (not merged).
 - `ackMaxChars`: max chars allowed after `HEARTBEAT_OK` before delivery.
 
 ## Delivery behavior
 
-- Heartbeats run in the agent’s main session by default (`agent:<id>:<mainKey>`),
+- Heartbeats run in the agent's main session by default (`agent:<id>:<mainKey>`),
   or `global` when `session.scope = "global"`. Set `session` to override to a
-  specific channel session (Discord/WhatsApp/etc.).
+  specific channel session (Telegram/etc.).
 - `session` only affects the run context; delivery is controlled by `target` and `to`.
 - To deliver to a specific channel/recipient, set `target` + `to`. With
   `target: "last"`, delivery uses the last external channel for that session.
@@ -179,11 +179,6 @@ channels:
   telegram:
     heartbeat:
       showOk: true       # Show OK acknowledgments on Telegram
-  whatsapp:
-    accounts:
-      work:
-        heartbeat:
-          showAlerts: false # Suppress alert delivery for this account
 ```
 
 Precedence: per-account → per-channel → channel defaults → built-in defaults.
@@ -205,13 +200,6 @@ channels:
       showOk: false
       showAlerts: true
       useIndicator: true
-  slack:
-    heartbeat:
-      showOk: true # all Slack accounts
-    accounts:
-      ops:
-        heartbeat:
-          showAlerts: false # suppress alerts for the ops account only
   telegram:
     heartbeat:
       showOk: true

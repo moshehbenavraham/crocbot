@@ -79,7 +79,7 @@ crocbot onboard --install-daemon
 
 The wizard will walk you through:
 - Model auth (API keys or OAuth)
-- Channel setup (Telegram, WhatsApp, Discord, etc.)
+- Channel setup (Telegram)
 - Gateway token (auto-generated)
 - Daemon installation (systemd)
 
@@ -141,13 +141,7 @@ crocbot pairing list telegram
 crocbot pairing approve telegram <CODE>
 ```
 
-### WhatsApp
-```bash
-crocbot channels login whatsapp
-# Scan QR code
-```
-
-See [Channels](/channels) for other providers.
+See [Channels](/channels) for configuration details.
 
 ---
 

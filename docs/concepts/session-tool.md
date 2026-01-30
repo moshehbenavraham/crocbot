@@ -40,7 +40,7 @@ Behavior:
 Row shape (JSON):
 - `key`: session key (string)
 - `kind`: `main | group | cron | hook | node | other`
-- `channel`: `whatsapp | telegram | discord | signal | imessage | webchat | internal | unknown`
+- `channel`: `telegram | webchat | internal | unknown`
 - `displayName` (group display label if available)
 - `updatedAt` (ms)
 - `sessionId`
@@ -105,7 +105,7 @@ Policy-based blocking by channel/chat type (not per session id).
     "sendPolicy": {
       "rules": [
         {
-          "match": { "channel": "discord", "chatType": "group" },
+          "match": { "channel": "telegram", "chatType": "group" },
           "action": "deny"
         }
       ],

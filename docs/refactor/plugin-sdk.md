@@ -153,8 +153,8 @@ Notes:
 - Migrate MS Teams (largest set of runtime helpers).
 - Ensure reply/typing semantics match current behavior.
 
-### Phase 4: iMessage pluginization
-- Move iMessage into `extensions/imessage`.
+### Phase 4: Additional channel pluginization
+- Move additional channels into `extensions/` as needed.
 - Replace direct core calls with `api.runtime`.
 - Keep config keys, CLI behavior, and docs intact.
 

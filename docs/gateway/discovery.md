@@ -9,10 +9,10 @@ read_when:
 
 crocbot has two distinct problems that look similar on the surface:
 
-1) **Operator remote control**: the macOS menu bar app controlling a gateway running elsewhere.
-2) **Node pairing**: iOS/Android (and future nodes) finding a gateway and pairing securely.
+1) **Operator remote control**: clients controlling a gateway running elsewhere.
+2) **Node pairing**: remote nodes finding a gateway and pairing securely.
 
-The design goal is to keep all network discovery/advertising in the **Node Gateway** (`clawd` / `crocbot gateway`) and keep clients (mac app, iOS) as consumers.
+The design goal is to keep all network discovery/advertising in the **Node Gateway** (`clawd` / `crocbot gateway`) and keep clients as consumers.
 
 ## Terms
 
@@ -106,5 +106,5 @@ The gateway is the source of truth for node/client admission.
 ## Responsibilities by component
 
 - **Gateway**: advertises discovery beacons, owns pairing decisions, and hosts the WS endpoint.
-- **macOS app**: helps you pick a gateway, shows pairing prompts, and uses SSH only as a fallback.
-- **iOS/Android nodes**: browse Bonjour as a convenience and connect to the paired Gateway WS.
+- **Clients**: help you pick a gateway, show pairing prompts, and use SSH only as a fallback.
+- **Nodes**: browse Bonjour as a convenience and connect to the paired Gateway WS.

@@ -20,7 +20,7 @@ Related:
 
 Notes:
 - Choosing where the Gateway runs always updates `gateway.mode`. You can select "Continue" without other sections if that is all you need.
-- Channel-oriented services (Slack/Discord/Matrix/Microsoft Teams) prompt for channel/room allowlists during setup. You can enter names or IDs; the wizard resolves names to IDs when possible.
+- Channel setup prompts for allowlists during setup. You can enter names or IDs; the wizard resolves names to IDs when possible.
 
 ## Examples
 

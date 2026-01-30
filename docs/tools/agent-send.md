@@ -34,14 +34,14 @@ crocbot agent --agent ops --message "Summarize logs"
 crocbot agent --session-id 1234 --message "Summarize inbox" --thinking medium
 crocbot agent --to +15555550123 --message "Trace logs" --verbose on --json
 crocbot agent --to +15555550123 --message "Summon reply" --deliver
-crocbot agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
+crocbot agent --agent ops --message "Generate report" --deliver --reply-channel telegram --reply-to "123456789"
 ```
 
 ## Flags
 
 - `--local`: run locally (requires model provider API keys in your shell)
 - `--deliver`: send the reply to the chosen channel
-- `--channel`: delivery channel (`whatsapp|telegram|discord|googlechat|slack|signal|imessage`, default: `whatsapp`)
+- `--channel`: delivery channel (`telegram`, default: `telegram`)
 - `--reply-to`: delivery target override
 - `--reply-channel`: delivery channel override
 - `--reply-account`: delivery account id override

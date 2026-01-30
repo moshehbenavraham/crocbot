@@ -103,11 +103,11 @@ crocbot cron add \
   --message "Generate today's briefing: weather, calendar, top emails, news summary." \
   --model opus \
   --deliver \
-  --channel whatsapp \
-  --to "+15551234567"
+  --channel telegram \
+  --to "-1001234567890"
 ```
 
-This runs at exactly 7:00 AM New York time, uses Opus for quality, and delivers directly to WhatsApp.
+This runs at exactly 7:00 AM New York time, uses Opus for quality, and delivers directly to Telegram.
 
 ### Cron example: One-shot reminder
 

@@ -8,8 +8,8 @@ read_when:
 crocbot reads an optional **JSON5** config from `~/.clawdbot/crocbot.json` (comments + trailing commas allowed).
 
 If the file is missing, crocbot uses safe-ish defaults (embedded Pi agent + per-sender sessions + workspace `~/clawd`). You usually only need a config to:
-- restrict who can trigger the bot (`channels.whatsapp.allowFrom`, `channels.telegram.allowFrom`, etc.)
-- control group allowlists + mention behavior (`channels.whatsapp.groups`, `channels.telegram.groups`, `channels.discord.guilds`, `agents.list[].groupChat`)
+- restrict who can trigger the bot (`channels.telegram.allowFrom`)
+- control group allowlists + mention behavior (`channels.telegram.groups`, `agents.list[].groupChat`)
 - customize message prefixes (`messages`)
 - set the agent's workspace (`agents.defaults.workspace` or `agents.list[].workspace`)
 - tune the embedded agent defaults (`agents.defaults`) and session behavior (`session`)
@@ -63,7 +63,7 @@ crocbot gateway call config.get --params '{}' # capture payload.hash
 crocbot gateway call config.apply --params '{
   "raw": "{\\n  agents: { defaults: { workspace: \\"~/clawd\\" } }\\n}\\n",
   "baseHash": "<hash-from-config.get>",
-  "sessionKey": "agent:main:whatsapp:dm:+15555550123",
+  "sessionKey": "agent:main:telegram:dm:123456789",
   "restartDelayMs": 1000
 }'
 ```
@@ -92,7 +92,7 @@ crocbot gateway call config.get --params '{}' # capture payload.hash
 crocbot gateway call config.patch --params '{
   "raw": "{\\n  channels: { telegram: { groups: { \\"*\\": { requireMention: false } } } }\\n}\\n",
   "baseHash": "<hash-from-config.get>",
-  "sessionKey": "agent:main:whatsapp:dm:+15555550123",
+  "sessionKey": "agent:main:telegram:dm:123456789",
   "restartDelayMs": 1000
 }'
 ```
@@ -102,7 +102,7 @@ crocbot gateway call config.patch --params '{
 ```json5
 {
   agents: { defaults: { workspace: "~/clawd" } },
-  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+  channels: { telegram: { allowFrom: ["123456789"] } }
 }
 ```
 
@@ -111,9 +111,9 @@ Build the default image once with:
 scripts/sandbox-setup.sh
 ```
 
-## Self-chat mode (recommended for group control)
+## Group chat control
 
-To prevent the bot from responding to WhatsApp @-mentions in groups (only respond to specific text triggers):
+To configure the bot to respond only to specific text triggers in groups:
 
 ```json5
 {
@@ -127,9 +127,8 @@ To prevent the bot from responding to WhatsApp @-mentions in groups (only respon
     ]
   },
   channels: {
-    whatsapp: {
-      // Allowlist is DMs only; including your own number enables self-chat mode.
-      allowFrom: ["+15555550123"],
+    telegram: {
+      allowFrom: ["123456789"],
       groups: { "*": { requireMention: true } }
     }
   }
@@ -243,7 +242,7 @@ Included files can themselves contain `$include` directives (up to 10 levels dee
     "./clients/schmidt/broadcast.json5"
   ]},
   
-  channels: { whatsapp: { groupPolicy: "allowlist" } }
+  channels: { telegram: { groupPolicy: "allowlist" } }
 }
 ```
 
@@ -396,11 +395,11 @@ rotation order used for failover.
 
 ### `agents.list[].identity`
 
-Optional per-agent identity used for defaults and UX. This is written by the macOS onboarding assistant.
+Optional per-agent identity used for defaults and UX. This is written by the onboarding assistant.
 
-If set, crocbot derives defaults (only when you haven’t set them explicitly):
-- `messages.ackReaction` from the **active agent**’s `identity.emoji` (falls back to 👀)
-- `agents.list[].groupChat.mentionPatterns` from the agent’s `identity.name`/`identity.emoji` (so “@Samantha” works in groups across Telegram/Slack/Discord/Google Chat/iMessage/WhatsApp)
+If set, crocbot derives defaults (only when you haven't set them explicitly):
+- `messages.ackReaction` from the **active agent**'s `identity.emoji` (falls back to 👀)
+- `agents.list[].groupChat.mentionPatterns` from the agent's `identity.name`/`identity.emoji` (so "@Samantha" works in groups across Telegram)
 - `identity.avatar` accepts a workspace-relative image path or a remote URL/data URL. Local files must live inside the agent workspace.
 
 `identity.avatar` accepts:
@@ -470,32 +469,32 @@ Metadata written by CLI wizards (`onboard`, `configure`, `doctor`).
 }
 ```
 
-### `channels.whatsapp.dmPolicy`
+### `channels.telegram.dmPolicy`
 
-Controls how WhatsApp direct chats (DMs) are handled:
+Controls how Telegram direct chats (DMs) are handled:
 - `"pairing"` (default): unknown senders get a pairing code; owner must approve
-- `"allowlist"`: only allow senders in `channels.whatsapp.allowFrom` (or paired allow store)
-- `"open"`: allow all inbound DMs (**requires** `channels.whatsapp.allowFrom` to include `"*"`)
+- `"allowlist"`: only allow senders in `channels.telegram.allowFrom` (or paired allow store)
+- `"open"`: allow all inbound DMs (**requires** `channels.telegram.allowFrom` to include `"*"`)
 - `"disabled"`: ignore all inbound DMs
 
 Pairing codes expire after 1 hour; the bot only sends a pairing code when a new request is created. Pending DM pairing requests are capped at **3 per channel** by default.
 
 Pairing approvals:
-- `crocbot pairing list whatsapp`
-- `crocbot pairing approve whatsapp <code>`
+- `crocbot pairing list telegram`
+- `crocbot pairing approve telegram <code>`
 
-### `channels.whatsapp.allowFrom`
+### `channels.telegram.allowFrom`
 
-Allowlist of E.164 phone numbers that may trigger WhatsApp auto-replies (**DMs only**).
-If empty and `channels.whatsapp.dmPolicy="pairing"`, unknown senders will receive a pairing code.
-For groups, use `channels.whatsapp.groupPolicy` + `channels.whatsapp.groupAllowFrom`.
+Allowlist of Telegram chat IDs that may trigger auto-replies (**DMs only**).
+If empty and `channels.telegram.dmPolicy="pairing"`, unknown senders will receive a pairing code.
+For groups, use `channels.telegram.groupPolicy` + `channels.telegram.groupAllowFrom`.
 
 ```json5
 {
   channels: {
-    whatsapp: {
+    telegram: {
       dmPolicy: "pairing", // pairing | allowlist | open | disabled
-      allowFrom: ["+15555550123", "+447700900123"],
+      allowFrom: ["123456789", "987654321"],
       textChunkLimit: 4000, // optional outbound chunk size (chars)
       chunkMode: "length", // optional chunking mode (length | newline)
       mediaMaxMb: 50 // optional inbound media cap (MB)
@@ -504,48 +503,7 @@ For groups, use `channels.whatsapp.groupPolicy` + `channels.whatsapp.groupAllowF
 }
 ```
 
-### `channels.whatsapp.sendReadReceipts`
-
-Controls whether inbound WhatsApp messages are marked as read (blue ticks). Default: `true`.
-
-Self-chat mode always skips read receipts, even when enabled.
-
-Per-account override: `channels.whatsapp.accounts.<id>.sendReadReceipts`.
-
-```json5
-{
-  channels: {
-    whatsapp: { sendReadReceipts: false }
-  }
-}
-```
-
-### `channels.whatsapp.accounts` (multi-account)
-
-Run multiple WhatsApp accounts in one gateway:
-
-```json5
-{
-  channels: {
-    whatsapp: {
-      accounts: {
-        default: {}, // optional; keeps the default id stable
-        personal: {},
-        biz: {
-          // Optional override. Default: ~/.clawdbot/credentials/whatsapp/biz
-          // authDir: "~/.clawdbot/credentials/whatsapp/biz",
-        }
-      }
-    }
-  }
-}
-```
-
-Notes:
-- Outbound commands default to account `default` if present; otherwise the first configured account id (sorted).
-- The legacy single-account Baileys auth dir is migrated by `crocbot doctor` into `whatsapp/default`.
-
-### `channels.telegram.accounts` / `channels.discord.accounts` / `channels.googlechat.accounts` / `channels.slack.accounts` / `channels.mattermost.accounts` / `channels.signal.accounts` / `channels.imessage.accounts`
+### `channels.telegram.accounts`
 
 Run multiple accounts per channel (each account has its own `accountId` and optional `name`):
 
@@ -576,11 +534,11 @@ Notes:
 
 ### Group chat mention gating (`agents.list[].groupChat` + `messages.groupChat`)
 
-Group messages default to **require mention** (either metadata mention or regex patterns). Applies to WhatsApp, Telegram, Discord, Google Chat, and iMessage group chats.
+Group messages default to **require mention** (either metadata mention or regex patterns). Applies to Telegram group chats.
 
 **Mention types:**
-- **Metadata mentions**: Native platform @-mentions (e.g., WhatsApp tap-to-mention). Ignored in WhatsApp self-chat mode (see `channels.whatsapp.allowFrom`).
-- **Text patterns**: Regex patterns defined in `agents.list[].groupChat.mentionPatterns`. Always checked regardless of self-chat mode.
+- **Metadata mentions**: Native platform @-mentions.
+- **Text patterns**: Regex patterns defined in `agents.list[].groupChat.mentionPatterns`.
 - Mention gating is enforced only when mention detection is possible (native mentions or at least one `mentionPattern`).
 
 ```json5
@@ -620,7 +578,7 @@ Resolution order:
 2. Provider default: `channels.<provider>.dmHistoryLimit`
 3. No limit (all history retained)
 
-Supported providers: `telegram`, `whatsapp`, `discord`, `slack`, `signal`, `imessage`, `msteams`.
+Supported providers: `telegram`.
 
 Per-agent override (takes precedence when set, even `[]`):
 ```json5
@@ -634,15 +592,14 @@ Per-agent override (takes precedence when set, even `[]`):
 }
 ```
 
-Mention gating defaults live per channel (`channels.whatsapp.groups`, `channels.telegram.groups`, `channels.imessage.groups`, `channels.discord.guilds`). When `*.groups` is set, it also acts as a group allowlist; include `"*"` to allow all groups.
+Mention gating defaults live per channel (`channels.telegram.groups`). When `*.groups` is set, it also acts as a group allowlist; include `"*"` to allow all groups.
 
 To respond **only** to specific text triggers (ignoring native @-mentions):
 ```json5
 {
   channels: {
-    whatsapp: {
-      // Include your own number to enable self-chat mode (ignore native @-mentions).
-      allowFrom: ["+15555550123"],
+    telegram: {
+      allowFrom: ["123456789"],
       groups: { "*": { requireMention: true } }
     }
   },
@@ -667,37 +624,9 @@ Use `channels.*.groupPolicy` to control whether group/room messages are accepted
 ```json5
 {
   channels: {
-    whatsapp: {
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["+15551234567"]
-    },
     telegram: {
       groupPolicy: "allowlist",
-      groupAllowFrom: ["tg:123456789", "@alice"]
-    },
-    signal: {
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["+15551234567"]
-    },
-    imessage: {
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["chat_id:123"]
-    },
-    msteams: {
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["user@org.com"]
-    },
-    discord: {
-      groupPolicy: "allowlist",
-      guilds: {
-        "GUILD_ID": {
-          channels: { help: { allow: true } }
-        }
-      }
-    },
-    slack: {
-      groupPolicy: "allowlist",
-      channels: { "#general": { allow: true } }
+      groupAllowFrom: ["-1001234567890", "@alice"]
     }
   }
 }
@@ -707,10 +636,8 @@ Notes:
 - `"open"`: groups bypass allowlists; mention-gating still applies.
 - `"disabled"`: block all group/room messages.
 - `"allowlist"`: only allow groups/rooms that match the configured allowlist.
-- `channels.defaults.groupPolicy` sets the default when a provider’s `groupPolicy` is unset.
-- WhatsApp/Telegram/Signal/iMessage/Microsoft Teams use `groupAllowFrom` (fallback: explicit `allowFrom`).
-- Discord/Slack use channel allowlists (`channels.discord.guilds.*.channels`, `channels.slack.channels`).
-- Group DMs (Discord/Slack) are still controlled by `dm.groupEnabled` + `dm.groupChannels`.
+- `channels.defaults.groupPolicy` sets the default when a provider's `groupPolicy` is unset.
+- Telegram uses `groupAllowFrom` (fallback: explicit `allowFrom`).
 - Default is `groupPolicy: "allowlist"` (unless overridden by `channels.defaults.groupPolicy`); if no allowlist is configured, group messages are blocked.
 
 ### Multi-agent routing (`agents.list` + `bindings`)
@@ -824,7 +751,7 @@ No filesystem access (messaging/session tools enabled):
           workspaceAccess: "none"
         },
         tools: {
-          allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "whatsapp", "telegram", "slack", "discord", "gateway"],
+          allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "telegram", "gateway"],
           deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "canvas", "nodes", "cron", "gateway", "image"]
         }
       }
@@ -833,7 +760,7 @@ No filesystem access (messaging/session tools enabled):
 }
 ```
 
-Example: two WhatsApp accounts → two agents:
+Example: two Telegram accounts with two agents:
 
 ```json5
 {
@@ -844,14 +771,14 @@ Example: two WhatsApp accounts → two agents:
     ]
   },
   bindings: [
-    { agentId: "home", match: { channel: "whatsapp", accountId: "personal" } },
-    { agentId: "work", match: { channel: "whatsapp", accountId: "biz" } }
+    { agentId: "home", match: { channel: "telegram", accountId: "personal" } },
+    { agentId: "work", match: { channel: "telegram", accountId: "biz" } }
   ],
   channels: {
-    whatsapp: {
+    telegram: {
       accounts: {
-        personal: {},
-        biz: {},
+        personal: { botToken: "..." },
+        biz: { botToken: "..." }
       }
     }
   }
@@ -886,10 +813,7 @@ Controls how inbound messages behave when an agent run is already active.
       cap: 20,
       drop: "summarize", // old | new | summarize
       byChannel: {
-        whatsapp: "collect",
         telegram: "collect",
-        discord: "collect",
-        imessage: "collect",
         webchat: "collect"
       }
     }
@@ -909,9 +833,7 @@ and uses the most recent message for reply threading/IDs.
     inbound: {
       debounceMs: 2000, // 0 disables
       byChannel: {
-        whatsapp: 5000,
-        slack: 1500,
-        discord: 1500
+        telegram: 2000
       }
     }
   }
@@ -944,39 +866,18 @@ Controls how chat commands are enabled across connectors.
 Notes:
 - Text commands must be sent as a **standalone** message and use the leading `/` (no plain-text aliases).
 - `commands.text: false` disables parsing chat messages for commands.
-- `commands.native: "auto"` (default) turns on native commands for Discord/Telegram and leaves Slack off; unsupported channels stay text-only.
-- Set `commands.native: true|false` to force all, or override per channel with `channels.discord.commands.native`, `channels.telegram.commands.native`, `channels.slack.commands.native` (bool or `"auto"`). `false` clears previously registered commands on Discord/Telegram at startup; Slack commands are managed in the Slack app.
+- `commands.native: "auto"` (default) turns on native commands for Telegram; unsupported channels stay text-only.
+- Set `commands.native: true|false` to force all, or override per channel with `channels.telegram.commands.native` (bool or `"auto"`). `false` clears previously registered commands at startup.
 - `channels.telegram.customCommands` adds extra Telegram bot menu entries. Names are normalized; conflicts with native commands are ignored.
 - `commands.bash: true` enables `! <cmd>` to run host shell commands (`/bash <cmd>` also works as an alias). Requires `tools.elevated.enabled` and allowlisting the sender in `tools.elevated.allowFrom.<channel>`.
 - `commands.bashForegroundMs` controls how long bash waits before backgrounding. While a bash job is running, new `! <cmd>` requests are rejected (one at a time).
 - `commands.config: true` enables `/config` (reads/writes `crocbot.json`).
-- `channels.<provider>.configWrites` gates config mutations initiated by that channel (default: true). This applies to `/config set|unset` plus provider-specific auto-migrations (Telegram supergroup ID changes, Slack channel ID changes).
+- `channels.<provider>.configWrites` gates config mutations initiated by that channel (default: true). This applies to `/config set|unset` plus provider-specific auto-migrations (Telegram supergroup ID changes).
 - `commands.debug: true` enables `/debug` (runtime-only overrides).
 - `commands.restart: true` enables `/restart` and the gateway tool restart action.
 - `commands.useAccessGroups: false` allows commands to bypass access-group allowlists/policies.
 - Slash commands and directives are only honored for **authorized senders**. Authorization is derived from
   channel allowlists/pairing plus `commands.useAccessGroups`.
-
-### `web` (WhatsApp web channel runtime)
-
-WhatsApp runs through the gateway’s web channel (Baileys Web). It starts automatically when a linked session exists.
-Set `web.enabled: false` to keep it off by default.
-
-```json5
-{
-  web: {
-    enabled: true,
-    heartbeatSeconds: 60,
-    reconnect: {
-      initialMs: 2000,
-      maxMs: 120000,
-      factor: 1.4,
-      jitter: 0.2,
-      maxAttempts: 0
-    }
-  }
-}
-```
 
 ### `channels.telegram` (bot transport)
 
@@ -1047,88 +948,6 @@ Draft streaming notes:
 - `/reasoning stream` streams reasoning into the draft, then sends the final answer.
 Retry policy defaults and behavior are documented in [Retry policy](/concepts/retry).
 
-### `channels.discord` (bot transport)
-
-Configure the Discord bot by setting the bot token and optional gating:
-Multi-account support lives under `channels.discord.accounts` (see the multi-account section above). Env tokens only apply to the default account.
-
-```json5
-{
-  channels: {
-    discord: {
-      enabled: true,
-      token: "your-bot-token",
-      mediaMaxMb: 8,                          // clamp inbound media size
-      allowBots: false,                       // allow bot-authored messages
-      actions: {                              // tool action gates (false disables)
-        reactions: true,
-        stickers: true,
-        polls: true,
-        permissions: true,
-        messages: true,
-        threads: true,
-        pins: true,
-        search: true,
-        memberInfo: true,
-        roleInfo: true,
-        roles: false,
-        channelInfo: true,
-        voiceStatus: true,
-        events: true,
-        moderation: false
-      },
-      replyToMode: "off",                     // off | first | all
-      dm: {
-        enabled: true,                        // disable all DMs when false
-        policy: "pairing",                    // pairing | allowlist | open | disabled
-        allowFrom: ["1234567890", "steipete"], // optional DM allowlist ("open" requires ["*"])
-        groupEnabled: false,                 // enable group DMs
-        groupChannels: ["clawd-dm"]          // optional group DM allowlist
-      },
-      guilds: {
-        "123456789012345678": {               // guild id (preferred) or slug
-          slug: "friends-of-clawd",
-          requireMention: false,              // per-guild default
-          reactionNotifications: "own",       // off | own | all | allowlist
-          users: ["987654321098765432"],      // optional per-guild user allowlist
-          channels: {
-            general: { allow: true },
-            help: {
-              allow: true,
-              requireMention: true,
-              users: ["987654321098765432"],
-              skills: ["docs"],
-              systemPrompt: "Short answers only."
-            }
-          }
-        }
-      },
-      historyLimit: 20,                       // include last N guild messages as context
-      textChunkLimit: 2000,                   // optional outbound text chunk size (chars)
-      chunkMode: "length",                    // optional chunking mode (length | newline)
-      maxLinesPerMessage: 17,                 // soft max lines per message (Discord UI clipping)
-      retry: {                                // outbound retry policy
-        attempts: 3,
-        minDelayMs: 500,
-        maxDelayMs: 30000,
-        jitter: 0.1
-      }
-    }
-  }
-}
-```
-
-crocbot starts Discord only when a `channels.discord` config section exists. The token is resolved from `channels.discord.token`, with `DISCORD_BOT_TOKEN` as a fallback for the default account (unless `channels.discord.enabled` is `false`). Use `user:<id>` (DM) or `channel:<id>` (guild channel) when specifying delivery targets for cron/CLI commands; bare numeric IDs are ambiguous and rejected.
-Guild slugs are lowercase with spaces replaced by `-`; channel keys use the slugged channel name (no leading `#`). Prefer guild ids as keys to avoid rename ambiguity.
-Bot-authored messages are ignored by default. Enable with `channels.discord.allowBots` (own messages are still filtered to prevent self-reply loops).
-Reaction notification modes:
-- `off`: no reaction events.
-- `own`: reactions on the bot's own messages (default).
-- `all`: all reactions on all messages.
-- `allowlist`: reactions from `guilds.<id>.users` on all messages (empty list disables).
-Outbound text is chunked by `channels.discord.textChunkLimit` (default 2000). Set `channels.discord.chunkMode="newline"` to split on blank lines (paragraph boundaries) before length chunking. Discord clients can clip very tall messages, so `channels.discord.maxLinesPerMessage` (default 17) splits long multi-line replies even when under 2000 chars.
-Retry policy defaults and behavior are documented in [Retry policy](/concepts/retry).
-
 ### `channels.googlechat` (Chat API webhook)
 
 Google Chat runs over HTTP webhooks with app-level auth (service account).
@@ -1166,91 +985,6 @@ Notes:
 - Env fallbacks for the default account: `GOOGLE_CHAT_SERVICE_ACCOUNT` or `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE`.
 - `audienceType` + `audience` must match the Chat app’s webhook auth config.
 - Use `spaces/<spaceId>` or `users/<userId|email>` when setting delivery targets.
-
-### `channels.slack` (socket mode)
-
-Slack runs in Socket Mode and requires both a bot token and app token:
-
-```json5
-{
-  channels: {
-    slack: {
-      enabled: true,
-      botToken: "xoxb-...",
-      appToken: "xapp-...",
-      dm: {
-        enabled: true,
-        policy: "pairing", // pairing | allowlist | open | disabled
-        allowFrom: ["U123", "U456", "*"], // optional; "open" requires ["*"]
-        groupEnabled: false,
-        groupChannels: ["G123"]
-      },
-      channels: {
-        C123: { allow: true, requireMention: true, allowBots: false },
-        "#general": {
-          allow: true,
-          requireMention: true,
-          allowBots: false,
-          users: ["U123"],
-          skills: ["docs"],
-          systemPrompt: "Short answers only."
-        }
-      },
-      historyLimit: 50,          // include last N channel/group messages as context (0 disables)
-      allowBots: false,
-      reactionNotifications: "own", // off | own | all | allowlist
-      reactionAllowlist: ["U123"],
-      replyToMode: "off",           // off | first | all
-      thread: {
-        historyScope: "thread",     // thread | channel
-        inheritParent: false
-      },
-      actions: {
-        reactions: true,
-        messages: true,
-        pins: true,
-        memberInfo: true,
-        emojiList: true
-      },
-      slashCommand: {
-        enabled: true,
-        name: "clawd",
-        sessionPrefix: "slack:slash",
-        ephemeral: true
-      },
-      textChunkLimit: 4000,
-      chunkMode: "length",
-      mediaMaxMb: 20
-    }
-  }
-}
-```
-
-Multi-account support lives under `channels.slack.accounts` (see the multi-account section above). Env tokens only apply to the default account.
-
-crocbot starts Slack when the provider is enabled and both tokens are set (via config or `SLACK_BOT_TOKEN` + `SLACK_APP_TOKEN`). Use `user:<id>` (DM) or `channel:<id>` when specifying delivery targets for cron/CLI commands.
-Set `channels.slack.configWrites: false` to block Slack-initiated config writes (including channel ID migrations and `/config set|unset`).
-
-Bot-authored messages are ignored by default. Enable with `channels.slack.allowBots` or `channels.slack.channels.<id>.allowBots`.
-
-Reaction notification modes:
-- `off`: no reaction events.
-- `own`: reactions on the bot's own messages (default).
-- `all`: all reactions on all messages.
-- `allowlist`: reactions from `channels.slack.reactionAllowlist` on all messages (empty list disables).
-
-Thread session isolation:
-- `channels.slack.thread.historyScope` controls whether thread history is per-thread (`thread`, default) or shared across the channel (`channel`).
-- `channels.slack.thread.inheritParent` controls whether new thread sessions inherit the parent channel transcript (default: false).
-
-Slack action groups (gate `slack` tool actions):
-| Action group | Default | Notes |
-| --- | --- | --- |
-| reactions | enabled | React + list reactions |
-| messages | enabled | Read/send/edit/delete |
-| pins | enabled | Pin/unpin/list |
-| memberInfo | enabled | Member info |
-| emojiList | enabled | Custom emoji list |
 
 ### `channels.mattermost` (bot token)
 
@@ -1290,67 +1024,6 @@ Access control:
 
 Multi-account support lives under `channels.mattermost.accounts` (see the multi-account section above). Env vars only apply to the default account.
 Use `channel:<id>` or `user:<id>` (or `@username`) when specifying delivery targets; bare ids are treated as channel ids.
-
-### `channels.signal` (signal-cli)
-
-Signal reactions can emit system events (shared reaction tooling):
-
-```json5
-{
-  channels: {
-    signal: {
-      reactionNotifications: "own", // off | own | all | allowlist
-      reactionAllowlist: ["+15551234567", "uuid:123e4567-e89b-12d3-a456-426614174000"],
-      historyLimit: 50 // include last N group messages as context (0 disables)
-    }
-  }
-}
-```
-
-Reaction notification modes:
-- `off`: no reaction events.
-- `own`: reactions on the bot's own messages (default).
-- `all`: all reactions on all messages.
-- `allowlist`: reactions from `channels.signal.reactionAllowlist` on all messages (empty list disables).
-
-### `channels.imessage` (imsg CLI)
-
-crocbot spawns `imsg rpc` (JSON-RPC over stdio). No daemon or port required.
-
-```json5
-{
-  channels: {
-    imessage: {
-      enabled: true,
-      cliPath: "imsg",
-      dbPath: "~/Library/Messages/chat.db",
-      remoteHost: "user@gateway-host", // SCP for remote attachments when using SSH wrapper
-      dmPolicy: "pairing", // pairing | allowlist | open | disabled
-      allowFrom: ["+15555550123", "user@example.com", "chat_id:123"],
-      historyLimit: 50,    // include last N group messages as context (0 disables)
-      includeAttachments: false,
-      mediaMaxMb: 16,
-      service: "auto",
-      region: "US"
-    }
-  }
-}
-```
-
-Multi-account support lives under `channels.imessage.accounts` (see the multi-account section above).
-
-Notes:
-- Requires Full Disk Access to the Messages DB.
-- The first send will prompt for Messages automation permission.
-- Prefer `chat_id:<id>` targets. Use `imsg chats --limit 20` to list chats.
-- `channels.imessage.cliPath` can point to a wrapper script (e.g. `ssh` to another Mac that runs `imsg rpc`); use SSH keys to avoid password prompts.
-- For remote SSH wrappers, set `channels.imessage.remoteHost` to fetch attachments via SCP when `includeAttachments` is enabled.
-
-Example wrapper:
-```bash
-#!/usr/bin/env bash
-exec ssh -T gateway-host imsg "$@"
-```
 
 ### `agents.defaults.workspace`
 
@@ -1446,7 +1119,7 @@ See [Messages](/concepts/messages) for queueing, sessions, and streaming context
 `responsePrefix` is applied to **all outbound replies** (tool summaries, block
 streaming, final replies) across channels unless already present.
 
-If `messages.responsePrefix` is unset, no prefix is applied by default. WhatsApp self-chat
+If `messages.responsePrefix` is unset, no prefix is applied by default. Self-chat
 replies are the exception: they default to `[{identity.name}]` when set, otherwise
 `[crocbot]`, so same-phone conversations stay legible.
 Set it to `"auto"` to derive `[{identity.name}]` for the routed agent (when set).
@@ -1476,15 +1149,15 @@ Unresolved variables remain as literal text.
 
 Example output: `[claude-opus-4-5 | think:high] Here's my response...`
 
-WhatsApp inbound prefix is configured via `channels.whatsapp.messagePrefix` (deprecated:
+Inbound prefix is configured via `channels.telegram.messagePrefix` (deprecated:
 `messages.messagePrefix`). Default stays **unchanged**: `"[crocbot]"` when
-`channels.whatsapp.allowFrom` is empty, otherwise `""` (no prefix). When using
+`channels.telegram.allowFrom` is empty, otherwise `""` (no prefix). When using
 `"[crocbot]"`, crocbot will instead use `[{identity.name}]` when the routed
 agent has `identity.name` set.
 
 `ackReaction` sends a best-effort emoji reaction to acknowledge inbound messages
-on channels that support reactions (Slack/Discord/Telegram/Google Chat). Defaults to the
-active agent’s `identity.emoji` when set, otherwise `"👀"`. Set it to `""` to disable.
+on channels that support reactions (Telegram). Defaults to the
+active agent's `identity.emoji` when set, otherwise `"👀"`. Set it to `""` to disable.
 
 `ackReactionScope` controls when reactions fire:
 - `group-mentions` (default): only when a group/room requires mentions **and** the bot was mentioned
@@ -1492,8 +1165,8 @@ active agent’s `identity.emoji` when set, otherwise `"👀"`. Set it to `""` t
 - `direct`: direct messages only
 - `all`: all messages
 
-`removeAckAfterReply` removes the bot’s ack reaction after a reply is sent
-(Slack/Discord/Telegram/Google Chat only). Default: `false`.
+`removeAckAfterReply` removes the bot's ack reaction after a reply is sent
+(Telegram only). Default: `false`.
 
 #### `messages.tts`
 
@@ -1558,8 +1231,8 @@ Notes:
 
 ### `talk`
 
-Defaults for Talk mode (macOS/iOS/Android). Voice IDs fall back to `ELEVENLABS_VOICE_ID` or `SAG_VOICE_ID` when unset.
-`apiKey` falls back to `ELEVENLABS_API_KEY` (or the gateway’s shell profile) when unset.
+Defaults for Talk mode. Voice IDs fall back to `ELEVENLABS_VOICE_ID` or `SAG_VOICE_ID` when unset.
+`apiKey` falls back to `ELEVENLABS_API_KEY` (or the gateway's shell profile) when unset.
 `voiceAliases` lets Talk directives use friendly names (e.g. `"voice":"Clawd"`).
 
 ```json5
@@ -1880,12 +1553,9 @@ Block streaming:
   ```
 - `agents.defaults.blockStreamingCoalesce`: merge streamed blocks before sending.
   Defaults to `{ idleMs: 1000 }` and inherits `minChars` from `blockStreamingChunk`
-  with `maxChars` capped to the channel text limit. Signal/Slack/Discord/Google Chat default
+  with `maxChars` capped to the channel text limit. Google Chat defaults
   to `minChars: 1500` unless overridden.
-  Channel overrides: `channels.whatsapp.blockStreamingCoalesce`, `channels.telegram.blockStreamingCoalesce`,
-  `channels.discord.blockStreamingCoalesce`, `channels.slack.blockStreamingCoalesce`, `channels.mattermost.blockStreamingCoalesce`,
-  `channels.signal.blockStreamingCoalesce`, `channels.imessage.blockStreamingCoalesce`, `channels.msteams.blockStreamingCoalesce`,
-  `channels.googlechat.blockStreamingCoalesce`
+  Channel overrides: `channels.telegram.blockStreamingCoalesce`
   (and per-account variants).
 - `agents.defaults.humanDelay`: randomized pause between **block replies** after the first.
   Modes: `off` (default), `natural` (800–2500ms), `custom` (use `minMs`/`maxMs`).
@@ -1902,7 +1572,7 @@ Typing indicators:
 - `agents.defaults.typingMode`: `"never" | "instant" | "thinking" | "message"`. Defaults to
   `instant` for direct chats / mentions and `message` for unmentioned group chats.
 - `session.typingMode`: per-session override for the mode.
-- `agents.defaults.typingIntervalSeconds`: how often the typing signal is refreshed (default: 6s).
+- `agents.defaults.typingIntervalSeconds`: how often the typing indicator is refreshed (default: 6s).
 - `session.typingIntervalSeconds`: per-session override for the refresh interval.
 See [/concepts/typing-indicators](/concepts/typing-indicators) for behavior details.
 
@@ -1919,8 +1589,8 @@ Z.AI models are available as `zai/<model>` (e.g. `zai/glm-4.7`) and require
 - `model`: optional override model for heartbeat runs (`provider/model`).
 - `includeReasoning`: when `true`, heartbeats will also deliver the separate `Reasoning:` message when available (same shape as `/reasoning on`). Default: `false`.
 - `session`: optional session key to control which session the heartbeat runs in. Default: `main`.
-- `to`: optional recipient override (channel-specific id, e.g. E.164 for WhatsApp, chat id for Telegram).
-- `target`: optional delivery channel (`last`, `whatsapp`, `telegram`, `discord`, `slack`, `msteams`, `signal`, `imessage`, `none`). Default: `last`.
+- `to`: optional recipient override (channel-specific id, e.g. chat id for Telegram).
+- `target`: optional delivery channel (`last`, `telegram`, `none`). Default: `last`.
 - `prompt`: optional override for the heartbeat body (default: `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`). Overrides are sent verbatim; include a `Read HEARTBEAT.md` line if you still want the file read.
 - `ackMaxChars`: max chars allowed after `HEARTBEAT_OK` before delivery (default: 300).
 
@@ -2029,12 +1699,12 @@ Example:
 
 Per-agent override: `agents.list[].tools.profile`.
 
-Example (messaging-only by default, allow Slack + Discord tools too):
+Example (messaging-only by default, allow telegram tools too):
 ```json5
 {
   tools: {
     profile: "messaging",
-    allow: ["slack", "discord"]
+    allow: ["telegram"]
   }
 }
 ```
@@ -2106,11 +1776,7 @@ Tool groups (shorthands) work in **global** and **per-agent** tool policies:
 `tools.elevated` controls elevated (host) exec access:
 - `enabled`: allow elevated mode (default true)
 - `allowFrom`: per-channel allowlists (empty = disabled)
-  - `whatsapp`: E.164 numbers
   - `telegram`: chat ids or usernames
-  - `discord`: user ids or usernames (falls back to `channels.discord.dm.allowFrom` if omitted)
-  - `signal`: E.164 numbers
-  - `imessage`: handles/chat ids
   - `webchat`: session ids or usernames
 
 Example:
@@ -2120,8 +1786,7 @@ Example:
     elevated: {
       enabled: true,
       allowFrom: {
-        whatsapp: ["+15555550123"],
-        discord: ["steipete", "1234567890123"]
+        telegram: ["12345678", "username"]
       }
     }
   }
@@ -2246,7 +1911,7 @@ For package installs, ensure network egress, a writable root FS, and a root user
     sandbox: {
       tools: {
         allow: ["exec", "process", "read", "write", "edit", "apply_patch", "sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status"],
-        deny: ["browser", "canvas", "nodes", "cron", "discord", "gateway"]
+        deny: ["browser", "canvas", "nodes", "cron", "gateway"]
       }
     }
   }
@@ -2618,7 +2283,7 @@ Controls session scoping, reset policy, reset triggers, and where the session st
     scope: "per-sender",
     dmScope: "main",
     identityLinks: {
-      alice: ["telegram:123456789", "discord:987654321012345678"]
+      alice: ["telegram:123456789"]
     },
     reset: {
       mode: "daily",
@@ -2642,7 +2307,7 @@ Controls session scoping, reset policy, reset triggers, and where the session st
     },
     sendPolicy: {
       rules: [
-        { action: "deny", match: { channel: "discord", chatType: "group" } }
+        { action: "deny", match: { channel: "telegram", chatType: "group" } }
       ],
       default: "allow"
     }
@@ -2658,7 +2323,7 @@ Fields:
   - `per-peer`: isolate DMs by sender id across channels.
   - `per-channel-peer`: isolate DMs per channel + sender (recommended for multi-user inboxes).
 - `identityLinks`: map canonical ids to provider-prefixed peers so the same person shares a DM session across channels when using `per-peer` or `per-channel-peer`.
-  - Example: `alice: ["telegram:123456789", "discord:987654321012345678"]`.
+  - Example: `alice: ["telegram:123456789"]`.
 - `reset`: primary reset policy. Defaults to daily resets at 4:00 AM local time on the gateway host.
   - `mode`: `daily` or `idle` (default: `daily` when `reset` is present).
   - `atHour`: local hour (0-23) for the daily reset boundary.
@@ -2887,14 +2552,13 @@ Auth and Tailscale:
 
 Remote client defaults (CLI):
 - `gateway.remote.url` sets the default Gateway WebSocket URL for CLI calls when `gateway.mode = "remote"`.
-- `gateway.remote.transport` selects the macOS remote transport (`ssh` default, `direct` for ws/wss). When `direct`, `gateway.remote.url` must be `ws://` or `wss://`. `ws://host` defaults to port `18789`.
+- `gateway.remote.transport` selects the remote transport (`ssh` default, `direct` for ws/wss). When `direct`, `gateway.remote.url` must be `ws://` or `wss://`. `ws://host` defaults to port `18789`.
 - `gateway.remote.token` supplies the token for remote calls (leave unset for no auth).
 - `gateway.remote.password` supplies the password for remote calls (leave unset for no auth).
 
-macOS app behavior:
-- crocbot.app watches `~/.clawdbot/crocbot.json` and switches modes live when `gateway.mode` or `gateway.remote.url` changes.
-- If `gateway.mode` is unset but `gateway.remote.url` is set, the macOS app treats it as remote mode.
-- When you change connection mode in the macOS app, it writes `gateway.mode` (and `gateway.remote.url` + `gateway.remote.transport` in remote mode) back to the config file.
+Client behavior:
+- Clients watch `~/.clawdbot/crocbot.json` and switch modes live when `gateway.mode` or `gateway.remote.url` changes.
+- If `gateway.mode` is unset but `gateway.remote.url` is set, clients treat it as remote mode.
 
 ```json5
 {
@@ -2909,7 +2573,7 @@ macOS app behavior:
 }
 ```
 
-Direct transport example (macOS app):
+Direct transport example:
 
 ```json5
 {
@@ -2955,9 +2619,9 @@ Hot-applied (no full gateway restart):
 - `browser` (browser control server restart)
 - `cron` (cron service restart + concurrency update)
 - `agents.defaults.heartbeat` (heartbeat runner restart)
-- `web` (WhatsApp web channel restart)
-- `telegram`, `discord`, `signal`, `imessage` (channel restarts)
-- `agent`, `models`, `routing`, `messages`, `session`, `whatsapp`, `logging`, `skills`, `ui`, `talk`, `identity`, `wizard` (dynamic reads)
+- `telegram` (channel restart)
+- `telegram` (channel restarts)
+- `agent`, `models`, `routing`, `messages`, `session`, `logging`, `skills`, `ui`, `talk`, `identity`, `wizard` (dynamic reads)
 
 Requires full Gateway restart:
 - `gateway` (port/bind/auth/control UI/tailscale)
@@ -3041,8 +2705,8 @@ Mapping notes:
 - `match.source` matches a payload field (e.g. `{ source: "gmail" }`) so you can use a generic `/hooks/ingest` path.
 - Templates like `{{messages[0].subject}}` read from the payload.
 - `transform` can point to a JS/TS module that returns a hook action.
-- `deliver: true` sends the final reply to a channel; `channel` defaults to `last` (falls back to WhatsApp).
-- If there is no prior delivery route, set `channel` + `to` explicitly (required for Telegram/Discord/Google Chat/Slack/Signal/iMessage/MS Teams).
+- `deliver: true` sends the final reply to a channel; `channel` defaults to `last` (falls back to Telegram).
+- If there is no prior delivery route, set `channel` + `to` explicitly (required for Telegram).
 - `model` overrides the LLM for this hook run (`provider/model` or alias; must be allowed if `agents.defaults.models` is set).
 
 Gmail helper config (used by `crocbot webhooks gmail setup` / `run`):
@@ -3094,7 +2758,7 @@ If you need the backend to receive the prefixed path, set
 
 ### `canvasHost` (LAN/tailnet Canvas file server + live reload)
 
-The Gateway serves a directory of HTML/CSS/JS over HTTP so iOS/Android nodes can simply `canvas.navigate` to it.
+The Gateway serves a directory of HTML/CSS/JS over HTTP so nodes can simply `canvas.navigate` to it.
 
 Default root: `~/clawd/canvas`  
 Default port: `18793` (chosen to avoid the clawd browser CDP port `18792`)  
@@ -3133,7 +2797,7 @@ Current builds no longer include the TCP bridge listener; `bridge.*` config keys
 Nodes connect over the Gateway WebSocket. This section is kept for historical reference.
 
 Legacy behavior:
-- The Gateway could expose a simple TCP bridge for nodes (iOS/Android), typically on port `18790`.
+- The Gateway could expose a simple TCP bridge for nodes, typically on port `18790`.
 
 Defaults:
 - enabled: `true`
@@ -3191,7 +2855,7 @@ Controls LAN mDNS discovery broadcasts (`_crocbot-gw._tcp`).
 
 When enabled, the Gateway writes a unicast DNS-SD zone for `_crocbot-bridge._tcp` under `~/.clawdbot/dns/` using the standard discovery domain `crocbot.internal.`
 
-To make iOS/Android discover across networks (Vienna ⇄ London), pair this with:
+To make nodes discover across networks (Vienna to London), pair this with:
 - a DNS server on the gateway host serving `crocbot.internal.` (CoreDNS is recommended)
 - Tailscale **split DNS** so clients resolve `crocbot.internal` via that server
 
@@ -3216,7 +2880,7 @@ Template placeholders are expanded in `tools.media.*.models[].args` and `tools.m
 | `{{Body}}` | Full inbound message body |
 | `{{RawBody}}` | Raw inbound message body (no history/sender wrappers; best for command parsing) |
 | `{{BodyStripped}}` | Body with group mentions stripped (best default for agents) |
-| `{{From}}` | Sender identifier (E.164 for WhatsApp; may differ per channel) |
+| `{{From}}` | Sender identifier (may differ per channel) |
 | `{{To}}` | Destination identifier |
 | `{{MessageSid}}` | Channel message id (when available) |
 | `{{SessionId}}` | Current session UUID |
@@ -3232,7 +2896,7 @@ Template placeholders are expanded in `tools.media.*.models[].args` and `tools.m
 | `{{GroupMembers}}` | Group members preview (best effort) |
 | `{{SenderName}}` | Sender display name (best effort) |
 | `{{SenderE164}}` | Sender phone number (best effort) |
-| `{{Provider}}` | Provider hint (whatsapp|telegram|discord|googlechat|slack|signal|imessage|msteams|webchat|…) |
+| `{{Provider}}` | Provider hint (telegram|webchat|...) |
 
 ## Cron (Gateway scheduler)
 

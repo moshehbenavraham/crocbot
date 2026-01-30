@@ -18,7 +18,7 @@ Single, rigorous document for:
 - Migration plan, risks, open questions.
 
 ## Goals (from discussion)
-- One protocol for all clients (mac app, CLI, iOS, Android, headless node).
+- One protocol for all clients (CLI, headless node).
 - Every network participant authenticated + paired.
 - Role clarity: nodes vs operators.
 - Central approvals routed to where the user is.
@@ -65,15 +65,13 @@ Single, rigorous document for:
 - Browser control uses its own HTTP control server.
 
 ## Nodes today
-- macOS app in node mode connects to Gateway bridge (`MacNodeBridgeSession`).
-- iOS/Android apps connect to Gateway bridge.
+- Headless nodes connect to Gateway bridge.
 - Pairing + per‑node token stored on gateway.
 
 ## Current approval flow (exec)
 - Agent uses `system.run` via Gateway.
 - Gateway invokes node over bridge.
 - Node runtime decides approval.
-- UI prompt shown by mac app (when node == mac app).
 - Node returns `invoke-res` to Gateway.
 - Multi‑hop, UI tied to node host.
 
@@ -206,7 +204,7 @@ Approval is **gateway‑hosted**, UI delivered to operator clients.
 - Resolution requires `operator.approvals` scope.
 
 ## Benefits
-- Prompt appears where user is (mac/phone).
+- Prompt appears where user is.
 - Consistent approvals for remote nodes.
 - Node runtime stays headless; no UI dependency.
 
@@ -214,15 +212,9 @@ Approval is **gateway‑hosted**, UI delivered to operator clients.
 
 # Role clarity examples
 
-## iPhone app
-- **Node role** for: mic, camera, voice chat, location, push‑to‑talk.
-- Optional **operator.read** for status and chat view.
-- Optional **operator.write/admin** only when explicitly enabled.
-
-## macOS app
-- Operator role by default (control UI).
-- Node role when “Mac node” enabled (system.run, screen, camera).
-- Same deviceId for both connections → merged UI entry.
+## Headless node
+- **Node role** for: system.run, other local commands.
+- Pairing + per‑node token stored on gateway.
 
 ## CLI
 - Operator role always.
@@ -279,7 +271,7 @@ Same `deviceId` across roles → single “Instance” row:
 - Add pinning to clients.
 
 ## Phase 5: Deprecate bridge
-- Migrate iOS/Android/mac node to WS.
+- Migrate all nodes to WS.
 - Keep bridge as fallback; remove once stable.
 
 ## Phase 6: Device‑bound auth

@@ -4,7 +4,7 @@
 **Sessions**: 5
 **Estimated Duration**: 2-3 days
 
-**Progress**: 4/5 sessions (80%)
+**Progress**: 5/5 sessions (100%)
 
 ---
 
@@ -22,7 +22,7 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 | 02 | Docker Optimization | Complete | 20 | 2026-01-30 |
 | 03 | Gateway Hardening | Complete | 20 | 2026-01-30 |
 | 04 | CI/CD Finalization | Complete | 18 | 2026-01-30 |
-| 05 | Internal Docs Cleanup | Not Started | ~12-18 | - |
+| 05 | Internal Docs Cleanup | Complete | 20 | 2026-01-30 |
 
 ---
 
@@ -69,11 +69,21 @@ With the crocbot codebase stripped to a minimal footprint (CLI + Telegram only),
 - Dependabot now monitors only npm and github-actions ecosystems
 - 3590 tests passing, full quality gates verified
 
+### Session 05: Internal Docs Cleanup (2026-01-30)
+
+- Cleaned 122 documentation files of stale channel/platform references
+- Removed operational references to Discord, Slack, Signal, iMessage, WhatsApp, Line
+- Removed operational references to iOS, macOS, Android platforms
+- Preserved historical context in planning documents (docs/ongoing-projects/)
+- Updated docs.json navigation, verified no dead entries
+- Updated CONSIDERATIONS.md to mark docs cleanup complete
+- All 20 tasks completed, validation passed
+
 ---
 
-## Upcoming Sessions
+## Phase Complete
 
-- Session 05: Internal Docs Cleanup
+Phase 01 is now complete. All 5 sessions have been validated and merged.
 
 ---
 
@@ -134,15 +144,15 @@ Phase complete when:
 - [x] Session 02 - Docker Optimization completed
 - [x] Session 03 - Gateway Hardening completed
 - [x] Session 04 - CI/CD Finalization completed
-- [ ] Session 05 - Internal Docs Cleanup completed
-- [ ] No stub files remaining for removed features
-- [ ] No orphaned code referencing removed channels
+- [x] Session 05 - Internal Docs Cleanup completed
+- [x] No stub files remaining for removed features
+- [x] No orphaned code referencing removed channels
 - [x] Docker image optimized and tested
 - [x] Gateway handles disconnects and errors gracefully
 - [x] CI/CD pipelines verified for production use
-- [ ] Internal docs cleaned of stale references
-- [ ] All tests passing with coverage thresholds met
-- [ ] `crocbot doctor` validates clean installation
+- [x] Internal docs cleaned of stale references
+- [x] All tests passing with coverage thresholds met
+- [x] `crocbot doctor` validates clean installation
 
 ---
 

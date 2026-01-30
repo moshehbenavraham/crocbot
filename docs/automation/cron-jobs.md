@@ -124,7 +124,7 @@ Resolution priority:
 
 ### Delivery (channel + target)
 Isolated jobs can deliver output to a channel. The job payload can specify:
-- `channel`: `whatsapp` / `telegram` / `discord` / `slack` / `mattermost` (plugin) / `signal` / `imessage` / `last`
+- `channel`: `telegram` / `last`
 - `to`: channel-specific recipient target
 
 If `channel` or `to` is omitted, cron can fall back to the main session’s “last route”
@@ -136,7 +136,6 @@ Delivery notes:
 - Use `deliver: false` to keep output internal even if a `to` is present.
 
 Target format reminders:
-- Slack/Discord/Mattermost (plugin) targets should use explicit prefixes (e.g. `channel:<id>`, `user:<id>`) to avoid ambiguity.
 - Telegram topics should use the `:topic:` form (see below).
 
 #### Telegram delivery targets (topics / forum threads)
@@ -194,7 +193,7 @@ crocbot cron add \
   --wake now
 ```
 
-Recurring isolated job (deliver to WhatsApp):
+Recurring isolated job (deliver to Telegram):
 ```bash
 crocbot cron add \
   --name "Morning status" \
@@ -203,8 +202,8 @@ crocbot cron add \
   --session isolated \
   --message "Summarize inbox + calendar for today." \
   --deliver \
-  --channel whatsapp \
-  --to "+15551234567"
+  --channel telegram \
+  --to "-1001234567890"
 ```
 
 Recurring isolated job (deliver to a Telegram topic):
@@ -231,8 +230,8 @@ crocbot cron add \
   --model "opus" \
   --thinking high \
   --deliver \
-  --channel whatsapp \
-  --to "+15551234567"
+  --channel telegram \
+  --to "-1001234567890"
 
 Agent selection (multi-agent setups):
 ```bash

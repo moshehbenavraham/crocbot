@@ -1,7 +1,7 @@
 # Considerations
 
 > Institutional memory for AI assistants. Updated between phases via /carryforward.
-> **Line budget**: 600 max | **Last updated**: Phase 00 (2026-01-30)
+> **Line budget**: 600 max | **Last updated**: Phase 01 (2026-01-30)
 
 ---
 
@@ -14,7 +14,7 @@ Items requiring attention in upcoming phases. Review before each session.
 
 - [P00] **Stub files for disabled features**: API-compatible stubs remain for TTS, pairing, Bonjour (`src/tts/tts.ts`, `src/pairing/`, `src/infra/device-pairing.ts`, etc.). Functional code removed but stubs maintain type compatibility. Consider full removal in future cleanup phase.
 
-- [P00] **Internal docs reference removed features**: 123 internal/advanced docs files still reference removed channels and platforms (Discord, Slack, iOS, macOS, etc.). User-facing docs updated; internal docs deferred.
+- [P01] **Internal docs cleanup complete**: 130+ files cleaned of stale channel/platform references. Only 2 files retain historical context (lore.md, device-models.md).
 
 ### External Dependencies
 <!-- Max 5 items -->
@@ -100,6 +100,7 @@ Recently closed items (buffer - rotates out after 2 phases).
 | P00 | Dead channel config types | Deleted in Session 06 |
 | P00 | Mobile infrastructure (TTS/Bonjour/pairing) | Stubbed/disabled in Session 07 |
 | P00 | User-facing documentation | Updated for Telegram-only in Session 08 |
+| P01 | Internal docs cleanup | Cleaned 130+ files in Session 05 |
 
 ---
 

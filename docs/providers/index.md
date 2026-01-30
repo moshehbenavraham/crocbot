@@ -9,7 +9,7 @@ read_when:
 crocbot can use many LLM providers. Pick a provider, authenticate, then set the
 default model as `provider/model`.
 
-Looking for chat channel docs (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/etc.)? See [Channels](/channels).
+Looking for chat channel docs (Telegram)? See [Channels](/channels).
 
 ## Highlight: Venius (Venice AI)
 

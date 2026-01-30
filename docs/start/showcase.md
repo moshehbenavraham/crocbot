@@ -9,7 +9,7 @@ summary: "Community-built projects and integrations powered by crocbot"
 Real projects from the community. See what people are building with crocbot.
 
 <Info>
-**Want to be featured?** Share your project in [#showcase on Discord](https://discord.gg/clawd) or [tag @crocbot on X](https://x.com/crocbot).
+**Want to be featured?** [Tag @crocbot on X](https://x.com/crocbot) to share your project.
 </Info>
 
 ## 🎥 crocbot in Action
@@ -82,7 +82,7 @@ Full setup walkthrough (28m) by VelvetShark.
 
 [Watch on YouTube](https://www.youtube.com/watch?v=5kkIJNUGFho)
 
-## 🆕 Fresh from Discord
+## 🆕 Community Projects
 
 <CardGroup cols={2}>
 
@@ -170,13 +170,6 @@ Full setup walkthrough (28m) by VelvetShark.
   Upload to Cloudflare R2/S3 and generate secure presigned download links. Perfect for remote crocbot instances.
 </Card>
 
-<Card title="iOS App via Telegram" icon="mobile" href="#">
-  **@coard** • `ios` `xcode` `testflight`
-
-  Built a complete iOS app with maps and voice recording, deployed to TestFlight entirely via Telegram chat.
-
-  <img src="/assets/showcase/ios-testflight.jpg" alt="iOS app on TestFlight" />
-</Card>
 
 <Card title="Oura Ring Health Assistant" icon="heart-pulse" href="#">
   **@AS** • `health` `oura` `calendar`
@@ -200,7 +193,7 @@ Full setup walkthrough (28m) by VelvetShark.
 <Card title="Beeper CLI" icon="message" href="https://github.com/blqke/beepcli">
   **@jules** • `messaging` `beeper` `cli` `automation`
 
-  Read, send, and archive messages via Beeper Desktop. Uses Beeper local MCP API so agents can manage all your chats (iMessage, WhatsApp, etc.) in one place.
+  Read, send, and archive messages via Beeper Desktop. Uses Beeper local MCP API so agents can manage all your chats in one place.
 </Card>
 
 </CardGroup>
@@ -275,11 +268,6 @@ Full setup walkthrough (28m) by VelvetShark.
   Logs into TradingView via browser automation, screenshots charts, and performs technical analysis on demand. No API needed—just browser control.
 </Card>
 
-<Card title="Slack Auto-Support" icon="slack">
-  **@henrymascot** • `slack` `automation` `support`
-
-  Watches company Slack channel, responds helpfully, and forwards notifications to Telegram. Autonomously fixed a production bug in a deployed app without being asked.
-</Card>
 
 </CardGroup>
 
@@ -295,11 +283,6 @@ Full setup walkthrough (28m) by VelvetShark.
   <img src="/assets/showcase/xuezh-pronunciation.jpeg" alt="xuezh pronunciation feedback" />
 </Card>
 
-<Card title="WhatsApp Memory Vault" icon="vault">
-  **Community** • `memory` `transcription` `indexing`
-  
-  Ingests full WhatsApp exports, transcribes 1k+ voice notes, cross-checks with git logs, outputs linked markdown reports.
-</Card>
 
 <Card title="Karakeep Semantic Search" icon="magnifying-glass" href="https://github.com/jamesbrooksco/karakeep-semantic-search">
   **@jamesbrooksco** • `search` `vector` `bookmarks`
@@ -405,7 +388,7 @@ Have something to share? We'd love to feature it!
 
 <Steps>
   <Step title="Share It">
-    Post in [#showcase on Discord](https://discord.gg/clawd) or [tweet @crocbot](https://x.com/crocbot)
+    [Tweet @crocbot](https://x.com/crocbot)
   </Step>
   <Step title="Include Details">
     Tell us what it does, link to the repo/demo, share a screenshot if you have one

@@ -368,9 +368,8 @@ Notes:
 
 ### Register a messaging channel
 
-Plugins can register **channel plugins** that behave like built‑in channels
-(WhatsApp, Telegram, etc.). Channel config lives under `channels.<id>` and is
-validated by your channel plugin code.
+Plugins can register **channel plugins** that behave like the built-in Telegram channel.
+Channel config lives under `channels.<id>` and is validated by your channel plugin code.
 
 ```ts
 const myChannel = {

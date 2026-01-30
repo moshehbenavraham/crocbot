@@ -18,5 +18,5 @@ Related:
 crocbot agent --to +15555550123 --message "status update" --deliver
 crocbot agent --agent ops --message "Summarize logs"
 crocbot agent --session-id 1234 --message "Summarize inbox" --thinking medium
-crocbot agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
+crocbot agent --agent ops --message "Generate report" --deliver --reply-channel telegram --reply-to "123456789"
 ```

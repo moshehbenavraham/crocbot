@@ -11,10 +11,6 @@ It does not define which tools exist; crocbot provides built-in tools internally
 
 ## Examples
 
-### imsg
-- Send an iMessage/SMS: describe who/what, confirm before sending.
-- Prefer short messages; avoid sending secrets.
-
 ### sag
 - Text-to-speech: specify voice, target speaker/room, and whether to stream.
 

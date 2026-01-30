@@ -38,12 +38,11 @@ Profiles:
 - `messaging`: `group:messaging`, `sessions_list`, `sessions_history`, `sessions_send`, `session_status`
 - `full`: no restriction (same as unset)
 
-Example (messaging-only by default, allow Slack + Discord tools too):
+Example (messaging-only by default):
 ```json5
 {
   tools: {
-    profile: "messaging",
-    allow: ["slack", "discord"]
+    profile: "messaging"
   }
 }
 ```
@@ -66,7 +65,7 @@ Example (global coding profile, messaging-only support agent):
     list: [
       {
         id: "support",
-        tools: { profile: "messaging", allow: ["slack"] }
+        tools: { profile: "messaging" }
       }
     ]
   }
@@ -326,11 +325,11 @@ Notes:
 - Uses the image model directly (independent of the main chat model).
 
 ### `message`
-Send messages and channel actions across Discord/Google Chat/Slack/Telegram/WhatsApp/Signal/iMessage/MS Teams.
+Send messages and channel actions via Telegram.
 
 Core actions:
-- `send` (text + optional media; MS Teams also supports `card` for Adaptive Cards)
-- `poll` (WhatsApp/Discord/MS Teams polls)
+- `send` (text + optional media)
+- `poll` (Telegram polls)
 - `react` / `reactions` / `read` / `edit` / `delete`
 - `pin` / `unpin` / `list-pins`
 - `permissions`
@@ -346,9 +345,8 @@ Core actions:
 - `timeout` / `kick` / `ban`
 
 Notes:
-- `send` routes WhatsApp via the Gateway; other channels go direct.
-- `poll` uses the Gateway for WhatsApp and MS Teams; Discord polls go direct.
-- When a message tool call is bound to an active chat session, sends are constrained to that session’s target to avoid cross-context leaks.
+- `send` routes via the Gateway.
+- When a message tool call is bound to an active chat session, sends are constrained to that session's target to avoid cross-context leaks.
 
 ### `cron`
 Manage Gateway cron jobs and wakeups.

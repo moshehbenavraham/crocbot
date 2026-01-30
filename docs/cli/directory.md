@@ -22,20 +22,13 @@ Directory lookups for channels that support it (contacts/peers, groups, and “m
 ## Using results with `message send`
 
 ```bash
-crocbot directory peers list --channel slack --query "U0"
-crocbot message send --channel slack --target user:U012ABCDEF --message "hello"
+crocbot directory peers list --channel telegram --query "@"
+crocbot message send --channel telegram --target 123456789 --message "hello"
 ```
 
 ## ID formats (by channel)
 
-- WhatsApp: `+15551234567` (DM), `1234567890-1234567890@g.us` (group)
 - Telegram: `@username` or numeric chat id; groups are numeric ids
-- Slack: `user:U…` and `channel:C…`
-- Discord: `user:<id>` and `channel:<id>`
-- Matrix (plugin): `user:@user:server`, `room:!roomId:server`, or `#alias:server`
-- Microsoft Teams (plugin): `user:<id>` and `conversation:<id>`
-- Zalo (plugin): user id (Bot API)
-- Zalo Personal / `zalouser` (plugin): thread id (DM/group) from `zca` (`me`, `friend list`, `group list`)
 
 ## Self (“me”)
 

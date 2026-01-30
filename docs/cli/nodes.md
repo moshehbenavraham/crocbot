@@ -55,7 +55,7 @@ Invoke flags:
 - Reads `tools.exec.*` (plus `agents.list[].tools.exec.*` overrides).
 - Uses exec approvals (`exec.approval.request`) before invoking `system.run`.
 - `--node` can be omitted when `tools.exec.node` is set.
-- Requires a node that advertises `system.run` (macOS companion app or headless node host).
+- Requires a node that advertises `system.run` (headless node host).
 
 Flags:
 - `--cwd <path>`: working directory.

@@ -10,7 +10,7 @@ Last updated: 2026-01-10
 TypeBox is a TypeScript-first schema library. We use it to define the **Gateway
 WebSocket protocol** (handshake, request/response, server events). Those schemas
 drive **runtime validation**, **JSON Schema export**, and **Swift codegen** for
-the macOS app. One source of truth; everything else is generated.
+clients. One source of truth; everything else is generated.
 
 If you want the higher-level protocol context, start with
 [Gateway architecture](/concepts/architecture).

@@ -145,7 +145,7 @@ crocbot hooks enable session-memory
 - Saves config to disk
 
 **After enabling:**
-- Restart the gateway so hooks reload (menu bar app restart on macOS, or restart your gateway process in dev).
+- Restart the gateway so hooks reload.
 
 ## Disable a Hook
 

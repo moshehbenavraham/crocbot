@@ -15,9 +15,6 @@ read_when:
 
 ## Why a selector (not just a switch)
 OS permissions are multi-level. We can expose a selector in-app, but the OS still decides the actual grant.
-- iOS/macOS: user can choose **While Using** or **Always** in system prompts/Settings. App can request upgrade, but OS may require Settings.
-- Android: background location is a separate permission; on Android 10+ it often requires a Settings flow.
-- Precise location is a separate grant (iOS 14+ “Precise”, Android “fine” vs “coarse”).
 
 Selector in UI drives our requested mode; actual grant lives in OS settings.
 
@@ -32,7 +29,7 @@ UI behavior:
 - If OS denies requested level, revert to the highest granted level and show status.
 
 ## Permissions mapping (node.permissions)
-Optional. macOS node reports `location` via the permissions map; iOS/Android may omit it.
+Optional. Nodes may report `location` via the permissions map.
 
 ## Command: `location.get`
 Called via `node.invoke`.
@@ -72,16 +69,17 @@ Errors (stable codes):
 Goal: model can request location even when node is backgrounded, but only when:
 - User selected **Always**.
 - OS grants background location.
-- App is allowed to run in background for location (iOS background mode / Android foreground service or special allowance).
+- Node is allowed to run in background for location.
 
 Push-triggered flow (future):
-1) Gateway sends a push to the node (silent push or FCM data).
+1) Gateway sends a push to the node (silent push or data message).
 2) Node wakes briefly and requests location from the device.
 3) Node forwards payload to Gateway.
 
 Notes:
-- iOS: Always permission + background location mode required. Silent push may be throttled; expect intermittent failures.
-- Android: background location may require a foreground service; otherwise, expect denial.
+- Always permission + background location mode required.
+- Silent push may be throttled; expect intermittent failures.
+- Background location may require a foreground service; otherwise, expect denial.
 
 ## Model/tooling integration
 - Tool surface: `nodes` tool adds `location_get` action (node required).
@@ -89,7 +87,7 @@ Notes:
 - Agent guidelines: only call when user enabled location and understands the scope.
 
 ## UX copy (suggested)
-- Off: “Location sharing is disabled.”
-- While Using: “Only when crocbot is open.”
-- Always: “Allow background location. Requires system permission.”
-- Precise: “Use precise GPS location. Toggle off to share approximate location.”
+- Off: "Location sharing is disabled."
+- While Using: "Only when crocbot is open."
+- Always: "Allow background location. Requires system permission."
+- Precise: "Use precise GPS location. Toggle off to share approximate location."

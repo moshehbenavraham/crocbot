@@ -54,9 +54,8 @@ For the generic Docker flow, see [Docker](/install/docker).
 - ~20 minutes  
 - Docker and Docker Compose  
 - Model auth credentials  
-- Optional provider credentials  
-  - WhatsApp QR  
-  - Telegram bot token  
+- Optional provider credentials
+  - Telegram bot token
   - Gmail OAuth  
 
 ---
@@ -177,9 +176,6 @@ services:
       # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
       - "127.0.0.1:${CLAWDBOT_GATEWAY_PORT}:18789"
 
-      # Optional: only if you run iOS/Android nodes against this VPS and need Canvas host.
-      # If you expose this publicly, read /gateway/security and firewall accordingly.
-      # - "18793:18793"
     command:
       [
         "node",
@@ -201,10 +197,9 @@ Anything installed at runtime will be lost on restart.
 
 All external binaries required by skills must be installed at image build time.
 
-The examples below show three common binaries only:
+The examples below show two common binaries:
 - `gog` for Gmail access
 - `goplaces` for Google Places
-- `wacli` for WhatsApp
 
 These are examples, not a complete list.
 You may install as many binaries as needed using the same pattern.
@@ -228,10 +223,6 @@ RUN curl -L https://github.com/steipete/gog/releases/latest/download/gog_Linux_x
 # Example binary 2: Google Places CLI
 RUN curl -L https://github.com/steipete/goplaces/releases/latest/download/goplaces_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/goplaces
-
-# Example binary 3: WhatsApp CLI
-RUN curl -L https://github.com/steipete/wacli/releases/latest/download/wacli_Linux_x86_64.tar.gz \
-  | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/wacli
 
 # Add more binaries below using the same pattern
 
@@ -267,7 +258,6 @@ Verify binaries:
 ```bash
 docker compose exec crocbot-gateway which gog
 docker compose exec crocbot-gateway which goplaces
-docker compose exec crocbot-gateway which wacli
 ```
 
 Expected output:
@@ -275,7 +265,6 @@ Expected output:
 ```
 /usr/local/bin/gog
 /usr/local/bin/goplaces
-/usr/local/bin/wacli
 ```
 
 ---
@@ -317,7 +306,6 @@ All long-lived state must survive restarts, rebuilds, and reboots.
 | Model auth profiles | `/home/node/.clawdbot/` | Host volume mount | OAuth tokens, API keys |
 | Skill configs | `/home/node/.clawdbot/skills/` | Host volume mount | Skill-level state |
 | Agent workspace | `/home/node/clawd/` | Host volume mount | Code and agent artifacts |
-| WhatsApp session | `/home/node/.clawdbot/` | Host volume mount | Preserves QR login |
 | Gmail keyring | `/home/node/.clawdbot/` | Host volume + password | Requires `GOG_KEYRING_PASSWORD` |
 | External binaries | `/usr/local/bin/` | Docker image | Must be baked at build time |
 | Node runtime | Container filesystem | Docker image | Rebuilt every image build |

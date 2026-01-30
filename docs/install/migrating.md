@@ -2,7 +2,7 @@
 summary: "Move (migrate) a crocbot install from one machine to another"
 read_when:
   - You are moving crocbot to a new laptop/server
-  - You want to preserve sessions, auth, and channel logins (WhatsApp, etc.)
+  - You want to preserve sessions, auth, and channel logins
 ---
 # Migrating crocbot to a new machine
 
@@ -52,7 +52,7 @@ If you copy **both** the state dir and workspace, you keep:
 - Gateway configuration (`crocbot.json`)
 - Auth profiles / API keys / OAuth tokens
 - Session history + agent state
-- Channel state (e.g. WhatsApp login/session)
+- Channel state (e.g. Telegram login/session)
 - Your workspace files (memory, skills notes, etc.)
 
 If you copy **only** the workspace (e.g., via Git), you do **not** preserve:
@@ -168,7 +168,7 @@ If you’re in remote mode, migrate the **gateway host**.
 
 ### Footgun: secrets in backups
 
-`$CLAWDBOT_STATE_DIR` contains secrets (API keys, OAuth tokens, WhatsApp creds). Treat backups like production secrets:
+`$CLAWDBOT_STATE_DIR` contains secrets (API keys, OAuth tokens, channel credentials). Treat backups like production secrets:
 
 - store encrypted
 - avoid sharing over insecure channels
@@ -179,7 +179,7 @@ If you’re in remote mode, migrate the **gateway host**.
 On the new machine, confirm:
 
 - `crocbot status` shows the gateway running
-- Your channels are still connected (e.g. WhatsApp doesn’t require re-pair)
+- Your channels are still connected (e.g. Telegram doesn't require re-login)
 - The dashboard opens and shows existing sessions
 - Your workspace files (memory, configs) are present
 

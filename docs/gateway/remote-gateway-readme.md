@@ -1,11 +1,11 @@
 ---
-summary: "SSH tunnel setup for crocbot.app connecting to a remote gateway"
-read_when: "Connecting the macOS app to a remote gateway over SSH"
+summary: "SSH tunnel setup for connecting to a remote gateway"
+read_when: "Connecting a client to a remote gateway over SSH"
 ---
 
-# Running crocbot.app with a Remote Gateway
+# Running crocbot with a Remote Gateway
 
-crocbot.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
+crocbot uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
 
 ## Overview
 

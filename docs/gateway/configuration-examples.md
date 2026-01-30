@@ -15,11 +15,11 @@ Examples below are aligned with the current config schema. For the exhaustive re
 ```json5
 {
   agent: { workspace: "~/clawd" },
-  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+  channels: { telegram: { allowFrom: ["123456789"] } }
 }
 ```
 
-Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
+Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that chat ID.
 
 ### Recommended starter
 ```json5
@@ -34,8 +34,9 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
     model: { primary: "anthropic/claude-sonnet-4-5" }
   },
   channels: {
-    whatsapp: {
-      allowFrom: ["+15555550123"],
+    telegram: {
+      botToken: "YOUR_TELEGRAM_BOT_TOKEN",
+      allowFrom: ["123456789"],
       groups: { "*": { requireMention: true } }
     }
   }
@@ -111,12 +112,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
       cap: 20,
       drop: "summarize",
       byChannel: {
-        whatsapp: "collect",
         telegram: "collect",
-        discord: "collect",
-        slack: "collect",
-        signal: "collect",
-        imessage: "collect",
         webchat: "collect"
       }
     }
@@ -152,7 +148,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
       idleMinutes: 60
     },
     resetByChannel: {
-      discord: { mode: "idle", idleMinutes: 10080 }
+      telegram: { mode: "idle", idleMinutes: 10080 }
     },
     resetTriggers: ["/new", "/reset"],
     store: "~/.clawdbot/agents/default/sessions/sessions.json",
@@ -160,60 +156,21 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
     sendPolicy: {
       default: "allow",
       rules: [
-        { action: "deny", match: { channel: "discord", chatType: "group" } }
+        { action: "deny", match: { channel: "telegram", chatType: "group" } }
       ]
     }
   },
 
   // Channels
   channels: {
-    whatsapp: {
-      dmPolicy: "pairing",
-      allowFrom: ["+15555550123"],
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["+15555550123"],
-      groups: { "*": { requireMention: true } }
-    },
-
     telegram: {
       enabled: true,
       botToken: "YOUR_TELEGRAM_BOT_TOKEN",
+      dmPolicy: "pairing",
       allowFrom: ["123456789"],
       groupPolicy: "allowlist",
-      groupAllowFrom: ["123456789"],
+      groupAllowFrom: ["-1001234567890"],
       groups: { "*": { requireMention: true } }
-    },
-
-    discord: {
-      enabled: true,
-      token: "YOUR_DISCORD_BOT_TOKEN",
-      dm: { enabled: true, allowFrom: ["steipete"] },
-      guilds: {
-        "123456789012345678": {
-          slug: "friends-of-clawd",
-          requireMention: false,
-          channels: {
-            general: { allow: true },
-            help: { allow: true, requireMention: true }
-          }
-        }
-      }
-    },
-
-    slack: {
-      enabled: true,
-      botToken: "xoxb-REPLACE_ME",
-      appToken: "xapp-REPLACE_ME",
-      channels: {
-        "#general": { allow: true, requireMention: true }
-      },
-      dm: { enabled: true, allowFrom: ["U123"] },
-      slashCommand: {
-        enabled: true,
-        name: "clawd",
-        sessionPrefix: "slack:slash",
-        ephemeral: true
-      }
     }
   },
 
@@ -299,12 +256,7 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
     elevated: {
       enabled: true,
       allowFrom: {
-        whatsapp: ["+15555550123"],
         telegram: ["123456789"],
-        discord: ["steipete"],
-        slack: ["U123"],
-        signal: ["+15555550123"],
-        imessage: ["user@example.com"],
         webchat: ["session:demo"]
       }
     }
@@ -422,21 +374,15 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
 
 ## Common patterns
 
-### Multi-platform setup
+### Telegram bot setup
 ```json5
 {
   agent: { workspace: "~/clawd" },
   channels: {
-    whatsapp: { allowFrom: ["+15555550123"] },
     telegram: {
       enabled: true,
-      botToken: "YOUR_TOKEN",
+      botToken: "YOUR_BOT_TOKEN",
       allowFrom: ["123456789"]
-    },
-    discord: {
-      enabled: true,
-      token: "YOUR_TOKEN",
-      dm: { allowFrom: ["yourname"] }
     }
   }
 }
@@ -521,12 +467,12 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
     elevated: { enabled: false }
   },
   channels: {
-    slack: {
+    telegram: {
       enabled: true,
-      botToken: "xoxb-...",
-      channels: {
-        "#engineering": { allow: true, requireMention: true },
-        "#general": { allow: true, requireMention: true }
+      botToken: "YOUR_BOT_TOKEN",
+      allowFrom: ["123456789"],
+      groups: {
+        "-1001234567890": { allow: true, requireMention: true }
       }
     }
   }
@@ -568,5 +514,5 @@ Save to `~/.clawdbot/crocbot.json` and you can DM the bot from that number.
 
 - If you set `dmPolicy: "open"`, the matching `allowFrom` list must include `"*"`.
 - Provider IDs differ (phone numbers, user IDs, channel IDs). Use the provider docs to confirm the format.
-- Optional sections to add later: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
-- See [Providers](/channels/whatsapp) and [Troubleshooting](/gateway/troubleshooting) for deeper setup notes.
+- Optional sections to add later: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`.
+- See [Telegram](/channels/telegram) and [Troubleshooting](/gateway/troubleshooting) for deeper setup notes.

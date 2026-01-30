@@ -43,7 +43,7 @@ Use `--json` to require JSON5 parsing.
 ```bash
 crocbot config set agents.defaults.heartbeat.every "0m"
 crocbot config set gateway.port 19001 --json
-crocbot config set channels.whatsapp.groups '["*"]' --json
+crocbot config set channels.telegram.groups '["*"]' --json
 ```
 
 Restart the gateway after edits.

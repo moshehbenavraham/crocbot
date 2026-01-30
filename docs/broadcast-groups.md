@@ -1,23 +1,21 @@
 ---
-summary: "Broadcast a WhatsApp message to multiple agents"
+summary: "Broadcast a Telegram message to multiple agents"
 read_when:
   - Configuring broadcast groups
-  - Debugging multi-agent replies in WhatsApp
+  - Debugging multi-agent replies in Telegram
 status: experimental
 ---
 
 # Broadcast Groups
 
-**Status:** Experimental  
+**Status:** Experimental
 **Version:** Added in 2026.1.9
 
 ## Overview
 
-Broadcast Groups enable multiple agents to process and respond to the same message simultaneously. This allows you to create specialized agent teams that work together in a single WhatsApp group or DM — all using one phone number.
+Broadcast Groups enable multiple agents to process and respond to the same message simultaneously. This allows you to create specialized agent teams that work together in a single Telegram group or DM.
 
-Current scope: **WhatsApp only** (web channel).
-
-Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when crocbot would normally reply (for example: on mention, depending on your group settings).
+Broadcast groups are evaluated after channel allowlists and group activation rules. In Telegram groups, this means broadcasts happen when crocbot would normally reply (for example: on mention, depending on your group settings).
 
 ## Use Cases
 
@@ -64,14 +62,14 @@ Agents:
 
 ### Basic Setup
 
-Add a top-level `broadcast` section (next to `bindings`). Keys are WhatsApp peer ids:
-- group chats: group JID (e.g. `120363403215116621@g.us`)
-- DMs: E.164 phone number (e.g. `+15551234567`)
+Add a top-level `broadcast` section (next to `bindings`). Keys are Telegram peer ids:
+- group chats: group chat ID (e.g. `-1001234567890`)
+- DMs: user ID (e.g. `123456789`)
 
 ```json
 {
   "broadcast": {
-    "120363403215116621@g.us": ["alfred", "baerbel", "assistant3"]
+    "-1001234567890": ["alfred", "baerbel", "assistant3"]
   }
 }
 ```
@@ -88,7 +86,7 @@ All agents process simultaneously:
 {
   "broadcast": {
     "strategy": "parallel",
-    "120363403215116621@g.us": ["alfred", "baerbel"]
+    "-1001234567890": ["alfred", "baerbel"]
   }
 }
 ```
@@ -99,7 +97,7 @@ Agents process in order (one waits for previous to finish):
 {
   "broadcast": {
     "strategy": "sequential",
-    "120363403215116621@g.us": ["alfred", "baerbel"]
+    "-1001234567890": ["alfred", "baerbel"]
   }
 }
 ```
@@ -132,9 +130,9 @@ Agents process in order (one waits for previous to finish):
   },
   "broadcast": {
     "strategy": "parallel",
-    "120363403215116621@g.us": ["code-reviewer", "security-auditor", "docs-generator"],
-    "120363424282127706@g.us": ["support-en", "support-de"],
-    "+15555550123": ["assistant", "logger"]
+    "-1001234567890": ["code-reviewer", "security-auditor", "docs-generator"],
+    "-1009876543210": ["support-en", "support-de"],
+    "123456789": ["assistant", "logger"]
   }
 }
 ```
@@ -143,7 +141,7 @@ Agents process in order (one waits for previous to finish):
 
 ### Message Flow
 
-1. **Incoming message** arrives in a WhatsApp group
+1. **Incoming message** arrives in a Telegram group
 2. **Broadcast check**: System checks if peer ID is in `broadcast`
 3. **If in broadcast list**:
    - All listed agents process the message
@@ -158,7 +156,7 @@ Note: broadcast groups do not bypass channel allowlists or group activation rule
 
 Each agent in a broadcast group maintains completely separate:
 
-- **Session keys** (`agent:alfred:whatsapp:group:120363...` vs `agent:baerbel:whatsapp:group:120363...`)
+- **Session keys** (`agent:alfred:telegram:group:-1001234567890` vs `agent:baerbel:telegram:group:-1001234567890`)
 - **Conversation history** (agent doesn't see other agents' messages)
 - **Workspace** (separate sandboxes if configured)
 - **Tool access** (different allow/deny lists)
@@ -173,21 +171,21 @@ This allows each agent to have:
 
 ### Example: Isolated Sessions
 
-In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
+In group `-1001234567890` with agents `["alfred", "baerbel"]`:
 
 **Alfred's context:**
 ```
-Session: agent:alfred:whatsapp:group:120363403215116621@g.us
+Session: agent:alfred:telegram:group:-1001234567890
 History: [user message, alfred's previous responses]
-Workspace: /Users/pascal/clawd-alfred/
+Workspace: /home/user/clawd-alfred/
 Tools: read, write, exec
 ```
 
 **Bärbel's context:**
 ```
-Session: agent:baerbel:whatsapp:group:120363403215116621@g.us  
+Session: agent:baerbel:telegram:group:-1001234567890
 History: [user message, baerbel's previous responses]
-Workspace: /Users/pascal/clawd-baerbel/
+Workspace: /home/user/clawd-baerbel/
 Tools: read only
 ```
 
@@ -257,14 +255,6 @@ Result: Agent A and C respond, Agent B logs error
 
 ## Compatibility
 
-### Providers
-
-Broadcast groups currently work with:
-- ✅ WhatsApp (implemented)
-- 🚧 Telegram (planned)
-- 🚧 Discord (planned)
-- 🚧 Slack (planned)
-
 ### Routing
 
 Broadcast groups work alongside existing routing:
@@ -272,16 +262,16 @@ Broadcast groups work alongside existing routing:
 ```json
 {
   "bindings": [
-    { "match": { "channel": "whatsapp", "peer": { "kind": "group", "id": "GROUP_A" } }, "agentId": "alfred" }
+    { "match": { "channel": "telegram", "peer": { "kind": "group", "id": "-1001234567890" } }, "agentId": "alfred" }
   ],
   "broadcast": {
-    "GROUP_B": ["agent1", "agent2"]
+    "-1009876543210": ["agent1", "agent2"]
   }
 }
 ```
 
-- `GROUP_A`: Only alfred responds (normal routing)
-- `GROUP_B`: agent1 AND agent2 respond (broadcast)
+- `-1001234567890`: Only alfred responds (normal routing)
+- `-1009876543210`: agent1 AND agent2 respond (broadcast)
 
 **Precedence:** `broadcast` takes priority over `bindings`.
 
@@ -291,7 +281,7 @@ Broadcast groups work alongside existing routing:
 
 **Check:**
 1. Agent IDs exist in `agents.list`
-2. Peer ID format is correct (e.g., `120363403215116621@g.us`)
+2. Peer ID format is correct (e.g., `-1001234567890` for groups, `123456789` for users)
 3. Agents are not in deny lists
 
 **Debug:**
@@ -320,7 +310,7 @@ tail -f ~/.clawdbot/logs/gateway.log | grep broadcast
 {
   "broadcast": {
     "strategy": "parallel",
-    "120363403215116621@g.us": [
+    "-1001234567890": [
       "code-formatter",
       "security-scanner",
       "test-coverage",
@@ -351,7 +341,7 @@ tail -f ~/.clawdbot/logs/gateway.log | grep broadcast
 {
   "broadcast": {
     "strategy": "sequential",
-    "+15555550123": ["detect-language", "translator-en", "translator-de"]
+    "123456789": ["detect-language", "translator-en", "translator-de"]
   },
   "agents": {
     "list": [
@@ -381,8 +371,8 @@ interface crocbotConfig {
 - `strategy` (optional): How to process agents
   - `"parallel"` (default): All agents process simultaneously
   - `"sequential"`: Agents process in array order
-  
-- `[peerId]`: WhatsApp group JID, E.164 number, or other peer ID
+
+- `[peerId]`: Telegram group ID, user ID, or other peer ID
   - Value: Array of agent IDs that should process messages
 
 ## Limitations
@@ -390,7 +380,7 @@ interface crocbotConfig {
 1. **Max agents:** No hard limit, but 10+ agents may be slow
 2. **Shared context:** Agents don't see each other's responses (by design)
 3. **Message ordering:** Parallel responses may arrive in any order
-4. **Rate limits:** All agents count toward WhatsApp rate limits
+4. **Rate limits:** All agents count toward Telegram rate limits
 
 ## Future Enhancements
 

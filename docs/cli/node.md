@@ -2,7 +2,7 @@
 summary: "CLI reference for `crocbot node` (headless node host)"
 read_when:
   - Running the headless node host
-  - Pairing a non-macOS node for system.run
+  - Pairing a node for system.run
 ---
 
 # `crocbot node`
@@ -13,7 +13,7 @@ Run a **headless node host** that connects to the Gateway WebSocket and exposes
 ## Why use a node host?
 
 Use a node host when you want agents to **run commands on other machines** in your
-network without installing a full macOS companion app there.
+network.
 
 Common use cases:
 - Run commands on remote Linux/Windows boxes (build servers, lab machines, NAS).

@@ -44,11 +44,9 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [Is a local model OK for casual chats?](#is-a-local-model-ok-for-casual-chats)
   - [How do I keep hosted model traffic in a specific region?](#how-do-i-keep-hosted-model-traffic-in-a-specific-region)
   - [Do I have to buy a Mac Mini to install this?](#do-i-have-to-buy-a-mac-mini-to-install-this)
-  - [Do I need a Mac mini for iMessage support?](#do-i-need-a-mac-mini-for-imessage-support)
   - [If I buy a Mac mini to run crocbot, can I connect it to my MacBook Pro?](#if-i-buy-a-mac-mini-to-run-crocbot-can-i-connect-it-to-my-macbook-pro)
   - [Can I use Bun?](#can-i-use-bun)
   - [Telegram: what goes in `allowFrom`?](#telegram-what-goes-in-allowfrom)
-  - [Can multiple people use one WhatsApp number with different crocbots?](#can-multiple-people-use-one-whatsapp-number-with-different-crocbots)
   - [Can I run a "fast chat" agent and an "Opus for coding" agent?](#can-i-run-a-fast-chat-agent-and-an-opus-for-coding-agent)
   - [Does Homebrew work on Linux?](#does-homebrew-work-on-linux)
   - [What’s the difference between the hackable (git) install and npm install?](#whats-the-difference-between-the-hackable-git-install-and-npm-install)
@@ -126,12 +124,9 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [I’m getting “context too large” errors - how do I reset or compact?](#im-getting-context-too-large-errors-how-do-i-reset-or-compact)
   - [Why am I seeing “LLM request rejected: messages.N.content.X.tool_use.input: Field required”?](#why-am-i-seeing-llm-request-rejected-messagesncontentxtooluseinput-field-required)
   - [Why am I getting heartbeat messages every 30 minutes?](#why-am-i-getting-heartbeat-messages-every-30-minutes)
-  - [Do I need to add a “bot account” to a WhatsApp group?](#do-i-need-to-add-a-bot-account-to-a-whatsapp-group)
-  - [How do I get the JID of a WhatsApp group?](#how-do-i-get-the-jid-of-a-whatsapp-group)
   - [Why doesn’t crocbot reply in a group?](#why-doesnt-crocbot-reply-in-a-group)
   - [Do groups/threads share context with DMs?](#do-groupsthreads-share-context-with-dms)
   - [How many workspaces and agents can I create?](#how-many-workspaces-and-agents-can-i-create)
-  - [Can I run multiple bots or chats at the same time (Slack), and how should I set that up?](#can-i-run-multiple-bots-or-chats-at-the-same-time-slack-and-how-should-i-set-that-up)
 - [Models: defaults, selection, aliases, switching](#models-defaults-selection-aliases-switching)
   - [What is the “default model”?](#what-is-the-default-model)
   - [What model do you recommend?](#what-model-do-you-recommend)
@@ -186,11 +181,9 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [Can I give it autonomy over my text messages and is that safe](#can-i-give-it-autonomy-over-my-text-messages-and-is-that-safe)
   - [Can I use cheaper models for personal assistant tasks?](#can-i-use-cheaper-models-for-personal-assistant-tasks)
   - [I ran `/start` in Telegram but didn’t get a pairing code](#i-ran-start-in-telegram-but-didnt-get-a-pairing-code)
-  - [WhatsApp: will it message my contacts? How does pairing work?](#whatsapp-will-it-message-my-contacts-how-does-pairing-work)
 - [Chat commands, aborting tasks, and “it won’t stop”](#chat-commands-aborting-tasks-and-it-wont-stop)
   - [How do I stop internal system messages from showing in chat](#how-do-i-stop-internal-system-messages-from-showing-in-chat)
   - [How do I stop/cancel a running task?](#how-do-i-stopcancel-a-running-task)
-  - [How do I send a Discord message from Telegram? (“Cross-context messaging denied”)](#how-do-i-send-a-discord-message-from-telegram-crosscontext-messaging-denied)
   - [Why does it feel like the bot “ignores” rapid‑fire messages?](#why-does-it-feel-like-the-bot-ignores-rapidfire-messages)
 
 ## First 60 seconds if something's broken
@@ -247,7 +240,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 ### Im stuck whats the fastest way to get unstuck
 
 Use a local AI agent that can **see your machine**. That is far more effective than asking
-in Discord, because most "I'm stuck" cases are **local config or environment issues** that
+on GitHub, because most "I'm stuck" cases are **local config or environment issues** that
 remote helpers cannot inspect.
 
 - **Claude Code**: https://www.anthropic.com/claude-code/
@@ -345,8 +338,8 @@ disk as enough for personal use, and note that a **Raspberry Pi 4 can run it**.
 If you want extra headroom (logs, media, other services), **2GB is recommended**, but it’s
 not a hard minimum.
 
-Tip: a small Pi/VPS can host the Gateway, and you can pair **nodes** on your laptop/phone for
-local screen/camera/canvas or command execution. See [Nodes](/nodes).
+Tip: a small Pi/VPS can host the Gateway, and you can pair **nodes** on other machines for
+command execution. See [Nodes](/nodes).
 
 ### Any tips for Raspberry Pi installs
 
@@ -394,7 +387,7 @@ state) as long as you copy **both** locations:
 3) Copy your workspace (default: `~/clawd`).
 4) Run `crocbot doctor` and restart the Gateway service.
 
-That preserves config, auth profiles, WhatsApp creds, sessions, and memory. If you’re in
+That preserves config, auth profiles, sessions, and memory. If you're in
 remote mode, remember the gateway host owns the session store and workspace.
 
 **Important:** if you only commit/push your workspace to GitHub, you’re backing
@@ -574,9 +567,8 @@ How it works in the cloud: the **Gateway runs on the server**, and you access it
 from your laptop/phone via the Control UI (or Tailscale/SSH). Your state + workspace
 live on the server, so treat the host as the source of truth and back it up.
 
-You can pair **nodes** (Mac/iOS/Android/headless) to that cloud Gateway to access
-local screen/camera/canvas or run commands on your laptop while keeping the
-Gateway in the cloud.
+You can pair **nodes** (headless) to that cloud Gateway to run commands on your
+laptop while keeping the Gateway in the cloud.
 
 Hub: [Platforms](/platforms). Remote access: [Gateway remote](/gateway/remote).
 Nodes: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
@@ -613,7 +605,7 @@ Docs: [Update](/cli/update), [Updating](/install/updating).
 - **Model/auth setup** (Anthropic **setup-token** recommended for Claude subscriptions, OpenAI Codex OAuth supported, API keys optional, LM Studio local models supported)
 - **Workspace** location + bootstrap files
 - **Gateway settings** (bind/port/auth/tailscale)
-- **Providers** (WhatsApp, Telegram, Discord, Mattermost (plugin), Signal, iMessage)
+- **Providers** (Telegram)
 - **Daemon install** (LaunchAgent on macOS; systemd user unit on Linux/WSL2)
 - **Health checks** and **skills** selection
 
@@ -706,25 +698,7 @@ Pick region-pinned endpoints. OpenRouter exposes US-hosted options for MiniMax, 
 No. crocbot runs on macOS or Linux (Windows via WSL2). A Mac mini is optional - some people
 buy one as an always‑on host, but a small VPS, home server, or Raspberry Pi‑class box works too.
 
-You only need a Mac **for macOS‑only tools**. For iMessage, you can keep the Gateway on Linux
-and run `imsg` on any Mac over SSH by pointing `channels.imessage.cliPath` at an SSH wrapper.
-If you want other macOS‑only tools, run the Gateway on a Mac or pair a macOS node.
-
-Docs: [iMessage](/channels/imessage), [Nodes](/nodes), [Mac remote mode](/platforms/mac/remote).
-
-### Do I need a Mac mini for iMessage support
-
-You need **some macOS device** signed into Messages. It does **not** have to be a Mac mini -
-any Mac works. crocbot’s iMessage integrations run on macOS (BlueBubbles or `imsg`), while
-the Gateway can run elsewhere.
-
-Common setups:
-- Run the Gateway on Linux/VPS, and point `channels.imessage.cliPath` at an SSH wrapper that
-  runs `imsg` on the Mac.
-- Run everything on the Mac if you want the simplest single‑machine setup.
-
-Docs: [iMessage](/channels/imessage), [BlueBubbles](/channels/bluebubbles),
-[Mac remote mode](/platforms/mac/remote).
+Docs: [Nodes](/nodes).
 
 ### If I buy a Mac mini to run crocbot can I connect it to my MacBook Pro
 
@@ -741,11 +715,11 @@ Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
 
 ### Can I use Bun
 
-Bun is **not recommended**. We see runtime bugs, especially with WhatsApp and Telegram.
+Bun is **not recommended**. We see runtime bugs, especially with Telegram.
 Use **Node** for stable gateways.
 
 If you still want to experiment with Bun, do it on a non‑production gateway
-without WhatsApp/Telegram.
+without Telegram.
 
 ### Telegram what goes in allowFrom
 
@@ -761,10 +735,6 @@ Third-party (less private):
 - DM `@userinfobot` or `@getidsbot`.
 
 See [/channels/telegram](/channels/telegram#access-control-dms--groups).
-
-### Can multiple people use one WhatsApp number with different crocbots
-
-Yes, via **multi‑agent routing**. Bind each sender’s WhatsApp **DM** (peer `kind: "dm"`, sender E.164 like `+15551234567`) to a different `agentId`, so each person gets their own workspace and session store. Replies still come from the **same WhatsApp account**, and DM access control (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) is global per WhatsApp account. See [Multi-Agent Routing](/concepts/multi-agent) and [WhatsApp](/channels/whatsapp).
 
 ### Can I run a fast chat agent and an Opus for coding agent
 
@@ -835,7 +805,7 @@ lowest friction and you’re okay with sleep/restarts, run it locally.
 - **Pros:** always‑on, stable network, no laptop sleep issues, easier to keep running.
 - **Cons:** often run headless (use screenshots), remote file access only, you must SSH for updates.
 
-**crocbot-specific note:** WhatsApp/Telegram/Slack/Mattermost (plugin)/Discord all work fine from a VPS. The only real trade-off is **headless browser** vs a visible window. See [Browser](/tools/browser).
+**crocbot-specific note:** Telegram works fine from a VPS. The only real trade-off is **headless browser** vs a visible window. See [Browser](/tools/browser).
 
 **Recommended default:** VPS if you had gateway disconnects before. Local is great when you’re actively using the Mac and want local file access or UI automation with a visible browser.
 
@@ -878,7 +848,7 @@ If you are running macOS in a VM, see [macOS VM](/platforms/macos-vm).
 
 ### What is crocbot in one paragraph
 
-crocbot is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost (plugin), Discord, Google Chat, Signal, iMessage, WebChat) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
+crocbot is a personal AI assistant you run on your own devices. It replies on Telegram and WebChat. The **Gateway** is the always-on control plane; the assistant is the product.
 
 ### Whats the value proposition
 
@@ -890,8 +860,7 @@ SaaS.
 Highlights:
 - **Your devices, your data:** run the Gateway wherever you want (Mac, Linux, VPS) and keep the
   workspace + session history local.  
-- **Real channels, not a web sandbox:** WhatsApp/Telegram/Slack/Discord/Signal/iMessage/etc,
-  plus mobile voice and Canvas on supported platforms.  
+- **Real channels, not a web sandbox:** Telegram and WebChat.  
 - **Model-agnostic:** use Anthropic, OpenAI, MiniMax, OpenRouter, etc., with per‑agent routing
   and failover.  
 - **Local-only option:** run local models so **all data can stay on your device** if you want.
@@ -941,7 +910,7 @@ want durable memory, cross-device access, and tool orchestration.
 
 Advantages:
 - **Persistent memory + workspace** across sessions
-- **Multi-platform access** (WhatsApp, Telegram, TUI, WebChat)
+- **Multi-platform access** (Telegram, TUI, WebChat)
 - **Tool orchestration** (browser, files, scheduling, hooks)
 - **Always-on Gateway** (run on a VPS, interact from anywhere)
 - **Nodes** for local browser/screen/camera/exec
@@ -1039,24 +1008,10 @@ Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Co
 **Option C - proxy macOS binaries over SSH (advanced).**  
 Keep the Gateway on Linux, but make the required CLI binaries resolve to SSH wrappers that run on a Mac. Then override the skill to allow Linux so it stays eligible.
 
-1) Create an SSH wrapper for the binary (example: `imsg`):
-   ```bash
-   #!/usr/bin/env bash
-   set -euo pipefail
-   exec ssh -T user@mac-host /opt/homebrew/bin/imsg "$@"
-   ```
-2) Put the wrapper on `PATH` on the Linux host (for example `~/bin/imsg`).
-3) Override the skill metadata (workspace or `~/.clawdbot/skills`) to allow Linux:
-   ```markdown
-   ---
-   name: imsg
-   description: iMessage/SMS CLI for listing chats, history, watch, and sending.
-   metadata: {"crocbot":{"os":["darwin","linux"],"requires":{"bins":["imsg"]}}}
-   ---
-   ```
+1) Create an SSH wrapper for the binary.
+2) Put the wrapper on `PATH` on the Linux host.
+3) Override the skill metadata (workspace or `~/.clawdbot/skills`) to allow Linux.
 4) Start a new session so the skills snapshot refreshes.
-
-For iMessage specifically, you can also point `channels.imessage.cliPath` at an SSH wrapper (crocbot only needs stdio). See [iMessage](/channels/imessage).
 
 ### Do you have a Notion or HeyGen integration
 
@@ -1178,7 +1133,7 @@ No - **crocbot’s state is local**, but **external services still see what you 
 - **Local by default:** sessions, memory files, config, and workspace live on the Gateway host
   (`~/.clawdbot` + your workspace directory).
 - **Remote by necessity:** messages you send to model providers (Anthropic/OpenAI/etc.) go to
-  their APIs, and chat platforms (WhatsApp/Telegram/Slack/etc.) store message data on their
+  their APIs, and chat platforms (Telegram) store message data on their
   servers.
 - **You control the footprint:** using local models keeps prompts on your machine, but channel
   traffic still goes through the channel’s servers.
@@ -1195,7 +1150,7 @@ Everything lives under `$CLAWDBOT_STATE_DIR` (default: `~/.clawdbot`):
 | `$CLAWDBOT_STATE_DIR/credentials/oauth.json` | Legacy OAuth import (copied into auth profiles on first use) |
 | `$CLAWDBOT_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth + API keys) |
 | `$CLAWDBOT_STATE_DIR/agents/<agentId>/agent/auth.json` | Runtime auth cache (managed automatically) |
-| `$CLAWDBOT_STATE_DIR/credentials/` | Provider state (e.g. `whatsapp/<accountId>/creds.json`) |
+| `$CLAWDBOT_STATE_DIR/credentials/` | Provider state (e.g. `telegram/<accountId>/creds.json`) |
 | `$CLAWDBOT_STATE_DIR/agents/` | Per‑agent state (agentDir + sessions) |
 | `$CLAWDBOT_STATE_DIR/agents/<agentId>/sessions/` | Conversation history & state (per agent) |
 | `$CLAWDBOT_STATE_DIR/agents/<agentId>/sessions/sessions.json` | Session metadata (per agent) |
@@ -1352,8 +1307,8 @@ Docs: [Web tools](/tools/web).
 
 The common pattern is **one Gateway** (e.g. Raspberry Pi) plus **nodes** and **agents**:
 
-- **Gateway (central):** owns channels (Signal/WhatsApp), routing, and sessions.
-- **Nodes (devices):** Macs/iOS/Android connect as peripherals and expose local tools (`system.run`, `canvas`, `camera`).
+- **Gateway (central):** owns channels (Telegram), routing, and sessions.
+- **Nodes (devices):** connect as peripherals and expose local tools (`system.run`).
 - **Agents (workers):** separate brains/workspaces for special roles (e.g. “Hetzner ops”, “Personal data”).
 - **Sub‑agents:** spawn background work from a main agent when you want parallelism.
 - **TUI:** connect to the Gateway and switch agents/sessions.
@@ -1441,7 +1396,7 @@ Docs: [Tailscale](/gateway/tailscale), [Remote access](/gateway/remote), [Channe
 Yes. There is no built-in "bot-to-bot" bridge, but you can wire it up in a few
 reliable ways:
 
-**Simplest:** use a normal chat channel both bots can access (Telegram/Slack/WhatsApp).
+**Simplest:** use a normal chat channel both bots can access (Telegram).
 Have Bot A send a message to Bot B, then let Bot B reply as usual.
 
 **CLI bridge (generic):** run a script that calls the other Gateway with
@@ -1500,8 +1455,7 @@ Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes), [Multiple gateways](/gateway/mul
 ### Do nodes run a gateway service
 
 No. Only **one gateway** should run per host unless you intentionally run isolated profiles (see [Multiple gateways](/gateway/multiple-gateways)). Nodes are peripherals that connect
-to the gateway (iOS/Android nodes, or macOS “node mode” in the menubar app). For headless node
-hosts and CLI control, see [Node host CLI](/cli/node).
+to the gateway. For headless node hosts and CLI control, see [Node host CLI](/cli/node).
 
 A full restart is required for `gateway`, `discovery`, and `canvasHost` changes.
 
@@ -1531,11 +1485,11 @@ Docs: [Config](/cli/config), [Configure](/cli/configure), [Doctor](/gateway/doct
 ```json5
 {
   agents: { defaults: { workspace: "~/clawd" } },
-  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+  channels: { telegram: { enabled: true } }
 }
 ```
 
-This sets your workspace and restricts who can trigger the bot.
+This sets your workspace and enables Telegram.
 
 ### How do I set up Tailscale on a VPS and connect from my Mac
 
@@ -1766,54 +1720,13 @@ If the file is missing, the heartbeat still runs and the model decides what to d
 
 Per-agent overrides use `agents.list[].heartbeat`. Docs: [Heartbeat](/gateway/heartbeat).
 
-### Do I need to add a bot account to a WhatsApp group
-
-No. crocbot runs on **your own account**, so if you’re in the group, crocbot can see it.
-By default, group replies are blocked until you allow senders (`groupPolicy: "allowlist"`).
-
-If you want only **you** to be able to trigger group replies:
-
-```json5
-{
-  channels: {
-    whatsapp: {
-      groupPolicy: "allowlist",
-      groupAllowFrom: ["+15551234567"]
-    }
-  }
-}
-```
-
-### How do I get the JID of a WhatsApp group
-
-Option 1 (fastest): tail logs and send a test message in the group:
-
-```bash
-crocbot logs --follow --json
-```
-
-Look for `chatId` (or `from`) ending in `@g.us`, like:
-`1234567890-1234567890@g.us`.
-
-Option 2 (if already configured/allowlisted): list groups from config:
-
-```bash
-crocbot directory groups list --channel whatsapp
-```
-
-Docs: [WhatsApp](/channels/whatsapp), [Directory](/cli/directory), [Logs](/cli/logs).
-
 ### Why doesnt crocbot reply in a group
 
-Two common causes:
-- Mention gating is on (default). You must @mention the bot (or match `mentionPatterns`).
-- You configured `channels.whatsapp.groups` without `"*"` and the group isn’t allowlisted.
-
-See [Groups](/concepts/groups) and [Group messages](/concepts/group-messages).
+By default, group replies are blocked until you allow senders. Check your `channels.telegram.groupPolicy` and `groupAllowFrom` settings. See [Groups](/concepts/groups).
 
 ### Do groupsthreads share context with DMs
 
-Direct chats collapse to the main session by default. Groups/channels have their own session keys, and Telegram topics / Discord threads are separate sessions. See [Groups](/concepts/groups) and [Group messages](/concepts/group-messages).
+Direct chats collapse to the main session by default. Groups/channels have their own session keys, and Telegram topics are separate sessions. See [Groups](/concepts/groups) and [Group messages](/concepts/group-messages).
 
 ### How many workspaces and agents can I create
 
@@ -1828,23 +1741,18 @@ Tips:
 - Prune old sessions (delete JSONL or store entries) if disk grows.
 - Use `crocbot doctor` to spot stray workspaces and profile mismatches.
 
-### Can I run multiple bots or chats at the same time Slack and how should I set that up
+### Can I run multiple bots or chats at the same time
 
-Yes. Use **Multi‑Agent Routing** to run multiple isolated agents and route inbound messages by
-channel/account/peer. Slack is supported as a channel and can be bound to specific agents.
+Yes. Use **Multi-Agent Routing** to run multiple isolated agents and route inbound messages by
+channel/account/peer.
 
-Browser access is powerful but not “do anything a human can” - anti‑bot, CAPTCHAs, and MFA can
-still block automation. For the most reliable browser control, use the Chrome extension relay
-on the machine that runs the browser (and keep the Gateway anywhere).
-
-Best‑practice setup:
-- Always‑on Gateway host (VPS/Mac mini).
+Best-practice setup:
+- Always-on Gateway host (VPS/Mac mini).
 - One agent per role (bindings).
-- Slack channel(s) bound to those agents.
+- Telegram bound to those agents.
 - Local browser via extension relay (or a node) when needed.
 
-Docs: [Multi‑Agent Routing](/concepts/multi-agent), [Slack](/channels/slack),
-[Browser](/tools/browser), [Chrome extension](/tools/chrome-extension), [Nodes](/nodes).
+Docs: [Multi-Agent Routing](/concepts/multi-agent), [Browser](/tools/browser), [Chrome extension](/tools/chrome-extension), [Nodes](/nodes).
 
 ## Models: defaults, selection, aliases, switching
 
@@ -2614,25 +2522,7 @@ crocbot pairing list telegram
 If you want immediate access, allowlist your sender id or set `dmPolicy: "open"`
 for that account.
 
-### WhatsApp will it message my contacts How does pairing work
-
-No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. crocbot only replies to chats it receives or to explicit sends you trigger.
-
-Approve pairing with:
-
-```bash
-crocbot pairing approve whatsapp <code>
-```
-
-List pending requests:
-
-```bash
-crocbot pairing list whatsapp
-```
-
-Wizard phone number prompt: it’s used to set your **allowlist/owner** so your own DMs are permitted. It’s not used for auto-sending. If you run on your personal WhatsApp number, use that number and enable `channels.whatsapp.selfChatMode`.
-
-## Chat commands, aborting tasks, and “it won’t stop”
+## Chat commands, aborting tasks, and "it won't stop"
 
 ### How do I stop internal system messages from showing in chat
 
@@ -2676,33 +2566,6 @@ Slash commands overview: see [Slash commands](/tools/slash-commands).
 
 Most commands must be sent as a **standalone** message that starts with `/`, but a few shortcuts (like `/status`) also work inline for allowlisted senders.
 
-### How do I send a Discord message from Telegram Crosscontext messaging denied
-
-crocbot blocks **cross‑provider** messaging by default. If a tool call is bound
-to Telegram, it won’t send to Discord unless you explicitly allow it.
-
-Enable cross‑provider messaging for the agent:
-
-```json5
-{
-  agents: {
-    defaults: {
-      tools: {
-        message: {
-          crossContext: {
-            allowAcrossProviders: true,
-            marker: { enabled: true, prefix: "[from {channel}] " }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-Restart the gateway after editing config. If you only want this for a single
-agent, set it under `agents.list[].tools.message` instead.
-
 ### Why does it feel like the bot ignores rapidfire messages
 
 Queue mode controls how new messages interact with an in‑flight run. Use `/queue` to change modes:
@@ -2723,4 +2586,4 @@ You can add options like `debounce:2s cap:25 drop:summarize` for followup modes.
 
 ---
 
-Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open a [GitHub discussion](https://github.com/crocbot/crocbot/discussions).
+Still stuck? Open a [GitHub discussion](https://github.com/crocbot/crocbot/discussions).

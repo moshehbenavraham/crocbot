@@ -25,4 +25,4 @@ Last updated: 2025-12-11
 
 ## Operational notes
 - If the port is occupied by *another* process, the error is the same; free the port or choose another with `crocbot gateway --port <port>`.
-- The macOS app still maintains its own lightweight PID guard before spawning the gateway; the runtime lock is enforced by the WebSocket bind.
+- Clients may maintain their own lightweight PID guard before spawning the gateway; the runtime lock is enforced by the WebSocket bind.

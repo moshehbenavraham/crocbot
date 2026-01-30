@@ -7,9 +7,9 @@ status: active
 
 # Multi-Agent Routing
 
-Goal: multiple *isolated* agents (separate workspace + `agentDir` + sessions), plus multiple channel accounts (e.g. two WhatsApps) in one running Gateway. Inbound is routed to an agent via bindings.
+Goal: multiple *isolated* agents (separate workspace + `agentDir` + sessions), plus multiple channel accounts in one running Gateway. Inbound is routed to an agent via bindings.
 
-## What is “one agent”?
+## What is "one agent"?
 
 An **agent** is a fully scoped brain with its own:
 
@@ -27,12 +27,12 @@ Main agent credentials are **not** shared automatically. Never reuse `agentDir`
 across agents (it causes auth/session collisions). If you want to share creds,
 copy `auth-profiles.json` into the other agent's `agentDir`.
 
-Skills are per-agent via each workspace’s `skills/` folder, with shared skills
+Skills are per-agent via each workspace's `skills/` folder, with shared skills
 available from `~/.clawdbot/skills`. See [Skills: per-agent vs shared](/tools/skills#per-agent-vs-shared-skills).
 
 The Gateway can host **one agent** (default) or **many agents** side-by-side.
 
-**Workspace note:** each agent’s workspace is the **default cwd**, not a hard
+**Workspace note:** each agent's workspace is the **default cwd**, not a hard
 sandbox. Relative paths resolve inside the workspace, but absolute paths can
 reach other host locations unless sandboxing is enabled. See
 [Sandboxing](/gateway/sandboxing).
@@ -74,17 +74,17 @@ crocbot agents list --bindings
 
 With **multiple agents**, each `agentId` becomes a **fully isolated persona**:
 
-- **Different phone numbers/accounts** (per channel `accountId`).
+- **Different bot tokens/accounts** (per channel `accountId`).
 - **Different personalities** (per-agent workspace files like `AGENTS.md` and `SOUL.md`).
 - **Separate auth + sessions** (no cross-talk unless explicitly enabled).
 
-This lets **multiple people** share one Gateway server while keeping their AI “brains” and data isolated.
+This lets **multiple people** share one Gateway server while keeping their AI "brains" and data isolated.
 
-## One WhatsApp number, multiple people (DM split)
+## One Telegram bot, multiple people (DM split)
 
-You can route **different WhatsApp DMs** to different agents while staying on **one WhatsApp account**. Match on sender E.164 (like `+15551234567`) with `peer.kind: "dm"`. Replies still come from the same WhatsApp number (no per‑agent sender identity).
+You can route **different Telegram DMs** to different agents while staying on **one Telegram bot**. Match on sender user ID with `peer.kind: "dm"`. Replies still come from the same bot (no per-agent sender identity).
 
-Important detail: direct chats collapse to the agent’s **main session key**, so true isolation requires **one agent per person**.
+Important detail: direct chats collapse to the agent's **main session key**, so true isolation requires **one agent per person**.
 
 Example:
 
@@ -97,20 +97,20 @@ Example:
     ]
   },
   bindings: [
-    { agentId: "alex", match: { channel: "whatsapp", peer: { kind: "dm", id: "+15551230001" } } },
-    { agentId: "mia",  match: { channel: "whatsapp", peer: { kind: "dm", id: "+15551230002" } } }
+    { agentId: "alex", match: { channel: "telegram", peer: { kind: "dm", id: "123456789" } } },
+    { agentId: "mia",  match: { channel: "telegram", peer: { kind: "dm", id: "987654321" } } }
   ],
   channels: {
-    whatsapp: {
+    telegram: {
       dmPolicy: "allowlist",
-      allowFrom: ["+15551230001", "+15551230002"]
+      allowFrom: ["123456789", "987654321"]
     }
   }
 }
 ```
 
 Notes:
-- DM access control is **global per WhatsApp account** (pairing/allowlist), not per agent.
+- DM access control is **global per Telegram bot** (allowlist), not per agent.
 - For shared groups, bind the group to one agent or use [Broadcast groups](/broadcast-groups).
 
 ## Routing rules (how messages pick an agent)
@@ -118,26 +118,24 @@ Notes:
 Bindings are **deterministic** and **most-specific wins**:
 
 1. `peer` match (exact DM/group/channel id)
-2. `guildId` (Discord)
-3. `teamId` (Slack)
-4. `accountId` match for a channel
-5. channel-level match (`accountId: "*"`)
-6. fallback to default agent (`agents.list[].default`, else first list entry, default: `main`)
+2. `accountId` match for a channel
+3. channel-level match (`accountId: "*"`)
+4. fallback to default agent (`agents.list[].default`, else first list entry, default: `main`)
 
-## Multiple accounts / phone numbers
+## Multiple accounts / bot tokens
 
-Channels that support **multiple accounts** (e.g. WhatsApp) use `accountId` to identify
+Channels that support **multiple accounts** (e.g. multiple Telegram bots) use `accountId` to identify
 each login. Each `accountId` can be routed to a different agent, so one server can host
-multiple phone numbers without mixing sessions.
+multiple bots without mixing sessions.
 
 ## Concepts
 
-- `agentId`: one “brain” (workspace, per-agent auth, per-agent session store).
-- `accountId`: one channel account instance (e.g. WhatsApp account `"personal"` vs `"biz"`).
-- `binding`: routes inbound messages to an `agentId` by `(channel, accountId, peer)` and optionally guild/team ids.
-- Direct chats collapse to `agent:<agentId>:<mainKey>` (per-agent “main”; `session.mainKey`).
+- `agentId`: one "brain" (workspace, per-agent auth, per-agent session store).
+- `accountId`: one channel account instance (e.g. Telegram bot `"personal"` vs `"work"`).
+- `binding`: routes inbound messages to an `agentId` by `(channel, accountId, peer)`.
+- Direct chats collapse to `agent:<agentId>:<mainKey>` (per-agent "main"; `session.mainKey`).
 
-## Example: two WhatsApps → two agents
+## Example: two Telegram bots -> two agents
 
 `~/.clawdbot/crocbot.json` (JSON5):
 
@@ -163,16 +161,16 @@ multiple phone numbers without mixing sessions.
 
   // Deterministic routing: first match wins (most-specific first).
   bindings: [
-    { agentId: "home", match: { channel: "whatsapp", accountId: "personal" } },
-    { agentId: "work", match: { channel: "whatsapp", accountId: "biz" } },
+    { agentId: "home", match: { channel: "telegram", accountId: "personal" } },
+    { agentId: "work", match: { channel: "telegram", accountId: "biz" } },
 
     // Optional per-peer override (example: send a specific group to work agent).
     {
       agentId: "work",
       match: {
-        channel: "whatsapp",
+        channel: "telegram",
         accountId: "personal",
-        peer: { kind: "group", id: "1203630...@g.us" },
+        peer: { kind: "group", id: "-1001234567890" },
       },
     },
   ],
@@ -186,15 +184,13 @@ multiple phone numbers without mixing sessions.
   },
 
   channels: {
-    whatsapp: {
+    telegram: {
       accounts: {
         personal: {
-          // Optional override. Default: ~/.clawdbot/credentials/whatsapp/personal
-          // authDir: "~/.clawdbot/credentials/whatsapp/personal",
+          // Bot token for personal bot
         },
         biz: {
-          // Optional override. Default: ~/.clawdbot/credentials/whatsapp/biz
-          // authDir: "~/.clawdbot/credentials/whatsapp/biz",
+          // Bot token for work bot
         },
       },
     },
@@ -202,9 +198,9 @@ multiple phone numbers without mixing sessions.
 }
 ```
 
-## Example: WhatsApp daily chat + Telegram deep work
+## Example: Telegram fast chat + Telegram deep work
 
-Split by channel: route WhatsApp to a fast everyday agent and Telegram to an Opus agent.
+Split by account: route one Telegram bot to a fast everyday agent and another to an Opus agent.
 
 ```json5
 {
@@ -225,19 +221,19 @@ Split by channel: route WhatsApp to a fast everyday agent and Telegram to an Opu
     ]
   },
   bindings: [
-    { agentId: "chat", match: { channel: "whatsapp" } },
-    { agentId: "opus", match: { channel: "telegram" } }
+    { agentId: "chat", match: { channel: "telegram", accountId: "fast" } },
+    { agentId: "opus", match: { channel: "telegram", accountId: "deep" } }
   ]
 }
 ```
 
 Notes:
-- If you have multiple accounts for a channel, add `accountId` to the binding (for example `{ channel: "whatsapp", accountId: "personal" }`).
+- If you have multiple accounts for a channel, add `accountId` to the binding (for example `{ channel: "telegram", accountId: "personal" }`).
 - To route a single DM/group to Opus while keeping the rest on chat, add a `match.peer` binding for that peer; peer matches always win over channel-wide rules.
 
 ## Example: same channel, one peer to Opus
 
-Keep WhatsApp on the fast agent, but route one DM to Opus:
+Keep Telegram on the fast agent, but route one DM to Opus:
 
 ```json5
 {
@@ -248,17 +244,17 @@ Keep WhatsApp on the fast agent, but route one DM to Opus:
     ]
   },
   bindings: [
-    { agentId: "opus", match: { channel: "whatsapp", peer: { kind: "dm", id: "+15551234567" } } },
-    { agentId: "chat", match: { channel: "whatsapp" } }
+    { agentId: "opus", match: { channel: "telegram", peer: { kind: "dm", id: "123456789" } } },
+    { agentId: "chat", match: { channel: "telegram" } }
   ]
 }
 ```
 
 Peer bindings always win, so keep them above the channel-wide rule.
 
-## Family agent bound to a WhatsApp group
+## Family agent bound to a Telegram group
 
-Bind a dedicated family agent to a single WhatsApp group, with mention gating
+Bind a dedicated family agent to a single Telegram group, with mention gating
 and a tighter tool policy:
 
 ```json5
@@ -288,8 +284,8 @@ and a tighter tool policy:
     {
       agentId: "family",
       match: {
-        channel: "whatsapp",
-        peer: { kind: "group", id: "120363999999999999@g.us" }
+        channel: "telegram",
+        peer: { kind: "group", id: "-1001234567890" }
       }
     }
   ]

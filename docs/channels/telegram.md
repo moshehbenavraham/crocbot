@@ -64,7 +64,7 @@ Example:
 Env option: `TELEGRAM_BOT_TOKEN=...` (works for the default account).
 If both env and config are set, config takes precedence.
 
-Multi-account support: use `channels.telegram.accounts` with per-account tokens and optional `name`. See [`gateway/configuration`](/gateway/configuration#telegramaccounts--discordaccounts--slackaccounts--signalaccounts--imessageaccounts) for the shared pattern.
+Multi-account support: use `channels.telegram.accounts` with per-account tokens and optional `name`. See [`gateway/configuration`](/gateway/configuration#telegramaccounts) for the shared pattern.
 
 3) Start the gateway. Telegram starts when a token is resolved (config first, env fallback).
 4) DM access defaults to pairing. Approve the code when the bot is first contacted.
@@ -671,5 +671,5 @@ Provider options:
 Related global options:
 - `agents.list[].groupChat.mentionPatterns` (mention gating patterns).
 - `messages.groupChat.mentionPatterns` (global fallback).
-- `commands.native` (defaults to `"auto"` → on for Telegram/Discord, off for Slack), `commands.text`, `commands.useAccessGroups` (command behavior). Override with `channels.telegram.commands.native`.
+- `commands.native` (defaults to `"auto"` → on for Telegram), `commands.text`, `commands.useAccessGroups` (command behavior). Override with `channels.telegram.commands.native`.
 - `messages.responsePrefix`, `messages.ackReaction`, `messages.ackReactionScope`, `messages.removeAckAfterReply`.

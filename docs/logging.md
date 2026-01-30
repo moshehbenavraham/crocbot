@@ -72,10 +72,10 @@ See [/web/control-ui](/web/control-ui) for how to open it.
 
 ### Channel-only logs
 
-To filter channel activity (WhatsApp/Telegram/etc), use:
+To filter Telegram activity, use:
 
 ```bash
-crocbot channels logs --channel whatsapp
+crocbot channels logs --channel telegram
 ```
 
 ## Log formats
@@ -89,7 +89,7 @@ entries to render structured output (time, level, subsystem, message).
 
 Console logs are **TTY-aware** and formatted for readability:
 
-- Subsystem prefixes (e.g. `gateway/channels/whatsapp`)
+- Subsystem prefixes (e.g. `gateway/channels/telegram`)
 - Level coloring (info/warn/error)
 - Optional compact or JSON mode
 

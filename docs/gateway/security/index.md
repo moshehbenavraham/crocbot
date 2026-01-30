@@ -49,10 +49,7 @@ If you run `--deep`, crocbot also attempts a best-effort live Gateway probe.
 
 Use this when auditing access or deciding what to back up:
 
-- **WhatsApp**: `~/.clawdbot/credentials/whatsapp/<accountId>/creds.json`
 - **Telegram bot token**: config/env or `channels.telegram.tokenFile`
-- **Discord bot token**: config/env (token file not yet supported)
-- **Slack tokens**: config/env (`channels.slack.*`)
 - **Pairing allowlists**: `~/.clawdbot/credentials/<channel>-allowFrom.json`
 - **Model auth profiles**: `~/.clawdbot/agents/<agentId>/agent/auth-profiles.json`
 - **Legacy OAuth import**: `~/.clawdbot/credentials/oauth.json`
@@ -108,17 +105,17 @@ stronger isolation between agents, run them under separate OS users or separate 
 
 ## Node execution (system.run)
 
-If a macOS node is paired, the Gateway can invoke `system.run` on that node. This is **remote code execution** on the Mac:
+If a node is paired, the Gateway can invoke `system.run` on that node. This is **remote code execution**:
 
 - Requires node pairing (approval + token).
-- Controlled on the Mac via **Settings → Exec approvals** (security + ask + allowlist).
-- If you don’t want remote execution, set security to **deny** and remove node pairing for that Mac.
+- Controlled via exec approvals (security + ask + allowlist).
+- If you don't want remote execution, set security to **deny** and remove node pairing.
 
 ## Dynamic skills (watcher / remote nodes)
 
 crocbot can refresh the skills list mid-session:
 - **Skills watcher**: changes to `SKILL.md` can update the skills snapshot on the next agent turn.
-- **Remote nodes**: connecting a macOS node can make macOS-only skills eligible (based on bin probing).
+- **Remote nodes**: connecting a node can make platform-specific skills eligible (based on bin probing).
 
 Treat skill folders as **trusted code** and restrict who can modify them.
 
@@ -128,7 +125,7 @@ Your AI assistant can:
 - Execute arbitrary shell commands
 - Read/write files
 - Access network services
-- Send messages to anyone (if you give it WhatsApp access)
+- Send messages to anyone (if you give it channel access)
 
 People who message you can:
 - Try to trick your AI into doing bad things
@@ -203,13 +200,12 @@ This prevents cross-user context leakage while keeping group chats isolated. If 
 
 crocbot has two separate “who can trigger me?” layers:
 
-- **DM allowlist** (`allowFrom` / `channels.discord.dm.allowFrom` / `channels.slack.dm.allowFrom`): who is allowed to talk to the bot in direct messages.
+- **DM allowlist** (`allowFrom` / `channels.telegram.allowFrom`): who is allowed to talk to the bot in direct messages.
   - When `dmPolicy="pairing"`, approvals are written to `~/.clawdbot/credentials/<channel>-allowFrom.json` (merged with config allowlists).
 - **Group allowlist** (channel-specific): which groups/channels/guilds the bot will accept messages from at all.
   - Common patterns:
-    - `channels.whatsapp.groups`, `channels.telegram.groups`, `channels.imessage.groups`: per-group defaults like `requireMention`; when set, it also acts as a group allowlist (include `"*"` to keep allow-all behavior).
-    - `groupPolicy="allowlist"` + `groupAllowFrom`: restrict who can trigger the bot *inside* a group session (WhatsApp/Telegram/Signal/iMessage/Microsoft Teams).
-    - `channels.discord.guilds` / `channels.slack.channels`: per-surface allowlists + mention defaults.
+    - `channels.telegram.groups`: per-group defaults like `requireMention`; when set, it also acts as a group allowlist (include `"*"` to keep allow-all behavior).
+    - `groupPolicy="allowlist"` + `groupAllowFrom`: restrict who can trigger the bot *inside* a group session.
   - **Security note:** treat `dmPolicy="open"` and `groupPolicy="open"` as last-resort settings. They should be barely used; prefer pairing + allowlists unless you fully trust every member of the room.
 
 Details: [Configuration](/gateway/configuration) and [Groups](/concepts/groups)
@@ -407,7 +403,7 @@ Auth modes:
 
 Rotation checklist (token/password):
 1. Generate/set a new secret (`gateway.auth.token` or `CLAWDBOT_GATEWAY_PASSWORD`).
-2. Restart the Gateway (or restart the macOS app if it supervises the Gateway).
+2. Restart the Gateway.
 3. Update any remote clients (`gateway.remote.token` / `.password` on machines that call into the Gateway).
 4. Verify you can no longer connect with the old credentials.
 
@@ -451,7 +447,7 @@ Avoid:
 Assume anything under `~/.clawdbot/` (or `$CLAWDBOT_STATE_DIR/`) may contain secrets or private data:
 
 - `crocbot.json`: config may include tokens (gateway, remote gateway), provider settings, and allowlists.
-- `credentials/**`: channel credentials (example: WhatsApp creds), pairing allowlists, legacy OAuth imports.
+- `credentials/**`: channel credentials, pairing allowlists, legacy OAuth imports.
 - `agents/<agentId>/agent/auth-profiles.json`: API keys + OAuth tokens (imported from legacy `credentials/oauth.json`).
 - `agents/<agentId>/sessions/**`: session transcripts (`*.jsonl`) + routing metadata (`sessions.json`) that can contain private messages and tool output.
 - `extensions/**`: installed plugins (plus their `node_modules/`).
@@ -480,7 +476,7 @@ Details: [Logging](/gateway/logging)
 
 ```json5
 {
-  channels: { whatsapp: { dmPolicy: "pairing" } }
+  channels: { telegram: { dmPolicy: "pairing" } }
 }
 ```
 
@@ -489,7 +485,7 @@ Details: [Logging](/gateway/logging)
 ```json
 {
   "channels": {
-    "whatsapp": {
+    "telegram": {
       "groups": {
         "*": { "requireMention": true }
       }
@@ -535,7 +531,7 @@ One “safe default” config that keeps the Gateway private, requires DM pairin
     auth: { mode: "token", token: "your-long-random-token" }
   },
   channels: {
-    whatsapp: {
+    telegram: {
       dmPolicy: "pairing",
       groups: { "*": { requireMention: true } }
     }
@@ -650,7 +646,7 @@ Common use cases:
           workspaceAccess: "none"
         },
         tools: {
-          allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "whatsapp", "telegram", "slack", "discord"],
+          allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "telegram"],
           deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "canvas", "nodes", "cron", "gateway", "image"]
         }
       }
@@ -678,7 +674,7 @@ If your AI does something bad:
 
 ### Contain
 
-1. **Stop it:** stop the macOS app (if it supervises the Gateway) or terminate your `crocbot gateway` process.
+1. **Stop it:** terminate your `crocbot gateway` process.
 2. **Close exposure:** set `gateway.bind: "loopback"` (or disable Tailscale Funnel/Serve) until you understand what happened.
 3. **Freeze access:** switch risky DMs/groups to `dmPolicy: "disabled"` / require mentions, and remove `"*"` allow-all entries if you had them.
 
@@ -686,7 +682,7 @@ If your AI does something bad:
 
 1. Rotate Gateway auth (`gateway.auth.token` / `CLAWDBOT_GATEWAY_PASSWORD`) and restart.
 2. Rotate remote client secrets (`gateway.remote.token` / `.password`) on any machine that can call the Gateway.
-3. Rotate provider/API credentials (WhatsApp creds, Slack/Discord tokens, model/API keys in `auth-profiles.json`).
+3. Rotate provider/API credentials (model/API keys in `auth-profiles.json`).
 
 ### Audit
 

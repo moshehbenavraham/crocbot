@@ -15,7 +15,7 @@ Run a persistent, always-on crocbot Gateway on a Raspberry Pi for **~$35-80** on
 Perfect for:
 - 24/7 personal AI assistant
 - Home automation hub
-- Low-power, always-available Telegram/WhatsApp bot
+- Low-power, always-available Telegram bot
 
 ## Hardware Requirements
 
@@ -223,7 +223,6 @@ Most crocbot features work on ARM64, but some external binaries may need ARM bui
 | Tool | ARM64 Status | Notes |
 |------|--------------|-------|
 | Node.js | ✅ | Works great |
-| WhatsApp (Baileys) | ✅ | Pure JS, no issues |
 | Telegram | ✅ | Pure JS, no issues |
 | gog (Gmail CLI) | ⚠️ | Check for ARM release |
 | Chromium (browser) | ✅ | `sudo apt install chromium-browser` |

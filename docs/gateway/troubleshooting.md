@@ -106,7 +106,7 @@ Doctor/service will show runtime state (PID/last exit) and log hints.
 **Logs:**
 - Preferred: `crocbot logs --follow`
 - File logs (always): `/tmp/crocbot/crocbot-YYYY-MM-DD.log` (or your configured `logging.file`)
-- macOS LaunchAgent (if installed): `$CLAWDBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
+- LaunchAgent (if installed): `$CLAWDBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
 - Linux systemd (if installed): `journalctl --user -u crocbot-gateway[-<profile>].service -n 200 --no-pager`
 - Windows: `schtasks /Query /TN "crocbot Gateway (<profile>)" /V /FO LIST`
 
@@ -154,7 +154,6 @@ the gateway.
 ### Service Environment (PATH + runtime)
 
 The gateway service runs with a **minimal PATH** to avoid shell/manager cruft:
-- macOS: `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, `/bin`
 - Linux: `/usr/local/bin`, `/usr/bin`, `/bin`
 
 This intentionally excludes version managers (nvm/fnm/volta/asdf) and package
@@ -165,7 +164,7 @@ Exec runs on `host=gateway` merge your login-shell `PATH` into the exec environm
 so missing tools usually mean your shell init isn’t exporting them (or set
 `tools.exec.pathPrepend`). See [/tools/exec](/tools/exec).
 
-WhatsApp + Telegram channels require **Node**; Bun is unsupported. If your
+Telegram channels require **Node**; Bun is unsupported. If your
 service was installed with Bun or a version-managed Node path, run `crocbot doctor`
 to migrate to a system Node install.
 
@@ -291,7 +290,7 @@ Look for `AllowFrom: ...` in the output.
 ```bash
 # The message must match mentionPatterns or explicit mentions; defaults live in channel groups/guilds.
 # Multi-agent: `agents.list[].groupChat.mentionPatterns` overrides global patterns.
-grep -n "agents\\|groupChat\\|mentionPatterns\\|channels\\.whatsapp\\.groups\\|channels\\.telegram\\.groups\\|channels\\.imessage\\.groups\\|channels\\.discord\\.guilds" \
+grep -n "agents\\|groupChat\\|mentionPatterns\\|channels\\.telegram\\.groups" \
   "${CLAWDBOT_CONFIG_PATH:-$HOME/.clawdbot/crocbot.json}"
 ```
 
@@ -322,7 +321,7 @@ crocbot logs --follow | grep "pairing request"
 
 ### Image + Mention Not Working
 
-Known issue: When you send an image with ONLY a mention (no other text), WhatsApp sometimes doesn't include the mention metadata.
+In some cases, when you send an image with ONLY a mention (no other text), mention metadata may not be included.
 
 **Workaround:** Add some text with the mention:
 - ❌ `@clawd` + image
@@ -364,30 +363,30 @@ Default timeout is 30 minutes. For long tasks:
 
 Or use the `process` tool to background long commands.
 
-### WhatsApp Disconnected
+### Channel Disconnected
 
 ```bash
 # Check local status (creds, sessions, queued events)
 crocbot status
-# Probe the running gateway + channels (WA connect + Telegram + Discord APIs)
+# Probe the running gateway + channels
 crocbot status --deep
 
 # View recent connection events
 crocbot logs --limit 200 | grep "connection\\|disconnect\\|logout"
 ```
 
-**Fix:** Usually reconnects automatically once the Gateway is running. If you’re stuck, restart the Gateway process (however you supervise it), or run it manually with verbose output:
+**Fix:** Usually reconnects automatically once the Gateway is running. If you're stuck, restart the Gateway process (however you supervise it), or run it manually with verbose output:
 
 ```bash
 crocbot gateway --verbose
 ```
 
-If you’re logged out / unlinked:
+If you're logged out / unlinked:
 
 ```bash
 crocbot channels logout
 trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}/credentials" # if logout can't cleanly remove everything
-crocbot channels login --verbose       # re-scan QR
+crocbot channels login --verbose
 ```
 
 ### Media Send Failing
@@ -445,37 +444,11 @@ Notes:
 - **Gateway logs** in `/tmp/crocbot/…` for the exact provider error.
 - **Model status**: use `/model status` (chat) or `crocbot models status` (CLI).
 
-### I’m running on my personal WhatsApp number — why is self-chat weird?
-
-Enable self-chat mode and allowlist your own number:
-
-```json5
-{
-  channels: {
-    whatsapp: {
-      selfChatMode: true,
-      dmPolicy: "allowlist",
-      allowFrom: ["+15555550123"]
-    }
-  }
-}
-```
-
-See [WhatsApp setup](/channels/whatsapp).
-
-### WhatsApp logged me out. How do I re‑auth?
-
-Run the login command again and scan the QR code:
-
-```bash
-crocbot channels login
-```
-
-### Build errors on `main` — what’s the standard fix path?
+### Build errors on `main` — what's the standard fix path?
 
 1) `git pull origin main && pnpm install`
 2) `crocbot doctor`
-3) Check GitHub issues or Discord
+3) Check GitHub issues
 4) Temporary workaround: check out an older commit
 
 ### npm install fails (allow-build-scripts / missing tar or yargs). What now?
@@ -534,21 +507,6 @@ Fix checklist:
 
 See [Streaming](/concepts/streaming).
 
-### Discord doesn’t reply in my server even with `requireMention: false`. Why?
-
-`requireMention` only controls mention‑gating **after** the channel passes allowlists.
-By default `channels.discord.groupPolicy` is **allowlist**, so guilds must be explicitly enabled.
-If you set `channels.discord.guilds.<guildId>.channels`, only the listed channels are allowed; omit it to allow all channels in the guild.
-
-Fix checklist:
-1) Set `channels.discord.groupPolicy: "open"` **or** add a guild allowlist entry (and optionally a channel allowlist).
-2) Use **numeric channel IDs** in `channels.discord.guilds.<guildId>.channels`.
-3) Put `requireMention: false` **under** `channels.discord.guilds` (global or per‑channel).
-   Top‑level `channels.discord.requireMention` is not a supported key.
-4) Ensure the bot has **Message Content Intent** and channel permissions.
-5) Run `crocbot channels status --probe` for audit hints.
-
-Docs: [Discord](/channels/discord), [Channels troubleshooting](/channels/troubleshooting).
 
 ### Cloud Code Assist API error: invalid tool schema (400). What now?
 
@@ -568,30 +526,15 @@ Fix checklist:
 
 See [Tools](/tools) and [TypeBox schemas](/concepts/typebox).
 
-## macOS Specific Issues
+## Gateway stuck on "Starting..."
 
-### App Crashes when Granting Permissions (Speech/Mic)
-
-If the app disappears or shows "Abort trap 6" when you click "Allow" on a privacy prompt:
-
-**Fix 1: Reset TCC Cache**
-```bash
-tccutil reset All com.clawdbot.mac.debug
-```
-
-**Fix 2: Force New Bundle ID**
-If resetting doesn't work, change the `BUNDLE_ID` in [`scripts/package-mac-app.sh`](https://github.com/crocbot/crocbot/blob/main/scripts/package-mac-app.sh) (e.g., add a `.test` suffix) and rebuild. This forces macOS to treat it as a new app.
-
-### Gateway stuck on "Starting..."
-
-The app connects to a local gateway on port `18789`. If it stays stuck:
+The client connects to a local gateway on port `18789`. If it stays stuck:
 
 **Fix 1: Stop the supervisor (preferred)**
-If the gateway is supervised by launchd, killing the PID will just respawn it. Stop the supervisor first:
+If the gateway is supervised by systemd, killing the PID will just respawn it. Stop the supervisor first:
 ```bash
 crocbot gateway status
 crocbot gateway stop
-# Or: launchctl bootout gui/$UID/com.clawdbot.gateway (replace with com.clawdbot.<profile> if needed)
 ```
 
 **Fix 2: Port is busy (find the listener)**
@@ -599,7 +542,7 @@ crocbot gateway stop
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 ```
 
-If it’s an unsupervised process, try a graceful stop first, then escalate:
+If it's an unsupervised process, try a graceful stop first, then escalate:
 ```bash
 kill -TERM <PID>
 sleep 1
@@ -607,7 +550,7 @@ kill -9 <PID> # last resort
 ```
 
 **Fix 3: Check the CLI install**
-Ensure the global `crocbot` CLI is installed and matches the app version:
+Ensure the global `crocbot` CLI is installed:
 ```bash
 crocbot --version
 npm install -g crocbot@<version>
@@ -631,7 +574,7 @@ crocbot channels login --verbose
 | Log | Location |
 |-----|----------|
 | Gateway file logs (structured) | `/tmp/crocbot/crocbot-YYYY-MM-DD.log` (or `logging.file`) |
-| Gateway service logs (supervisor) | macOS: `$CLAWDBOT_STATE_DIR/logs/gateway.log` + `gateway.err.log` (default: `~/.clawdbot/logs/...`; profiles use `~/.clawdbot-<profile>/logs/...`)<br />Linux: `journalctl --user -u crocbot-gateway[-<profile>].service -n 200 --no-pager`<br />Windows: `schtasks /Query /TN "crocbot Gateway (<profile>)" /V /FO LIST` |
+| Gateway service logs (supervisor) | Linux: `journalctl --user -u crocbot-gateway[-<profile>].service -n 200 --no-pager` |
 | Session files | `$CLAWDBOT_STATE_DIR/agents/<agentId>/sessions/` |
 | Media cache | `$CLAWDBOT_STATE_DIR/media/` |
 | Credentials | `$CLAWDBOT_STATE_DIR/credentials/` |
@@ -668,11 +611,11 @@ crocbot gateway stop
 # crocbot gateway uninstall
 
 trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}"
-crocbot channels login         # re-pair WhatsApp
+crocbot channels login         # re-authenticate
 crocbot gateway restart           # or: crocbot gateway
 ```
 
-⚠️ This loses all sessions and requires re-pairing WhatsApp.
+Warning: This loses all sessions and requires re-authentication.
 
 ## Getting Help
 

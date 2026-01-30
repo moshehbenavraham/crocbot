@@ -1,7 +1,7 @@
 ---
 summary: "Bonjour/mDNS discovery + debugging (Gateway beacons, clients, and common failure modes)"
 read_when:
-  - Debugging Bonjour discovery issues on macOS/iOS
+  - Debugging Bonjour discovery issues
   - Changing mDNS service types, TXT records, or discovery UX
 ---
 # Bonjour / mDNS discovery
@@ -22,9 +22,9 @@ High‑level steps:
 2) Publish DNS‑SD records for `_crocbot-gw._tcp` under a dedicated zone
    (example: `crocbot.internal.`).
 3) Configure Tailscale **split DNS** so `crocbot.internal` resolves via that
-   DNS server for clients (including iOS).
+   DNS server for clients.
 
-crocbot standardizes on `crocbot.internal.` for this mode. iOS/Android nodes
+crocbot standardizes on `crocbot.internal.` for this mode. Nodes
 browse both `local.` and `crocbot.internal.` automatically.
 
 ### Gateway config (recommended)
@@ -60,7 +60,7 @@ In the Tailscale admin console:
 - Add a nameserver pointing at the gateway’s tailnet IP (UDP/TCP 53).
 - Add split DNS so the domain `crocbot.internal` uses that nameserver.
 
-Once clients accept tailnet DNS, iOS nodes can browse
+Once clients accept tailnet DNS, nodes can browse
 `_crocbot-gw._tcp` in `crocbot.internal.` without multicast.
 
 ### Gateway listener security (recommended)
@@ -70,7 +70,7 @@ access, bind explicitly and keep auth enabled.
 
 For tailnet‑only setups:
 - Set `gateway.bind: "tailnet"` in `~/.clawdbot/crocbot.json`.
-- Restart the Gateway (or restart the macOS menubar app).
+- Restart the Gateway.
 
 ## What advertises
 
@@ -78,7 +78,7 @@ Only the Gateway advertises `_crocbot-gw._tcp`.
 
 ## Service types
 
-- `_crocbot-gw._tcp` — gateway transport beacon (used by macOS/iOS/Android nodes).
+- `_crocbot-gw._tcp` — gateway transport beacon (used by nodes).
 
 ## TXT keys (non‑secret hints)
 
@@ -96,20 +96,21 @@ The Gateway advertises small non‑secret hints to make UI flows convenient:
 - `cliPath=<path>` (optional; absolute path to a runnable `crocbot` entrypoint)
 - `tailnetDns=<magicdns>` (optional hint when Tailnet is available)
 
-## Debugging on macOS
+## Debugging discovery
 
-Useful built‑in tools:
+Useful built‑in tools (Linux/Unix):
 
 - Browse instances:
   ```bash
   dns-sd -B _crocbot-gw._tcp local.
+  # or on Linux: avahi-browse -r _crocbot-gw._tcp
   ```
 - Resolve one instance (replace `<instance>`):
   ```bash
   dns-sd -L "<instance>" _crocbot-gw._tcp local.
   ```
 
-If browsing works but resolving fails, you’re usually hitting a LAN policy or
+If browsing works but resolving fails, you're usually hitting a LAN policy or
 mDNS resolver issue.
 
 ## Debugging in Gateway logs
@@ -121,21 +122,11 @@ The Gateway writes a rolling log file (printed on startup as
 - `bonjour: ... name conflict resolved` / `hostname conflict resolved`
 - `bonjour: watchdog detected non-announced service ...`
 
-## Debugging on iOS node
-
-The iOS node uses `NWBrowser` to discover `_crocbot-gw._tcp`.
-
-To capture logs:
-- Settings → Gateway → Advanced → **Discovery Debug Logs**
-- Settings → Gateway → Advanced → **Discovery Logs** → reproduce → **Copy**
-
-The log includes browser state transitions and result‑set changes.
-
 ## Common failure modes
 
-- **Bonjour doesn’t cross networks**: use Tailnet or SSH.
+- **Bonjour doesn't cross networks**: use Tailnet or SSH.
 - **Multicast blocked**: some Wi‑Fi networks disable mDNS.
-- **Sleep / interface churn**: macOS may temporarily drop mDNS results; retry.
+- **Sleep / interface churn**: systems may temporarily drop mDNS results; retry.
 - **Browse works but resolve fails**: keep machine names simple (avoid emojis or
   punctuation), then restart the Gateway. The service instance name derives from
   the host name, so overly complex names can confuse some resolvers.
@@ -146,7 +137,7 @@ Bonjour/DNS‑SD often escapes bytes in service instance names as decimal `\DDD`
 sequences (e.g. spaces become `\032`).
 
 - This is normal at the protocol level.
-- UIs should decode for display (iOS uses `BonjourEscapes.decode`).
+- UIs should decode for display.
 
 ## Disabling / configuration
 

@@ -7,7 +7,7 @@ read_when:
 # Linux App
 
 The Gateway is fully supported on Linux. **Node is the recommended runtime**.
-Bun is not recommended for the Gateway (WhatsApp/Telegram bugs).
+Bun is not recommended for the Gateway (Telegram bugs).
 
 Native Linux companion apps are planned. Contributions are welcome if you want to help build one.
 

@@ -170,9 +170,8 @@ Config:
       enabled: true,
       mode: "session", // "session" | "targets" | "both"
       agentFilter: ["main"],
-      sessionFilter: ["discord"], // substring or regex
+      sessionFilter: ["telegram"], // substring or regex
       targets: [
-        { channel: "slack", to: "U12345678" },
         { channel: "telegram", to: "123456789" }
       ]
     }

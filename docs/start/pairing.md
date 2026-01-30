@@ -2,7 +2,7 @@
 summary: "Pairing overview: approve who can DM you + which nodes can join"
 read_when:
   - Setting up DM access control
-  - Pairing a new iOS/Android node
+  - Pairing a new node
   - Reviewing crocbot security posture
 ---
 
@@ -34,7 +34,7 @@ crocbot pairing list telegram
 crocbot pairing approve telegram <CODE>
 ```
 
-Supported channels: `telegram`, `whatsapp`, `signal`, `imessage`, `discord`, `slack`.
+Supported channels: `telegram`.
 
 ### Where the state lives
 
@@ -45,7 +45,7 @@ Stored under `~/.clawdbot/credentials/`:
 Treat these as sensitive (they gate access to your assistant).
 
 
-## 2) Node device pairing (iOS/Android/macOS/headless nodes)
+## 2) Node device pairing (headless nodes)
 
 Nodes connect to the Gateway as **devices** with `role: node`. The Gateway
 creates a device pairing request that must be approved.
@@ -74,10 +74,4 @@ Stored under `~/.clawdbot/devices/`:
 
 - Security model + prompt injection: [Security](/gateway/security)
 - Updating safely (run doctor): [Updating](/install/updating)
-- Channel configs:
-  - Telegram: [Telegram](/channels/telegram)
-  - WhatsApp: [WhatsApp](/channels/whatsapp)
-  - Signal: [Signal](/channels/signal)
-  - iMessage: [iMessage](/channels/imessage)
-  - Discord: [Discord](/channels/discord)
-  - Slack: [Slack](/channels/slack)
+- Channel config: [Telegram](/channels/telegram)

@@ -355,7 +355,7 @@ Options:
 ## Channel helpers
 
 ### `channels`
-Manage chat channel accounts (WhatsApp/Telegram/Discord/Google Chat/Slack/Mattermost (plugin)/Signal/iMessage/MS Teams).
+Manage chat channel accounts (Telegram).
 
 Subcommands:
 - `channels list`: show configured channels and auth profiles.
@@ -364,21 +364,21 @@ Subcommands:
 - `channels logs`: show recent channel logs from the gateway log file.
 - `channels add`: wizard-style setup when no flags are passed; flags switch to non-interactive mode.
 - `channels remove`: disable by default; pass `--delete` to remove config entries without prompts.
-- `channels login`: interactive channel login (WhatsApp Web only).
+- `channels login`: interactive channel login.
 - `channels logout`: log out of a channel session (if supported).
 
 Common options:
-- `--channel <name>`: `whatsapp|telegram|discord|googlechat|slack|mattermost|signal|imessage|msteams`
+- `--channel <name>`: `telegram`
 - `--account <id>`: channel account id (default `default`)
 - `--name <label>`: display name for the account
 
 `channels login` options:
-- `--channel <channel>` (default `whatsapp`; supports `whatsapp`/`web`)
+- `--channel <channel>` (default `telegram`)
 - `--account <id>`
 - `--verbose`
 
 `channels logout` options:
-- `--channel <channel>` (default `whatsapp`)
+- `--channel <channel>` (default `telegram`)
 - `--account <id>`
 
 `channels list` options:
@@ -395,8 +395,7 @@ More detail: [/concepts/oauth](/concepts/oauth)
 Examples:
 ```bash
 crocbot channels add --channel telegram --account alerts --name "Alerts Bot" --token $TELEGRAM_BOT_TOKEN
-crocbot channels add --channel discord --account work --name "Work Bot" --token $DISCORD_BOT_TOKEN
-crocbot channels remove --channel discord --account work --delete
+crocbot channels remove --channel telegram --account alerts --delete
 crocbot channels status --probe
 crocbot status --deep
 ```
@@ -434,7 +433,7 @@ Subcommands:
 Wide-area discovery DNS helper (CoreDNS + Tailscale). See [/gateway/discovery](/gateway/discovery).
 
 Options:
-- `--apply`: install/update CoreDNS config (requires sudo; macOS only).
+- `--apply`: install/update CoreDNS config (requires sudo).
 
 ## Messaging + agent
 
@@ -456,7 +455,7 @@ Subcommands:
 
 Examples:
 - `crocbot message send --target +15555550123 --message "Hi"`
-- `crocbot message poll --channel discord --target channel:123 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
+- `crocbot message poll --channel telegram --target -1001234567890 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
 
 ### `agent`
 Run one agent turn via the Gateway (or `--local` embedded).
@@ -469,7 +468,7 @@ Options:
 - `--session-id <id>`
 - `--thinking <off|minimal|low|medium|high|xhigh>` (GPT-5.2 + Codex models only)
 - `--verbose <on|full|off>`
-- `--channel <whatsapp|telegram|discord|slack|mattermost|signal|imessage|msteams>`
+- `--channel telegram`
 - `--local`
 - `--deliver`
 - `--json`
@@ -496,7 +495,7 @@ Options:
 - `--non-interactive`
 - `--json`
 
-Binding specs use `channel[:accountId]`. When `accountId` is omitted for WhatsApp, the default account id is used.
+Binding specs use `channel[:accountId]`. When `accountId` is omitted, the default account id is used.
 
 #### `agents delete <id>`
 Delete an agent and prune its workspace + state.
@@ -531,7 +530,7 @@ crocbot can surface provider usage/quota when OAuth/API creds are available.
 Surfaces:
 - `/status` (adds a short provider usage line when available)
 - `crocbot status --usage` (prints full provider breakdown)
-- macOS menu bar (Usage section under Context)
+- Gateway dashboard (Usage section)
 
 Notes:
 - Data comes directly from provider usage endpoints (no estimates).
@@ -627,7 +626,7 @@ Notes:
 - `gateway status` also surfaces legacy or extra gateway services when it can detect them (`--deep` adds system-level scans). Profile-named crocbot services are treated as first-class and aren't flagged as "extra".
 - `gateway status` prints which config path the CLI uses vs which config the service likely uses (service env), plus the resolved probe target URL.
 - `gateway install|uninstall|start|stop|restart` support `--json` for scripting (default output stays human-friendly).
-- `gateway install` defaults to Node runtime; bun is **not recommended** (WhatsApp/Telegram bugs).
+- `gateway install` defaults to Node runtime; bun is **not recommended** (Telegram bugs).
 - `gateway install` options: `--port`, `--runtime`, `--token`, `--force`, `--json`.
 
 ### `logs`

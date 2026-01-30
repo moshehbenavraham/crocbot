@@ -7,7 +7,7 @@ read_when:
 
 # `crocbot dns`
 
-DNS helpers for wide-area discovery (Tailscale + CoreDNS). Currently focused on macOS + Homebrew CoreDNS.
+DNS helpers for wide-area discovery (Tailscale + CoreDNS).
 
 Related:
 - Gateway discovery: [Discovery](/gateway/discovery)

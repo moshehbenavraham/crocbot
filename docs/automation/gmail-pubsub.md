@@ -60,7 +60,7 @@ that sets `deliver` + optional `channel`/`to`:
 ```
 
 If you want a fixed channel, set `channel` + `to`. Otherwise `channel: "last"`
-uses the last delivery route (falls back to WhatsApp).
+uses the last delivery route.
 
 To force a cheaper model for Gmail runs, set `model` in the mapping
 (`provider/model` or alias). If you enforce `agents.defaults.models`, include it there.
@@ -91,7 +91,7 @@ under `hooks.transformsDir` (see [Webhooks](/automation/webhook)).
 
 ## Wizard (recommended)
 
-Use the crocbot helper to wire everything together (installs deps on macOS via brew):
+Use the crocbot helper to wire everything together:
 
 ```bash
 crocbot webhooks gmail setup \
@@ -113,8 +113,7 @@ If you need the backend to receive the prefixed path, set
 
 Want a custom endpoint? Use `--push-endpoint <url>` or `--tailscale off`.
 
-Platform note: on macOS the wizard installs `gcloud`, `gogcli`, and `tailscale`
-via Homebrew; on Linux install them manually first.
+Platform note: install `gcloud`, `gogcli`, and `tailscale` manually before running the wizard.
 
 Gateway auto-start (recommended):
 - When `hooks.enabled=true` and `hooks.gmail.account` is set, the Gateway starts

@@ -1,22 +1,20 @@
 ---
 summary: "Nodes: pairing, capabilities, permissions, and CLI helpers for canvas/camera/screen/system"
 read_when:
-  - Pairing iOS/Android nodes to a gateway
+  - Pairing nodes to a gateway
   - Using node canvas/camera for agent context
   - Adding new node commands or CLI helpers
 ---
 
 # Nodes
 
-A **node** is a companion device (macOS/iOS/Android/headless) that connects to the Gateway **WebSocket** (same port as operators) with `role: "node"` and exposes a command surface (e.g. `canvas.*`, `camera.*`, `system.*`) via `node.invoke`. Protocol details: [Gateway protocol](/gateway/protocol).
+A **node** is a companion device (headless) that connects to the Gateway **WebSocket** (same port as operators) with `role: "node"` and exposes a command surface (e.g. `canvas.*`, `camera.*`, `system.*`) via `node.invoke`. Protocol details: [Gateway protocol](/gateway/protocol).
 
 Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL; deprecated/removed for current nodes).
 
-macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `crocbot nodes …` works against this Mac).
-
 Notes:
-- Nodes are **peripherals**, not gateways. They don’t run the gateway service.
-- Telegram/WhatsApp/etc. messages land on the **gateway**, not on nodes.
+- Nodes are **peripherals**, not gateways. They don't run the gateway service.
+- Telegram messages land on the **gateway**, not on nodes.
 
 ## Pairing + status
 
@@ -121,7 +119,7 @@ Low-level (raw RPC):
 crocbot nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
-Higher-level helpers exist for the common “give the agent a MEDIA attachment” workflows.
+Higher-level helpers exist for the common "give the agent a MEDIA attachment" workflows.
 
 ## Screenshots (canvas snapshots)
 
@@ -178,7 +176,6 @@ crocbot nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 Notes:
 - The node must be **foregrounded** for `canvas.*` and `camera.*` (background calls return `NODE_BACKGROUND_UNAVAILABLE`).
 - Clip duration is clamped (currently `<= 60s`) to avoid oversized base64 payloads.
-- Android will prompt for `CAMERA`/`RECORD_AUDIO` permissions when possible; denied permissions fail with `*_PERMISSION_REQUIRED`.
 
 ## Screen recordings (nodes)
 
@@ -191,9 +188,8 @@ crocbot nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-a
 
 Notes:
 - `screen.record` requires the node app to be foregrounded.
-- Android will show the system screen-capture prompt before recording.
 - Screen recordings are clamped to `<= 60s`.
-- `--no-audio` disables microphone capture (supported on iOS/Android; macOS uses system capture audio).
+- `--no-audio` disables microphone capture.
 - Use `--screen <index>` to select a display when multiple screens are available.
 
 ## Location (nodes)
@@ -209,43 +205,24 @@ crocbot nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15
 
 Notes:
 - Location is **off by default**.
-- “Always” requires system permission; background fetch is best-effort.
+- "Always" requires system permission; background fetch is best-effort.
 - The response includes lat/lon, accuracy (meters), and timestamp.
 
-## SMS (Android nodes)
+## System commands (node host)
 
-Android nodes can expose `sms.send` when the user grants **SMS** permission and the device supports telephony.
-
-Low-level invoke:
-
-```bash
-crocbot nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from crocbot"}'
-```
-
-Notes:
-- The permission prompt must be accepted on the Android device before the capability is advertised.
-- Wi-Fi-only devices without telephony will not advertise `sms.send`.
-
-## System commands (node host / mac node)
-
-The macOS node exposes `system.run`, `system.notify`, and `system.execApprovals.get/set`.
 The headless node host exposes `system.run`, `system.which`, and `system.execApprovals.get/set`.
 
 Examples:
 
 ```bash
-crocbot nodes run --node <idOrNameOrIp> -- echo "Hello from mac node"
+crocbot nodes run --node <idOrNameOrIp> -- echo "Hello from node"
 crocbot nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway ready"
 ```
 
 Notes:
 - `system.run` returns stdout/stderr/exit code in the payload.
-- `system.notify` respects notification permission state on the macOS app.
 - `system.run` supports `--cwd`, `--env KEY=VAL`, `--command-timeout`, and `--needs-screen-recording`.
 - `system.notify` supports `--priority <passive|active|timeSensitive>` and `--delivery <system|overlay|auto>`.
-- macOS nodes drop `PATH` overrides; headless node hosts only accept `PATH` when it prepends the node host PATH.
-- On macOS node mode, `system.run` is gated by exec approvals in the macOS app (Settings → Exec approvals).
-  Ask/allowlist/full behave the same as the headless node host; denied prompts return `SYSTEM_RUN_DENIED`.
 - On headless node host, `system.run` is gated by exec approvals (`~/.clawdbot/exec-approvals.json`).
 
 ## Exec node binding
@@ -294,12 +271,4 @@ Notes:
 - The node host stores its node id, token, display name, and gateway connection info in `~/.clawdbot/node.json`.
 - Exec approvals are enforced locally via `~/.clawdbot/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).
-- On macOS, the headless node host prefers the companion app exec host when reachable and falls
-  back to local execution if the app is unavailable. Set `CLAWDBOT_NODE_EXEC_HOST=app` to require
-  the app, or `CLAWDBOT_NODE_EXEC_FALLBACK=0` to disable fallback.
 - Add `--tls` / `--tls-fingerprint` when the Gateway WS uses TLS.
-
-## Mac node mode
-
-- The macOS menubar app connects to the Gateway WS server as a node (so `crocbot nodes …` works against this Mac).
-- In remote mode, the app opens an SSH tunnel for the Gateway port and connects to `localhost`.

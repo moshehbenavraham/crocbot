@@ -27,7 +27,7 @@ If you’re on any other Linux VPS, the same steps apply — you just won’t us
 - exe.dev account + `ssh exe.dev` working on your laptop
 - SSH keys set up (your laptop → exe.dev)
 - Model auth (OAuth or API key) you want to use
-- Provider credentials (optional): WhatsApp QR scan, Telegram bot token, Discord bot token, …
+- Provider credentials (optional): Telegram bot token
 
 ## 1) Create the VM
 

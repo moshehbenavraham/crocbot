@@ -56,9 +56,7 @@ Usually unnecessary: one Gateway can serve multiple messaging channels and agent
 Supported if you isolate state + config and use unique ports. Full guide: [Multiple gateways](/gateway/multiple-gateways).
 
 Service names are profile-aware:
-- macOS: `com.clawdbot.<profile>`
 - Linux: `crocbot-gateway-<profile>.service`
-- Windows: `crocbot Gateway (<profile>)`
 
 Install metadata is embedded in the service config:
 - `CLAWDBOT_SERVICE_MARKER=crocbot`
@@ -98,7 +96,7 @@ Checklist per instance:
 - unique `CLAWDBOT_CONFIG_PATH`
 - unique `CLAWDBOT_STATE_DIR`
 - unique `agents.defaults.workspace`
-- separate WhatsApp numbers (if using WA)
+- separate Telegram accounts (if using multiple)
 
 Service install per profile:
 ```bash
@@ -145,7 +143,7 @@ See also: [Presence](/concepts/presence) for how presence is produced/deduped an
 ## WebChat integration
 - WebChat is a native SwiftUI UI that talks directly to the Gateway WebSocket for history, sends, abort, and events.
 - Remote use goes through the same SSH/Tailscale tunnel; if a gateway token is configured, the client includes it during `connect`.
-- macOS app connects via a single WS (shared connection); it hydrates presence from the initial snapshot and listens for `presence` events to update the UI.
+- Clients connect via a single WS (shared connection); they hydrate presence from the initial snapshot and listen for `presence` events to update the UI.
 
 ## Typing and validation
 - Server validates every inbound frame with AJV against JSON Schema emitted from the protocol definitions.
@@ -161,7 +159,7 @@ See also: [Presence](/concepts/presence) for how presence is produced/deduped an
 ## Error codes (res.error shape)
 - Errors use `{ code, message, details?, retryable?, retryAfterMs? }`.
 - Standard codes:
-  - `NOT_LINKED` — WhatsApp not authenticated.
+  - `NOT_LINKED` — channel not authenticated.
   - `AGENT_TIMEOUT` — agent did not respond within the configured deadline.
   - `INVALID_REQUEST` — schema/param validation failed.
   - `UNAVAILABLE` — Gateway is shutting down or a dependency is unavailable.
@@ -171,9 +169,9 @@ See also: [Presence](/concepts/presence) for how presence is produced/deduped an
 - Send/agent acknowledgements remain separate responses; do not overload ticks for sends.
 
 ## Replay / gaps
-- Events are not replayed. Clients detect seq gaps and should refresh (`health` + `system-presence`) before continuing. WebChat and macOS clients now auto-refresh on gap.
+- Events are not replayed. Clients detect seq gaps and should refresh (`health` + `system-presence`) before continuing. WebChat clients auto-refresh on gap.
 
-## Supervision (macOS example)
+## Supervision (systemd example)
 - Use launchd to keep the service alive:
   - Program: path to `crocbot`
   - Arguments: `gateway`
@@ -281,7 +279,7 @@ Windows installs should use **WSL2** and follow the Linux systemd section above.
 
 ## CLI helpers
 - `crocbot gateway health|status` — request health/status over the Gateway WS.
-- `crocbot message send --target <num> --message "hi" [--media ...]` — send via Gateway (idempotent for WhatsApp).
+- `crocbot message send --target <num> --message "hi" [--media ...]` — send via Gateway.
 - `crocbot agent --message "hi" --to <num>` — run an agent turn (waits for final by default).
 - `crocbot gateway call <method> --params '{"k":"v"}'` — raw method invoker for debugging.
 - `crocbot gateway stop|restart` — stop/restart the supervised gateway service (launchd/systemd).

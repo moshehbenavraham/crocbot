@@ -62,7 +62,7 @@ sudo -i -u crocbot
 The post-install script will guide you through:
 
 1. **Onboarding wizard**: Configure crocbot settings
-2. **Provider login**: Connect WhatsApp/Telegram/Discord/Signal
+2. **Provider login**: Connect Telegram
 3. **Gateway testing**: Verify the installation
 4. **Tailscale setup**: Connect to your VPN mesh
 

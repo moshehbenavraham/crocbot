@@ -1,5 +1,5 @@
 title: "crocbot Docs"
-description: "A TypeScript/Node gateway + macOS/iOS/Android companions for WhatsApp (web) and Telegram (bot)."
+description: "A TypeScript/Node gateway for Telegram bots."
 markdown: kramdown
 highlighter: rouge
 
@@ -34,12 +34,6 @@ nav:
     url: "/gateway/configuration/"
   - title: "WebChat"
     url: "/web/webchat/"
-  - title: "macOS App"
-    url: "/platforms/macos/"
-  - title: "iOS App"
-    url: "/platforms/ios/"
-  - title: "Android App"
-    url: "/platforms/android/"
   - title: "Telegram"
     url: "/channels/telegram/"
   - title: "Security"

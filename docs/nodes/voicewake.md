@@ -28,8 +28,8 @@ Shape:
 
 ### Methods
 
-- `voicewake.get` → `{ triggers: string[] }`
-- `voicewake.set` with params `{ triggers: string[] }` → `{ triggers: string[] }`
+- `voicewake.get` returns `{ triggers: string[] }`
+- `voicewake.set` with params `{ triggers: string[] }` returns `{ triggers: string[] }`
 
 Notes:
 - Triggers are normalized (trimmed, empties dropped). Empty lists fall back to defaults.
@@ -40,22 +40,9 @@ Notes:
 - `voicewake.changed` payload `{ triggers: string[] }`
 
 Who receives it:
-- All WebSocket clients (macOS app, WebChat, etc.)
-- All connected nodes (iOS/Android), and also on node connect as an initial “current state” push.
+- All WebSocket clients (WebChat, etc.)
+- All connected nodes, and also on node connect as an initial "current state" push.
 
 ## Client behavior
 
-### macOS app
-
-- Uses the global list to gate `VoiceWakeRuntime` triggers.
-- Editing “Trigger words” in Voice Wake settings calls `voicewake.set` and then relies on the broadcast to keep other clients in sync.
-
-### iOS node
-
-- Uses the global list for `VoiceWakeManager` trigger detection.
-- Editing Wake Words in Settings calls `voicewake.set` (over the Gateway WS) and also keeps local wake-word detection responsive.
-
-### Android node
-
-- Exposes a Wake Words editor in Settings.
-- Calls `voicewake.set` over the Gateway WS so edits sync everywhere.
+Nodes use the global list for wake word trigger detection. Editing "Trigger words" in settings calls `voicewake.set` and relies on the broadcast to keep other clients in sync.

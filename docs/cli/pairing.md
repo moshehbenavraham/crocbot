@@ -14,7 +14,7 @@ Related:
 ## Commands
 
 ```bash
-crocbot pairing list whatsapp
-crocbot pairing approve whatsapp <code> --notify
+crocbot pairing list telegram
+crocbot pairing approve telegram <code> --notify
 ```
 
