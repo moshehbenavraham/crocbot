@@ -32,7 +32,7 @@ Use these hubs to discover every page, including deep dives and reference docs t
 ## Core concepts
 
 - [Architecture](/concepts/architecture)
-- [Network hub](/network)
+- [Network hub](/gateway/network)
 - [Agent runtime](/concepts/agent)
 - [Agent workspace](/concepts/agent-workspace)
 - [Memory](/concepts/memory)
@@ -51,7 +51,6 @@ Use these hubs to discover every page, including deep dives and reference docs t
 - [Timezone handling](/concepts/timezone)
 - [Presence](/concepts/presence)
 - [Discovery + transports](/gateway/discovery)
-- [Bonjour](/gateway/bonjour)
 - [Channel routing](/concepts/channel-routing)
 - [Groups](/concepts/groups)
 - [Group messages](/concepts/group-messages)
@@ -72,7 +71,6 @@ Use these hubs to discover every page, including deep dives and reference docs t
 ## Gateway + operations
 
 - [Gateway runbook](/gateway)
-- [Gateway pairing](/gateway/pairing)
 - [Gateway lock](/gateway/gateway-lock)
 - [Background process](/gateway/background-process)
 - [Health](/gateway/health)
@@ -91,7 +89,6 @@ Use these hubs to discover every page, including deep dives and reference docs t
 ## Tools + automation
 
 - [Tools surface](/tools)
-- [OpenProse](/prose)
 - [CLI reference](/cli)
 - [Exec tool](/tools/exec)
 - [Elevated mode](/tools/elevated)
@@ -101,7 +98,7 @@ Use these hubs to discover every page, including deep dives and reference docs t
 - [Models](/concepts/models)
 - [Sub-agents](/tools/subagents)
 - [Agent send CLI](/tools/agent-send)
-- [Terminal UI](/tui)
+- [Terminal UI](/web/tui)
 - [Browser control](/tools/browser)
 - [Browser (Linux troubleshooting)](/tools/browser-linux-troubleshooting)
 - [Polls](/automation/poll)
@@ -114,7 +111,6 @@ Use these hubs to discover every page, including deep dives and reference docs t
 - [Audio](/nodes/audio)
 - [Location command](/nodes/location-command)
 - [Voice wake](/nodes/voicewake)
-- [Talk mode](/nodes/talk)
 
 ## Platforms
 
@@ -149,4 +145,3 @@ Use these hubs to discover every page, including deep dives and reference docs t
 
 - [Testing](/reference/test)
 - [Release checklist](/reference/RELEASING)
-- [Device models](/reference/device-models)

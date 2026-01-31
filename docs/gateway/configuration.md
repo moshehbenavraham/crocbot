@@ -287,7 +287,7 @@ process env is missing the key (same non-overriding rule):
 }
 ```
 
-See [/environment](/environment) for full precedence and sources.
+See [/gateway/environment](/gateway/environment) for full precedence and sources.
 
 ### `env.shellEnv` (optional)
 
@@ -472,28 +472,21 @@ Metadata written by CLI wizards (`onboard`, `configure`, `doctor`).
 ### `channels.telegram.dmPolicy`
 
 Controls how Telegram direct chats (DMs) are handled:
-- `"pairing"` (default): unknown senders get a pairing code; owner must approve
-- `"allowlist"`: only allow senders in `channels.telegram.allowFrom` (or paired allow store)
+- `"allowlist"` (default): only allow senders in `channels.telegram.allowFrom`
 - `"open"`: allow all inbound DMs (**requires** `channels.telegram.allowFrom` to include `"*"`)
 - `"disabled"`: ignore all inbound DMs
-
-Pairing codes expire after 1 hour; the bot only sends a pairing code when a new request is created. Pending DM pairing requests are capped at **3 per channel** by default.
-
-Pairing approvals:
-- `crocbot pairing list telegram`
-- `crocbot pairing approve telegram <code>`
 
 ### `channels.telegram.allowFrom`
 
 Allowlist of Telegram chat IDs that may trigger auto-replies (**DMs only**).
-If empty and `channels.telegram.dmPolicy="pairing"`, unknown senders will receive a pairing code.
+If empty and `channels.telegram.dmPolicy="allowlist"`, unknown senders are ignored.
 For groups, use `channels.telegram.groupPolicy` + `channels.telegram.groupAllowFrom`.
 
 ```json5
 {
   channels: {
     telegram: {
-      dmPolicy: "pairing", // pairing | allowlist | open | disabled
+      dmPolicy: "allowlist", // allowlist | open | disabled
       allowFrom: ["123456789", "987654321"],
       textChunkLimit: 4000, // optional outbound chunk size (chars)
       chunkMode: "length", // optional chunking mode (length | newline)
@@ -696,7 +689,7 @@ levels in one gateway:
 - **Read-only** tools + workspace
 - **No filesystem access** (messaging/session tools only)
 
-See [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) for precedence and
+See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for precedence and
 additional examples.
 
 Full access (no sandbox):
@@ -877,7 +870,7 @@ Notes:
 - `commands.restart: true` enables `/restart` and the gateway tool restart action.
 - `commands.useAccessGroups: false` allows commands to bypass access-group allowlists/policies.
 - Slash commands and directives are only honored for **authorized senders**. Authorization is derived from
-  channel allowlists/pairing plus `commands.useAccessGroups`.
+  channel allowlists plus `commands.useAccessGroups`.
 
 ### `channels.telegram` (bot transport)
 
@@ -892,7 +885,7 @@ Set `channels.telegram.configWrites: false` to block Telegram-initiated config w
     telegram: {
       enabled: true,
       botToken: "your-bot-token",
-      dmPolicy: "pairing",                 // pairing | allowlist | open | disabled
+      dmPolicy: "allowlist",               // allowlist | open | disabled
       allowFrom: ["tg:123456789"],         // optional; "open" requires ["*"]
       groups: {
         "*": { requireMention: true },
@@ -947,83 +940,6 @@ Draft streaming notes:
 - Requires **private chat topics** (message_thread_id in DMs; bot has topics enabled).
 - `/reasoning stream` streams reasoning into the draft, then sends the final answer.
 Retry policy defaults and behavior are documented in [Retry policy](/concepts/retry).
-
-### `channels.googlechat` (Chat API webhook)
-
-Google Chat runs over HTTP webhooks with app-level auth (service account).
-Multi-account support lives under `channels.googlechat.accounts` (see the multi-account section above). Env vars only apply to the default account.
-
-```json5
-{
-  channels: {
-    "googlechat": {
-      enabled: true,
-      serviceAccountFile: "/path/to/service-account.json",
-      audienceType: "app-url",             // app-url | project-number
-      audience: "https://gateway.example.com/googlechat",
-      webhookPath: "/googlechat",
-      botUser: "users/1234567890",        // optional; improves mention detection
-      dm: {
-        enabled: true,
-        policy: "pairing",                // pairing | allowlist | open | disabled
-        allowFrom: ["users/1234567890"]   // optional; "open" requires ["*"]
-      },
-      groupPolicy: "allowlist",
-      groups: {
-        "spaces/AAAA": { allow: true, requireMention: true }
-      },
-      actions: { reactions: true },
-      typingIndicator: "message",
-      mediaMaxMb: 20
-    }
-  }
-}
-```
-
-Notes:
-- Service account JSON can be inline (`serviceAccount`) or file-based (`serviceAccountFile`).
-- Env fallbacks for the default account: `GOOGLE_CHAT_SERVICE_ACCOUNT` or `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE`.
-- `audienceType` + `audience` must match the Chat app’s webhook auth config.
-- Use `spaces/<spaceId>` or `users/<userId|email>` when setting delivery targets.
-
-### `channels.mattermost` (bot token)
-
-Mattermost ships as a plugin and is not bundled with the core install.
-Install it first: `crocbot plugins install @crocbot/mattermost` (or `./extensions/mattermost` from a git checkout).
-
-Mattermost requires a bot token plus the base URL for your server:
-
-```json5
-{
-  channels: {
-    mattermost: {
-      enabled: true,
-      botToken: "mm-token",
-      baseUrl: "https://chat.example.com",
-      dmPolicy: "pairing",
-      chatmode: "oncall", // oncall | onmessage | onchar
-      oncharPrefixes: [">", "!"],
-      textChunkLimit: 4000,
-      chunkMode: "length"
-    }
-  }
-}
-```
-
-crocbot starts Mattermost when the account is configured (bot token + base URL) and enabled. The token + base URL are resolved from `channels.mattermost.botToken` + `channels.mattermost.baseUrl` or `MATTERMOST_BOT_TOKEN` + `MATTERMOST_URL` for the default account (unless `channels.mattermost.enabled` is `false`).
-
-Chat modes:
-- `oncall` (default): respond to channel messages only when @mentioned.
-- `onmessage`: respond to every channel message.
-- `onchar`: respond when a message starts with a trigger prefix (`channels.mattermost.oncharPrefixes`, default `[">", "!"]`).
-
-Access control:
-- Default DMs: `channels.mattermost.dmPolicy="pairing"` (unknown senders get a pairing code).
-- Public DMs: `channels.mattermost.dmPolicy="open"` plus `channels.mattermost.allowFrom=["*"]`.
-- Groups: `channels.mattermost.groupPolicy="allowlist"` by default (mention-gated). Use `channels.mattermost.groupAllowFrom` to restrict senders.
-
-Multi-account support lives under `channels.mattermost.accounts` (see the multi-account section above). Env vars only apply to the default account.
-Use `channel:<id>` or `user:<id>` (or `@username`) when specifying delivery targets; bare ids are treated as channel ids.
 
 ### `agents.defaults.workspace`
 
@@ -1168,88 +1084,9 @@ active agent's `identity.emoji` when set, otherwise `"👀"`. Set it to `""` to 
 `removeAckAfterReply` removes the bot's ack reaction after a reply is sent
 (Telegram only). Default: `false`.
 
-#### `messages.tts`
+#### Audio replies (removed)
 
-Enable text-to-speech for outbound replies. When on, crocbot generates audio
-using ElevenLabs or OpenAI and attaches it to responses. Telegram uses Opus
-voice notes; other channels send MP3 audio.
-
-```json5
-{
-  messages: {
-    tts: {
-      auto: "always", // off | always | inbound | tagged
-      mode: "final", // final | all (include tool/block replies)
-      provider: "elevenlabs",
-      summaryModel: "openai/gpt-4.1-mini",
-      modelOverrides: {
-        enabled: true
-      },
-      maxTextLength: 4000,
-      timeoutMs: 30000,
-      prefsPath: "~/.crocbot/settings/tts.json",
-      elevenlabs: {
-        apiKey: "elevenlabs_api_key",
-        baseUrl: "https://api.elevenlabs.io",
-        voiceId: "voice_id",
-        modelId: "eleven_multilingual_v2",
-        seed: 42,
-        applyTextNormalization: "auto",
-        languageCode: "en",
-        voiceSettings: {
-          stability: 0.5,
-          similarityBoost: 0.75,
-          style: 0.0,
-          useSpeakerBoost: true,
-          speed: 1.0
-        }
-      },
-      openai: {
-        apiKey: "openai_api_key",
-        model: "gpt-4o-mini-tts",
-        voice: "alloy"
-      }
-    }
-  }
-}
-```
-
-Notes:
-- `messages.tts.auto` controls auto‑TTS (`off`, `always`, `inbound`, `tagged`).
-- `/tts off|always|inbound|tagged` sets the per‑session auto mode (overrides config).
-- `messages.tts.enabled` is legacy; doctor migrates it to `messages.tts.auto`.
-- `prefsPath` stores local overrides (provider/limit/summarize).
-- `maxTextLength` is a hard cap for TTS input; summaries are truncated to fit.
-- `summaryModel` overrides `agents.defaults.model.primary` for auto-summary.
-  - Accepts `provider/model` or an alias from `agents.defaults.models`.
-- `modelOverrides` enables model-driven overrides like `[[tts:...]]` tags (on by default).
-- `/tts limit` and `/tts summary` control per-user summarization settings.
-- `apiKey` values fall back to `ELEVENLABS_API_KEY`/`XI_API_KEY` and `OPENAI_API_KEY`.
-- `elevenlabs.baseUrl` overrides the ElevenLabs API base URL.
-- `elevenlabs.voiceSettings` supports `stability`/`similarityBoost`/`style` (0..1),
-  `useSpeakerBoost`, and `speed` (0.5..2.0).
-
-### `talk`
-
-Defaults for Talk mode. Voice IDs fall back to `ELEVENLABS_VOICE_ID` or `SAG_VOICE_ID` when unset.
-`apiKey` falls back to `ELEVENLABS_API_KEY` (or the gateway's shell profile) when unset.
-`voiceAliases` lets Talk directives use friendly names (e.g. `"voice":"Croc"`).
-
-```json5
-{
-  talk: {
-    voiceId: "elevenlabs_voice_id",
-    voiceAliases: {
-      Croc: "EXAVITQu4vr4xnSDxMaL",
-      Roger: "CwhRBWXzGAHq8TQ4Fs17"
-    },
-    modelId: "eleven_v3",
-    outputFormat: "mp3_44100_128",
-    apiKey: "elevenlabs_api_key",
-    interruptOnSpeech: true
-  }
-}
-```
+Text-to-speech and Talk mode are removed in the Telegram-only build.
 
 ### `agents.defaults`
 
@@ -2389,7 +2226,7 @@ Example:
 Controls plugin discovery, allow/deny, and per-plugin config. Plugins are loaded
 from `~/.crocbot/extensions`, `<workspace>/.crocbot/extensions`, plus any
 `plugins.load.paths` entries. **Config changes require a gateway restart.**
-See [/plugin](/plugin) for full usage.
+See [/plugins](/plugins) for full usage.
 
 Fields:
 - `enabled`: master toggle for plugin loading (default: true).
@@ -2437,7 +2274,7 @@ Defaults:
 - control service: loopback only (port derived from `gateway.port`, default `18791`)
 - CDP URL: `http://127.0.0.1:18792` (control service + 1, legacy single-profile)
 - profile color: `#FF4500` (lobster-orange)
-- Note: the control server is started by the running gateway (crocbot.app menubar, or `crocbot gateway`).
+- Note: the control server is started by the running gateway (via `crocbot gateway`).
 - Auto-detect order: default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
 
 ```json5
@@ -2464,7 +2301,7 @@ Defaults:
 
 ### `ui` (Appearance)
 
-Optional accent color used by the native apps for UI chrome (e.g. Talk Mode bubble tint).
+Optional accent color used by the Control UI for UI chrome (e.g. Talk Mode bubble tint).
 
 If unset, clients fall back to a muted light-blue.
 
@@ -2522,7 +2359,7 @@ Related docs:
 
 Trusted proxies:
 - `gateway.trustedProxies`: list of reverse proxy IPs that terminate TLS in front of the Gateway.
-- When a connection comes from one of these IPs, crocbot uses `x-forwarded-for` (or `x-real-ip`) to determine the client IP for local pairing checks and HTTP auth/local checks.
+- When a connection comes from one of these IPs, crocbot uses `x-forwarded-for` (or `x-real-ip`) to determine the client IP for local HTTP auth checks.
 - Only list proxies you fully control, and ensure they **overwrite** incoming `x-forwarded-for`.
 
 Notes:
@@ -2837,19 +2674,10 @@ Auto-generated certs require `openssl` on PATH; if generation fails, the bridge 
 }
 ```
 
-### `discovery.mdns` (Bonjour / mDNS broadcast mode)
+### Local mDNS discovery (removed)
 
-Controls LAN mDNS discovery broadcasts (`_crocbot-gw._tcp`).
-
-- `minimal` (default): omit `cliPath` + `sshPort` from TXT records
-- `full`: include `cliPath` + `sshPort` in TXT records
-- `off`: disable mDNS broadcasts entirely
-
-```json5
-{
-  discovery: { mdns: { mode: "minimal" } }
-}
-```
+Local mDNS/Bonjour discovery is removed in the Telegram-only build. Use
+`discovery.wideArea` (DNS‑SD over Tailnet) for discovery instead.
 
 ### `discovery.wideArea` (Wide-Area Bonjour / unicast DNS‑SD)
 

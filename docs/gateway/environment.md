@@ -5,6 +5,7 @@ read_when:
   - You are debugging missing API keys in the Gateway
   - You are documenting provider auth or deployment environments
 ---
+
 # Environment variables
 
 crocbot pulls environment variables from multiple sources. The rule is **never override existing values**.

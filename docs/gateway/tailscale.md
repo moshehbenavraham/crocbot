@@ -106,7 +106,7 @@ If you run the Gateway on one machine but want to drive a browser on another mac
 run a **node host** on the browser machine and keep both on the same tailnet.
 The Gateway will proxy browser actions to the node; no separate control server or Serve URL needed.
 
-Avoid Funnel for browser control; treat node pairing like operator access.
+Avoid Funnel for browser control; treat node access like operator access.
 
 ## Tailscale prerequisites + limits
 

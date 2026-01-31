@@ -118,7 +118,7 @@ Tip: `--json` does **not** imply non-interactive mode. Use `--non-interactive` (
 
 5) **Channels**
   - Telegram: bot token from BotFather.
-  - DM security: default is pairing. First DM sends a code; approve via `crocbot pairing approve telegram <code>` or use allowlists.
+  - DM security: default is allowlist. Add your user ID to `channels.telegram.allowFrom`.
 
 6) **Daemon install**
    - Linux (and Windows via WSL2): systemd user unit
@@ -267,7 +267,7 @@ crocbot agents add work \
 ## Gateway wizard RPC
 
 The Gateway exposes the wizard flow over RPC (`wizard.start`, `wizard.next`, `wizard.cancel`, `wizard.status`).
-Clients (macOS app, Control UI) can render steps without re‑implementing onboarding logic.
+Clients (Control UI, CLI) can render steps without re‑implementing onboarding logic.
 
 ## What the wizard writes
 

@@ -1,0 +1,11 @@
+{
+  "name": "@crocbot/telegram",
+  "version": "2026.1.45",
+  "type": "module",
+  "description": "crocbot Telegram channel plugin",
+  "crocbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

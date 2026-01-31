@@ -1,3 +1,9 @@
+---
+summary: "Security reporting and operational hardening guidance"
+read_when:
+  - Reporting a security issue
+  - Reviewing security requirements and hardening guidance
+---
 # Security Policy
 
 If you believe you've found a security issue in crocbot, please report it privately.

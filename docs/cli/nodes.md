@@ -1,13 +1,13 @@
 ---
-summary: "CLI reference for `crocbot nodes` (list/status/approve/invoke, camera/canvas/screen)"
+summary: "CLI reference for `crocbot nodes` (list/status/invoke, camera/canvas/screen)"
 read_when:
-  - You’re managing paired nodes (cameras, screen, canvas)
-  - You need to approve requests or invoke node commands
+  - You’re managing nodes (cameras, screen, canvas)
+  - You need to invoke node commands
 ---
 
 # `crocbot nodes`
 
-Manage paired nodes (devices) and invoke node capabilities.
+Manage nodes (devices) and invoke node capabilities.
 
 Related:
 - Nodes overview: [Nodes](/nodes)
@@ -23,14 +23,12 @@ Common options:
 crocbot nodes list
 crocbot nodes list --connected
 crocbot nodes list --last-connected 24h
-crocbot nodes pending
-crocbot nodes approve <requestId>
 crocbot nodes status
 crocbot nodes status --connected
 crocbot nodes status --last-connected 24h
 ```
 
-`nodes list` prints pending/paired tables. Paired rows include the most recent connect age (Last Connect).
+`nodes list` prints known/connected tables. Rows include the most recent connect age (Last Connect).
 Use `--connected` to only show currently-connected nodes. Use `--last-connected <duration>` to
 filter to nodes that connected within a duration (e.g. `24h`, `7d`).
 

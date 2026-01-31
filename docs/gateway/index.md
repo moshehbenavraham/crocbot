@@ -130,7 +130,6 @@ CROCBOT_CONFIG_PATH=~/.crocbot/b.json CROCBOT_STATE_DIR=~/.crocbot-b crocbot gat
 - `node.list` — list paired + currently-connected nodes (includes `caps`, `deviceFamily`, `modelIdentifier`, `paired`, `connected`, and advertised `commands`).
 - `node.describe` — describe a node (capabilities + supported `node.invoke` commands; works for paired nodes and for currently-connected unpaired nodes).
 - `node.invoke` — invoke a command on a node (e.g. `canvas.*`, `camera.*`).
-- `node.pair.*` — pairing lifecycle (`request`, `list`, `approve`, `reject`, `verify`).
 
 See also: [Presence](/concepts/presence) for how presence is produced/deduped and why a stable `client.instanceId` matters.
 
@@ -208,14 +207,6 @@ Notes:
   We still recommend **one gateway per machine** for most setups; use isolated profiles/ports for redundancy or a rescue bot. See [Multiple gateways](/gateway/multiple-gateways).
   - Cleanup: `crocbot gateway uninstall` (current service) and `crocbot doctor` (legacy migrations).
 - `gateway install` is a no-op when already installed; use `crocbot gateway install --force` to reinstall (profile/env/path changes).
-
-Bundled mac app:
-- crocbot.app can bundle a Node-based gateway relay and install a per-user LaunchAgent labeled
-  `com.crocbot.gateway` (or `com.crocbot.<profile>`).
-- To stop it cleanly, use `crocbot gateway stop` (or `launchctl bootout gui/$UID/com.crocbot.gateway`).
-- To restart, use `crocbot gateway restart` (or `launchctl kickstart -k gui/$UID/com.crocbot.gateway`).
-  - `launchctl` only works if the LaunchAgent is installed; otherwise use `crocbot gateway install` first.
-  - Replace the label with `com.crocbot.<profile>` when running a named profile.
 
 ## Supervision (systemd user unit)
 crocbot installs a **systemd user service** by default on Linux/WSL2. We

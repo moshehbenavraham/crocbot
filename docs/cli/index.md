@@ -44,12 +44,10 @@ This page describes the current CLI behavior. If commands change, update this do
 - [`docs`](/cli/docs)
 - [`hooks`](/cli/hooks)
 - [`webhooks`](/cli/webhooks)
-- [`pairing`](/cli/pairing)
 - [`plugins`](/cli/plugins) (plugin commands)
 - [`channels`](/cli/channels)
 - [`security`](/cli/security)
 - [`skills`](/cli/skills)
-- [`voicecall`](/cli/voicecall) (plugin; if installed)
 
 ## Global flags
 
@@ -227,16 +225,13 @@ crocbot [--dev] [--profile <name>] <command>
     update
   webhooks
     gmail setup|run
-  pairing
-    list
-    approve
   docs
   dns
     setup
   tui
 ```
 
-Note: plugins can add additional top-level commands (for example `crocbot voicecall`).
+Note: plugins can add additional top-level commands.
 
 ## Security
 
@@ -254,7 +249,7 @@ Manage extensions and their config:
 - `crocbot plugins enable <id>` / `disable <id>` — toggle `plugins.entries.<id>.enabled`.
 - `crocbot plugins doctor` — report plugin load errors.
 
-Most plugin changes require a gateway restart. See [/plugin](/plugin).
+Most plugin changes require a gateway restart. See [/plugins](/plugins).
 
 ## Memory
 
@@ -415,13 +410,6 @@ Options:
 
 Tip: use `npx crochub` to search, install, and sync skills.
 
-### `pairing`
-Approve DM pairing requests across channels.
-
-Subcommands:
-- `pairing list <channel> [--json]`
-- `pairing approve <channel> <code> [--notify]`
-
 ### `webhooks gmail`
 Gmail Pub/Sub hook setup + runner. See [/automation/gmail-pubsub](/automation/gmail-pubsub).
 
@@ -454,7 +442,7 @@ Subcommands:
 - `message event <list|create>`
 
 Examples:
-- `crocbot message send --target +15555550123 --message "Hi"`
+- `crocbot message send --target @mychat --message "Hi"`
 - `crocbot message poll --channel telegram --target -1001234567890 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
 
 ### `agent`
@@ -827,9 +815,6 @@ Subcommands:
 - `nodes status [--connected] [--last-connected <duration>]`
 - `nodes describe --node <id|name|ip>`
 - `nodes list [--connected] [--last-connected <duration>]`
-- `nodes pending`
-- `nodes approve <requestId>`
-- `nodes reject <requestId>`
 - `nodes rename --node <id|name|ip> --name <displayName>`
 - `nodes invoke --node <id|name|ip> --command <command> [--params <json>] [--invoke-timeout <ms>] [--idempotency-key <key>]`
 - `nodes run --node <id|name|ip> [--cwd <path>] [--env KEY=VAL] [--command-timeout <ms>] [--needs-screen-recording] [--invoke-timeout <ms>] <command...>` (mac node or headless node host)

@@ -2,30 +2,28 @@
 summary: "Exec approvals, allowlists, and sandbox escape prompts"
 read_when:
   - Configuring exec approvals or allowlists
-  - Implementing exec approval UX in the macOS app
   - Reviewing sandbox escape prompts and implications
 ---
 
 # Exec approvals
 
-Exec approvals are the **companion app / node host guardrail** for letting a sandboxed agent run
+Exec approvals are the **execution host guardrail** for letting a sandboxed agent run
 commands on a real host (`gateway` or `node`). Think of it like a safety interlock:
 commands are allowed only when policy + allowlist + (optional) user approval all agree.
 Exec approvals are **in addition** to tool policy and elevated gating (unless elevated is set to `full`, which skips approvals).
 Effective policy is the **stricter** of `tools.exec.*` and approvals defaults; if an approvals field is omitted, the `tools.exec` value is used.
 
-If the companion app UI is **not available**, any request that requires a prompt is
+If no approval UI is **available**, any request that requires a prompt is
 resolved by the **ask fallback** (default: deny).
 
 ## Where it applies
 
 Exec approvals are enforced locally on the execution host:
 - **gateway host** → `crocbot` process on the gateway machine
-- **node host** → node runner (macOS companion app or headless node host)
+- **node host** → node runner (headless execution host)
 
-macOS split:
-- **node host service** forwards `system.run` to the **macOS app** over local IPC.
-- **macOS app** enforces approvals + executes the command in UI context.
+If an approval UI is available, prompts can be surfaced there; otherwise
+`askFallback` applies.
 
 ## Settings and storage
 
@@ -88,7 +86,7 @@ If a prompt is required but no UI is reachable, fallback decides:
 ## Allowlist (per agent)
 
 Allowlists are **per agent**. If multiple agents exist, switch which agent you’re
-editing in the macOS app. Patterns are **case-insensitive glob matches**.
+editing in the Control UI. Patterns are **case-insensitive glob matches**.
 Patterns should resolve to **binary paths** (basename-only entries are ignored).
 Legacy `agents.default` entries are migrated to `agents.main` on load.
 
@@ -106,7 +104,7 @@ Each allowlist entry tracks:
 ## Auto-allow skill CLIs
 
 When **Auto-allow skill CLIs** is enabled, executables referenced by known skills
-are treated as allowlisted on nodes (macOS node or headless node host). This uses
+are treated as allowlisted on nodes (headless node host). This uses
 `skills.bins` over the Gateway RPC to fetch the skill bin list. Disable this if you want strict manual allowlists.
 
 ## Safe bins (stdin-only)
@@ -129,7 +127,7 @@ add/remove allowlist patterns, then **Save**. The UI shows **last used** metadat
 per pattern so you can keep the list tidy.
 
 The target selector chooses **Gateway** (local approvals) or a **Node**. Nodes
-must advertise `system.execApprovals.get/set` (macOS app or headless node host).
+must advertise `system.execApprovals.get/set` (node host).
 If a node does not advertise exec approvals yet, edit its local
 `~/.crocbot/exec-approvals.json` directly.
 
@@ -138,7 +136,7 @@ CLI: `crocbot approvals` supports gateway or node editing (see [Approvals CLI](/
 ## Approval flow
 
 When a prompt is required, the gateway broadcasts `exec.approval.requested` to operator clients.
-The Control UI and macOS app resolve it via `exec.approval.resolve`, then the gateway forwards the
+The Control UI resolves it via `exec.approval.resolve`, then the gateway forwards the
 approved request to the node host.
 
 When approvals are required, the exec tool returns immediately with an approval id. Use that id to
@@ -185,19 +183,6 @@ Reply in chat:
 /approve <id> allow-always
 /approve <id> deny
 ```
-
-### macOS IPC flow
-```
-Gateway -> Node Service (WS)
-                 |  IPC (UDS + token + HMAC + TTL)
-                 v
-             Mac App (UI + approvals + system.run)
-```
-
-Security notes:
-- Unix socket mode `0600`, token stored in `exec-approvals.json`.
-- Same-UID peer check.
-- Challenge/response (nonce + HMAC token + request hash) + short TTL.
 
 ## System events
 

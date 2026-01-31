@@ -22,6 +22,18 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "destination": "/start/index"
+    },
+    {
+      "source": "/index",
+      "destination": "/start/index"
+    },
+    {
+      "source": "/index/",
+      "destination": "/start/index"
+    },
+    {
       "source": "/cron",
       "destination": "/cron-jobs"
     },
@@ -227,7 +239,11 @@
     },
     {
       "source": "/bonjour",
-      "destination": "/gateway/bonjour"
+      "destination": "/gateway/discovery"
+    },
+    {
+      "source": "/bonjour/",
+      "destination": "/gateway/discovery"
     },
     {
       "source": "/browser",
@@ -280,10 +296,6 @@
     {
       "source": "/dashboard",
       "destination": "/web/dashboard"
-    },
-    {
-      "source": "/device-models",
-      "destination": "/reference/device-models"
     },
     {
       "source": "/discovery",
@@ -387,7 +399,11 @@
     },
     {
       "source": "/pairing",
-      "destination": "/start/pairing"
+      "destination": "/gateway/security"
+    },
+    {
+      "source": "/pairing/",
+      "destination": "/gateway/security"
     },
     {
       "source": "/plans/cron-add-hardening",
@@ -487,7 +503,15 @@
     },
     {
       "source": "/talk",
-      "destination": "/nodes/talk"
+      "destination": "/nodes/audio"
+    },
+    {
+      "source": "/nodes/talk",
+      "destination": "/nodes/audio"
+    },
+    {
+      "source": "/nodes/talk/",
+      "destination": "/nodes/audio"
     },
     {
       "source": "/telegram",
@@ -542,8 +566,84 @@
       "destination": "/gateway/troubleshooting"
     },
     {
-      "source": "/web/tui",
-      "destination": "/tui"
+      "source": "/debugging",
+      "destination": "/help/debugging"
+    },
+    {
+      "source": "/logging",
+      "destination": "/help/logging"
+    },
+    {
+      "source": "/network",
+      "destination": "/gateway/network"
+    },
+    {
+      "source": "/environment",
+      "destination": "/gateway/environment"
+    },
+    {
+      "source": "/token-use",
+      "destination": "/concepts/token-use"
+    },
+    {
+      "source": "/docker-env-vars",
+      "destination": "/install/docker-env-vars"
+    },
+    {
+      "source": "/brave-search",
+      "destination": "/tools/brave-search"
+    },
+    {
+      "source": "/perplexity",
+      "destination": "/tools/perplexity"
+    },
+    {
+      "source": "/broadcast-groups",
+      "destination": "/channels/broadcast-groups"
+    },
+    {
+      "source": "/multi-agent-sandbox-tools",
+      "destination": "/tools/multi-agent-sandbox-tools"
+    },
+    {
+      "source": "/bedrock",
+      "destination": "/providers/bedrock"
+    },
+    {
+      "source": "/deployment",
+      "destination": "/platforms/deployment"
+    },
+    {
+      "source": "/development",
+      "destination": "/reference/development"
+    },
+    {
+      "source": "/testing",
+      "destination": "/reference/testing"
+    },
+    {
+      "source": "/scripts",
+      "destination": "/reference/scripts"
+    },
+    {
+      "source": "/contributing",
+      "destination": "/reference/contributing"
+    },
+    {
+      "source": "/security-policy",
+      "destination": "/reference/security-policy"
+    },
+    {
+      "source": "/vps",
+      "destination": "/platforms/vps"
+    },
+    {
+      "source": "/tui",
+      "destination": "/web/tui"
+    },
+    {
+      "source": "/tui/",
+      "destination": "/web/tui"
     },
     {
       "source": "/typebox",
@@ -586,112 +686,116 @@
       "destination": "/concepts/oauth"
     },
     {
-      "source": "/plugins",
-      "destination": "/plugin"
+      "source": "/plugin",
+      "destination": "/plugins"
+    },
+    {
+      "source": "/plugin/",
+      "destination": "/plugins"
     },
     {
       "source": "/install/railway",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/install/railway/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/install/northflank",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/install/northflank/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/gcp",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/gcp/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/gcp",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/gcp/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/fly",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/fly/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/fly-backups",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/fly-backups/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/hetzner",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/hetzner/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/exe-dev",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/exe-dev/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/digitalocean",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/digitalocean/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/oracle",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/platforms/oracle/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/railway",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/railway/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/render",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/render/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/northflank",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     },
     {
       "source": "/northflank/",
-      "destination": "/deployment"
+      "destination": "/platforms/deployment"
     }
   ],
   "navigation": {
@@ -699,11 +803,10 @@
       {
         "group": "Start Here",
         "pages": [
-          "index",
+          "start/index",
           "start/getting-started",
           "start/wizard",
           "start/setup",
-          "start/pairing",
           "start/croc",
           "start/showcase",
           "start/hubs",
@@ -716,7 +819,9 @@
         "pages": [
           "help/index",
           "help/troubleshooting",
-          "help/faq"
+          "help/faq",
+          "help/debugging",
+          "help/logging"
         ]
       },
       {
@@ -763,12 +868,10 @@
           "cli/approvals",
           "cli/gateway",
           "cli/tui",
-          "cli/voicecall",
           "cli/cron",
           "cli/dns",
           "cli/docs",
           "cli/hooks",
-          "cli/pairing",
           "cli/security",
           "cli/update",
           "cli/sandbox"
@@ -782,7 +885,7 @@
           "concepts/agent-loop",
           "concepts/system-prompt",
           "concepts/context",
-          "token-use",
+          "concepts/token-use",
           "concepts/oauth",
           "concepts/agent-workspace",
           "concepts/memory",
@@ -816,9 +919,8 @@
           "gateway",
           "gateway/protocol",
           "gateway/bridge-protocol",
-          "gateway/pairing",
           "gateway/gateway-lock",
-          "environment",
+          "gateway/environment",
           "gateway/configuration",
           "gateway/multiple-gateways",
           "gateway/configuration-examples",
@@ -839,11 +941,9 @@
           "gateway/sandbox-vs-tool-policy-vs-elevated",
           "gateway/sandboxing",
           "gateway/troubleshooting",
-          "debugging",
           "gateway/remote",
           "gateway/remote-gateway-readme",
           "gateway/discovery",
-          "gateway/bonjour",
           "gateway/tailscale"
         ]
       },
@@ -854,7 +954,7 @@
           "web/control-ui",
           "web/dashboard",
           "web/webchat",
-          "tui"
+          "web/tui"
         ]
       },
       {
@@ -863,7 +963,7 @@
           "channels/index",
           "channels/telegram",
           "channels/grammy",
-          "broadcast-groups",
+          "channels/broadcast-groups",
           "channels/troubleshooting",
           "channels/location"
         ]
@@ -875,7 +975,7 @@
           "providers/models",
           "providers/openai",
           "providers/anthropic",
-          "bedrock",
+          "providers/bedrock",
           "providers/moonshot",
           "providers/minimax",
           "providers/vercel-ai-gateway",
@@ -905,9 +1005,11 @@
           "tools",
           "tools/lobster",
           "tools/llm-task",
-          "plugin",
+          "plugins",
           "tools/exec",
           "tools/web",
+          "tools/brave-search",
+          "tools/perplexity",
           "tools/apply-patch",
           "tools/elevated",
           "tools/browser",
@@ -918,7 +1020,7 @@
           "tools/thinking",
           "tools/agent-send",
           "tools/subagents",
-          "multi-agent-sandbox-tools",
+          "tools/multi-agent-sandbox-tools",
           "tools/reactions",
           "tools/skills",
           "tools/skills-config",
@@ -933,8 +1035,7 @@
           "nodes/images",
           "nodes/audio",
           "nodes/location-command",
-          "nodes/voicewake",
-          "nodes/talk"
+          "nodes/voicewake"
         ]
       },
       {
@@ -944,20 +1045,20 @@
           "platforms/windows",
           "platforms/linux",
           "platforms/raspberry-pi",
-          "deployment"
+          "platforms/deployment",
+          "platforms/vps"
         ]
       },
       {
         "group": "Reference & Templates",
         "pages": [
-          "ARCHITECTURE",
-          "development",
-          "deployment",
-          "testing",
-          "scripts",
+          "reference/contributing",
+          "reference/security-policy",
+          "reference/development",
+          "reference/testing",
+          "reference/scripts",
           "reference/session-management-compaction",
           "reference/rpc",
-          "reference/device-models",
           "reference/test",
           "reference/RELEASING",
           "reference/AGENTS.default",

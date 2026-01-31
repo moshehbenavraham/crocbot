@@ -12,7 +12,7 @@ crocbot uses **[AgentSkills](https://agentskills.io)-compatible** skill folders 
 
 Skills are loaded from **three** places:
 
-1) **Bundled skills**: shipped with the install (npm package or crocbot.app)
+1) **Bundled skills**: shipped with the install (npm package)
 2) **Managed/local skills**: `~/.crocbot/skills`
 3) **Workspace skills**: `<workspace>/skills`
 
@@ -42,7 +42,7 @@ Plugins can ship their own skills by listing `skills` directories in
 `crocbot.plugin.json` (paths relative to the plugin root). Plugin skills load
 when the plugin is enabled and participate in the normal skill precedence rules.
 You can gate them via `metadata.crocbot.requires.config` on the plugin’s config
-entry. See [Plugins](/plugin) for discovery/config and [Tools](/tools) for the
+entry. See [Plugins](/plugins) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
 ## CrocHub (install + sync)
@@ -252,7 +252,7 @@ Notes:
 ## Managed skills lifecycle
 
 crocbot ships a baseline set of skills as **bundled skills** as part of the
-install (npm package or crocbot.app). `~/.crocbot/skills` exists for local
+install (npm package). `~/.crocbot/skills` exists for local
 overrides (for example, pinning/patching a skill without changing the bundled
 copy). Workspace skills are user-owned and override both on name conflicts.
 

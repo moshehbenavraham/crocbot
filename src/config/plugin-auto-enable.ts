@@ -1,5 +1,6 @@
 import type { crocbotConfig } from "./config.js";
 import {
+  CHAT_CHANNEL_ORDER,
   getChatChannelMeta,
   listChatChannels,
   normalizeChatChannelId,
@@ -178,8 +179,12 @@ function resolveConfiguredPlugins(
       channelIds.add(key);
     }
   }
+  // Core built-in channels (like telegram) don't need plugin entries
+  const coreChannelIds = new Set<string>(CHAT_CHANNEL_ORDER);
   for (const channelId of channelIds) {
     if (!channelId) continue;
+    // Skip core built-in channels - they're handled directly, not as plugins
+    if (coreChannelIds.has(channelId)) continue;
     if (isChannelConfigured(cfg, channelId, env)) {
       changes.push({
         pluginId: channelId,

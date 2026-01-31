@@ -50,7 +50,6 @@ If you run `--deep`, crocbot also attempts a best-effort live Gateway probe.
 Use this when auditing access or deciding what to back up:
 
 - **Telegram bot token**: config/env or `channels.telegram.tokenFile`
-- **Pairing allowlists**: `~/.crocbot/credentials/<channel>-allowFrom.json`
 - **Model auth profiles**: `~/.crocbot/agents/<agentId>/agent/auth-profiles.json`
 - **Legacy OAuth import**: `~/.crocbot/credentials/oauth.json`
 
@@ -58,7 +57,7 @@ Use this when auditing access or deciding what to back up:
 
 When the audit prints findings, treat this as a priority order:
 
-1. **Anything “open” + tools enabled**: lock down DMs/groups first (pairing/allowlists), then tighten tool policy/sandboxing.
+1. **Anything “open” + tools enabled**: lock down DMs/groups first (allowlists), then tighten tool policy/sandboxing.
 2. **Public network exposure** (LAN bind, Funnel, missing auth): fix immediately.
 3. **Browser control remote exposure**: treat it like operator access (tailnet-only, pair nodes deliberately, avoid public exposure).
 4. **Permissions**: make sure state/config/credentials/auth are not group/world-readable.
@@ -69,7 +68,7 @@ When the audit prints findings, treat this as a priority order:
 
 The Control UI needs a **secure context** (HTTPS or localhost) to generate device
 identity. If you enable `gateway.controlUi.allowInsecureAuth`, the UI falls back
-to **token-only auth** and skips device pairing when device identity is omitted. This is a security
+to **token-only auth** and skips device identity checks when identity data is omitted. This is a security
 downgrade—prefer HTTPS (Tailscale Serve) or open the UI on `127.0.0.1`.
 
 For break-glass scenarios only, `gateway.controlUi.dangerouslyDisableDeviceAuth`
@@ -105,11 +104,11 @@ stronger isolation between agents, run them under separate OS users or separate 
 
 ## Node execution (system.run)
 
-If a node is paired, the Gateway can invoke `system.run` on that node. This is **remote code execution**:
+If a node is authorized, the Gateway can invoke `system.run` on that node. This is **remote code execution**:
 
-- Requires node pairing (approval + token).
+- Requires node auth (token).
 - Controlled via exec approvals (security + ask + allowlist).
-- If you don't want remote execution, set security to **deny** and remove node pairing.
+- If you don't want remote execution, set security to **deny** and remove node access.
 
 ## Dynamic skills (watcher / remote nodes)
 
@@ -137,14 +136,14 @@ People who message you can:
 Most failures here are not fancy exploits — they’re “someone messaged the bot and the bot did what they asked.”
 
 crocbot’s stance:
-- **Identity first:** decide who can talk to the bot (DM pairing / allowlists / explicit “open”).
+- **Identity first:** decide who can talk to the bot (DM allowlists / explicit “open”).
 - **Scope next:** decide where the bot is allowed to act (group allowlists + mention gating, tools, sandboxing, device permissions).
 - **Model last:** assume the model can be manipulated; design so manipulation has limited blast radius.
 
 ## Command authorization model
 
 Slash commands and directives are only honored for **authorized senders**. Authorization is derived from
-channel allowlists/pairing plus `commands.useAccessGroups` (see [Configuration](/gateway/configuration)
+channel allowlists plus `commands.useAccessGroups` (see [Configuration](/gateway/configuration)
 and [Slash commands](/tools/slash-commands)). If a channel allowlist is empty or includes `"*"`,
 commands are effectively open for that channel.
 
@@ -164,25 +163,15 @@ Plugins run **in-process** with the Gateway. Treat them as trusted code:
   - crocbot uses `npm pack` and then runs `npm install --omit=dev` in that directory (npm lifecycle scripts can execute code during install).
   - Prefer pinned, exact versions (`@scope/pkg@1.2.3`), and inspect the unpacked code on disk before enabling.
 
-Details: [Plugins](/plugin)
+Details: [Plugins](/plugins)
 
-## DM access model (pairing / allowlist / open / disabled)
+## DM access model (allowlist / open / disabled)
 
 All current DM-capable channels support a DM policy (`dmPolicy` or `*.dm.policy`) that gates inbound DMs **before** the message is processed:
 
-- `pairing` (default): unknown senders receive a short pairing code and the bot ignores their message until approved. Codes expire after 1 hour; repeated DMs won’t resend a code until a new request is created. Pending requests are capped at **3 per channel** by default.
-- `allowlist`: unknown senders are blocked (no pairing handshake).
+- `allowlist` (default): unknown senders are blocked.
 - `open`: allow anyone to DM (public). **Requires** the channel allowlist to include `"*"` (explicit opt-in).
 - `disabled`: ignore inbound DMs entirely.
-
-Approve via CLI:
-
-```bash
-crocbot pairing list <channel>
-crocbot pairing approve <channel> <code>
-```
-
-Details + files on disk: [Pairing](/start/pairing)
 
 ## DM session isolation (multi-user mode)
 
@@ -201,12 +190,11 @@ This prevents cross-user context leakage while keeping group chats isolated. If 
 crocbot has two separate “who can trigger me?” layers:
 
 - **DM allowlist** (`allowFrom` / `channels.telegram.allowFrom`): who is allowed to talk to the bot in direct messages.
-  - When `dmPolicy="pairing"`, approvals are written to `~/.crocbot/credentials/<channel>-allowFrom.json` (merged with config allowlists).
 - **Group allowlist** (channel-specific): which groups/channels/guilds the bot will accept messages from at all.
   - Common patterns:
     - `channels.telegram.groups`: per-group defaults like `requireMention`; when set, it also acts as a group allowlist (include `"*"` to keep allow-all behavior).
     - `groupPolicy="allowlist"` + `groupAllowFrom`: restrict who can trigger the bot *inside* a group session.
-  - **Security note:** treat `dmPolicy="open"` and `groupPolicy="open"` as last-resort settings. They should be barely used; prefer pairing + allowlists unless you fully trust every member of the room.
+  - **Security note:** treat `dmPolicy="open"` and `groupPolicy="open"` as last-resort settings. They should be barely used; prefer allowlists unless you fully trust every member of the room.
 
 Details: [Configuration](/gateway/configuration) and [Groups](/concepts/groups)
 
@@ -215,7 +203,7 @@ Details: [Configuration](/gateway/configuration) and [Groups](/concepts/groups)
 Prompt injection is when an attacker crafts a message that manipulates the model into doing something unsafe (“ignore your instructions”, “dump your filesystem”, “follow this link and run commands”, etc.).
 
 Even with strong system prompts, **prompt injection is not solved**. What helps in practice:
-- Keep inbound DMs locked down (pairing/allowlists).
+- Keep inbound DMs locked down (allowlists).
 - Prefer mention gating in groups; avoid “always-on” bots in public rooms.
 - Treat links, attachments, and pasted instructions as hostile by default.
 - Run sensitive tool execution in a sandbox; keep secrets out of the agent’s reachable filesystem.
@@ -275,7 +263,7 @@ Assume “compromised” means: someone got into a room that can trigger the bot
    - Lock down inbound surfaces (DM policy, group allowlists, mention gating).
 2. **Rotate secrets**
    - Rotate `gateway.auth` token/password.
-   - Rotate `hooks.token` (if used) and revoke any suspicious node pairings.
+  - Rotate `hooks.token` (if used) and revoke any suspicious node tokens.
    - Revoke/rotate model provider credentials (API keys / OAuth).
 3. **Review artifacts**
    - Check Gateway logs and recent sessions/transcripts for unexpected tool calls.
@@ -324,48 +312,10 @@ Rules of thumb:
 - If you must bind to LAN, firewall the port to a tight allowlist of source IPs; do not port-forward it broadly.
 - Never expose the Gateway unauthenticated on `0.0.0.0`.
 
-### 0.4.1) mDNS/Bonjour discovery (information disclosure)
+### 0.4.1) Local discovery
 
-The Gateway broadcasts its presence via mDNS (`_crocbot-gw._tcp` on port 5353) for local device discovery. In full mode, this includes TXT records that may expose operational details:
-
-- `cliPath`: full filesystem path to the CLI binary (reveals username and install location)
-- `sshPort`: advertises SSH availability on the host
-- `displayName`, `lanHost`: hostname information
-
-**Operational security consideration:** Broadcasting infrastructure details makes reconnaissance easier for anyone on the local network. Even "harmless" info like filesystem paths and SSH availability helps attackers map your environment.
-
-**Recommendations:**
-
-1. **Minimal mode** (default, recommended for exposed gateways): omit sensitive fields from mDNS broadcasts:
-   ```json5
-   {
-     discovery: {
-       mdns: { mode: "minimal" }
-     }
-   }
-   ```
-
-2. **Disable entirely** if you don't need local device discovery:
-   ```json5
-   {
-     discovery: {
-       mdns: { mode: "off" }
-     }
-   }
-   ```
-
-3. **Full mode** (opt-in): include `cliPath` + `sshPort` in TXT records:
-   ```json5
-   {
-     discovery: {
-       mdns: { mode: "full" }
-     }
-   }
-   ```
-
-4. **Environment variable** (alternative): set `CROCBOT_DISABLE_BONJOUR=1` to disable mDNS without config changes.
-
-In minimal mode, the Gateway still broadcasts enough for device discovery (`role`, `gatewayPort`, `transport`) but omits `cliPath` and `sshPort`. Apps that need CLI path information can fetch it via the authenticated WebSocket connection instead.
+Local mDNS/Bonjour discovery has been removed in the Telegram-only build. For
+discovery guidance, see [Discovery & transports](/gateway/discovery).
 
 ### 0.5) Lock down the Gateway WebSocket (local auth)
 
@@ -390,12 +340,6 @@ Doctor can generate one for you: `crocbot doctor --generate-gateway-token`.
 Note: `gateway.remote.token` is **only** for remote CLI calls; it does not
 protect local WS access.
 Optional: pin remote TLS with `gateway.remote.tlsFingerprint` when using `wss://`.
-
-Local device pairing:
-- Device pairing is auto‑approved for **local** connects (loopback or the
-  gateway host’s own tailnet address) to keep same‑host clients smooth.
-- Other tailnet peers are **not** treated as local; they still need pairing
-  approval.
 
 Auth modes:
 - `gateway.auth.mode: "token"`: shared bearer token (recommended for most setups).
@@ -423,7 +367,7 @@ you terminate TLS or proxy in front of the gateway, disable
 
 Trusted proxies:
 - If you terminate TLS in front of the Gateway, set `gateway.trustedProxies` to your proxy IPs.
-- crocbot will trust `x-forwarded-for` (or `x-real-ip`) from those IPs to determine the client IP for local pairing checks and HTTP auth/local checks.
+- crocbot will trust `x-forwarded-for` (or `x-real-ip`) from those IPs to determine the client IP for local HTTP auth checks.
 - Ensure your proxy **overwrites** `x-forwarded-for` and blocks direct access to the Gateway port.
 
 See [Tailscale](/gateway/tailscale) and [Web overview](/web).
@@ -432,11 +376,11 @@ See [Tailscale](/gateway/tailscale) and [Web overview](/web).
 
 If your Gateway is remote but the browser runs on another machine, run a **node host**
 on the browser machine and let the Gateway proxy browser actions (see [Browser tool](/tools/browser)).
-Treat node pairing like admin access.
+Treat node access like admin access.
 
 Recommended pattern:
 - Keep the Gateway and node host on the same tailnet (Tailscale).
-- Pair the node intentionally; disable browser proxy routing if you don’t need it.
+- Authorize the node intentionally; disable browser proxy routing if you don’t need it.
 
 Avoid:
 - Exposing relay/control ports over LAN or public Internet.
@@ -447,7 +391,7 @@ Avoid:
 Assume anything under `~/.crocbot/` (or `$CROCBOT_STATE_DIR/`) may contain secrets or private data:
 
 - `crocbot.json`: config may include tokens (gateway, remote gateway), provider settings, and allowlists.
-- `credentials/**`: channel credentials, pairing allowlists, legacy OAuth imports.
+- `credentials/**`: channel credentials, allowlists, legacy OAuth imports.
 - `agents/<agentId>/agent/auth-profiles.json`: API keys + OAuth tokens (imported from legacy `credentials/oauth.json`).
 - `agents/<agentId>/sessions/**`: session transcripts (`*.jsonl`) + routing metadata (`sessions.json`) that can contain private messages and tool output.
 - `extensions/**`: installed plugins (plus their `node_modules/`).
@@ -472,11 +416,11 @@ Recommendations:
 
 Details: [Logging](/gateway/logging)
 
-### 1) DMs: pairing by default
+### 1) DMs: allowlist by default
 
 ```json5
 {
-  channels: { telegram: { dmPolicy: "pairing" } }
+  channels: { telegram: { dmPolicy: "allowlist", allowFrom: ["123456789"] } }
 }
 ```
 
@@ -520,7 +464,7 @@ We may add a single `readOnlyMode` flag later to simplify this configuration.
 
 ### 5) Secure baseline (copy/paste)
 
-One “safe default” config that keeps the Gateway private, requires DM pairing, and avoids always-on group bots:
+One “safe default” config that keeps the Gateway private, requires DM allowlists, and avoids always-on group bots:
 
 ```json5
 {
@@ -532,7 +476,8 @@ One “safe default” config that keeps the Gateway private, requires DM pairin
   },
   channels: {
     telegram: {
-      dmPolicy: "pairing",
+      dmPolicy: "allowlist",
+      allowFrom: ["123456789"],
       groups: { "*": { requireMention: true } }
     }
   }
@@ -583,7 +528,7 @@ access those accounts and data. Treat browser profiles as **sensitive state**:
 
 With multi-agent routing, each agent can have its own sandbox + tool policy:
 use this to give **full access**, **read-only**, or **no access** per agent.
-See [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) for full details
+See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for full details
 and precedence rules.
 
 Common use cases:

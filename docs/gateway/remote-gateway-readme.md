@@ -13,7 +13,7 @@ crocbot uses SSH tunneling to connect to a remote gateway. This guide shows you 
 ┌─────────────────────────────────────────────────────────────┐
 │                        Client Machine                          │
 │                                                              │
-│  crocbot.app ──► ws://127.0.0.1:18789 (local port)           │
+│  Control UI / CLI ──► ws://127.0.0.1:18789 (local port)      │
 │                     │                                        │
 │                     ▼                                        │
 │  SSH Tunnel ────────────────────────────────────────────────│
@@ -55,9 +55,8 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 
 ### Step 3: Set Gateway Token
 
-```bash
-launchctl setenv CROCBOT_GATEWAY_TOKEN "<your-token>"
-```
+Ensure the remote Gateway has auth configured (token/password) via config or
+service env vars.
 
 ### Step 4: Start SSH Tunnel
 
@@ -65,14 +64,15 @@ launchctl setenv CROCBOT_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### Step 5: Restart crocbot.app
+### Step 5: Open the Control UI
 
-```bash
-# Quit crocbot.app (⌘Q), then reopen:
-open /path/to/crocbot.app
+Open the Control UI through the tunnel:
+
+```
+http://127.0.0.1:18789/?token=<your-token>
 ```
 
-The app will now connect to the remote gateway through the SSH tunnel.
+You can also point the CLI at the same tunnel using `--url` and `--token`.
 
 ---
 
@@ -150,4 +150,4 @@ launchctl bootout gui/$UID/com.crocbot.ssh-tunnel
 | `KeepAlive` | Automatically restarts tunnel if it crashes |
 | `RunAtLoad` | Starts tunnel when the agent loads |
 
-crocbot.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.
+The Control UI connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.

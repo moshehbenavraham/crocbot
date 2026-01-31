@@ -23,31 +23,18 @@ Fast path:
 crocbot plugins list
 ```
 
-2) Install an official plugin (example: Voice Call):
+2) Install a plugin from npm:
 
 ```bash
-crocbot plugins install @crocbot/voice-call
+crocbot plugins install <npm-spec>
 ```
 
 3) Restart the Gateway, then configure under `plugins.entries.<id>.config`.
 
-See [Voice Call](/plugins/voice-call) for a concrete example plugin.
+## Available plugins
 
-## Available plugins (official)
-
-- Microsoft Teams is plugin-only as of 2026.1.15; install `@crocbot/msteams` if you use Teams.
-- Memory (Core) — bundled memory search plugin (enabled by default via `plugins.slots.memory`)
-- Memory (LanceDB) — bundled long-term memory plugin (auto-recall/capture; set `plugins.slots.memory = "memory-lancedb"`)
-- [Voice Call](/plugins/voice-call) — `@crocbot/voice-call`
-- [Zalo Personal](/plugins/zalouser) — `@crocbot/zalouser`
-- [Matrix](/channels/matrix) — `@crocbot/matrix`
-- [Nostr](/channels/nostr) — `@crocbot/nostr`
-- [Zalo](/channels/zalo) — `@crocbot/zalo`
-- [Microsoft Teams](/channels/msteams) — `@crocbot/msteams`
-- Google Antigravity OAuth (provider auth) — bundled as `google-antigravity-auth` (disabled by default)
-- Gemini CLI OAuth (provider auth) — bundled as `google-gemini-cli-auth` (disabled by default)
-- Qwen OAuth (provider auth) — bundled as `qwen-portal-auth` (disabled by default)
-- Copilot Proxy (provider auth) — local VS Code Copilot Proxy bridge; distinct from built-in `github-copilot` device login (bundled, disabled by default)
+Discover plugins on CrocHub and other registries, then install them via
+`crocbot plugins install <npm-spec>`.
 
 crocbot plugins are **TypeScript modules** loaded at runtime via jiti. **Config
 validation does not execute plugin code**; it uses the plugin manifest and JSON
@@ -69,19 +56,8 @@ Tool authoring guide: [Plugin agent tools](/plugins/agent-tools).
 
 ## Runtime helpers
 
-Plugins can access selected core helpers via `api.runtime`. For telephony TTS:
-
-```ts
-const result = await api.runtime.tts.textToSpeechTelephony({
-  text: "Hello from crocbot",
-  cfg: api.config,
-});
-```
-
-Notes:
-- Uses core `messages.tts` configuration (OpenAI or ElevenLabs).
-- Returns PCM audio buffer + sample rate. Plugins must resample/encode for providers.
-- Edge TTS is not supported for telephony.
+Plugins can access selected core helpers via `api.runtime` (config, logging, media utilities).
+See the plugin SDK types for the current surface area.
 
 ## Discovery & precedence
 
@@ -177,7 +153,7 @@ contain `{ "entries": [ { "name": "@scope/pkg", "crocbot": { "channel": {...}, "
 Default plugin ids:
 
 - Package packs: `package.json` `name`
-- Standalone file: file base name (`~/.../voice-call.ts` → `voice-call`)
+- Standalone file: file base name (`~/.../example-plugin.ts` → `example-plugin`)
 
 If a plugin exports `id`, crocbot uses it but warns when it doesn’t match the
 configured id.
@@ -188,11 +164,11 @@ configured id.
 {
   plugins: {
     enabled: true,
-    allow: ["voice-call"],
+    allow: ["example-plugin"],
     deny: ["untrusted-plugin"],
-    load: { paths: ["~/Projects/oss/voice-call-extension"] },
+    load: { paths: ["~/Projects/oss/example-plugin"] },
     entries: {
-      "voice-call": { enabled: true, config: { provider: "twilio" } }
+      "example-plugin": { enabled: true, config: { provider: "demo" } }
     }
   }
 }
@@ -272,11 +248,11 @@ Example:
 crocbot plugins list
 crocbot plugins info <id>
 crocbot plugins install <path>                 # copy a local file/dir into ~/.crocbot/extensions/<id>
-crocbot plugins install ./extensions/voice-call # relative path ok
+crocbot plugins install ./extensions/example-plugin # relative path ok
 crocbot plugins install ./plugin.tgz           # install from a local tarball
 crocbot plugins install ./plugin.zip           # install from a local zip
-crocbot plugins install -l ./extensions/voice-call # link (no copy) for dev
-crocbot plugins install @crocbot/voice-call # install from npm
+crocbot plugins install -l ./extensions/example-plugin # link (no copy) for dev
+crocbot plugins install @crocbot/example-plugin # install from npm
 crocbot plugins update <id>
 crocbot plugins update --all
 crocbot plugins enable <id>
@@ -286,7 +262,7 @@ crocbot plugins doctor
 
 `plugins update` only works for npm installs tracked under `plugins.installs`.
 
-Plugins may also register their own top‑level commands (example: `crocbot voicecall`).
+Plugins may also register their own top‑level commands.
 
 ## Plugin API (overview)
 
@@ -583,8 +559,8 @@ export default function (api) {
 
 ## Naming conventions
 
-- Gateway methods: `pluginId.action` (example: `voicecall.status`)
-- Tools: `snake_case` (example: `voice_call`)
+- Gateway methods: `pluginId.action` (example: `myplugin.status`)
+- Tools: `snake_case` (example: `my_tool`)
 - CLI commands: kebab or camel, but avoid clashing with core commands
 
 ## Skills
@@ -598,7 +574,7 @@ it’s present in your workspace/managed skills locations.
 Recommended packaging:
 
 - Main package: `crocbot` (this repo)
-- Plugins: separate npm packages under `@crocbot/*` (example: `@crocbot/voice-call`)
+- Plugins: separate npm packages under `@crocbot/*` (example: `@crocbot/example-plugin`)
 
 Publishing contract:
 
@@ -606,20 +582,6 @@ Publishing contract:
 - Entry files can be `.js` or `.ts` (jiti loads TS at runtime).
 - `crocbot plugins install <npm-spec>` uses `npm pack`, extracts into `~/.crocbot/extensions/<id>/`, and enables it in config.
 - Config key stability: scoped packages are normalized to the **unscoped** id for `plugins.entries.*`.
-
-## Example plugin: Voice Call
-
-This repo includes a voice‑call plugin (Twilio or log fallback):
-
-- Source: `extensions/voice-call`
-- Skill: `skills/voice-call`
-- CLI: `crocbot voicecall start|status`
-- Tool: `voice_call`
-- RPC: `voicecall.start`, `voicecall.status`
-- Config (twilio): `provider: "twilio"` + `twilio.accountSid/authToken/from` (optional `statusCallbackUrl`, `twimlUrl`)
-- Config (dev): `provider: "log"` (no network)
-
-See [Voice Call](/plugins/voice-call) and `extensions/voice-call/README.md` for setup and usage.
 
 ## Safety notes
 
@@ -633,5 +595,5 @@ Plugins run in-process with the Gateway. Treat them as trusted code:
 
 Plugins can (and should) ship tests:
 
-- In-repo plugins can keep Vitest tests under `src/**` (example: `src/plugins/voice-call.plugin.test.ts`).
+- In-repo plugins can keep Vitest tests under `src/**` (example: `src/plugins/example.plugin.test.ts`).
 - Separately published plugins should run their own CI (lint/build/test) and validate `crocbot.extensions` points at the built entrypoint (`dist/index.js`).

@@ -16,7 +16,7 @@ crocbot supports two deployment paths:
 1. **Local (Docker Compose)** - For development and testing
 2. **Coolify (VPS)** - For production deployment
 
-See [Deployment](/deployment) for full setup instructions.
+See [Deployment](/platforms/deployment) for full setup instructions.
 
 ## Operating Systems
 

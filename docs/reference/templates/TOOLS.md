@@ -12,7 +12,6 @@ Skills define *how* tools work. This file is for *your* specifics — the stuff 
 Things like:
 - Camera names and locations
 - SSH hosts and aliases  
-- Preferred voices for TTS
 - Speaker/room names
 - Device nicknames
 - Anything environment-specific
@@ -27,9 +26,6 @@ Things like:
 ### SSH
 - home-server → 192.168.1.100, user: admin
 
-### TTS
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
 ```
 
 ## Why Separate?

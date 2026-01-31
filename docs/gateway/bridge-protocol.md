@@ -1,8 +1,8 @@
 ---
-summary: "Bridge protocol (legacy nodes): TCP JSONL, pairing, scoped RPC"
+summary: "Bridge protocol (legacy nodes): TCP JSONL, scoped RPC"
 read_when:
   - Building or debugging node clients
-  - Investigating pairing or bridge auth failures
+  - Investigating legacy bridge auth failures
   - Auditing the node surface exposed by the gateway
 ---
 
@@ -21,10 +21,9 @@ Legacy `bridge.*` config keys are no longer part of the config schema.
 
 - **Security boundary**: the bridge exposes a small allowlist instead of the
   full gateway API surface.
-- **Pairing + node identity**: node admission is owned by the gateway and tied
+- **Node identity**: node admission is owned by the gateway and tied
   to a per-node token.
-- **Discovery UX**: nodes can discover gateways via Bonjour on LAN, or connect
-  directly over a tailnet.
+- **Discovery UX**: legacy Bonjour discovery (removed) or manual tailnet targeting.
 - **Loopback WS**: the full WS control plane stays local unless tunneled via SSH.
 
 ## Transport
@@ -36,12 +35,10 @@ Legacy `bridge.*` config keys are no longer part of the config schema.
 When TLS is enabled, discovery TXT records include `bridgeTls=1` plus
 `bridgeTlsSha256` so nodes can pin the certificate.
 
-## Handshake + pairing
+## Handshake (legacy)
 
-1) Client sends `hello` with node metadata + token (if already paired).  
-2) If not paired, gateway replies `error` (`NOT_PAIRED`/`UNAUTHORIZED`).  
-3) Client sends `pair-request`.  
-4) Gateway waits for approval, then sends `pair-ok` and `hello-ok`.
+1) Client sends `hello` with node metadata + token.  
+2) If unauthorized, gateway replies `error` and closes the connection.  
 
 `hello-ok` returns `serverName` and may include `canvasHostUrl`.
 
@@ -76,7 +73,7 @@ Payload fields (all optional unless noted):
 - Bind the bridge to a tailnet IP: `bridge.bind: "tailnet"` in
   `~/.crocbot/crocbot.json`.
 - Clients connect via MagicDNS name or tailnet IP.
-- Bonjour does **not** cross networks; use manual host/port or wide-area DNS‑SD
+- Local Bonjour discovery has been removed; use manual host/port or wide-area DNS‑SD
   when needed.
 
 ## Versioning

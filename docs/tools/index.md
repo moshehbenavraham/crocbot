@@ -154,7 +154,7 @@ Example (allow only file tools + browser):
 ## Plugins + tools
 
 Plugins can register **additional tools** (and CLI commands) beyond the core set.
-See [Plugins](/plugin) for install + config, and [Skills](/tools/skills) for how
+See [Plugins](/plugins) for install + config, and [Skills](/tools/skills) for how
 tool usage guidance is injected into prompts. Some plugins ship their own skills
 alongside tools (for example, the voice-call plugin).
 
@@ -281,13 +281,12 @@ Notes:
 - Quick smoke: `crocbot nodes canvas a2ui push --node <id> --text "Hello from A2UI"`.
 
 ### `nodes`
-Discover and target paired nodes; send notifications; capture camera/screen.
+Discover and target connected nodes; send notifications; capture camera/screen.
 
 Core actions:
 - `status`, `describe`
-- `pending`, `approve`, `reject` (pairing)
-- `notify` (macOS `system.notify`)
-- `run` (macOS `system.run`)
+- `notify` (node `system.notify`)
+- `run` (node `system.run`)
 - `camera_snap`, `camera_clip`, `screen_record`
 - `location_get`
 
@@ -321,7 +320,7 @@ Core parameters:
 - `maxBytesMb` (optional size cap)
 
 Notes:
-- Only available when `agents.defaults.imageModel` is configured (primary or fallbacks), or when an implicit image model can be inferred from your default model + configured auth (best-effort pairing).
+- Only available when `agents.defaults.imageModel` is configured (primary or fallbacks), or when an implicit image model can be inferred from your default model + configured auth (best-effort inference).
 - Uses the image model directly (independent of the main chat model).
 
 ### `message`

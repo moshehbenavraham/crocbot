@@ -1,7 +1,7 @@
 ---
-summary: "Nodes: pairing, capabilities, permissions, and CLI helpers for canvas/camera/screen/system"
+summary: "Nodes: capabilities, permissions, and CLI helpers for canvas/camera/screen/system"
 read_when:
-  - Pairing nodes to a gateway
+  - Connecting nodes to a gateway
   - Using node canvas/camera for agent context
   - Adding new node commands or CLI helpers
 ---
@@ -16,25 +16,18 @@ Notes:
 - Nodes are **peripherals**, not gateways. They don't run the gateway service.
 - Telegram messages land on the **gateway**, not on nodes.
 
-## Pairing + status
+## Status + identity
 
-**WS nodes use device pairing.** Nodes present a device identity during `connect`; the Gateway
-creates a device pairing request for `role: node`. Approve via the devices CLI (or UI).
-
-Quick CLI:
+Nodes connect over the Gateway WebSocket with `role: "node"`. Use the CLI to inspect:
 
 ```bash
-crocbot devices list
-crocbot devices approve <requestId>
-crocbot devices reject <requestId>
 crocbot nodes status
 crocbot nodes describe --node <idOrNameOrIp>
 ```
 
 Notes:
-- `nodes status` marks a node as **paired** when its device pairing role includes `node`.
-- `node.pair.*` (CLI: `crocbot nodes pending/approve/reject`) is a separate gateway-owned
-  node pairing store; it does **not** gate the WS `connect` handshake.
+- `nodes status` shows connection state and capabilities.
+- Use `--display-name` when starting a node to set a friendly name.
 
 ## Remote node host (system.run)
 
@@ -62,15 +55,7 @@ crocbot node install --host <gateway-host> --port 18789 --display-name "Build No
 crocbot node restart
 ```
 
-### Pair + name
-
-On the gateway host:
-
-```bash
-crocbot nodes pending
-crocbot nodes approve <requestId>
-crocbot nodes list
-```
+### Naming
 
 Naming options:
 - `--display-name` on `crocbot node run` / `crocbot node install` (persists in `~/.crocbot/node.json` on the node).
@@ -267,7 +252,7 @@ crocbot node run --host <gateway-host> --port 18789
 ```
 
 Notes:
-- Pairing is still required (the Gateway will show a node approval prompt).
+- Ensure gateway auth is configured for non-loopback connections.
 - The node host stores its node id, token, display name, and gateway connection info in `~/.crocbot/node.json`.
 - Exec approvals are enforced locally via `~/.crocbot/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).

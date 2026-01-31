@@ -69,17 +69,6 @@ See also: `docs/gateway-exposure-matrix.md` in the models repo.
   - `make nodes-pipeline-negative`
   - `make approvals-token-negative`
 
-### Pairing store (DM gating)
-
-**Claim:** pairing requests respect TTL and pending-request caps.
-
-- Green runs:
-  - `make pairing`
-  - `make pairing-cap`
-- Red (expected):
-  - `make pairing-negative`
-  - `make pairing-cap-negative`
-
 ### Ingress gating (mentions + control-command bypass)
 
 **Claim:** in group contexts requiring mention, an unauthorized “control command” cannot bypass mention gating.
@@ -101,7 +90,6 @@ See also: `docs/gateway-exposure-matrix.md` in the models repo.
 ## Roadmap
 
 Next models to deepen fidelity:
-- Pairing store concurrency/locking/idempotency
 - Provider-specific ingress preflight modeling
 - Routing identity-links + dmScope variants + binding precedence
 - Gateway auth conformance (proxy/tailscale specifics)

@@ -86,4 +86,4 @@ For remote gateways, you can also use `crocbot logs --follow` (see [/cli/logs](/
 
 - If `logging.level` is set higher than `warn`, these logs may be suppressed. Default `info` is fine.
 - Flags are safe to leave enabled; they only affect log volume for the specific subsystem.
-- Use [/logging](/logging) to change log destinations, levels, and redaction.
+- Use [/help/logging](/help/logging) to change log destinations, levels, and redaction.

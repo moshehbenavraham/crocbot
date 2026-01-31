@@ -112,7 +112,6 @@ Use Coolify for production VPS deployment with automatic SSL, persistent storage
    Optional:
    - `SETUP_PASSWORD` - Password for `/setup` wizard
    - `TELEGRAM_BOT_TOKEN` - Telegram bot token
-   - `DISCORD_BOT_TOKEN` - Discord bot token
    - `OPENAI_API_KEY` - OpenAI API key (fallback)
 
 4. **Configure domain (optional)**
@@ -205,4 +204,4 @@ The repository includes CI workflows:
 
 ## Docker Environment Variables
 
-See [Docker Environment Variables](/docker-env-vars) for the full list of supported environment variables.
+See [Docker Environment Variables](/install/docker-env-vars) for the full list of supported environment variables.

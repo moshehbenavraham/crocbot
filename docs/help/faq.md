@@ -180,7 +180,6 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [Should my bot have its own email GitHub account or phone number](#should-my-bot-have-its-own-email-github-account-or-phone-number)
   - [Can I give it autonomy over my text messages and is that safe](#can-i-give-it-autonomy-over-my-text-messages-and-is-that-safe)
   - [Can I use cheaper models for personal assistant tasks?](#can-i-use-cheaper-models-for-personal-assistant-tasks)
-  - [I ran `/start` in Telegram but didn’t get a pairing code](#i-ran-start-in-telegram-but-didnt-get-a-pairing-code)
 - [Chat commands, aborting tasks, and “it won’t stop”](#chat-commands-aborting-tasks-and-it-wont-stop)
   - [How do I stop internal system messages from showing in chat](#how-do-i-stop-internal-system-messages-from-showing-in-chat)
   - [How do I stop/cancel a running task?](#how-do-i-stopcancel-a-running-task)
@@ -220,7 +219,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
    ```bash
    tail -f "$(ls -t /tmp/crocbot/crocbot-*.log | head -1)"
    ```
-   File logs are separate from service logs; see [Logging](/logging) and [Troubleshooting](/gateway/troubleshooting).
+  File logs are separate from service logs; see [Logging](/help/logging) and [Troubleshooting](/gateway/troubleshooting).
 
 6) **Run the doctor (repairs)**
    ```bash
@@ -558,7 +557,7 @@ Remote access: [Gateway remote](/gateway/remote).
 
 We keep a **hosting hub** with the common providers. Pick one and follow the guide:
 
-- [VPS hosting](/vps) (all providers in one place)
+- [VPS hosting](/platforms/vps) (all providers in one place)
 - [Fly.io](/platforms/fly)
 - [Hetzner](/platforms/hetzner)
 - [exe.dev](/platforms/exe-dev)
@@ -662,7 +661,7 @@ See [Models](/cli/models) and [OAuth](/concepts/oauth).
 
 ### Is AWS Bedrock supported
 
-Yes - via pi‑ai’s **Amazon Bedrock (Converse)** provider with **manual config**. You must supply AWS credentials/region on the gateway host and add a Bedrock provider entry in your models config. See [Amazon Bedrock](/bedrock) and [Model providers](/providers/models). If you prefer a managed key flow, an OpenAI‑compatible proxy in front of Bedrock is still a valid option.
+Yes - via pi‑ai’s **Amazon Bedrock (Converse)** provider with **manual config**. You must supply AWS credentials/region on the gateway host and add a Bedrock provider entry in your models config. See [Amazon Bedrock](/providers/bedrock) and [Model providers](/providers/models). If you prefer a managed key flow, an OpenAI‑compatible proxy in front of Bedrock is still a valid option.
 
 ### How does Codex auth work
 
@@ -708,7 +707,7 @@ capabilities like screen/camera/canvas and `system.run` on that device.
 
 Common pattern:
 - Gateway on the Mac mini (always‑on).
-- MacBook Pro runs the macOS app or a node host and pairs to the Gateway.
+- MacBook Pro runs a node host and connects to the Gateway.
 - Use `crocbot nodes status` / `crocbot nodes list` to see it.
 
 Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
@@ -828,7 +827,7 @@ crocbot is lightweight. For a basic Gateway + one chat channel:
 
 OS: use **Ubuntu LTS** (or any modern Debian/Ubuntu). The Linux install path is best tested there.
 
-Docs: [Linux](/platforms/linux), [VPS hosting](/vps).
+Docs: [Linux](/platforms/linux), [VPS hosting](/platforms/vps).
 
 ### Can I run crocbot in a VM and what are the requirements
 
@@ -841,7 +840,7 @@ Baseline guidance:
 - **OS:** Ubuntu LTS or another modern Debian/Ubuntu.
 
 If you are on Windows, **WSL2 is the easiest VM style setup** and has the best tooling
-compatibility. See [Windows](/platforms/windows), [VPS hosting](/vps).
+compatibility. See [Windows](/platforms/windows), [VPS hosting](/platforms/vps).
 If you are running macOS in a VM, see [macOS VM](/platforms/macos-vm).
 
 ## What is crocbot?
@@ -1313,7 +1312,7 @@ The common pattern is **one Gateway** (e.g. Raspberry Pi) plus **nodes** and **a
 - **Sub‑agents:** spawn background work from a main agent when you want parallelism.
 - **TUI:** connect to the Gateway and switch agents/sessions.
 
-Docs: [Nodes](/nodes), [Remote access](/gateway/remote), [Multi-Agent Routing](/concepts/multi-agent), [Sub-agents](/tools/subagents), [TUI](/tui).
+Docs: [Nodes](/nodes), [Remote access](/gateway/remote), [Multi-Agent Routing](/concepts/multi-agent), [Sub-agents](/tools/subagents), [TUI](/web/tui).
 
 ### Can the crocbot browser run headless
 
@@ -1355,27 +1354,32 @@ Nodes don’t see inbound provider traffic; they only receive node RPC calls.
 
 ### How can my agent access my computer if the Gateway is hosted remotely
 
-Short answer: **pair your computer as a node**. The Gateway runs elsewhere, but it can
+Short answer: **run a node host on your computer**. The Gateway runs elsewhere, but it can
 call `node.*` tools (screen, camera, system) on your local machine over the Gateway WebSocket.
 
 Typical setup:
 1) Run the Gateway on the always‑on host (VPS/home server).
 2) Put the Gateway host + your computer on the same tailnet.
 3) Ensure the Gateway WS is reachable (tailnet bind or SSH tunnel).
-4) Open the macOS app locally and connect in **Remote over SSH** mode (or direct tailnet)
-   so it can register as a node.
-5) Approve the node on the Gateway:
+4) Run a node host locally so it can register with the Gateway:
    ```bash
-   crocbot nodes pending
-   crocbot nodes approve <requestId>
+   crocbot node run --host <gateway-host> --port 18789
+   ```
+   Or install it as a service:
+   ```bash
+   crocbot node install --host <gateway-host> --port 18789
+   ```
+5) Confirm it shows up:
+   ```bash
+   crocbot nodes status
    ```
 
 No separate TCP bridge is required; nodes connect over the Gateway WebSocket.
 
-Security reminder: pairing a macOS node allows `system.run` on that machine. Only
-pair devices you trust, and review [Security](/gateway/security).
+Security reminder: node access allows `system.run` on that machine. Only
+connect devices you trust, and review [Security](/gateway/security).
 
-Docs: [Nodes](/nodes), [Gateway protocol](/gateway/protocol), [macOS remote mode](/platforms/mac/remote), [Security](/gateway/security).
+Docs: [Nodes](/nodes), [Nodes CLI](/cli/node), [Gateway protocol](/gateway/protocol), [Security](/gateway/security).
 
 ### Tailscale is connected but I get no replies What now
 
@@ -1431,7 +1435,7 @@ unlock more than shell access. The Gateway runs on macOS/Linux (Windows via WSL2
 lightweight (a small VPS or Raspberry Pi-class box is fine; 4 GB RAM is plenty), so a common
 setup is an always‑on host plus your laptop as a node.
 
-- **No inbound SSH required.** Nodes connect out to the Gateway WebSocket and use device pairing.
+- **No inbound SSH required.** Nodes connect out to the Gateway WebSocket and use gateway auth.
 - **Safer execution controls.** `system.run` is gated by node allowlists/approvals on that laptop.
 - **More device tools.** Nodes expose `canvas`, `camera`, and `screen` in addition to `system.run`.
 - **Local browser automation.** Keep the Gateway on a VPS, but run Chrome locally and relay control
@@ -1514,21 +1518,26 @@ crocbot gateway --tailscale serve
 ```
 This keeps the gateway bound to loopback and exposes HTTPS via Tailscale. See [Tailscale](/gateway/tailscale).
 
-### How do I connect a Mac node to a remote Gateway Tailscale Serve
+### How do I connect a Mac node to a remote Gateway (Tailscale Serve)
 
 Serve exposes the **Gateway Control UI + WS**. Nodes connect over the same Gateway WS endpoint.
 
 Recommended setup:
 1) **Make sure the VPS + Mac are on the same tailnet**.
-2) **Use the macOS app in Remote mode** (SSH target can be the tailnet hostname).
-   The app will tunnel the Gateway port and connect as a node.
-3) **Approve the node** on the gateway:
+2) **Run a node host on the Mac**:
    ```bash
-   crocbot nodes pending
-   crocbot nodes approve <requestId>
+   crocbot node run --host <gateway-host> --port 18789 --tls
+   ```
+   Or install it as a service:
+   ```bash
+   crocbot node install --host <gateway-host> --port 18789 --tls
+   ```
+3) **Confirm it shows up**:
+   ```bash
+   crocbot nodes status
    ```
 
-Docs: [Gateway protocol](/gateway/protocol), [Discovery](/gateway/discovery), [macOS remote mode](/platforms/mac/remote).
+Docs: [Gateway protocol](/gateway/protocol), [Discovery](/gateway/discovery), [Nodes CLI](/cli/node).
 
 ## Env vars and .env loading
 
@@ -1552,7 +1561,7 @@ You can also define inline env vars in config (applied only if missing from the 
 }
 ```
 
-See [/environment](/environment) for full precedence and sources.
+See [/gateway/environment](/gateway/environment) for full precedence and sources.
 
 ### I started the Gateway via the service and my env vars disappeared What now
 
@@ -1597,7 +1606,7 @@ crocbot models status
 ```
 
 Copilot tokens are read from `COPILOT_GITHUB_TOKEN` (also `GH_TOKEN` / `GITHUB_TOKEN`).
-See [/concepts/model-providers](/concepts/model-providers) and [/environment](/environment).
+See [/concepts/model-providers](/concepts/model-providers) and [/gateway/environment](/gateway/environment).
 
 ## Sessions & multiple chats
 
@@ -2192,7 +2201,6 @@ Set `gateway.mode: "remote"` and point to a remote WebSocket URL, optionally wit
 
 Notes:
 - `crocbot gateway` only starts when `gateway.mode` is `local` (or you pass the override flag).
-- The macOS app watches the config file and switches modes live when these values change.
 
 ### The Control UI says unauthorized or keeps reconnecting What now
 
@@ -2348,7 +2356,7 @@ crocbot logs --follow
 
 Common causes:
 - Model auth not loaded on the **gateway host** (check `models status`).
-- Channel pairing/allowlist blocking replies (check channel config + logs).
+- Channel allowlists blocking replies (check channel config + logs).
 - WebChat/Dashboard is open without the right token.
 
 If you are remote, confirm the tunnel/Tailscale connection is up and that the
@@ -2400,7 +2408,7 @@ crocbot logs --follow
 In the TUI, use `/status` to see the current state. If you expect replies in a chat
 channel, make sure delivery is enabled (`/deliver on`).
 
-Docs: [TUI](/tui), [Slash commands](/tools/slash-commands).
+Docs: [TUI](/web/tui), [Slash commands](/tools/slash-commands).
 
 ### How do I completely stop then start the Gateway
 
@@ -2443,7 +2451,7 @@ Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (o
 CLI sending:
 
 ```bash
-crocbot message send --target +15555550123 --message "Here you go" --media /path/to/file.png
+crocbot message send --target @mychat --message "Here you go" --media /path/to/file.png
 ```
 
 Also check:
@@ -2458,10 +2466,8 @@ See [Images](/nodes/images).
 
 Treat inbound DMs as untrusted input. Defaults are designed to reduce risk:
 
-- Default behavior on DM‑capable channels is **pairing**:
-  - Unknown senders receive a pairing code; the bot does not process their message.
-  - Approve with: `crocbot pairing approve <channel> <code>`
-  - Pending requests are capped at **3 per channel**; check `crocbot pairing list <channel>` if a code didn’t arrive.
+- Default behavior on DM‑capable channels is **allowlist**:
+  - Unknown senders are ignored until they are added to `allowFrom`.
 - Opening DMs publicly requires explicit opt‑in (`dmPolicy: "open"` and allowlist `"*"`).
 
 Run `crocbot doctor` to surface risky DM policies.
@@ -2490,12 +2496,12 @@ credentials or revoke access without impacting your personal accounts.
 Start small. Give access only to the tools and accounts you actually need, and expand
 later if required.
 
-Docs: [Security](/gateway/security), [Pairing](/start/pairing).
+Docs: [Security](/gateway/security), [Telegram](/channels/telegram).
 
 ### Can I give it autonomy over my text messages and is that safe
 
 We do **not** recommend full autonomy over your personal messages. The safest pattern is:
-- Keep DMs in **pairing mode** or a tight allowlist.
+- Keep DMs in a tight allowlist.
 - Use a **separate number or account** if you want it to message on your behalf.
 - Let it draft, then **approve before sending**.
 
@@ -2508,19 +2514,6 @@ Yes, **if** the agent is chat-only and the input is trusted. Smaller tiers are
 more susceptible to instruction hijacking, so avoid them for tool-enabled agents
 or when reading untrusted content. If you must use a smaller model, lock down
 tools and run inside a sandbox. See [Security](/gateway/security).
-
-### I ran start in Telegram but didnt get a pairing code
-
-Pairing codes are sent **only** when an unknown sender messages the bot and
-`dmPolicy: "pairing"` is enabled. `/start` by itself doesn’t generate a code.
-
-Check pending requests:
-```bash
-crocbot pairing list telegram
-```
-
-If you want immediate access, allowlist your sender id or set `dmPolicy: "open"`
-for that account.
 
 ## Chat commands, aborting tasks, and "it won't stop"
 

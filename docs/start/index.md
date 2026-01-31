@@ -8,7 +8,7 @@ read_when:
 > *"Cold-blooded patience, chrome-laced synapses."* — The crocodile in the datastream
 
 <p align="center">
-  <img src="whatsapp-croc.jpg" alt="crocbot" width="420" />
+  <img src="/assets/showcase/pr-review-telegram.jpg" alt="crocbot on Telegram" width="420" />
 </p>
 
 <p align="center">
@@ -124,7 +124,7 @@ crocbot gateway --port 19001
 Send a test message (requires a running Gateway):
 
 ```bash
-crocbot message send --target +15555550123 --message "Hello from crocbot"
+crocbot message send --channel telegram --target @your_username --message "Hello from crocbot"
 ```
 
 ## Configuration (optional)
@@ -159,7 +159,6 @@ Example:
   - [Slash commands](/tools/slash-commands)
   - [Multi-agent routing](/concepts/multi-agent)
   - [Updating / rollback](/install/updating)
-  - [Pairing (DM + nodes)](/start/pairing)
   - [Nix mode](/install/nix)
   - [crocbot assistant setup (Croc)](/start/croc)
   - [Skills](/tools/skills)

@@ -142,7 +142,6 @@ Common scopes:
 - `operator.write`
 - `operator.admin`
 - `operator.approvals`
-- `operator.pairing`
 
 ### Caps/commands/permissions (node)
 Nodes declare capability claims at connect time:
@@ -181,21 +180,17 @@ The Gateway treats these as **claims** and enforces server-side allowlists.
 
 - If `CROCBOT_GATEWAY_TOKEN` (or `--token`) is set, `connect.params.auth.token`
   must match or the socket is closed.
-- After pairing, the Gateway issues a **device token** scoped to the connection
+- After successful auth, the Gateway issues a **device token** scoped to the connection
   role + scopes. It is returned in `hello-ok.auth.deviceToken` and should be
   persisted by the client for future connects.
 - Device tokens can be rotated/revoked via `device.token.rotate` and
-  `device.token.revoke` (requires `operator.pairing` scope).
+  `device.token.revoke` (requires `operator.admin` scope).
 
-## Device identity + pairing
+## Device identity
 
 - Nodes should include a stable device identity (`device.id`) derived from a
   keypair fingerprint.
 - Gateways issue tokens per device + role.
-- Pairing approvals are required for new device IDs unless local auto-approval
-  is enabled.
-- **Local** connects include loopback and the gateway host’s own tailnet address
-  (so same‑host tailnet binds can still auto‑approve).
 - All WS clients must include `device` identity during `connect` (operator + node).
   Control UI can omit it **only** when `gateway.controlUi.allowInsecureAuth` is enabled
   (or `gateway.controlUi.dangerouslyDisableDeviceAuth` for break-glass use).

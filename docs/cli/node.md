@@ -2,7 +2,7 @@
 summary: "CLI reference for `crocbot node` (headless node host)"
 read_when:
   - Running the headless node host
-  - Pairing a node for system.run
+  - Connecting a node for system.run
 ---
 
 # `crocbot node`
@@ -52,7 +52,7 @@ Options:
 - `--port <port>`: Gateway WebSocket port (default: `18789`)
 - `--tls`: Use TLS for the gateway connection
 - `--tls-fingerprint <sha256>`: Expected TLS certificate fingerprint (sha256)
-- `--node-id <id>`: Override node id (clears pairing token)
+- `--node-id <id>`: Override node id (clears stored node token)
 - `--display-name <name>`: Override the node display name
 
 ## Service (background)
@@ -68,7 +68,7 @@ Options:
 - `--port <port>`: Gateway WebSocket port (default: `18789`)
 - `--tls`: Use TLS for the gateway connection
 - `--tls-fingerprint <sha256>`: Expected TLS certificate fingerprint (sha256)
-- `--node-id <id>`: Override node id (clears pairing token)
+- `--node-id <id>`: Override node id (clears stored node token)
 - `--display-name <name>`: Override the node display name
 - `--runtime <runtime>`: Service runtime (`node` or `bun`)
 - `--force`: Reinstall/overwrite if already installed
@@ -86,15 +86,7 @@ Use `crocbot node run` for a foreground node host (no service).
 
 Service commands accept `--json` for machine-readable output.
 
-## Pairing
-
-The first connection creates a pending node pair request on the Gateway.
-Approve it via:
-
-```bash
-crocbot nodes pending
-crocbot nodes approve <requestId>
-```
+## Node identity
 
 The node host stores its node id, token, display name, and gateway connection info in
 `~/.crocbot/node.json`.

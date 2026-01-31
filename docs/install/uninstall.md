@@ -62,12 +62,6 @@ pnpm remove -g crocbot
 bun remove -g crocbot
 ```
 
-6) If you installed the macOS app:
-
-```bash
-rm -rf /Applications/crocbot.app
-```
-
 Notes:
 - If you used profiles (`--profile` / `CROCBOT_PROFILE`), repeat step 3 for each state dir (defaults are `~/.crocbot-<profile>`).
 - In remote mode, the state dir lives on the **gateway host**, so run steps 1-4 there too.

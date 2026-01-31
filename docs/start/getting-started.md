@@ -1,5 +1,5 @@
 ---
-summary: "Beginner guide: from zero to first message (wizard, auth, channels, pairing)"
+summary: "Beginner guide: from zero to first message (wizard, auth, channels, DM safety)"
 read_when:
   - First time setup from zero
   - You want the fastest path from install → onboarding → first message
@@ -17,11 +17,11 @@ Recommended path: use the **CLI onboarding wizard** (`crocbot onboard`). It sets
 - model/auth (OAuth recommended)
 - gateway settings
 - Telegram channel
-- pairing defaults (secure DMs)
+- DM allowlists (secure DMs)
 - workspace bootstrap + skills
 - optional background service
 
-If you want the deeper reference pages, jump to: [Wizard](/start/wizard), [Setup](/start/setup), [Pairing](/start/pairing), [Security](/gateway/security).
+If you want the deeper reference pages, jump to: [Wizard](/start/wizard), [Setup](/start/setup), [Security](/gateway/security).
 
 Sandboxing note: `agents.defaults.sandbox.mode: "non-main"` uses `session.mainKey` (default `"main"`),
 so group/channel sessions are sandboxed. If you want the main agent to always
@@ -135,19 +135,12 @@ The wizard can write tokens/config for you. If you prefer manual config:
 - Set `TELEGRAM_BOT_TOKEN` or add to config: `channels.telegram.botToken`
 - Telegram doc: [Telegram](/channels/telegram)
 
-**Telegram DM tip:** your first DM returns a pairing code. Approve it (see next step) or the bot won't respond.
+**Telegram DM tip:** your first DM is ignored unless your user ID is allowlisted.
 
-## 5) DM safety (pairing approvals)
+## 5) DM safety (allowlists)
 
-Default posture: unknown DMs get a short code and messages are not processed until approved.
-If your first DM gets no reply, approve the pairing:
-
-```bash
-crocbot pairing list telegram
-crocbot pairing approve telegram <code>
-```
-
-Pairing doc: [Pairing](/start/pairing)
+Default posture: unknown DMs are ignored until they are allowlisted.
+Add your user ID to `channels.telegram.allowFrom`, then restart the Gateway.
 
 ## From source (development)
 
@@ -176,7 +169,7 @@ node dist/entry.js gateway --port 18789 --verbose
 In a new terminal, send a test message:
 
 ```bash
-crocbot message send --target +15555550123 --message "Hello from crocbot"
+crocbot message send --target @mychat --message "Hello from crocbot"
 ```
 
 If `crocbot health` shows “no auth configured”, go back to the wizard and set OAuth/key auth — the agent won’t be able to respond without it.

@@ -27,7 +27,7 @@ Quick triage commands (in order):
 
 **Sharing output:** prefer `crocbot status --all` (it redacts tokens). If you paste `crocbot status`, consider setting `CROCBOT_SHOW_SECRETS=0` first (token previews).
 
-See also: [Health checks](/gateway/health) and [Logging](/logging).
+See also: [Health checks](/gateway/health) and [Logging](/help/logging).
 
 ## Common Issues
 
@@ -82,7 +82,7 @@ blocks WebCrypto, so device identity can’t be generated.
 - Prefer HTTPS via [Tailscale Serve](/gateway/tailscale).
 - Or open locally on the gateway host: `http://127.0.0.1:18789/`.
 - If you must stay on HTTP, enable `gateway.controlUi.allowInsecureAuth: true` and
-  use a gateway token (token-only; no device identity/pairing). See
+  use a gateway token (token-only; no device identity). See
   [Control UI](/web/control-ui#insecure-http).
 
 ### CI Secrets Scan Failed
@@ -121,7 +121,7 @@ Doctor/service will show runtime state (PID/last exit) and log hints.
   ```
 - Quick tip: `--verbose` affects **console** output only. File logs remain controlled by `logging.level`.
 
-See [/logging](/logging) for a full overview of formats, config, and access.
+See [/help/logging](/help/logging) for a full overview of formats, config, and access.
 
 ### "Gateway start blocked: set gateway.mode=local"
 
@@ -301,23 +301,13 @@ crocbot logs --follow
 tail -f "$(ls -t /tmp/crocbot/crocbot-*.log | head -1)" | grep "blocked\\|skip\\|unauthorized"
 ```
 
-### Pairing Code Not Arriving
+### DM blocked (allowlist)
 
-If `dmPolicy` is `pairing`, unknown senders should receive a code and their message is ignored until approved.
+If `dmPolicy` is `allowlist`, unknown senders are ignored until they are added.
 
-**Check 1:** Is a pending request already waiting?
-```bash
-crocbot pairing list <channel>
-```
-
-Pending DM pairing requests are capped at **3 per channel** by default. If the list is full, new requests won’t generate a code until one is approved or expires.
-
-**Check 2:** Did the request get created but no reply was sent?
-```bash
-crocbot logs --follow | grep "pairing request"
-```
-
-**Check 3:** Confirm `dmPolicy` isn’t `open`/`allowlist` for that channel.
+**Check:**
+- Confirm `channels.telegram.allowFrom` contains your user ID.
+- Confirm `channels.telegram.dmPolicy` is `allowlist` or `open` as intended.
 
 ### Image + Mention Not Working
 

@@ -66,9 +66,3 @@ When you switch channels with `crocbot update`, crocbot also syncs plugin source
   - `beta` → candidate build
   - `dev` → main snapshot (optional)
 
-## macOS app availability
-
-Beta and dev builds may **not** include a macOS app release. That’s OK:
-
-- The git tag and npm dist-tag can still be published.
-- Call out “no macOS build for this beta” in release notes or changelog.

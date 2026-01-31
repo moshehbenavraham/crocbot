@@ -1,23 +1,24 @@
 ---
-summary: "Node discovery and transports (Bonjour, Tailscale, SSH) for finding the gateway"
+summary: "Node discovery and transports (Tailnet DNS-SD, SSH) for finding the gateway"
 read_when:
-  - Implementing or changing Bonjour discovery/advertising
-  - Adjusting remote connection modes (direct vs SSH)
-  - Designing node discovery + pairing for remote nodes
+  - Designing gateway discovery for remote clients or nodes
+  - Choosing between direct WS and SSH access
 ---
+
 # Discovery & transports
 
-crocbot has two distinct problems that look similar on the surface:
+crocbot has two related problems that look similar on the surface:
 
 1) **Operator remote control**: clients controlling a gateway running elsewhere.
-2) **Node pairing**: remote nodes finding a gateway and pairing securely.
+2) **Node connectivity**: nodes finding and connecting to a gateway.
 
-The design goal is to keep all network discovery/advertising in the **Node Gateway** (`croc` / `crocbot gateway`) and keep clients as consumers.
+The goal is to keep discovery and transport logic in the **Gateway** and keep
+clients/nodes as consumers.
 
 ## Terms
 
-- **Gateway**: a single long-running gateway process that owns state (sessions, pairing, node registry) and runs channels. Most setups use one per host; isolated multi-gateway setups are possible.
-- **Gateway WS (control plane)**: the WebSocket endpoint on `127.0.0.1:18789` by default; can be bound to LAN/tailnet via `gateway.bind`.
+- **Gateway**: a single long-running process that owns state and runs channels.
+- **Gateway WS (control plane)**: WebSocket endpoint on `127.0.0.1:18789` by default; can be bound to LAN/tailnet via `gateway.bind`.
 - **Direct WS transport**: a LAN/tailnet-facing Gateway WS endpoint (no SSH).
 - **SSH transport (fallback)**: remote control by forwarding `127.0.0.1:18789` over SSH.
 - **Legacy TCP bridge (deprecated/removed)**: older node transport (see [Bridge protocol](/gateway/bridge-protocol)); no longer advertised for discovery.
@@ -26,61 +27,47 @@ Protocol details:
 - [Gateway protocol](/gateway/protocol)
 - [Bridge protocol (legacy)](/gateway/bridge-protocol)
 
-## Why we keep both “direct” and SSH
-
-- **Direct WS** is the best UX on the same network and within a tailnet:
-  - auto-discovery on LAN via Bonjour
-  - pairing tokens + ACLs owned by the gateway
-  - no shell access required; protocol surface can stay tight and auditable
-- **SSH** remains the universal fallback:
-  - works anywhere you have SSH access (even across unrelated networks)
-  - survives multicast/mDNS issues
-  - requires no new inbound ports besides SSH
-
 ## Discovery inputs (how clients learn where the gateway is)
 
-### 1) Bonjour / mDNS (LAN only)
+### 1) Tailnet DNS-SD (recommended)
 
-Bonjour is best-effort and does not cross networks. It is only used for “same LAN” convenience.
+crocbot supports **wide‑area DNS‑SD** over Tailnet for discovery. This replaces
+local mDNS/Bonjour, which has been removed from the Telegram-only build.
 
-Target direction:
-- The **gateway** advertises its WS endpoint via Bonjour.
-- Clients browse and show a “pick a gateway” list, then store the chosen endpoint.
+High‑level flow:
+1) Run a DNS server on the gateway host (reachable over Tailnet).
+2) Publish DNS‑SD records for `_crocbot-gw._tcp` under `crocbot.internal.`.
+3) Configure Tailscale split DNS so clients resolve `crocbot.internal.` via that DNS server.
 
-Troubleshooting and beacon details: [Bonjour](/gateway/bonjour).
+Gateway config (recommended):
 
-#### Service beacon details
+```json5
+{
+  gateway: { bind: "tailnet" },
+  discovery: { wideArea: { enabled: true } }
+}
+```
 
-- Service types:
-  - `_crocbot-gw._tcp` (gateway transport beacon)
-- TXT keys (non-secret):
-  - `role=gateway`
-  - `lanHost=<hostname>.local`
-  - `sshPort=22` (or whatever is advertised)
-  - `gatewayPort=18789` (Gateway WS + HTTP)
-  - `gatewayTls=1` (only when TLS is enabled)
-  - `gatewayTlsSha256=<sha256>` (only when TLS is enabled and fingerprint is available)
-  - `canvasPort=18793` (default canvas host port; serves `/__crocbot__/canvas/`)
-  - `cliPath=<path>` (optional; absolute path to a runnable `crocbot` entrypoint or binary)
-  - `tailnetDns=<magicdns>` (optional hint; auto-detected when Tailscale is available)
+One‑time DNS server setup on the gateway host:
 
-Disable/override:
-- `CROCBOT_DISABLE_BONJOUR=1` disables advertising.
-- `gateway.bind` in `~/.crocbot/crocbot.json` controls the Gateway bind mode.
-- `CROCBOT_SSH_PORT` overrides the SSH port advertised in TXT (defaults to 22).
-- `CROCBOT_TAILNET_DNS` publishes a `tailnetDns` hint (MagicDNS).
-- `CROCBOT_CLI_PATH` overrides the advertised CLI path.
+```bash
+crocbot dns setup --apply
+```
 
-### 2) Tailnet (cross-network)
+### 2) Manual direct WS (LAN/tailnet)
 
-For London/Vienna style setups, Bonjour won’t help. The recommended “direct” target is:
-- Tailscale MagicDNS name (preferred) or a stable tailnet IP.
+If you already know the gateway host, connect directly over LAN or Tailnet:
 
-If the gateway can detect it is running under Tailscale, it publishes `tailnetDns` as an optional hint for clients (including wide-area beacons).
+- `ws://<host>:18789` (or whatever port you configured)
+- Use `gateway.auth.token` or `gateway.auth.password` for non-loopback binds.
 
-### 3) Manual / SSH target
+### 3) SSH tunnel (fallback)
 
-When there is no direct route (or direct is disabled), clients can always connect via SSH by forwarding the loopback gateway port.
+When direct access is not possible, use SSH to forward the loopback port:
+
+```bash
+ssh -N -L 18789:127.0.0.1:18789 user@host
+```
 
 See [Remote access](/gateway/remote).
 
@@ -88,23 +75,22 @@ See [Remote access](/gateway/remote).
 
 Recommended client behavior:
 
-1) If a paired direct endpoint is configured and reachable, use it.
-2) Else, if Bonjour finds a gateway on LAN, offer a one-tap “Use this gateway” choice and save it as the direct endpoint.
-3) Else, if a tailnet DNS/IP is configured, try direct.
-4) Else, fall back to SSH.
+1) If a direct endpoint is configured and reachable, use it.
+2) Else, if Tailnet DNS-SD discovery is enabled, offer a one-tap “Use this gateway”.
+3) Else, fall back to SSH.
 
-## Pairing + auth (direct transport)
+## Authentication
 
-The gateway is the source of truth for node/client admission.
+The gateway enforces auth on all non-loopback connections:
 
-- Pairing requests are created/approved/rejected in the gateway (see [Gateway pairing](/gateway/pairing)).
-- The gateway enforces:
-  - auth (token / keypair)
-  - scopes/ACLs (the gateway is not a raw proxy to every method)
-  - rate limits
+- **Token auth** (`gateway.auth.token`) or **password auth** (`gateway.auth.password`)
+- Scope/ACLs enforced by the gateway
+- Rate limits and per-method guards still apply
+
+See [Gateway security](/gateway/security).
 
 ## Responsibilities by component
 
-- **Gateway**: advertises discovery beacons, owns pairing decisions, and hosts the WS endpoint.
-- **Clients**: help you pick a gateway, show pairing prompts, and use SSH only as a fallback.
-- **Nodes**: browse Bonjour as a convenience and connect to the paired Gateway WS.
+- **Gateway**: advertises discovery beacons, owns auth, and hosts the WS endpoint.
+- **Clients**: store direct endpoints, connect with auth, and use SSH as fallback.
+- **Nodes**: connect to the paired gateway endpoint configured by the operator.

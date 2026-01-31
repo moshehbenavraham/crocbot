@@ -1,39 +1,22 @@
 ---
-summary: "CLI reference for `crocbot devices` (device pairing + token rotation/revocation)"
+summary: "CLI reference for `crocbot devices` (device token rotation/revocation)"
 read_when:
-  - You are approving device pairing requests
   - You need to rotate or revoke device tokens
 ---
 
 # `crocbot devices`
 
-Manage device pairing requests and device-scoped tokens.
+Manage device-scoped tokens.
 
 ## Commands
 
 ### `crocbot devices list`
 
-List pending pairing requests and paired devices.
+List registered devices and their tokens.
 
 ```
 crocbot devices list
 crocbot devices list --json
-```
-
-### `crocbot devices approve <requestId>`
-
-Approve a pending device pairing request.
-
-```
-crocbot devices approve <requestId>
-```
-
-### `crocbot devices reject <requestId>`
-
-Reject a pending device pairing request.
-
-```
-crocbot devices reject <requestId>
 ```
 
 ### `crocbot devices rotate --device <id> --role <role> [--scope <scope...>]`
@@ -63,4 +46,4 @@ crocbot devices revoke --device <deviceId> --role node
 ## Notes
 
 - Token rotation returns a new token (sensitive). Treat it like a secret.
-- These commands require `operator.pairing` (or `operator.admin`) scope.
+- These commands require `operator.admin` scope.

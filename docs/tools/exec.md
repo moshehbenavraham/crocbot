@@ -94,7 +94,7 @@ Example:
 
 ## Authorization model
 
-`/exec` is only honored for **authorized senders** (channel allowlists/pairing plus `commands.useAccessGroups`).
+`/exec` is only honored for **authorized senders** (channel allowlists plus `commands.useAccessGroups`).
 It updates **session state only** and does not write config. To hard-disable exec, deny it via tool
 policy (`tools.deny: ["exec"]` or per-agent). Host approvals still apply unless you explicitly set
 `security=full` and `ask=off`.

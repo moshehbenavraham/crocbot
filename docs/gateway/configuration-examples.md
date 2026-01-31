@@ -166,7 +166,7 @@ Save to `~/.crocbot/crocbot.json` and you can DM the bot from that chat ID.
     telegram: {
       enabled: true,
       botToken: "YOUR_TELEGRAM_BOT_TOKEN",
-      dmPolicy: "pairing",
+      dmPolicy: "allowlist",
       allowFrom: ["123456789"],
       groupPolicy: "allowlist",
       groupAllowFrom: ["-1001234567890"],

@@ -15,7 +15,7 @@ Status: production-ready for bot DMs + groups via grammY. Long-polling by defaul
    - Or config: `channels.telegram.botToken: "..."`.
    - If both are set, config takes precedence (env fallback is default-account only).
 3) Start the gateway.
-4) DM access is pairing by default; approve the pairing code on first contact.
+4) DM access defaults to allowlists; add your user id under `channels.telegram.allowFrom`.
 
 Minimal config:
 ```json5
@@ -24,7 +24,8 @@ Minimal config:
     telegram: {
       enabled: true,
       botToken: "123:abc",
-      dmPolicy: "pairing"
+      dmPolicy: "allowlist",
+      allowFrom: ["123456789"]
     }
   }
 }
@@ -54,7 +55,8 @@ Example:
     telegram: {
       enabled: true,
       botToken: "123:abc",
-      dmPolicy: "pairing",
+      dmPolicy: "allowlist",
+      allowFrom: ["123456789"],
       groups: { "*": { requireMention: true } }
     }
   }
@@ -67,7 +69,7 @@ If both env and config are set, config takes precedence.
 Multi-account support: use `channels.telegram.accounts` with per-account tokens and optional `name`. See [`gateway/configuration`](/gateway/configuration#telegramaccounts) for the shared pattern.
 
 3) Start the gateway. Telegram starts when a token is resolved (config first, env fallback).
-4) DM access defaults to pairing. Approve the code when the bot is first contacted.
+4) DM access defaults to allowlists. Add your user id under `channels.telegram.allowFrom`.
 5) For groups: add the bot, decide privacy/admin behavior (below), then set `channels.telegram.groups` to control mention gating + allowlists.
 
 ## Token + privacy + permissions (Telegram side)
@@ -200,7 +202,7 @@ Send in the group:
 
 Forward any message from the group to `@userinfobot` or `@getidsbot` on Telegram to see the chat ID (negative number like `-1001234567890`).
 
-**Tip:** For your own user ID, DM the bot and it will reply with your user ID (pairing message), or use `/whoami` once commands are enabled.
+**Tip:** For your own user ID, DM the bot and use `/whoami` once commands are enabled, or inspect `from.id` in `crocbot logs --follow`.
 
 **Privacy note:** `@userinfobot` is a third-party bot. If you prefer, add the bot to the group, send a message, and use `crocbot logs --follow` to read `chat.id`, or use the Bot API `getUpdates`.
 
@@ -308,12 +310,9 @@ Use the global setting when all Telegram bots/accounts should behave the same. U
 ## Access control (DMs + groups)
 
 ### DM access
-- Default: `channels.telegram.dmPolicy = "pairing"`. Unknown senders receive a pairing code; messages are ignored until approved (codes expire after 1 hour).
-- Approve via:
-  - `crocbot pairing list telegram`
-  - `crocbot pairing approve telegram <CODE>`
-- Pairing is the default token exchange used for Telegram DMs. Details: [Pairing](/start/pairing)
+- Default: `channels.telegram.dmPolicy = "allowlist"`. Unknown senders are ignored unless they are listed.
 - `channels.telegram.allowFrom` accepts numeric user IDs (recommended) or `@username` entries. It is **not** the bot username; use the human sender’s ID. The wizard accepts `@username` and resolves it to the numeric ID when possible.
+- For public DMs: set `dmPolicy: "open"` and `allowFrom: ["*"]`.
 
 #### Finding your Telegram user ID
 Safer (no third-party bot):
@@ -616,7 +615,7 @@ The agent sees reactions as **system notifications** in the conversation history
 - For persistent behavior, add group to `channels.telegram.groups` with `requireMention: false`
 
 **Commands like `/status` don't work:**
-- Make sure your Telegram user ID is authorized (via pairing or `channels.telegram.allowFrom`)
+- Make sure your Telegram user ID is authorized via `channels.telegram.allowFrom`
 - Commands require authorization even in groups with `groupPolicy: "open"`
 
 **Long-polling aborts immediately on Node 22+ (often with proxies/custom fetch):**
@@ -635,7 +634,7 @@ Provider options:
 - `channels.telegram.enabled`: enable/disable channel startup.
 - `channels.telegram.botToken`: bot token (BotFather).
 - `channels.telegram.tokenFile`: read token from file path.
-- `channels.telegram.dmPolicy`: `pairing | allowlist | open | disabled` (default: pairing).
+- `channels.telegram.dmPolicy`: `allowlist | open | disabled` (default: allowlist).
 - `channels.telegram.allowFrom`: DM allowlist (ids/usernames). `open` requires `"*"`.
 - `channels.telegram.groupPolicy`: `open | allowlist | disabled` (default: allowlist).
 - `channels.telegram.groupAllowFrom`: group sender allowlist (ids/usernames).

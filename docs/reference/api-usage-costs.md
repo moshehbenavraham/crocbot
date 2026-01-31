@@ -24,7 +24,7 @@ crocbot features that can generate provider usage or paid API calls.
 - `crocbot status --usage` and `crocbot channels list` show provider **usage windows**
   (quota snapshots, not per-message costs).
 
-See [Token use & costs](/token-use) for details and examples.
+See [Token use & costs](/concepts/token-use) for details and examples.
 
 ## How keys are discovered
 
@@ -41,7 +41,7 @@ crocbot can pick up credentials from:
 Every reply or tool call uses the **current model provider** (OpenAI, Anthropic, etc). This is the
 primary source of usage and cost.
 
-See [Models](/providers/models) for pricing config and [Token use & costs](/token-use) for display.
+See [Models](/providers/models) for pricing config and [Token use & costs](/concepts/token-use) for display.
 
 ### 2) Media understanding (audio/image/video)
 Inbound media can be summarized/transcribed before the reply runs. This uses model/provider APIs.
@@ -107,7 +107,6 @@ See [Models CLI](/cli/models).
 Talk mode can invoke **ElevenLabs** when configured:
 - `ELEVENLABS_API_KEY` or `talk.apiKey`
 
-See [Talk mode](/nodes/talk).
 
 ### 10) Skills (third-party APIs)
 Skills can store `apiKey` in `skills.entries.<name>.apiKey`. If a skill uses that key for external

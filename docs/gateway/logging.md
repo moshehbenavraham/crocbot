@@ -7,7 +7,7 @@ read_when:
 
 # Logging
 
-For a user-facing overview (CLI + Control UI + config), see [/logging](/logging).
+For a user-facing overview (CLI + Control UI + config), see [/help/logging](/help/logging).
 
 crocbot has two log “surfaces”:
 

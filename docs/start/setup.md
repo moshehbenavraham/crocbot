@@ -11,8 +11,8 @@ Last updated: 2026-01-01
 
 ## TL;DR
 - **Tailoring lives outside the repo:** `~/croc` (workspace) + `~/.crocbot/crocbot.json` (config).
-- **Stable workflow:** install the macOS app; let it run the bundled Gateway.
-- **Bleeding edge workflow:** run the Gateway yourself via `pnpm gateway:watch`, then let the macOS app attach in Local mode.
+- **Stable workflow:** run `crocbot onboard --install-daemon` and let the service manage the Gateway.
+- **Bleeding edge workflow:** run the Gateway via `pnpm gateway:watch`, then use the Control UI or TUI.
 
 ## Prereqs (from source)
 - Node `>=22`
@@ -32,45 +32,32 @@ Bootstrap once:
 crocbot setup
 ```
 
-From inside this repo, use the local CLI entry:
-
-```bash
-crocbot setup
-```
-
 If you don’t have a global install yet, run it via `pnpm crocbot setup`.
 
-## Stable workflow (macOS app first)
+## Stable workflow (CLI + service)
 
-1) Install + launch **crocbot.app** (menu bar).
-2) Complete the onboarding/permissions checklist (TCC prompts).
-3) Ensure Gateway is **Local** and running (the app manages it).
-4) Link surfaces (example: Telegram):
+1) Install crocbot (npm/pnpm or from source).
+2) Run onboarding and install the user service:
+
+```bash
+crocbot onboard --install-daemon
+```
+
+3) Link surfaces (example: Telegram):
 
 ```bash
 crocbot channels login
 ```
 
-5) Sanity check:
+4) Sanity check:
 
 ```bash
 crocbot health
 ```
 
-If onboarding is not available in your build:
-- Run `crocbot setup`, then `crocbot channels login`, then start the Gateway manually (`crocbot gateway`).
-
 ## Bleeding edge workflow (Gateway in a terminal)
 
-Goal: work on the TypeScript Gateway, get hot reload, keep the macOS app UI attached.
-
-### 0) (Optional) Run the macOS app from source too
-
-If you also want the macOS app on the bleeding edge:
-
-```bash
-./scripts/restart-mac.sh
-```
+Goal: work on the TypeScript Gateway, get hot reload, keep the UI attached.
 
 ### 1) Start the dev Gateway
 
@@ -81,24 +68,13 @@ pnpm gateway:watch
 
 `gateway:watch` runs the gateway in watch mode and reloads on TypeScript changes.
 
-### 2) Point the macOS app at your running Gateway
+### 2) Open a UI
 
-In **crocbot.app**:
-
-- Connection Mode: **Local**
-The app will attach to the running gateway on the configured port.
-
-### 3) Verify
-
-- In-app Gateway status should read **“Using existing gateway …”**
-- Or via CLI:
-
-```bash
-crocbot health
-```
+- Control UI: http://127.0.0.1:18789/
+- TUI: `crocbot tui`
 
 ### Common footguns
-- **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep app + CLI on the same port.
+- **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep UI + CLI on the same port.
 - **Where state lives:**
   - Credentials: `~/.crocbot/credentials/`
   - Sessions: `~/.crocbot/agents/<agentId>/sessions/`
@@ -109,9 +85,9 @@ crocbot health
 Use this when debugging auth or deciding what to back up:
 
 - **Telegram bot token**: config/env or `channels.telegram.tokenFile`
-- **Pairing allowlists**: `~/.crocbot/credentials/<channel>-allowFrom.json`
 - **Model auth profiles**: `~/.crocbot/agents/<agentId>/agent/auth-profiles.json`
 - **Legacy OAuth import**: `~/.crocbot/credentials/oauth.json`
+
 More detail: [Security](/gateway/security#credential-storage-map).
 
 ## Updating (without wrecking your setup)

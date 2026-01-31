@@ -11,7 +11,7 @@ It does not define which tools exist; crocbot provides built-in tools internally
 
 ## Examples
 
-### sag
-- Text-to-speech: specify voice, target speaker/room, and whether to stream.
+### ssh
+- Known hosts and aliases, preferred ports.
 
 Add whatever else you want the assistant to know about your local toolchain.

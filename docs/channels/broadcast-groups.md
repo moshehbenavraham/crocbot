@@ -231,7 +231,7 @@ Give agents only the tools they need:
       "tools": { "allow": ["read", "exec"] }  // Read-only
     },
     "fixer": {
-      "tools": { "allow": ["read", "write", "edit", "exec"] }  // Read-write
+      "tools": { "allow": ["read", "write", "edit", "apply_patch", "exec"] }  // Read-write
     }
   }
 }
@@ -392,6 +392,6 @@ Planned features:
 
 ## See Also
 
-- [Multi-Agent Configuration](/multi-agent-sandbox-tools)
+- [Multi-Agent Configuration](/tools/multi-agent-sandbox-tools)
 - [Routing Configuration](/concepts/channel-routing)
 - [Session Management](/concepts/sessions)

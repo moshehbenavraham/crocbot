@@ -53,7 +53,7 @@ crocbot doctor
 ## Advanced: expose WSL services over LAN (portproxy)
 
 WSL has its own virtual network. If another machine needs to reach a service
-running **inside WSL** (SSH, a local TTS server, or the Gateway), you must
+running **inside WSL** (SSH or the Gateway), you must
 forward a Windows port to the current WSL IP. The WSL IP changes after restarts,
 so you may need to refresh the forwarding rule.
 

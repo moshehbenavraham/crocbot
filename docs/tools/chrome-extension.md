@@ -159,7 +159,7 @@ This is powerful and risky. Treat it like giving the model “hands on your brow
 
 Recommendations:
 - Prefer a dedicated Chrome profile (separate from your personal browsing) for extension relay usage.
-- Keep the Gateway and any node hosts tailnet-only; rely on Gateway auth + node pairing.
+- Keep the Gateway and any node hosts tailnet-only; rely on Gateway auth + node authorization.
 - Avoid exposing relay ports over LAN (`0.0.0.0`) and avoid Funnel (public).
 
 Related:

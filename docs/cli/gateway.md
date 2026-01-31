@@ -3,7 +3,7 @@ summary: "crocbot Gateway CLI (`crocbot gateway`) — run, query, and discover g
 read_when:
   - Running the Gateway from the CLI (dev or servers)
   - Debugging Gateway auth, bind modes, and connectivity
-  - Discovering gateways via Bonjour (LAN + tailnet)
+  - Discovering gateways via DNS-SD (tailnet)
 ---
 
 # Gateway CLI
@@ -13,7 +13,7 @@ The Gateway is crocbot’s WebSocket server (channels, nodes, sessions, hooks).
 Subcommands in this page live under `crocbot gateway …`.
 
 Related docs:
-- [/gateway/bonjour](/gateway/bonjour)
+- [/gateway/discovery](/gateway/discovery)
 - [/gateway/discovery](/gateway/discovery)
 - [/gateway/configuration](/gateway/configuration)
 
@@ -151,16 +151,14 @@ Notes:
 - `gateway install` supports `--port`, `--runtime`, `--token`, `--force`, `--json`.
 - Lifecycle commands accept `--json` for scripting.
 
-## Discover gateways (Bonjour)
+## Discover gateways (DNS-SD)
 
-`gateway discover` scans for Gateway beacons (`_crocbot-gw._tcp`).
+`gateway discover` scans for Gateway beacons (`_crocbot-gw._tcp`) via DNS‑SD.
+Local mDNS discovery has been removed; use wide‑area DNS‑SD instead:
 
-- Multicast DNS-SD: `local.`
-- Unicast DNS-SD (Wide-Area Bonjour): `crocbot.internal.` (requires split DNS + DNS server; see [/gateway/bonjour](/gateway/bonjour))
+- Unicast DNS‑SD: `crocbot.internal.` (requires split DNS + DNS server; see [/gateway/discovery](/gateway/discovery))
 
-Only gateways with Bonjour discovery enabled (default) advertise the beacon.
-
-Wide-Area discovery records include (TXT):
+Discovery records include (TXT):
 - `role` (gateway role hint)
 - `transport` (transport hint, e.g. `gateway`)
 - `gatewayPort` (WebSocket port, usually `18789`)

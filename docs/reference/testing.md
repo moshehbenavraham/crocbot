@@ -55,7 +55,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 - Files: `src/**/*.e2e.test.ts`
 - Scope:
   - Multi-instance gateway end-to-end behavior
-  - WebSocket/HTTP surfaces, node pairing, and heavier networking
+  - WebSocket/HTTP surfaces, node connectivity, and heavier networking
 - Expectations:
   - Runs in CI (when enabled in the pipeline)
   - No real keys required
@@ -81,7 +81,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 
 Use this decision table:
 - Editing logic/tests: run `pnpm test` (and `pnpm test:coverage` if you changed a lot)
-- Touching gateway networking / WS protocol / pairing: add `pnpm test:e2e`
+- Touching gateway networking / WS protocol / node connectivity: add `pnpm test:e2e`
 - Debugging “my bot is down” / provider-specific failures / tool calling: run a narrowed `pnpm test:live`
 
 ## Live: model smoke (profile keys)

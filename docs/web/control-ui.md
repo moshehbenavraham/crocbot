@@ -109,7 +109,7 @@ crocbot **blocks** Control UI connections without device identity.
 }
 ```
 
-This disables device identity + pairing for the Control UI (even on HTTPS). Use
+This disables device identity checks for the Control UI (even on HTTPS). Use
 only if you trust the network.
 
 See [Tailscale](/gateway/tailscale) for HTTPS setup guidance.

@@ -2,6 +2,7 @@ packages:
   - .
   - ui
   - packages/*
+  - extensions/*
 
 onlyBuiltDependencies:
   - '@whiskeysockets/baileys'

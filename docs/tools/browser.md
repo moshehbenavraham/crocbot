@@ -3,7 +3,6 @@ summary: "Integrated browser control service + action commands"
 read_when:
   - Adding agent-controlled browser automation
   - Debugging why croc is interfering with your own Chrome
-  - Implementing browser settings + lifecycle in the macOS app
 ---
 
 # Browser (croc-managed)
@@ -183,7 +182,7 @@ Notes:
 ## Security
 
 Key ideas:
-- Browser control is loopback-only; access flows through the Gateway’s auth or node pairing.
+- Browser control is loopback-only; access flows through the Gateway’s auth.
 - Keep the Gateway and any node hosts on a private network (Tailscale); avoid public exposure.
 - Treat remote CDP URLs/tokens as secrets; prefer env vars or a secrets manager.
 

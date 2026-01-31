@@ -29,7 +29,7 @@ If you want a higher-level overview first, start with:
 
 crocbot is designed around a single **Gateway process** that owns session state.
 
-- UIs (macOS app, web Control UI, TUI) should query the Gateway for session lists and token counts.
+- UIs (web Control UI, TUI) should query the Gateway for session lists and token counts.
 - In remote mode, session files are on the remote host; “checking your local Mac files” won’t reflect what the Gateway is using.
 
 ---
@@ -147,7 +147,7 @@ If you’re tuning limits:
 - The context window comes from the model catalog (and can be overridden via config).
 - `contextTokens` in the store is a runtime estimate/reporting value; don’t treat it as a strict guarantee.
 
-For more, see [/token-use](/token-use).
+For more, see [/concepts/token-use](/concepts/token-use).
 
 ---
 

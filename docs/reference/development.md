@@ -1,3 +1,11 @@
+---
+summary: "Development guide: tools, scripts, testing, and workflows"
+read_when:
+  - Setting up local development
+  - Running scripts or tests
+  - Contributing changes
+---
+
 # Development Guide
 
 ## Local Environment

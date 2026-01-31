@@ -1,20 +1,17 @@
 ---
-summary: "Step-by-step release checklist for npm + macOS app"
+summary: "Step-by-step release checklist for npm"
 read_when:
   - Cutting a new npm release
-  - Cutting a new macOS app release
   - Verifying metadata before publishing
 ---
 
-# Release Checklist (npm + macOS)
+# Release Checklist (npm)
 
 Use `pnpm` (Node 22+) from the repo root. Keep the working tree clean before tagging/publishing.
 
 ## Operator trigger
 When the operator says “release”, immediately do this preflight (no extra questions unless blocked):
-- Read this doc and `docs/platforms/mac/release.md`.
-- Load env from `~/.profile` and confirm `SPARKLE_PRIVATE_KEY_FILE` + App Store Connect vars are set (SPARKLE_PRIVATE_KEY_FILE should live in `~/.profile`).
-- Use Sparkle keys from `~/Library/CloudStorage/Dropbox/Backup/Sparkle` if needed.
+- Read this doc and confirm npm auth is available.
 
 1) **Version & metadata**
 - [ ] Bump `package.json` version (e.g., `2026.1.26`).
@@ -48,22 +45,13 @@ When the operator says “release”, immediately do this preflight (no extra qu
   - `pnpm test:install:e2e` (requires both keys; runs both providers)
 - [ ] (Optional) Spot-check the web gateway if your changes affect send/receive paths.
 
-5) **macOS app (Sparkle)**
-- [ ] Build + sign the macOS app, then zip it for distribution.
-- [ ] Generate the Sparkle appcast (HTML notes via [`scripts/make_appcast.sh`](https://github.com/moshehbenavraham/crocbot/blob/main/scripts/make_appcast.sh)) and update `appcast.xml`.
-- [ ] Keep the app zip (and optional dSYM zip) ready to attach to the GitHub release.
-- [ ] Follow [macOS release](/platforms/mac/release) for the exact commands and required env vars.
-  - `APP_BUILD` must be numeric + monotonic (no `-beta`) so Sparkle compares versions correctly.
-  - If notarizing, use the `crocbot-notary` keychain profile created from App Store Connect API env vars (see [macOS release](/platforms/mac/release)).
-
-6) **Publish (npm)**
+5) **Publish (npm)**
 - [ ] Confirm git status is clean; commit and push as needed.
 - [ ] `npm login` (verify 2FA) if needed.
 - [ ] `npm publish --access public` (use `--tag beta` for pre-releases).
 - [ ] Verify the registry: `npm view crocbot version`, `npm view crocbot dist-tags`, and `npx -y crocbot@X.Y.Z --version` (or `--help`).
 
 ### Troubleshooting (notes from 2.0.0-beta2 release)
-- **npm pack/publish hangs or produces huge tarball**: the macOS app bundle in `dist/crocbot.app` (and release zips) get swept into the package. Fix by whitelisting publish contents via `package.json` `files` (include dist subdirs, docs, skills; exclude app bundles). Confirm with `npm pack --dry-run` that `dist/crocbot.app` is not listed.
 - **npm auth web loop for dist-tags**: use legacy auth to get an OTP prompt:
   - `NPM_CONFIG_AUTH_TYPE=legacy npm dist-tag add crocbot@X.Y.Z latest`
 - **`npx` verification fails with `ECOMPROMISED: Lock compromised`**: retry with a fresh cache:
@@ -71,11 +59,10 @@ When the operator says “release”, immediately do this preflight (no extra qu
 - **Tag needs repointing after a late fix**: force-update and push the tag, then ensure the GitHub release assets still match:
   - `git tag -f vX.Y.Z && git push -f origin vX.Y.Z`
 
-7) **GitHub release + appcast**
+6) **GitHub release**
 - [ ] Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z` (or `git push --tags`).
 - [ ] Create/refresh the GitHub release for `vX.Y.Z` with **title `crocbot X.Y.Z`** (not just the tag); body should include the **full** changelog section for that version (Highlights + Changes + Fixes), inline (no bare links), and **must not repeat the title inside the body**.
-- [ ] Attach artifacts: `npm pack` tarball (optional), `crocbot-X.Y.Z.zip`, and `crocbot-X.Y.Z.dSYM.zip` (if generated).
-- [ ] Commit the updated `appcast.xml` and push it (Sparkle feeds from main).
+- [ ] Attach artifacts: `npm pack` tarball (optional).
 - [ ] From a clean temp directory (no `package.json`), run `npx -y crocbot@X.Y.Z send --help` to confirm install/CLI entrypoints work.
 - [ ] Announce/share release notes.
 
@@ -90,18 +77,7 @@ Process to derive the list:
 2) Compare with `extensions/*/package.json` names.
 3) Publish only the **intersection** (already on npm).
 
-Current npm plugin list (update as needed):
-- @crocbot/bluebubbles
-- @crocbot/diagnostics-otel
-- @crocbot/discord
-- @crocbot/lobster
-- @crocbot/matrix
-- @crocbot/msteams
-- @crocbot/nextcloud-talk
-- @crocbot/nostr
-- @crocbot/voice-call
-- @crocbot/zalo
-- @crocbot/zalouser
+Current npm plugin list: derive it from `npm search @crocbot` and the repo plugin
+manifests, then update this doc as needed.
 
-Release notes must also call out **new optional bundled plugins** that are **not
-on by default** (example: `tlon`).
+Release notes should call out new optional plugins if any are introduced later.
