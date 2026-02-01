@@ -206,10 +206,10 @@ Node-based skills (bird, mcporter) may fail with "node: not found" if systemd se
 
 | Component | Status |
 |-----------|--------|
-| Version | `2026.1.46` |
+| Version | `2026.1.47` |
 | Gateway | Running on `ws://127.0.0.1:34219` |
 | Telegram | Connected as `@KroxTheBot` |
-| Model | `openai-codex/gpt-5.1-codex-mini` |
+| Model | `google-gemini-cli/gemini-3-flash-preview` (fallback: `openai-codex`) |
 | Concurrency | 2 agents / 4 subagents |
 | Skills | 18 active (allowlist configured) |
 | Plugins | memory-lancedb, lobster enabled |
@@ -277,13 +277,56 @@ pnpm crocbot models fallbacks add anthropic/claude-opus-4-5
 
 ---
 
+## Session 8: Google Gemini Primary Model (2026-02-01)
+
+### Model Configuration
+
+| Setting | Value |
+|---------|-------|
+| Primary | `google-gemini-cli/gemini-3-flash-preview` |
+| Fallback | `openai-codex/gpt-5.1-codex-mini` |
+| Auth | OAuth via `google-gemini-cli-auth` plugin |
+
+### Setup Steps
+
+1. Enabled plugin: `crocbot plugins enable google-gemini-cli-auth`
+2. Authenticated: `crocbot models auth login --provider google-gemini-cli --set-default`
+3. OAuth flow completed (WSL2 manual URL paste mode)
+
+### Other Changes
+
+- Enabled `/restart` command: added `commands.restart: true` to config
+- Enabled `/config`, `/debug`, `/bash` commands
+- Configured `tools.elevated` with Telegram allowlist
+
+### Code Changes
+
+- Modified `src/auto-reply/reply/commands-session.ts`: `/restart` command now writes a restart sentinel with delivery context, enabling post-restart notifications back to the originating channel
+
+### Deployment
+
+After code changes, rebuild and restart:
+```bash
+pnpm build && systemctl --user restart crocbot-gateway
+```
+
+### Restart Timing (from logs)
+
+| Phase | Duration |
+|-------|----------|
+| SIGUSR1 → Gateway started | ~40ms |
+| Telegram reconnect | ~370ms |
+| **Total** | **~400-500ms** |
+
+---
+
 ## TODO
 
 - [x] Fix skills probing (added `skills.allowBundled` config) ✅
 - [x] Restore needed extensions ✅
 - [x] Enable memory-lancedb ✅
 - [x] Upgrade Node to >=22.12.0 ✅ (v22.22.0)
-- [ ] Configure model fallbacks
+- [x] Configure model fallbacks ✅
 - [ ] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`

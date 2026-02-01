@@ -4,6 +4,11 @@ import { updateSessionStore } from "../../config/sessions.js";
 import { logVerbose } from "../../globals.js";
 import { createInternalHookEvent, triggerInternalHook } from "../../hooks/internal-hooks.js";
 import { scheduleGatewaySigusr1Restart, triggercrocbotRestart } from "../../infra/restart.js";
+import {
+  formatDoctorNonInteractiveHint,
+  type RestartSentinelPayload,
+  writeRestartSentinel,
+} from "../../infra/restart-sentinel.js";
 import { parseActivationCommand } from "../group-activation.js";
 import { parseSendPolicyCommand } from "../send-policy.js";
 import { normalizeUsageDisplay, resolveResponseUsageMode } from "../thinking.js";
@@ -231,8 +236,49 @@ export const handleRestartCommand: CommandHandler = async (params, allowTextComm
       },
     };
   }
+  // Build delivery context for post-restart notification
+  const sessionKey = params.sessionKey?.trim() || undefined;
+  const deliveryContext: { channel?: string; to?: string; accountId?: string } = {
+    channel: params.command.channel,
+    to: params.command.to,
+    accountId: params.ctx.AccountId,
+  };
+  // Extract thread ID from session key if present
+  const threadMarker = ":thread:";
+  const topicMarker = ":topic:";
+  let threadId: string | undefined;
+  if (sessionKey) {
+    const threadIndex = sessionKey.lastIndexOf(threadMarker);
+    const topicIndex = sessionKey.lastIndexOf(topicMarker);
+    const markerIndex = Math.max(threadIndex, topicIndex);
+    const marker = threadIndex > topicIndex ? threadMarker : topicMarker;
+    if (markerIndex !== -1) {
+      threadId = sessionKey.slice(markerIndex + marker.length).trim() || undefined;
+    }
+  }
+
   const hasSigusr1Listener = process.listenerCount("SIGUSR1") > 0;
   if (hasSigusr1Listener) {
+    // Write restart sentinel for post-restart notification
+    const payload: RestartSentinelPayload = {
+      kind: "restart",
+      status: "ok",
+      ts: Date.now(),
+      sessionKey,
+      deliveryContext,
+      threadId,
+      message: "Gateway restarted successfully via /restart command.",
+      doctorHint: formatDoctorNonInteractiveHint(),
+      stats: {
+        mode: "chat.restart",
+        reason: "/restart",
+      },
+    };
+    try {
+      await writeRestartSentinel(payload);
+    } catch {
+      // ignore: sentinel is best-effort
+    }
     scheduleGatewaySigusr1Restart({ reason: "/restart" });
     return {
       shouldContinue: false,
@@ -250,6 +296,26 @@ export const handleRestartCommand: CommandHandler = async (params, allowTextComm
         text: `⚠️ Restart failed (${restartMethod.method}).${detail}`,
       },
     };
+  }
+  // Write restart sentinel for post-restart notification (systemd/launchctl)
+  const payloadExt: RestartSentinelPayload = {
+    kind: "restart",
+    status: "ok",
+    ts: Date.now(),
+    sessionKey,
+    deliveryContext,
+    threadId,
+    message: `Gateway restarted successfully via ${restartMethod.method}.`,
+    doctorHint: formatDoctorNonInteractiveHint(),
+    stats: {
+      mode: `chat.restart.${restartMethod.method}`,
+      reason: "/restart",
+    },
+  };
+  try {
+    await writeRestartSentinel(payloadExt);
+  } catch {
+    // ignore: sentinel is best-effort
   }
   return {
     shouldContinue: false,
