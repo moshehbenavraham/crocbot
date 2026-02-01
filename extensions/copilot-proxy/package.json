@@ -1,0 +1,11 @@
+{
+  "name": "@crocbot/copilot-proxy",
+  "version": "2026.1.26",
+  "type": "module",
+  "description": "crocbot Copilot Proxy provider plugin",
+  "crocbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

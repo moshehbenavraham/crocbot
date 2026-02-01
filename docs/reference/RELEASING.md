@@ -15,7 +15,6 @@ When the operator says “release”, immediately do this preflight (no extra qu
 
 1) **Version & metadata**
 - [ ] Bump `package.json` version (e.g., `2026.1.26`).
-- [ ] Run `pnpm plugins:sync` to align extension package versions + changelogs.
 - [ ] Update CLI/version strings: [`src/cli/program.ts`](https://github.com/moshehbenavraham/crocbot/blob/main/src/cli/program.ts) and the Baileys user agent in [`src/provider-web.ts`](https://github.com/moshehbenavraham/crocbot/blob/main/src/provider-web.ts).
 - [ ] Confirm package metadata (name, description, repository, keywords, license) and `bin` map points to [`dist/entry.js`](https://github.com/moshehbenavraham/crocbot/blob/main/dist/entry.js) for `crocbot`.
 - [ ] If dependencies changed, run `pnpm install` so `pnpm-lock.yaml` is current.
@@ -68,14 +67,14 @@ When the operator says “release”, immediately do this preflight (no extra qu
 
 ## Plugin publish scope (npm)
 
-We only publish **existing npm plugins** under the `@crocbot/*` scope. Bundled
-plugins that are not on npm stay **disk-tree only** (still shipped in
-`extensions/**`).
+We only publish **existing npm plugins** under the `@crocbot/*` scope. The repo
+does not ship a bundle of extensions beyond the Telegram channel plugin, so
+plugin publishing is opt-in per package.
 
 Process to derive the list:
 1) `npm search @crocbot --json` and capture the package names.
-2) Compare with `extensions/*/package.json` names.
-3) Publish only the **intersection** (already on npm).
+2) Confirm each package is still maintained and intended to ship (skip repo-only
+   plugins like `extensions/telegram`).
 
 Current npm plugin list: derive it from `npm search @crocbot` and the repo plugin
 manifests, then update this doc as needed.

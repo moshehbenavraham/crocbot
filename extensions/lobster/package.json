@@ -1,0 +1,11 @@
+{
+  "name": "@crocbot/lobster",
+  "version": "2026.1.26",
+  "type": "module",
+  "description": "Lobster workflow tool plugin (typed pipelines + resumable approvals)",
+  "crocbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

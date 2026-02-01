@@ -82,7 +82,7 @@ High-level:
 6. Installs deps (pnpm preferred; npm fallback).
 7. Builds + builds the Control UI.
 8. Runs `crocbot doctor` as the final “safe update” check.
-9. Syncs plugins to the active channel (dev uses bundled extensions; stable/beta uses npm) and updates npm-installed plugins.
+9. Syncs plugins to the active channel (dev uses plugins from the git checkout; stable/beta uses npm) and updates npm-installed plugins.
 
 ## `--update` shorthand
 

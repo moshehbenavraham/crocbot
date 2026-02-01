@@ -17,7 +17,7 @@ Outbound sends were mirrored into the *current* agent session (tool session key)
 - Mirror outbound messages into the target channel session key.
 - Create session entries on outbound when missing.
 - Keep thread/topic scoping aligned with inbound session keys.
-- Cover core channels plus bundled extensions.
+- Cover core channels plus plugin channels.
 
 ## Implementation Summary
 - New outbound session routing helper:
@@ -53,7 +53,7 @@ Outbound sends were mirrored into the *current* agent session (tool session key)
 
 ## Open Items / Follow-ups
 - Voice-call plugin uses custom `voice:<phone>` session keys. Outbound mapping is not standardized here; if message-tool should support voice-call sends, add explicit mapping.
-- Confirm if any external plugin uses non-standard `From/To` formats beyond the bundled set.
+- Confirm if any external plugins use non-standard `From/To` formats beyond the core set.
 
 ## Files Touched
 - `src/infra/outbound/outbound-session.ts`

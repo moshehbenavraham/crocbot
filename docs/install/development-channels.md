@@ -54,7 +54,7 @@ Tip: if you want stable + dev in parallel, keep two clones and point your gatewa
 
 When you switch channels with `crocbot update`, crocbot also syncs plugin sources:
 
-- `dev` prefers bundled plugins from the git checkout.
+- `dev` prefers plugin sources from the git checkout (local `extensions/` or `plugins.load.paths`).
 - `stable` and `beta` restore npm-installed plugin packages.
 
 ## Tagging best practices

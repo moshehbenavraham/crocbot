@@ -83,11 +83,11 @@ crocbot ships with the pi‑ai catalog. These providers require **no**
 
 - Providers: `google-vertex`, `google-antigravity`, `google-gemini-cli`
 - Auth: Vertex uses gcloud ADC; Antigravity/Gemini CLI use their respective auth flows
-- Antigravity OAuth is shipped as a bundled plugin (`google-antigravity-auth`, disabled by default).
-  - Enable: `crocbot plugins enable google-antigravity-auth`
+- Antigravity OAuth requires the optional `google-antigravity-auth` plugin.
+  - Install it if needed (see [Plugins](/plugins)), then enable: `crocbot plugins enable google-antigravity-auth`
   - Login: `crocbot models auth login --provider google-antigravity --set-default`
-- Gemini CLI OAuth is shipped as a bundled plugin (`google-gemini-cli-auth`, disabled by default).
-  - Enable: `crocbot plugins enable google-gemini-cli-auth`
+- Gemini CLI OAuth requires the optional `google-gemini-cli-auth` plugin.
+  - Install it if needed (see [Plugins](/plugins)), then enable: `crocbot plugins enable google-gemini-cli-auth`
   - Login: `crocbot models auth login --provider google-gemini-cli --set-default`
   - Note: you do **not** paste a client id or secret into `crocbot.json`. The CLI login flow stores
     tokens in auth profiles on the gateway host.
@@ -188,7 +188,7 @@ Kimi Code uses a dedicated endpoint and key (separate from Moonshot):
 ### Qwen OAuth (free tier)
 
 Qwen provides OAuth access to Qwen Coder + Vision via a device-code flow.
-Enable the bundled plugin, then log in:
+Enable the optional `qwen-portal-auth` plugin (install if needed), then log in:
 
 ```bash
 crocbot plugins enable qwen-portal-auth

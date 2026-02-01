@@ -74,12 +74,12 @@ crocbot scans, in order:
 - `~/.crocbot/extensions/*.ts`
 - `~/.crocbot/extensions/*/index.ts`
 
-4) Bundled extensions (shipped with crocbot, **disabled by default**)
-- `<crocbot>/extensions/*`
+4) Bundled extensions (currently only `telegram`)
+- `<crocbot>/extensions/telegram`
 
-Bundled plugins must be enabled explicitly via `plugins.entries.<id>.enabled`
-or `crocbot plugins enable <id>`. Installed plugins are enabled by default,
-but can be disabled the same way.
+The bundled Telegram plugin is enabled by default. Any other plugin must be
+installed via workspace/global paths or `plugins.load.paths`, then enabled or
+disabled via `plugins.entries.<id>.enabled` (or `crocbot plugins enable <id>`).
 
 Each plugin must include a `crocbot.plugin.json` file in its root. If a path
 points at a file, the plugin root is the file's directory and must contain the

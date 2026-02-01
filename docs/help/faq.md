@@ -1001,8 +1001,8 @@ You have three supported patterns:
 **Option A - run the Gateway on a Mac (simplest).**  
 Run the Gateway where the macOS binaries exist, then connect from Linux in [remote mode](#how-do-i-run-crocbot-in-remote-mode-client-connects-to-a-gateway-elsewhere) or over Tailscale. The skills load normally because the Gateway host is macOS.
 
-**Option B - use a macOS node (no SSH).**  
-Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. crocbot can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
+**Option B - use a macOS node host (no SSH).**  
+Run the Gateway on Linux, start a macOS node host (`crocbot node run`), and pair it to the Gateway. crocbot can treat macOS-only skills as eligible when the required binaries exist on the node host. The agent runs those skills via the `nodes` tool, and approvals are enforced on the node host via exec allowlists.
 
 **Option C - proxy macOS binaries over SSH (advanced).**  
 Keep the Gateway on Linux, but make the required CLI binaries resolve to SSH wrappers that run on a Mac. Then override the skill to allow Linux so it stays eligible.

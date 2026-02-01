@@ -1,0 +1,11 @@
+{
+  "name": "@crocbot/google-gemini-cli-auth",
+  "version": "2026.1.26",
+  "type": "module",
+  "description": "crocbot Gemini CLI OAuth provider plugin",
+  "crocbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
