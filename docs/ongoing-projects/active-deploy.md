@@ -412,6 +412,35 @@ TTS voice notes were not using the configured ElevenLabs voice. Investigation re
 
 ---
 
+## Session 11: Environment Files Cleanup (2026-02-01)
+
+### Problem
+`.env` and `.env.example` were disorganized and missing critical path configuration variables.
+
+### Investigation
+- `.env.example` was orphaned documentation from the project's first commit (Nov 2025)
+- Only contained Twilio vars for `voice-call` extension
+- Never updated to reflect `~/.crocbot/` config system
+- Twilio only used by optional `extensions/voice-call/`, not core codebase
+
+### Fix Applied
+
+Updated both files with:
+
+| Section | Variables |
+|---------|-----------|
+| State & Config Paths | `CROCBOT_STATE_DIR`, `CROCBOT_CONFIG_PATH` |
+| Twilio (voice-call) | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` |
+| ElevenLabs TTS | `ELEVENLABS_VOICE_ID`, `ELEVENLABS_VOICE_ID_LINK` |
+
+### .env Loading Order
+1. CWD `.env` (project root if running from there)
+2. `~/.crocbot/.env` (global fallback)
+
+Defined in `src/infra/dotenv.ts`.
+
+---
+
 ## TODO
 
 - [x] Fix skills probing (added `skills.allowBundled` config)
@@ -421,6 +450,7 @@ TTS voice notes were not using the configured ElevenLabs voice. Investigation re
 - [x] Configure model fallbacks
 - [x] Restore TTS functionality
 - [x] Configure TTS voice (ElevenLabs `ZD29qZCdYhhdqzBLRKNH`)
+- [x] Clean up `.env` and `.env.example` with proper sections
 - [ ] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`
