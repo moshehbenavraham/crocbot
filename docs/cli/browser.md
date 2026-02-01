@@ -53,7 +53,7 @@ crocbot browser --browser-profile work tabs
 
 ```bash
 crocbot browser tabs
-crocbot browser open https://docs.github.com/moshehbenavraham/crocbot
+crocbot browser open https://aiwithapex.mintlify.app
 crocbot browser focus <targetId>
 crocbot browser close <targetId>
 ```

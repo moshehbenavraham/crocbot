@@ -18,7 +18,7 @@ export function registerDaemonCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "docs.github.com/moshehbenavraham/crocbot/cli/gateway")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "aiwithapex.mintlify.app/cli/gateway")}\n`,
     );
 
   daemon

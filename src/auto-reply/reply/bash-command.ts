@@ -189,7 +189,7 @@ export async function handleBashChatCommand(params: {
 }): Promise<ReplyPayload> {
   if (params.cfg.commands?.bash !== true) {
     return {
-      text: "⚠️ bash is disabled. Set commands.bash=true to enable. Docs: https://docs.github.com/moshehbenavraham/crocbot/tools/slash-commands#config",
+      text: "⚠️ bash is disabled. Set commands.bash=true to enable. Docs: https://aiwithapex.mintlify.app/tools/slash-commands#config",
     };
   }
 

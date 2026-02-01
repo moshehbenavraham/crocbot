@@ -116,7 +116,7 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
   return [
     "## Documentation",
     `crocbot docs: ${docsPath}`,
-    "Mirror: https://docs.github.com/moshehbenavraham/crocbot",
+    "Mirror: https://aiwithapex.mintlify.app",
     "Source: https://github.com/moshehbenavraham/crocbot",
     "Community: https://discord.com/invite/croc",
     "Find new skills: https://crochub.com",

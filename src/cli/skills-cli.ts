@@ -337,7 +337,7 @@ export function registerSkillsCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/skills", "docs.github.com/moshehbenavraham/crocbot/cli/skills")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/skills", "aiwithapex.mintlify.app/cli/skills")}\n`,
     );
 
   skills

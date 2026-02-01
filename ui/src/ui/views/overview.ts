@@ -49,7 +49,7 @@ export function renderOverview(props: OverviewProps) {
           <div style="margin-top: 6px;">
             <a
               class="session-link"
-              href="https://docs.github.com/moshehbenavraham/crocbot/web/dashboard"
+              href="https://aiwithapex.mintlify.app/web/dashboard"
               target="_blank"
               rel="noreferrer"
               title="Control UI auth docs (opens in new tab)"
@@ -67,7 +67,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px;">
           <a
             class="session-link"
-            href="https://docs.github.com/moshehbenavraham/crocbot/web/dashboard"
+            href="https://aiwithapex.mintlify.app/web/dashboard"
             target="_blank"
             rel="noreferrer"
             title="Control UI auth docs (opens in new tab)"
@@ -96,7 +96,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px;">
           <a
             class="session-link"
-            href="https://docs.github.com/moshehbenavraham/crocbot/gateway/tailscale"
+            href="https://aiwithapex.mintlify.app/gateway/tailscale"
             target="_blank"
             rel="noreferrer"
             title="Tailscale Serve docs (opens in new tab)"
@@ -105,7 +105,7 @@ export function renderOverview(props: OverviewProps) {
           <span class="muted"> · </span>
           <a
             class="session-link"
-            href="https://docs.github.com/moshehbenavraham/crocbot/web/control-ui#insecure-http"
+            href="https://aiwithapex.mintlify.app/web/control-ui#insecure-http"
             target="_blank"
             rel="noreferrer"
             title="Insecure HTTP docs (opens in new tab)"

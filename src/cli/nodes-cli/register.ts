@@ -17,7 +17,7 @@ export function registerNodesCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/nodes", "docs.github.com/moshehbenavraham/crocbot/cli/nodes")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/nodes", "aiwithapex.mintlify.app/cli/nodes")}\n`,
     );
 
   registerNodesStatusCommands(nodes);

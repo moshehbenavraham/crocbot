@@ -38,7 +38,7 @@ export function registerOnboardCommand(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/onboard", "docs.github.com/moshehbenavraham/crocbot/cli/onboard")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/onboard", "aiwithapex.mintlify.app/cli/onboard")}\n`,
     )
     .option("--workspace <dir>", "Agent workspace directory (default: ~/croc)")
     .option("--reset", "Reset config + credentials + sessions + workspace before running wizard")

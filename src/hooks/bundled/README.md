@@ -39,7 +39,7 @@ Swaps injected `SOUL.md` content with `SOUL_EVIL.md` during a purge window or by
 **Events**: `agent:bootstrap`
 **What it does**: Overrides the injected SOUL content before the system prompt is built.
 **Output**: No files written; swaps happen in-memory only.
-**Docs**: https://docs.github.com/moshehbenavraham/crocbot/hooks/soul-evil
+**Docs**: https://aiwithapex.mintlify.app/hooks/soul-evil
 
 **Enable**:
 
@@ -82,7 +82,7 @@ session-memory/
 ---
 name: my-hook
 description: "Short description"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#my-hook
+homepage: https://aiwithapex.mintlify.app/hooks#my-hook
 metadata:
   { "crocbot": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -221,4 +221,4 @@ Test your hooks by:
 
 ## Documentation
 
-Full documentation: https://docs.github.com/moshehbenavraham/crocbot/hooks
+Full documentation: https://aiwithapex.mintlify.app/hooks

@@ -44,7 +44,7 @@ export function registerModelsCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/models", "docs.github.com/moshehbenavraham/crocbot/cli/models")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/models", "aiwithapex.mintlify.app/cli/models")}\n`,
     );
 
   models

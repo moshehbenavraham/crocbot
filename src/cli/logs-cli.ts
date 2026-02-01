@@ -181,7 +181,7 @@ export function registerLogsCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/logs", "docs.github.com/moshehbenavraham/crocbot/cli/logs")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/logs", "aiwithapex.mintlify.app/cli/logs")}\n`,
     );
 
   addGatewayClientOptions(logs);

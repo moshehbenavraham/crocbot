@@ -76,7 +76,7 @@ export function registerChannelsCli(program: Command) {
       () =>
         `\n${theme.muted("Docs:")} ${formatDocsLink(
           "/cli/channels",
-          "docs.github.com/moshehbenavraham/crocbot/cli/channels",
+          "aiwithapex.mintlify.app/cli/channels",
         )}\n`,
     );
 

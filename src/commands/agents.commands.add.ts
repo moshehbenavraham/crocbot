@@ -326,7 +326,7 @@ export async function agentsAddCommand(
         await prompter.note(
           [
             "Routing unchanged. Add bindings when you're ready.",
-            "Docs: https://docs.github.com/moshehbenavraham/crocbot/concepts/multi-agent",
+            "Docs: https://aiwithapex.mintlify.app/concepts/multi-agent",
           ].join("\n"),
           "Routing",
         );

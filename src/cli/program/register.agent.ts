@@ -68,7 +68,7 @@ ${formatHelpExamples([
   ],
 ])}
 
-${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.github.com/moshehbenavraham/crocbot/cli/agent")}`,
+${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "aiwithapex.mintlify.app/cli/agent")}`,
     )
     .action(async (opts) => {
       const verboseLevel = typeof opts.verbose === "string" ? opts.verbose.toLowerCase() : "";
@@ -86,7 +86,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.github.com/moshehbe
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/agents", "docs.github.com/moshehbenavraham/crocbot/cli/agents")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/agents", "aiwithapex.mintlify.app/cli/agents")}\n`,
     );
 
   agents

@@ -44,7 +44,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     runtime.error(
       [
         "Non-interactive onboarding requires explicit risk acknowledgement.",
-        "Read: https://docs.github.com/moshehbenavraham/crocbot/security",
+        "Read: https://aiwithapex.mintlify.app/security",
         `Re-run with: ${formatCliCommand("crocbot onboard --non-interactive --accept-risk ...")}`,
       ].join("\n"),
     );
@@ -65,7 +65,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
       [
         "Windows detected.",
         "WSL2 is strongly recommended; native Windows is untested and more problematic.",
-        "Guide: https://docs.github.com/moshehbenavraham/crocbot/windows",
+        "Guide: https://aiwithapex.mintlify.app/windows",
       ].join("\n"),
     );
   }

@@ -98,7 +98,7 @@ export function registerDnsCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/dns", "docs.github.com/moshehbenavraham/crocbot/cli/dns")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/dns", "aiwithapex.mintlify.app/cli/dns")}\n`,
     );
 
   dns

@@ -125,7 +125,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
 
   if (!opts.json) {
     runtime.log(
-      `Tip: run \`${formatCliCommand("crocbot configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.github.com/moshehbenavraham/crocbot/tools/web`,
+      `Tip: run \`${formatCliCommand("crocbot configure --section web")}\` to store your Brave API key for web_search. Docs: https://aiwithapex.mintlify.app/tools/web`,
     );
   }
 }

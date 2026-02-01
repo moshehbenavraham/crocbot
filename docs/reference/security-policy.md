@@ -17,7 +17,7 @@ If you believe you've found a security issue in crocbot, please report it privat
 
 For threat model + hardening guidance (including `crocbot security audit --deep` and `--fix`), see:
 
-- `https://docs.github.com/moshehbenavraham/crocbot/gateway/security`
+- `https://aiwithapex.mintlify.app/gateway/security`
 
 ### Web Interface Safety
 

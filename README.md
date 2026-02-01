@@ -21,22 +21,22 @@ It answers you on Telegram with full bot integration via grammY. The Gateway is 
 
 If you want a personal, single-user assistant that is lean, fast, and always-on, this is it.
 
-[Website](https://github.com/moshehbenavraham/crocbot) · [Docs](https://docs.github.com/moshehbenavraham/crocbot) · [Getting Started](https://docs.github.com/moshehbenavraham/crocbot/start/getting-started) · [Updating](https://docs.github.com/moshehbenavraham/crocbot/install/updating) · [Showcase](https://docs.github.com/moshehbenavraham/crocbot/start/showcase) · [FAQ](https://docs.github.com/moshehbenavraham/crocbot/start/faq) · [Wizard](https://docs.github.com/moshehbenavraham/crocbot/start/wizard) · [Nix](https://github.com/moshehbenavraham/nix-crocbot) · [Docker](https://docs.github.com/moshehbenavraham/crocbot/install/docker) · [Discord](https://discord.gg/croc)
+[Website](https://github.com/moshehbenavraham/crocbot) · [Docs](https://aiwithapex.mintlify.app) · [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · [Updating](https://aiwithapex.mintlify.app/install/updating) · [Showcase](https://aiwithapex.mintlify.app/start/showcase) · [FAQ](https://aiwithapex.mintlify.app/start/faq) · [Wizard](https://aiwithapex.mintlify.app/start/wizard) · [Nix](https://github.com/moshehbenavraham/nix-crocbot) · [Docker](https://aiwithapex.mintlify.app/install/docker) · [Discord](https://discord.gg/croc)
 
 Preferred setup: run the onboarding wizard (`crocbot onboard`). It walks through gateway, workspace, Telegram configuration, and skills. The CLI wizard is the recommended path and works on **Linux and Windows (via WSL2; strongly recommended)**.
 Works with npm, pnpm, or bun.
-New install? Start here: [Getting started](https://docs.github.com/moshehbenavraham/crocbot/start/getting-started)
+New install? Start here: [Getting started](https://aiwithapex.mintlify.app/start/getting-started)
 
 **Subscriptions (OAuth):**
 - **[Anthropic](https://www.anthropic.com/)** (Claude Pro/Max)
 - **[OpenAI](https://openai.com/)** (ChatGPT/Codex)
 
-Model note: while any model is supported, I strongly recommend **Anthropic Pro/Max (100/200) + Opus 4.5** for long‑context strength and better prompt‑injection resistance. See [Onboarding](https://docs.github.com/moshehbenavraham/crocbot/start/onboarding).
+Model note: while any model is supported, I strongly recommend **Anthropic Pro/Max (100/200) + Opus 4.5** for long‑context strength and better prompt‑injection resistance. See [Onboarding](https://aiwithapex.mintlify.app/start/onboarding).
 
 ## Models (selection + auth)
 
-- Models config + CLI: [Models](https://docs.github.com/moshehbenavraham/crocbot/concepts/models)
-- Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://docs.github.com/moshehbenavraham/crocbot/concepts/model-failover)
+- Models config + CLI: [Models](https://aiwithapex.mintlify.app/concepts/models)
+- Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://aiwithapex.mintlify.app/concepts/model-failover)
 
 ## Install (recommended)
 
@@ -56,7 +56,7 @@ Legacy note: `crocbot` remains available as a compatibility shim.
 
 Runtime: **Node ≥22**.
 
-Full beginner guide (auth, pairing, channels): [Getting started](https://docs.github.com/moshehbenavraham/crocbot/start/getting-started)
+Full beginner guide (auth, pairing, channels): [Getting started](https://aiwithapex.mintlify.app/start/getting-started)
 
 ```bash
 crocbot onboard --install-daemon
@@ -67,7 +67,7 @@ crocbot gateway --port 18789 --verbose
 crocbot agent --message "Ship checklist" --thinking high
 ```
 
-Upgrading? [Updating guide](https://docs.github.com/moshehbenavraham/crocbot/install/updating) (and run `crocbot doctor`).
+Upgrading? [Updating guide](https://aiwithapex.mintlify.app/install/updating) (and run `crocbot doctor`).
 
 ## Development channels
 
@@ -76,7 +76,7 @@ Upgrading? [Updating guide](https://docs.github.com/moshehbenavraham/crocbot/ins
 - **dev**: moving head of `main`, npm dist-tag `dev` (when published).
 
 Switch channels (git + npm): `crocbot update --channel stable|beta|dev`.
-Details: [Development channels](https://docs.github.com/moshehbenavraham/crocbot/install/development-channels).
+Details: [Development channels](https://aiwithapex.mintlify.app/install/development-channels).
 
 ## From source (development)
 
@@ -102,7 +102,7 @@ Note: `pnpm crocbot ...` runs TypeScript directly (via `tsx`). `pnpm build` prod
 
 Crocbot connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
 
-Full security guide: [Security](https://docs.github.com/moshehbenavraham/crocbot/gateway/security)
+Full security guide: [Security](https://aiwithapex.mintlify.app/gateway/security)
 
 Default behavior on Telegram:
 - **DM pairing** (`dmPolicy="pairing"`): unknown senders receive a short pairing code and the bot does not process their message.
@@ -113,11 +113,11 @@ Run `crocbot doctor` to surface risky/misconfigured DM policies.
 
 ## Highlights
 
-- **[Local-first Gateway](https://docs.github.com/moshehbenavraham/crocbot/gateway)** - single control plane for sessions, Telegram, tools, and events.
-- **[Telegram integration](https://docs.github.com/moshehbenavraham/crocbot/channels/telegram)** - full bot integration via grammY with groups, DMs, and media support.
-- **[Multi-agent routing](https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration)** - route inbound messages to isolated agents (workspaces + per-agent sessions).
-- **[First-class tools](https://docs.github.com/moshehbenavraham/crocbot/tools)** - browser, cron, sessions, and automation.
-- **[Onboarding](https://docs.github.com/moshehbenavraham/crocbot/start/wizard) + [skills](https://docs.github.com/moshehbenavraham/crocbot/tools/skills)** - wizard-driven setup with bundled/managed/workspace skills.
+- **[Local-first Gateway](https://aiwithapex.mintlify.app/gateway)** - single control plane for sessions, Telegram, tools, and events.
+- **[Telegram integration](https://aiwithapex.mintlify.app/channels/telegram)** - full bot integration via grammY with groups, DMs, and media support.
+- **[Multi-agent routing](https://aiwithapex.mintlify.app/gateway/configuration)** - route inbound messages to isolated agents (workspaces + per-agent sessions).
+- **[First-class tools](https://aiwithapex.mintlify.app/tools)** - browser, cron, sessions, and automation.
+- **[Onboarding](https://aiwithapex.mintlify.app/start/wizard) + [skills](https://aiwithapex.mintlify.app/tools/skills)** - wizard-driven setup with bundled/managed/workspace skills.
 
 ## Star History
 
@@ -126,32 +126,32 @@ Run `crocbot doctor` to surface risky/misconfigured DM policies.
 ## Everything we built so far
 
 ### Core platform
-- [Gateway WS control plane](https://docs.github.com/moshehbenavraham/crocbot/gateway) with sessions, presence, config, cron, webhooks, and [Control UI](https://docs.github.com/moshehbenavraham/crocbot/web).
-- [CLI surface](https://docs.github.com/moshehbenavraham/crocbot/tools/agent-send): gateway, agent, send, [wizard](https://docs.github.com/moshehbenavraham/crocbot/start/wizard), and [doctor](https://docs.github.com/moshehbenavraham/crocbot/gateway/doctor).
-- [Pi agent runtime](https://docs.github.com/moshehbenavraham/crocbot/concepts/agent) in RPC mode with tool streaming and block streaming.
-- [Session model](https://docs.github.com/moshehbenavraham/crocbot/concepts/session): `main` for direct chats, group isolation, activation modes, queue modes, reply-back. Group rules: [Groups](https://docs.github.com/moshehbenavraham/crocbot/concepts/groups).
-- [Media pipeline](https://docs.github.com/moshehbenavraham/crocbot/nodes/images): images/audio/video, transcription hooks, size caps, temp file lifecycle. Audio details: [Audio](https://docs.github.com/moshehbenavraham/crocbot/nodes/audio).
+- [Gateway WS control plane](https://aiwithapex.mintlify.app/gateway) with sessions, presence, config, cron, webhooks, and [Control UI](https://aiwithapex.mintlify.app/web).
+- [CLI surface](https://aiwithapex.mintlify.app/tools/agent-send): gateway, agent, send, [wizard](https://aiwithapex.mintlify.app/start/wizard), and [doctor](https://aiwithapex.mintlify.app/gateway/doctor).
+- [Pi agent runtime](https://aiwithapex.mintlify.app/concepts/agent) in RPC mode with tool streaming and block streaming.
+- [Session model](https://aiwithapex.mintlify.app/concepts/session): `main` for direct chats, group isolation, activation modes, queue modes, reply-back. Group rules: [Groups](https://aiwithapex.mintlify.app/concepts/groups).
+- [Media pipeline](https://aiwithapex.mintlify.app/nodes/images): images/audio/video, transcription hooks, size caps, temp file lifecycle. Audio details: [Audio](https://aiwithapex.mintlify.app/nodes/audio).
 
 ### Channels
-- [Telegram](https://docs.github.com/moshehbenavraham/crocbot/channels/telegram) (grammY) - full bot integration with groups, DMs, and media support.
-- [Group routing](https://docs.github.com/moshehbenavraham/crocbot/concepts/group-messages): mention gating, reply tags, chunking and routing.
+- [Telegram](https://aiwithapex.mintlify.app/channels/telegram) (grammY) - full bot integration with groups, DMs, and media support.
+- [Group routing](https://aiwithapex.mintlify.app/concepts/group-messages): mention gating, reply tags, chunking and routing.
 
 ### Tools + automation
-- [Browser control](https://docs.github.com/moshehbenavraham/crocbot/tools/browser): dedicated croc Chrome/Chromium, snapshots, actions, uploads, profiles.
-- [Cron + wakeups](https://docs.github.com/moshehbenavraham/crocbot/automation/cron-jobs); [webhooks](https://docs.github.com/moshehbenavraham/crocbot/automation/webhook); [Gmail Pub/Sub](https://docs.github.com/moshehbenavraham/crocbot/automation/gmail-pubsub).
-- [Skills platform](https://docs.github.com/moshehbenavraham/crocbot/tools/skills): bundled, managed, and workspace skills with install gating + UI.
+- [Browser control](https://aiwithapex.mintlify.app/tools/browser): dedicated croc Chrome/Chromium, snapshots, actions, uploads, profiles.
+- [Cron + wakeups](https://aiwithapex.mintlify.app/automation/cron-jobs); [webhooks](https://aiwithapex.mintlify.app/automation/webhook); [Gmail Pub/Sub](https://aiwithapex.mintlify.app/automation/gmail-pubsub).
+- [Skills platform](https://aiwithapex.mintlify.app/tools/skills): bundled, managed, and workspace skills with install gating + UI.
 
 ### Runtime + safety
-- [Channel routing](https://docs.github.com/moshehbenavraham/crocbot/concepts/channel-routing), [retry policy](https://docs.github.com/moshehbenavraham/crocbot/concepts/retry), and [streaming/chunking](https://docs.github.com/moshehbenavraham/crocbot/concepts/streaming).
-- [Presence](https://docs.github.com/moshehbenavraham/crocbot/concepts/presence), [typing indicators](https://docs.github.com/moshehbenavraham/crocbot/concepts/typing-indicators), and [usage tracking](https://docs.github.com/moshehbenavraham/crocbot/concepts/usage-tracking).
-- [Models](https://docs.github.com/moshehbenavraham/crocbot/concepts/models), [model failover](https://docs.github.com/moshehbenavraham/crocbot/concepts/model-failover), and [session pruning](https://docs.github.com/moshehbenavraham/crocbot/concepts/session-pruning).
-- [Security](https://docs.github.com/moshehbenavraham/crocbot/gateway/security) and [troubleshooting](https://docs.github.com/moshehbenavraham/crocbot/channels/troubleshooting).
+- [Channel routing](https://aiwithapex.mintlify.app/concepts/channel-routing), [retry policy](https://aiwithapex.mintlify.app/concepts/retry), and [streaming/chunking](https://aiwithapex.mintlify.app/concepts/streaming).
+- [Presence](https://aiwithapex.mintlify.app/concepts/presence), [typing indicators](https://aiwithapex.mintlify.app/concepts/typing-indicators), and [usage tracking](https://aiwithapex.mintlify.app/concepts/usage-tracking).
+- [Models](https://aiwithapex.mintlify.app/concepts/models), [model failover](https://aiwithapex.mintlify.app/concepts/model-failover), and [session pruning](https://aiwithapex.mintlify.app/concepts/session-pruning).
+- [Security](https://aiwithapex.mintlify.app/gateway/security) and [troubleshooting](https://aiwithapex.mintlify.app/channels/troubleshooting).
 
 ### Ops + packaging
-- [Control UI](https://docs.github.com/moshehbenavraham/crocbot/web) + [WebChat](https://docs.github.com/moshehbenavraham/crocbot/web/webchat) served directly from the Gateway.
-- [Tailscale Serve/Funnel](https://docs.github.com/moshehbenavraham/crocbot/gateway/tailscale) or [SSH tunnels](https://docs.github.com/moshehbenavraham/crocbot/gateway/remote) with token/password auth.
-- [Nix mode](https://docs.github.com/moshehbenavraham/crocbot/install/nix) for declarative config; [Docker](https://docs.github.com/moshehbenavraham/crocbot/install/docker)-based installs.
-- [Doctor](https://docs.github.com/moshehbenavraham/crocbot/gateway/doctor) migrations, [logging](https://docs.github.com/moshehbenavraham/crocbot/logging).
+- [Control UI](https://aiwithapex.mintlify.app/web) + [WebChat](https://aiwithapex.mintlify.app/web/webchat) served directly from the Gateway.
+- [Tailscale Serve/Funnel](https://aiwithapex.mintlify.app/gateway/tailscale) or [SSH tunnels](https://aiwithapex.mintlify.app/gateway/remote) with token/password auth.
+- [Nix mode](https://aiwithapex.mintlify.app/install/nix) for declarative config; [Docker](https://aiwithapex.mintlify.app/install/docker)-based installs.
+- [Doctor](https://aiwithapex.mintlify.app/gateway/doctor) migrations, [logging](https://aiwithapex.mintlify.app/logging).
 
 ## How it works (short)
 
@@ -172,9 +172,9 @@ Run `crocbot doctor` to surface risky/misconfigured DM policies.
 
 ## Key subsystems
 
-- **[Gateway WebSocket network](https://docs.github.com/moshehbenavraham/crocbot/concepts/architecture)** - single WS control plane for clients, tools, and events (plus ops: [Gateway runbook](https://docs.github.com/moshehbenavraham/crocbot/gateway)).
-- **[Tailscale exposure](https://docs.github.com/moshehbenavraham/crocbot/gateway/tailscale)** - Serve/Funnel for the Gateway dashboard + WS (remote access: [Remote](https://docs.github.com/moshehbenavraham/crocbot/gateway/remote)).
-- **[Browser control](https://docs.github.com/moshehbenavraham/crocbot/tools/browser)** - croc-managed Chrome/Chromium with CDP control.
+- **[Gateway WebSocket network](https://aiwithapex.mintlify.app/concepts/architecture)** - single WS control plane for clients, tools, and events (plus ops: [Gateway runbook](https://aiwithapex.mintlify.app/gateway)).
+- **[Tailscale exposure](https://aiwithapex.mintlify.app/gateway/tailscale)** - Serve/Funnel for the Gateway dashboard + WS (remote access: [Remote](https://aiwithapex.mintlify.app/gateway/remote)).
+- **[Browser control](https://aiwithapex.mintlify.app/tools/browser)** - croc-managed Chrome/Chromium with CDP control.
 
 ## Tailscale access (Gateway dashboard)
 
@@ -190,7 +190,7 @@ Notes:
 - Funnel refuses to start unless `gateway.auth.mode: "password"` is set.
 - Optional: `gateway.tailscale.resetOnExit` to undo Serve/Funnel on shutdown.
 
-Details: [Tailscale guide](https://docs.github.com/moshehbenavraham/crocbot/gateway/tailscale) · [Web surfaces](https://docs.github.com/moshehbenavraham/crocbot/web)
+Details: [Tailscale guide](https://aiwithapex.mintlify.app/gateway/tailscale) · [Web surfaces](https://aiwithapex.mintlify.app/web)
 
 ## Remote Gateway (Linux VPS)
 
@@ -198,7 +198,7 @@ Running the Gateway on a small Linux VPS is the recommended deployment. Clients 
 
 - **Gateway host** runs the exec tool and Telegram connection.
 
-Details: [Remote access](https://docs.github.com/moshehbenavraham/crocbot/gateway/remote) · [Security](https://docs.github.com/moshehbenavraham/crocbot/gateway/security)
+Details: [Remote access](https://aiwithapex.mintlify.app/gateway/remote) · [Security](https://aiwithapex.mintlify.app/gateway/security)
 
 ## Agent to Agent (sessions_* tools)
 
@@ -207,7 +207,7 @@ Details: [Remote access](https://docs.github.com/moshehbenavraham/crocbot/gatewa
 - `sessions_history` — fetch transcript logs for a session.
 - `sessions_send` — message another session; optional reply‑back ping‑pong + announce step (`REPLY_SKIP`, `ANNOUNCE_SKIP`).
 
-Details: [Session tools](https://docs.github.com/moshehbenavraham/crocbot/concepts/session-tool)
+Details: [Session tools](https://aiwithapex.mintlify.app/concepts/session-tool)
 
 ## Skills registry (CrocHub)
 
@@ -246,7 +246,7 @@ Minimal `~/.crocbot/crocbot.json` (model + defaults):
 }
 ```
 
-[Full configuration reference (all keys + examples).](https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration)
+[Full configuration reference (all keys + examples).](https://aiwithapex.mintlify.app/gateway/configuration)
 
 ## Security model (important)
 
@@ -254,9 +254,9 @@ Minimal `~/.crocbot/crocbot.json` (model + defaults):
 - **Group/channel safety:** set `agents.defaults.sandbox.mode: "non-main"` to run **non-main sessions** (groups) inside per-session Docker sandboxes; bash then runs in Docker for those sessions.
 - **Sandbox defaults:** allowlist `bash`, `process`, `read`, `write`, `edit`, `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`; denylist `browser`, `cron`, `gateway`.
 
-Details: [Security guide](https://docs.github.com/moshehbenavraham/crocbot/gateway/security) · [Docker + sandboxing](https://docs.github.com/moshehbenavraham/crocbot/install/docker) · [Sandbox config](https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration)
+Details: [Security guide](https://aiwithapex.mintlify.app/gateway/security) · [Docker + sandboxing](https://aiwithapex.mintlify.app/install/docker) · [Sandbox config](https://aiwithapex.mintlify.app/gateway/configuration)
 
-### [Telegram](https://docs.github.com/moshehbenavraham/crocbot/channels/telegram)
+### [Telegram](https://aiwithapex.mintlify.app/channels/telegram)
 
 - Set `TELEGRAM_BOT_TOKEN` or `channels.telegram.botToken` (env wins).
 - Optional: set `channels.telegram.groups` (with `channels.telegram.groups."*".requireMention`); when set, it is a group allowlist (include `"*"` to allow all). Also `channels.telegram.allowFrom` or `channels.telegram.webhookUrl` as needed.
@@ -271,7 +271,7 @@ Details: [Security guide](https://docs.github.com/moshehbenavraham/crocbot/gatew
 }
 ```
 
-### [WebChat](https://docs.github.com/moshehbenavraham/crocbot/web/webchat)
+### [WebChat](https://aiwithapex.mintlify.app/web/webchat)
 
 - Uses the Gateway WebSocket; no separate WebChat port/config.
 
@@ -289,63 +289,63 @@ Browser control (optional):
 ## Docs
 
 Use these when you’re past the onboarding flow and want the deeper reference.
-- [Start with the docs index for navigation and “what’s where.”](https://docs.github.com/moshehbenavraham/crocbot)
-- [Read the architecture overview for the gateway + protocol model.](https://docs.github.com/moshehbenavraham/crocbot/concepts/architecture)
-- [Use the full configuration reference when you need every key and example.](https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration)
-- [Run the Gateway by the book with the operational runbook.](https://docs.github.com/moshehbenavraham/crocbot/gateway)
-- [Learn how the Control UI/Web surfaces work and how to expose them safely.](https://docs.github.com/moshehbenavraham/crocbot/web)
-- [Understand remote access over SSH tunnels or tailnets.](https://docs.github.com/moshehbenavraham/crocbot/gateway/remote)
-- [Follow the onboarding wizard flow for a guided setup.](https://docs.github.com/moshehbenavraham/crocbot/start/wizard)
-- [Wire external triggers via the webhook surface.](https://docs.github.com/moshehbenavraham/crocbot/automation/webhook)
-- [Set up Gmail Pub/Sub triggers.](https://docs.github.com/moshehbenavraham/crocbot/automation/gmail-pubsub)
-- [Platform guides: Windows (WSL2)](https://docs.github.com/moshehbenavraham/crocbot/platforms/windows), [Linux](https://docs.github.com/moshehbenavraham/crocbot/platforms/linux)
-- [Debug common failures with the troubleshooting guide.](https://docs.github.com/moshehbenavraham/crocbot/channels/troubleshooting)
-- [Review security guidance before exposing anything.](https://docs.github.com/moshehbenavraham/crocbot/gateway/security)
+- [Start with the docs index for navigation and “what’s where.”](https://aiwithapex.mintlify.app)
+- [Read the architecture overview for the gateway + protocol model.](https://aiwithapex.mintlify.app/concepts/architecture)
+- [Use the full configuration reference when you need every key and example.](https://aiwithapex.mintlify.app/gateway/configuration)
+- [Run the Gateway by the book with the operational runbook.](https://aiwithapex.mintlify.app/gateway)
+- [Learn how the Control UI/Web surfaces work and how to expose them safely.](https://aiwithapex.mintlify.app/web)
+- [Understand remote access over SSH tunnels or tailnets.](https://aiwithapex.mintlify.app/gateway/remote)
+- [Follow the onboarding wizard flow for a guided setup.](https://aiwithapex.mintlify.app/start/wizard)
+- [Wire external triggers via the webhook surface.](https://aiwithapex.mintlify.app/automation/webhook)
+- [Set up Gmail Pub/Sub triggers.](https://aiwithapex.mintlify.app/automation/gmail-pubsub)
+- [Platform guides: Windows (WSL2)](https://aiwithapex.mintlify.app/platforms/windows), [Linux](https://aiwithapex.mintlify.app/platforms/linux)
+- [Debug common failures with the troubleshooting guide.](https://aiwithapex.mintlify.app/channels/troubleshooting)
+- [Review security guidance before exposing anything.](https://aiwithapex.mintlify.app/gateway/security)
 
 ## Advanced docs (discovery + control)
 
-- [Discovery + transports](https://docs.github.com/moshehbenavraham/crocbot/gateway/discovery)
-- [Bonjour/mDNS](https://docs.github.com/moshehbenavraham/crocbot/gateway/bonjour)
-- [Gateway pairing](https://docs.github.com/moshehbenavraham/crocbot/gateway/pairing)
-- [Remote gateway README](https://docs.github.com/moshehbenavraham/crocbot/gateway/remote-gateway-readme)
-- [Control UI](https://docs.github.com/moshehbenavraham/crocbot/web/control-ui)
-- [Dashboard](https://docs.github.com/moshehbenavraham/crocbot/web/dashboard)
+- [Discovery + transports](https://aiwithapex.mintlify.app/gateway/discovery)
+- [Bonjour/mDNS](https://aiwithapex.mintlify.app/gateway/bonjour)
+- [Gateway pairing](https://aiwithapex.mintlify.app/gateway/pairing)
+- [Remote gateway README](https://aiwithapex.mintlify.app/gateway/remote-gateway-readme)
+- [Control UI](https://aiwithapex.mintlify.app/web/control-ui)
+- [Dashboard](https://aiwithapex.mintlify.app/web/dashboard)
 
 ## Operations & troubleshooting
 
-- [Health checks](https://docs.github.com/moshehbenavraham/crocbot/gateway/health)
-- [Gateway lock](https://docs.github.com/moshehbenavraham/crocbot/gateway/gateway-lock)
-- [Background process](https://docs.github.com/moshehbenavraham/crocbot/gateway/background-process)
-- [Browser troubleshooting (Linux)](https://docs.github.com/moshehbenavraham/crocbot/tools/browser-linux-troubleshooting)
-- [Logging](https://docs.github.com/moshehbenavraham/crocbot/logging)
+- [Health checks](https://aiwithapex.mintlify.app/gateway/health)
+- [Gateway lock](https://aiwithapex.mintlify.app/gateway/gateway-lock)
+- [Background process](https://aiwithapex.mintlify.app/gateway/background-process)
+- [Browser troubleshooting (Linux)](https://aiwithapex.mintlify.app/tools/browser-linux-troubleshooting)
+- [Logging](https://aiwithapex.mintlify.app/logging)
 
 ## Deep dives
 
-- [Agent loop](https://docs.github.com/moshehbenavraham/crocbot/concepts/agent-loop)
-- [Presence](https://docs.github.com/moshehbenavraham/crocbot/concepts/presence)
-- [TypeBox schemas](https://docs.github.com/moshehbenavraham/crocbot/concepts/typebox)
-- [RPC adapters](https://docs.github.com/moshehbenavraham/crocbot/reference/rpc)
-- [Queue](https://docs.github.com/moshehbenavraham/crocbot/concepts/queue)
+- [Agent loop](https://aiwithapex.mintlify.app/concepts/agent-loop)
+- [Presence](https://aiwithapex.mintlify.app/concepts/presence)
+- [TypeBox schemas](https://aiwithapex.mintlify.app/concepts/typebox)
+- [RPC adapters](https://aiwithapex.mintlify.app/reference/rpc)
+- [Queue](https://aiwithapex.mintlify.app/concepts/queue)
 
 ## Workspace & skills
 
-- [Skills config](https://docs.github.com/moshehbenavraham/crocbot/tools/skills-config)
-- [Default AGENTS](https://docs.github.com/moshehbenavraham/crocbot/reference/AGENTS.default)
-- [Templates: AGENTS](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/AGENTS)
-- [Templates: BOOTSTRAP](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/BOOTSTRAP)
-- [Templates: IDENTITY](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/IDENTITY)
-- [Templates: SOUL](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/SOUL)
-- [Templates: TOOLS](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/TOOLS)
-- [Templates: USER](https://docs.github.com/moshehbenavraham/crocbot/reference/templates/USER)
+- [Skills config](https://aiwithapex.mintlify.app/tools/skills-config)
+- [Default AGENTS](https://aiwithapex.mintlify.app/reference/AGENTS.default)
+- [Templates: AGENTS](https://aiwithapex.mintlify.app/reference/templates/AGENTS)
+- [Templates: BOOTSTRAP](https://aiwithapex.mintlify.app/reference/templates/BOOTSTRAP)
+- [Templates: IDENTITY](https://aiwithapex.mintlify.app/reference/templates/IDENTITY)
+- [Templates: SOUL](https://aiwithapex.mintlify.app/reference/templates/SOUL)
+- [Templates: TOOLS](https://aiwithapex.mintlify.app/reference/templates/TOOLS)
+- [Templates: USER](https://aiwithapex.mintlify.app/reference/templates/USER)
 
 ## Platform guides
 
-- [Windows (WSL2)](https://docs.github.com/moshehbenavraham/crocbot/platforms/windows)
-- [Linux](https://docs.github.com/moshehbenavraham/crocbot/platforms/linux)
+- [Windows (WSL2)](https://aiwithapex.mintlify.app/platforms/windows)
+- [Linux](https://aiwithapex.mintlify.app/platforms/linux)
 
 ## Email hooks (Gmail)
 
-- [docs.github.com/moshehbenavraham/crocbot/gmail-pubsub](https://docs.github.com/moshehbenavraham/crocbot/automation/gmail-pubsub)
+- [aiwithapex.mintlify.app/gmail-pubsub](https://aiwithapex.mintlify.app/automation/gmail-pubsub)
 
 ## Croc
 

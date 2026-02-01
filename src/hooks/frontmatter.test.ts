@@ -233,7 +233,7 @@ describe("resolvecrocbotMetadata", () => {
     const content = `---
 name: session-memory
 description: "Save session context to memory when /new command is issued"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#session-memory
+homepage: https://aiwithapex.mintlify.app/hooks#session-memory
 metadata:
   {
     "crocbot":

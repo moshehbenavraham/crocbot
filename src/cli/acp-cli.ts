@@ -22,7 +22,7 @@ export function registerAcpCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/acp", "docs.github.com/moshehbenavraham/crocbot/cli/acp")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/acp", "aiwithapex.mintlify.app/cli/acp")}\n`,
     )
     .action((opts) => {
       try {

@@ -85,7 +85,7 @@ Details:
   Source: crocbot-bundled
   Path: /path/to/crocbot/hooks/bundled/session-memory/HOOK.md
   Handler: /path/to/crocbot/hooks/bundled/session-memory/handler.ts
-  Homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#session-memory
+  Homepage: https://aiwithapex.mintlify.app/hooks#session-memory
   Events: command:new
 
 Requirements:

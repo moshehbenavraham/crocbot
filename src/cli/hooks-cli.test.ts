@@ -16,7 +16,7 @@ const report: HookStatusReport = {
       handlerPath: "/tmp/hooks/session-memory/handler.js",
       hookKey: "session-memory",
       emoji: "💾",
-      homepage: "https://docs.github.com/moshehbenavraham/crocbot/hooks#session-memory",
+      homepage: "https://aiwithapex.mintlify.app/hooks#session-memory",
       events: ["command:new"],
       always: false,
       disabled: false,

@@ -1,7 +1,7 @@
 ---
 name: soul-evil
 description: "Swap SOUL.md with SOUL_EVIL.md during a purge window or by random chance"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks/soul-evil
+homepage: https://aiwithapex.mintlify.app/hooks/soul-evil
 metadata:
   {
     "crocbot":

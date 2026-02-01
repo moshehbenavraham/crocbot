@@ -138,7 +138,7 @@ export async function applyAuthChoiceOpenAI(
       spin.stop("OpenAI OAuth failed");
       params.runtime.error(String(err));
       await params.prompter.note(
-        "Trouble with OAuth? See https://docs.github.com/moshehbenavraham/crocbot/start/faq",
+        "Trouble with OAuth? See https://aiwithapex.mintlify.app/start/faq",
         "OAuth help",
       );
     }

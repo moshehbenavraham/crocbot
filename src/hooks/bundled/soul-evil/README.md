@@ -2,7 +2,7 @@
 
 Small persona swap hook for Crocbot.
 
-Docs: https://docs.github.com/moshehbenavraham/crocbot/hooks/soul-evil
+Docs: https://aiwithapex.mintlify.app/hooks/soul-evil
 
 ## Setup
 

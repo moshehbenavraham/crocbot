@@ -30,7 +30,7 @@ type SandboxExplainOptions = {
   json: boolean;
 };
 
-const SANDBOX_DOCS_URL = "https://docs.github.com/moshehbenavraham/crocbot/sandbox";
+const SANDBOX_DOCS_URL = "https://aiwithapex.mintlify.app/sandbox";
 
 function normalizeExplainSessionKey(params: {
   cfg: crocbotConfig;
@@ -307,9 +307,7 @@ export async function sandboxExplainCommand(
   lines.push(heading("Fix-it:"));
   for (const key of payload.fixIt) lines.push(`  - ${key}`);
   lines.push("");
-  lines.push(
-    `${key("Docs:")} ${formatDocsLink("/sandbox", "docs.github.com/moshehbenavraham/crocbot/sandbox")}`,
-  );
+  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "aiwithapex.mintlify.app/sandbox")}`);
 
   runtime.log(`${lines.join("\n")}\n`);
 }

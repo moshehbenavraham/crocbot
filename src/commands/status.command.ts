@@ -560,8 +560,8 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.github.com/moshehbenavraham/crocbot/faq");
-  runtime.log("Troubleshooting: https://docs.github.com/moshehbenavraham/crocbot/troubleshooting");
+  runtime.log("FAQ: https://aiwithapex.mintlify.app/faq");
+  runtime.log("Troubleshooting: https://aiwithapex.mintlify.app/troubleshooting");
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {

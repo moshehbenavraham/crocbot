@@ -1,7 +1,7 @@
 ---
 name: command-logger
 description: "Log all command events to a centralized audit file"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#command-logger
+homepage: https://aiwithapex.mintlify.app/hooks#command-logger
 metadata:
   {
     "crocbot":

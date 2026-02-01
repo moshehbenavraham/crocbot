@@ -68,7 +68,7 @@ export function registerSandboxCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/sandbox", "docs.github.com/moshehbenavraham/crocbot/cli/sandbox")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/sandbox", "aiwithapex.mintlify.app/cli/sandbox")}\n`,
     )
     .action(() => {
       sandbox.help({ error: true });

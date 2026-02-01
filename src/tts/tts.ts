@@ -26,6 +26,9 @@ import type {
   TtsModelOverrideConfig,
 } from "../config/types.tts.js";
 import { logVerbose } from "../globals.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
+
+const ttsLogger = createSubsystemLogger("tts");
 import { isVoiceCompatibleAudio } from "../media/audio.js";
 import { CONFIG_DIR, resolveUserPath } from "../utils.js";
 import { getApiKeyForModel, requireApiKey } from "../agents/model-auth.js";
@@ -1100,10 +1103,15 @@ export async function textToSpeech(params: {
   const overrideProvider = params.overrides?.provider;
   const provider = overrideProvider ?? userProvider;
   const providers = resolveTtsProviderOrder(provider);
+  ttsLogger.info("tts provider selected", {
+    provider,
+    source: overrideProvider ? "override" : "config",
+  });
 
   let lastError: string | undefined;
 
   for (const provider of providers) {
+    ttsLogger.debug("tts api call", { provider, textLength: params.text.length });
     const providerStart = Date.now();
     try {
       if (provider === "edge") {
@@ -1137,6 +1145,10 @@ export async function textToSpeech(params: {
           edgeResult = await attemptEdgeTts(edgeOutputFormat);
         } catch (err) {
           if (fallbackEdgeOutputFormat && fallbackEdgeOutputFormat !== edgeOutputFormat) {
+            ttsLogger.debug("tts fallback", {
+              from: edgeOutputFormat,
+              to: fallbackEdgeOutputFormat,
+            });
             logVerbose(
               `TTS: Edge output ${edgeOutputFormat} failed; retrying with ${fallbackEdgeOutputFormat}.`,
             );
@@ -1163,11 +1175,18 @@ export async function textToSpeech(params: {
 
         scheduleCleanup(tempDir);
         const voiceCompatible = isVoiceCompatibleAudio({ fileName: edgeResult.audioPath });
+        const latencyMs = Date.now() - providerStart;
+        ttsLogger.info("tts generated", {
+          provider: "edge",
+          latencyMs,
+          outputFormat: edgeResult.outputFormat,
+          voiceCompatible,
+        });
 
         return {
           success: true,
           audioPath: edgeResult.audioPath,
-          latencyMs: Date.now() - providerStart,
+          latencyMs,
           provider,
           outputFormat: edgeResult.outputFormat,
           voiceCompatible,
@@ -1218,6 +1237,13 @@ export async function textToSpeech(params: {
       }
 
       const latencyMs = Date.now() - providerStart;
+      const outputFormat = provider === "openai" ? output.openai : output.elevenlabs;
+      ttsLogger.info("tts generated", {
+        provider,
+        latencyMs,
+        outputFormat,
+        voiceCompatible: output.voiceCompatible,
+      });
 
       const tempDir = mkdtempSync(path.join(tmpdir(), "tts-"));
       const audioPath = path.join(tempDir, `voice-${Date.now()}${output.extension}`);
@@ -1229,15 +1255,17 @@ export async function textToSpeech(params: {
         audioPath,
         latencyMs,
         provider,
-        outputFormat: provider === "openai" ? output.openai : output.elevenlabs,
+        outputFormat,
         voiceCompatible: output.voiceCompatible,
       };
     } catch (err) {
       const error = err as Error;
       if (error.name === "AbortError") {
         lastError = `${provider}: request timed out`;
+        ttsLogger.warn("tts failed", { provider, error: "request timed out" });
       } else {
         lastError = `${provider}: ${error.message}`;
+        ttsLogger.warn("tts failed", { provider, error: error.message });
       }
     }
   }
@@ -1357,7 +1385,13 @@ export async function maybeApplyTtsToPayload(params: {
     prefsPath,
     sessionAuto: params.ttsAuto,
   });
-  if (autoMode === "off") return params.payload;
+  const textLength = (params.payload.text ?? "").length;
+  const hasMedia = Boolean(params.payload.mediaUrl || (params.payload.mediaUrls?.length ?? 0) > 0);
+  ttsLogger.debug("tts check", { autoMode, kind: params.kind, textLength, hasMedia });
+  if (autoMode === "off") {
+    ttsLogger.debug("tts skipped: disabled", { autoMode });
+    return params.payload;
+  }
 
   const text = params.payload.text ?? "";
   const directives = parseTtsDirectives(text, config.modelOverrides);
@@ -1378,16 +1412,40 @@ export async function maybeApplyTtsToPayload(params: {
           text: visibleText.length > 0 ? visibleText : undefined,
         };
 
-  if (autoMode === "tagged" && !directives.hasDirective) return nextPayload;
-  if (autoMode === "inbound" && params.inboundAudio !== true) return nextPayload;
+  if (autoMode === "tagged" && !directives.hasDirective) {
+    ttsLogger.debug("tts skipped: no tts tag");
+    return nextPayload;
+  }
+  if (autoMode === "inbound" && params.inboundAudio !== true) {
+    ttsLogger.debug("tts skipped: no inbound audio");
+    return nextPayload;
+  }
 
   const mode = config.mode ?? "final";
-  if (mode === "final" && params.kind && params.kind !== "final") return nextPayload;
+  if (mode === "final" && params.kind && params.kind !== "final") {
+    ttsLogger.debug("tts skipped: not final", { kind: params.kind });
+    return nextPayload;
+  }
 
-  if (!ttsText.trim()) return nextPayload;
-  if (params.payload.mediaUrl || (params.payload.mediaUrls?.length ?? 0) > 0) return nextPayload;
-  if (text.includes("MEDIA:")) return nextPayload;
-  if (ttsText.trim().length < 10) return nextPayload;
+  if (!ttsText.trim()) {
+    ttsLogger.debug("tts skipped: empty text");
+    return nextPayload;
+  }
+  if (params.payload.mediaUrl || (params.payload.mediaUrls?.length ?? 0) > 0) {
+    ttsLogger.debug("tts skipped: has media");
+    return nextPayload;
+  }
+  if (text.includes("MEDIA:")) {
+    ttsLogger.debug("tts skipped: has media");
+    return nextPayload;
+  }
+  if (ttsText.trim().length < 10) {
+    ttsLogger.debug("tts skipped: text too short", {
+      length: ttsText.trim().length,
+      minLength: 10,
+    });
+    return nextPayload;
+  }
 
   const maxLength = getTtsMaxLength(prefsPath);
   let textForAudio = ttsText.trim();
@@ -1402,6 +1460,10 @@ export async function maybeApplyTtsToPayload(params: {
       textForAudio = `${textForAudio.slice(0, maxLength - 3)}...`;
     } else {
       // Summarize text when enabled
+      ttsLogger.debug("tts summarizing", {
+        inputLength: textForAudio.length,
+        targetLength: maxLength,
+      });
       try {
         const summary = await summarizeText({
           text: textForAudio,
@@ -1436,6 +1498,7 @@ export async function maybeApplyTtsToPayload(params: {
   });
 
   if (result.success && result.audioPath) {
+    ttsLogger.info("tts applied", { provider: result.provider, outputFormat: result.outputFormat });
     lastTtsAttempt = {
       timestamp: Date.now(),
       success: true,
@@ -1464,6 +1527,7 @@ export async function maybeApplyTtsToPayload(params: {
   };
 
   const latency = Date.now() - ttsStart;
+  ttsLogger.warn("tts failed in maybeApply", { error: result.error ?? "unknown" });
   logVerbose(`TTS: conversion failed after ${latency}ms (${result.error ?? "unknown"}).`);
   return nextPayload;
 }

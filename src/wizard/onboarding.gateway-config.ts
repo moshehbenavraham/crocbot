@@ -147,8 +147,8 @@ export async function configureGatewayForOnboarding(
     await prompter.note(
       [
         "Docs:",
-        "https://docs.github.com/moshehbenavraham/crocbot/gateway/tailscale",
-        "https://docs.github.com/moshehbenavraham/crocbot/web",
+        "https://aiwithapex.mintlify.app/gateway/tailscale",
+        "https://aiwithapex.mintlify.app/web",
       ].join("\n"),
       "Tailscale",
     );

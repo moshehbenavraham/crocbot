@@ -181,8 +181,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     authedUrl,
     "Docs:",
-    "https://docs.github.com/moshehbenavraham/crocbot/gateway/remote",
-    "https://docs.github.com/moshehbenavraham/crocbot/web/control-ui",
+    "https://aiwithapex.mintlify.app/gateway/remote",
+    "https://aiwithapex.mintlify.app/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

@@ -323,6 +323,6 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
 
   defaultRuntime.log(`${label("Troubles:")} run ${formatCliCommand("crocbot status")}`);
   defaultRuntime.log(
-    `${label("Troubleshooting:")} https://docs.github.com/moshehbenavraham/crocbot/troubleshooting`,
+    `${label("Troubleshooting:")} https://aiwithapex.mintlify.app/troubleshooting`,
   );
 }

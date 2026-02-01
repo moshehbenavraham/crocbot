@@ -23,7 +23,7 @@ export function registerSystemCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/system", "docs.github.com/moshehbenavraham/crocbot/cli/system")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/system", "aiwithapex.mintlify.app/cli/system")}\n`,
     );
 
   addGatewayClientOptions(

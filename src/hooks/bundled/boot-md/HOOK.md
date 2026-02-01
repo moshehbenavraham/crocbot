@@ -1,7 +1,7 @@
 ---
 name: boot-md
 description: "Run BOOT.md on gateway startup"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#boot-md
+homepage: https://aiwithapex.mintlify.app/hooks#boot-md
 metadata:
   {
     "crocbot":

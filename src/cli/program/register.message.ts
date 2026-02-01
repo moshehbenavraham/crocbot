@@ -45,7 +45,7 @@ ${formatHelpExamples([
   ],
 ])}
 
-${theme.muted("Docs:")} ${formatDocsLink("/cli/message", "docs.github.com/moshehbenavraham/crocbot/cli/message")}`,
+${theme.muted("Docs:")} ${formatDocsLink("/cli/message", "aiwithapex.mintlify.app/cli/message")}`,
     )
     .action(() => {
       message.help({ error: true });

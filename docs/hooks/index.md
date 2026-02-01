@@ -124,7 +124,7 @@ The `HOOK.md` file contains metadata in YAML frontmatter plus Markdown documenta
 ---
 name: my-hook
 description: "Short description of what this hook does"
-homepage: https://docs.github.com/moshehbenavraham/crocbot/hooks#my-hook
+homepage: https://aiwithapex.mintlify.app/hooks#my-hook
 metadata: {"crocbot":{"emoji":"🔗","events":["command:new"],"requires":{"bins":["node"]}}}
 ---
 

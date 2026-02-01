@@ -59,10 +59,10 @@ You can also set `CROCBOT_VERBOSE=1` instead of the flag.
 - [Gateway troubleshooting](/gateway/troubleshooting)
 - [Control UI](/web/control-ui#insecure-http)
 
-### `docs.github.com/moshehbenavraham/crocbot` shows an SSL error (Comcast/Xfinity)
+### `aiwithapex.mintlify.app` shows an SSL error (Comcast/Xfinity)
 
-Some Comcast/Xfinity connections block `docs.github.com/moshehbenavraham/crocbot` via Xfinity Advanced Security.
-Disable Advanced Security or add `docs.github.com/moshehbenavraham/crocbot` to the allowlist, then retry.
+Some Comcast/Xfinity connections block `aiwithapex.mintlify.app` via Xfinity Advanced Security.
+Disable Advanced Security or add `aiwithapex.mintlify.app` to the allowlist, then retry.
 
 - Xfinity Advanced Security help: https://www.xfinity.com/support/articles/using-xfinity-xfi-advanced-security
 - Quick sanity checks: try a mobile hotspot or VPN to confirm it’s ISP-level filtering

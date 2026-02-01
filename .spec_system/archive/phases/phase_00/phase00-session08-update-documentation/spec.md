@@ -77,11 +77,11 @@ Pure documentation update session - no code changes. All modifications are to Ma
 
 ### Design Patterns
 - **Mintlify conventions**: Root-relative links without .md extensions (e.g., `/channels/telegram`)
-- **GitHub README links**: Full absolute URLs (e.g., `https://docs.github.com/moshehbenavraham/crocbot/...`)
+- **GitHub README links**: Full absolute URLs (e.g., `https://aiwithapex.mintlify.app/...`)
 
 ### Technology Stack
 - Markdown documentation
-- Mintlify docs hosting (docs.github.com/moshehbenavraham/crocbot)
+- Mintlify docs hosting (aiwithapex.mintlify.app)
 - docs.json for navigation structure
 
 ---

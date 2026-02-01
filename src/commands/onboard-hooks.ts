@@ -15,7 +15,7 @@ export async function setupInternalHooks(
       "Hooks let you automate actions when agent commands are issued.",
       "Example: Save session context to memory when you issue /new.",
       "",
-      "Learn more: https://docs.github.com/moshehbenavraham/crocbot/hooks",
+      "Learn more: https://aiwithapex.mintlify.app/hooks",
     ].join("\n"),
     "Hooks",
   );

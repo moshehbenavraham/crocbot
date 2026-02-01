@@ -424,7 +424,7 @@ export function registerHooksCli(program: Command): void {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/hooks", "docs.github.com/moshehbenavraham/crocbot/cli/hooks")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/hooks", "aiwithapex.mintlify.app/cli/hooks")}\n`,
     );
 
   hooks

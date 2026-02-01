@@ -16,7 +16,7 @@ export function registerConfigureCommand(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/configure", "docs.github.com/moshehbenavraham/crocbot/cli/configure")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/configure", "aiwithapex.mintlify.app/cli/configure")}\n`,
     )
     .option(
       "--section <section>",

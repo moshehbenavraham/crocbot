@@ -5,7 +5,7 @@ import { formatDocsLink } from "../terminal/links.js";
 import { isRich, theme } from "../terminal/theme.js";
 import { formatCliCommand } from "../cli/command-format.js";
 
-const SEARCH_TOOL = "https://docs.github.com/moshehbenavraham/crocbot/mcp.Searchcrocbot";
+const SEARCH_TOOL = "https://aiwithapex.mintlify.app/mcp.Searchcrocbot";
 const SEARCH_TIMEOUT_MS = 30_000;
 const DEFAULT_SNIPPET_MAX = 220;
 
@@ -148,12 +148,12 @@ async function renderMarkdown(markdown: string, runtime: RuntimeEnv) {
 export async function docsSearchCommand(queryParts: string[], runtime: RuntimeEnv) {
   const query = queryParts.join(" ").trim();
   if (!query) {
-    const docs = formatDocsLink("/", "docs.github.com/moshehbenavraham/crocbot");
+    const docs = formatDocsLink("/", "aiwithapex.mintlify.app");
     if (isRich()) {
       runtime.log(`${theme.muted("Docs:")} ${docs}`);
       runtime.log(`${theme.muted("Search:")} ${formatCliCommand('crocbot docs "your query"')}`);
     } else {
-      runtime.log("Docs: https://docs.github.com/moshehbenavraham/crocbot/");
+      runtime.log("Docs: https://aiwithapex.mintlify.app/");
       runtime.log(`Search: ${formatCliCommand('crocbot docs "your query"')}`);
     }
     return;

@@ -481,7 +481,7 @@ Any response can include `"cached": true` if served from cache.
 {
   "error": "missing_brave_api_key",
   "message": "web_search needs a Brave Search API key. Run `crocbot configure --section web` to store it, or set BRAVE_API_KEY in the Gateway environment.",
-  "docs": "https://docs.github.com/moshehbenavraham/crocbot/tools/web"
+  "docs": "https://aiwithapex.mintlify.app/tools/web"
 }
 ```
 
@@ -489,7 +489,7 @@ Any response can include `"cached": true` if served from cache.
 {
   "error": "missing_perplexity_api_key",
   "message": "web_search (perplexity) needs an API key. Set PERPLEXITY_API_KEY or OPENROUTER_API_KEY in the Gateway environment, or configure tools.web.search.perplexity.apiKey.",
-  "docs": "https://docs.github.com/moshehbenavraham/crocbot/tools/web"
+  "docs": "https://aiwithapex.mintlify.app/tools/web"
 }
 ```
 
@@ -499,7 +499,7 @@ Any response can include `"cached": true` if served from cache.
 {
   "error": "invalid_freshness",
   "message": "freshness must be one of pd, pw, pm, py, or a range like YYYY-MM-DDtoYYYY-MM-DD.",
-  "docs": "https://docs.github.com/moshehbenavraham/crocbot/tools/web"
+  "docs": "https://aiwithapex.mintlify.app/tools/web"
 }
 ```
 
@@ -509,7 +509,7 @@ Any response can include `"cached": true` if served from cache.
 {
   "error": "unsupported_freshness",
   "message": "freshness is only supported by the Brave web_search provider.",
-  "docs": "https://docs.github.com/moshehbenavraham/crocbot/tools/web"
+  "docs": "https://aiwithapex.mintlify.app/tools/web"
 }
 ```
 
@@ -635,7 +635,7 @@ function missingSearchKeyPayload(provider: typeof SEARCH_PROVIDERS[number]) {
     return {
       error: "missing_newprovider_api_key",
       message: "web_search (newprovider) needs an API key. Set NEWPROVIDER_API_KEY or configure tools.web.search.newprovider.apiKey.",
-      docs: "https://docs.github.com/moshehbenavraham/crocbot/tools/web",
+      docs: "https://aiwithapex.mintlify.app/tools/web",
     };
   }
   // ... existing providers

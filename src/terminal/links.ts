@@ -1,6 +1,6 @@
 import { formatTerminalLink } from "../utils.js";
 
-export const DOCS_ROOT = "https://docs.github.com/moshehbenavraham/crocbot";
+export const DOCS_ROOT = "https://aiwithapex.mintlify.app";
 
 export function formatDocsLink(
   path: string,

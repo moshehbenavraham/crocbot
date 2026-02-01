@@ -18,7 +18,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [It is stuck on "wake up my friend" / onboarding will not hatch. What now?](#it-is-stuck-on-wake-up-my-friend-onboarding-will-not-hatch-what-now)
   - [Can I migrate my setup to a new machine (Mac mini) without redoing onboarding?](#can-i-migrate-my-setup-to-a-new-machine-mac-mini-without-redoing-onboarding)
   - [Where do I see what’s new in the latest version?](#where-do-i-see-whats-new-in-the-latest-version)
-  - [I can't access docs.github.com/moshehbenavraham/crocbot (SSL error). What now?](#i-cant-access-docscrocbot-ssl-error-what-now)
+  - [I can't access aiwithapex.mintlify.app (SSL error). What now?](#i-cant-access-docscrocbot-ssl-error-what-now)
   - [What’s the difference between stable and beta?](#whats-the-difference-between-stable-and-beta)
 - [How do I install the beta version, and what’s the difference between beta and dev?](#how-do-i-install-the-beta-version-and-whats-the-difference-between-beta-and-dev)
   - [How do I try the latest bits?](#how-do-i-try-the-latest-bits)
@@ -408,8 +408,8 @@ section is the latest shipped version. Entries are grouped by **Highlights**, **
 
 ### I cant access docscrocbot SSL error What now
 
-Some Comcast/Xfinity connections incorrectly block `docs.github.com/moshehbenavraham/crocbot` via Xfinity
-Advanced Security. Disable it or allowlist `docs.github.com/moshehbenavraham/crocbot`, then retry. More
+Some Comcast/Xfinity connections incorrectly block `aiwithapex.mintlify.app` via Xfinity
+Advanced Security. Disable it or allowlist `aiwithapex.mintlify.app`, then retry. More
 detail: [Troubleshooting](/help/troubleshooting#docscrocbot-shows-an-ssl-error-comcastxfinity).
 Please help us unblock it by reporting here: https://spa.xfinity.com/check_url_status.
 

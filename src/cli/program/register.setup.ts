@@ -14,7 +14,7 @@ export function registerSetupCommand(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/setup", "docs.github.com/moshehbenavraham/crocbot/cli/setup")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/setup", "aiwithapex.mintlify.app/cli/setup")}\n`,
     )
     .option(
       "--workspace <dir>",

@@ -31,7 +31,7 @@ export function registerBrowserCli(program: Command) {
           true,
         )}\n\n${theme.muted("Docs:")} ${formatDocsLink(
           "/cli/browser",
-          "docs.github.com/moshehbenavraham/crocbot/cli/browser",
+          "aiwithapex.mintlify.app/cli/browser",
         )}\n`,
     )
     .action(() => {

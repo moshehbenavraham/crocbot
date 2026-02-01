@@ -70,7 +70,7 @@ async function requireRiskAcknowledgement(params: {
       "crocbot security audit --deep",
       "crocbot security audit --fix",
       "",
-      "Must read: https://docs.github.com/moshehbenavraham/crocbot/gateway/security",
+      "Must read: https://aiwithapex.mintlify.app/gateway/security",
     ].join("\n"),
     "Security",
   );
@@ -103,7 +103,7 @@ export async function runOnboardingWizard(
         [
           ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
           "",
-          "Docs: https://docs.github.com/moshehbenavraham/crocbot/gateway/configuration",
+          "Docs: https://aiwithapex.mintlify.app/gateway/configuration",
         ].join("\n"),
         "Config issues",
       );

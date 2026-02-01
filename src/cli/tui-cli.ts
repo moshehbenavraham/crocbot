@@ -21,7 +21,7 @@ export function registerTuiCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/tui", "docs.github.com/moshehbenavraham/crocbot/cli/tui")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/tui", "aiwithapex.mintlify.app/cli/tui")}\n`,
     )
     .action(async (opts) => {
       try {

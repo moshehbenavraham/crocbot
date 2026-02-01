@@ -16,7 +16,7 @@ export function registerCronCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/cron", "docs.github.com/moshehbenavraham/crocbot/cli/cron")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/cron", "aiwithapex.mintlify.app/cli/cron")}\n`,
     );
 
   registerCronStatusCommand(cron);

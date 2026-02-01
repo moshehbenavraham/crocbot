@@ -36,7 +36,7 @@ stay consistent across channels.
 Input Markdown:
 
 ```markdown
-Hello **world** — see [docs](https://docs.github.com/moshehbenavraham/crocbot).
+Hello **world** — see [docs](https://aiwithapex.mintlify.app).
 ```
 
 IR (schematic):
@@ -48,7 +48,7 @@ IR (schematic):
     { "start": 6, "end": 11, "style": "bold" }
   ],
   "links": [
-    { "start": 19, "end": 23, "href": "https://docs.github.com/moshehbenavraham/crocbot" }
+    { "start": 19, "end": 23, "href": "https://aiwithapex.mintlify.app" }
   ]
 }
 ```

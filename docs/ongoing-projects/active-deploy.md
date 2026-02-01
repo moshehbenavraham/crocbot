@@ -441,6 +441,74 @@ Defined in `src/infra/dotenv.ts`.
 
 ---
 
+## Session 12: TTS API Key Fix (2026-02-01)
+
+### Problem
+TTS configured for ElevenLabs but no API key was set, causing silent fallback to Edge TTS.
+
+### Investigation
+Traced voice note generation flow:
+- Entry: `maybeApplyTtsToPayload()` in `src/tts/tts.ts:1345`
+- Provider selection: `getTtsProvider()` → checks prefs then config
+- API key resolution: `resolveTtsApiKey()` at line 476 checks `config.elevenlabs.apiKey` → `ELEVENLABS_API_KEY` → `XI_API_KEY`
+
+### Fix Applied
+Added ElevenLabs API key to `~/.crocbot/crocbot.json`:
+
+```json
+"messages": {
+  "tts": {
+    "auto": "always",
+    "provider": "elevenlabs",
+    "elevenlabs": {
+      "apiKey": "sk_89c36ce3...",
+      "voiceId": "ZD29qZCdYhhdqzBLRKNH"
+    }
+  }
+}
+```
+
+User prefs at `~/.crocbot/settings/tts.json` already correct:
+```json
+{"tts": {"provider": "elevenlabs", "auto": "always"}}
+```
+
+### TTS Flow Summary
+```
+Telegram message → dispatch-from-config.ts
+  → maybeApplyTtsToPayload()
+  → resolveTtsAutoMode() returns "always"
+  → getTtsProvider() returns "elevenlabs"
+  → resolveTtsApiKey() returns API key
+  → elevenLabsTTS() generates Opus 48kHz
+  → Telegram sends as voice bubble
+```
+
+---
+
+## Session 13: TTS Logging & Documentation URLs (2026-02-01)
+
+### TTS Logging Added
+Added structured logging to `src/tts/tts.ts` using `createSubsystemLogger("tts")`:
+
+| Function | Log Points |
+|----------|------------|
+| `textToSpeech` | provider selected, api call, fallback, generated, failed |
+| `maybeApplyTtsToPayload` | check, skipped (various reasons), summarizing, applied, failed |
+
+### Mintlify Documentation Setup
+Added to `.env` and `.env.example`:
+- `MINTLIFY_API_KEY`
+- `MINTLIFY_PROJECT_ID`
+
+### Documentation URL Fix
+Fixed 82 files with bogus `docs.github.com/moshehbenavraham/crocbot` URLs:
+- Replaced with `aiwithapex.mintlify.app`
+- Updated `docs/CNAME`
+- Verified all 93 unique URLs return 200
+
+---
+
 ## TODO
 
 - [x] Fix skills probing (added `skills.allowBundled` config)
@@ -451,6 +519,9 @@ Defined in `src/infra/dotenv.ts`.
 - [x] Restore TTS functionality
 - [x] Configure TTS voice (ElevenLabs `ZD29qZCdYhhdqzBLRKNH`)
 - [x] Clean up `.env` and `.env.example` with proper sections
+- [x] Add ElevenLabs API key to TTS config
+- [x] Add TTS structured logging
+- [x] Fix documentation URLs (Mintlify)
 - [ ] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`
