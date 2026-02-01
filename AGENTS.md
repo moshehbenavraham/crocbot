@@ -2,12 +2,22 @@
 
 **CLAUDE.md and GEMINI.md are symlinks to this file (AGENTS.md)**
 
-> **Active Deployment**: `.env` contains paths, credentials, and config for the current crocbot instance (state dir, workspace, API keys, Telegram bot, gateway).
+> **Active Deployment**: The project `.env` defines three paths:
+> - `CROCBOT_STATE_DIR` — runtime state: `crocbot.json` (main config), `credentials/`, `identity/`, `logs/`, `media/`, `memory/`, `settings/`, `telegram/`, `cron/`
+> - `CROCBOT_CONFIG_PATH` — main config file (auth, channels, skills, plugins)
+> - `CROCBOT_WORKSPACE` — agent working directory: `AGENTS.md`, `SOUL.md`, `USER.md`, `MEMORY.md`, `TOOLS.md`, `memory/`, `hooks/`, `canvas/`
+>
+> **API Keys & Secrets**: Read `.env` in this repo — it contains credentials and paths to external config. Do NOT grep the codebase for credentials.
 
 ## Project Snapshot
+- crocbot is a strip-down, sipmlification and customization of OpenClaw (details in "Source Project" below) specifically for only two interaction channels with crocobt (CLI & Telegram) and primary deployment is Coolify on a remote server
 - crocbot is a Telegram-first personal AI assistant and gateway CLI (`crocbot` binary).
 - Chat channels: Telegram only (`src/channels/registry.ts`). Other channels and native apps were removed during the strip-down.
 - Plugin runtime remains (`src/plugins`, `src/plugin-sdk`); there are no bundled `extensions/`.
+
+## Source Project
+- Upstream: `openclaw/openclaw` (https://github.com/openclaw/openclaw)
+- Local copy saved (.gitignored) in: `.001_ORIGINAL/` 
 
 ## Codebase Map
 - Core TypeScript: `src/` (CLI in `src/cli`, commands in `src/commands`, gateway in `src/gateway`, extensions in `extension/`, and Telegram in `src/telegram`).

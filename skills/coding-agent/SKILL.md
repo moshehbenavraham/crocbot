@@ -1,12 +1,19 @@
 ---
 name: coding-agent
-description: Run Codex CLI, Claude Code, OpenCode, or Pi Coding Agent via background process for programmatic control.
+description: Run Claude Code (preferred), Codex CLI, OpenCode, or Pi Coding Agent via background process for programmatic control.
 metadata: {"crocbot":{"emoji":"🧩","requires":{"anyBins":["claude","codex","opencode","pi"]}}}
 ---
 
 # Coding Agent (bash-first)
 
 Use **bash** (with optional background mode) for all coding agent work. Simple and effective.
+
+## 🎯 Preferred Tool: Claude Code
+
+**Always use Claude Code (`claude`) as the primary coding agent** unless the user specifically requests a different tool. Claude Code is the default because:
+- It's already authenticated and configured
+- No git repo requirement (unlike Codex)
+- Best integration with this system
 
 ## ⚠️ PTY Mode Required!
 
@@ -50,17 +57,17 @@ bash command:"codex exec 'Your prompt'"
 
 ## Quick Start: One-Shot Tasks
 
-For quick prompts/chats, create a temp git repo and run:
+For quick prompts/chats, use Claude Code:
 
 ```bash
-# Quick chat (Codex needs a git repo!)
-SCRATCH=$(mktemp -d) && cd $SCRATCH && git init && codex exec "Your prompt here"
+# Quick task with Claude Code (preferred!) - with PTY!
+bash pty:true workdir:~/Projects/myproject command:"claude 'Add error handling to the API calls'"
 
-# Or in a real project - with PTY!
-bash pty:true workdir:~/Projects/myproject command:"codex exec 'Add error handling to the API calls'"
+# Background mode for longer tasks
+bash pty:true workdir:~/project background:true command:"claude 'Build a dark mode toggle'"
 ```
 
-**Why git init?** Codex refuses to run outside a trusted git directory. Creating a temp repo solves this for scratch work.
+**Note:** If using Codex instead, it requires a git repository (use `git init` for scratch work).
 
 ---
 
@@ -90,6 +97,30 @@ process action:kill sessionId:XXX
 ```
 
 **Why workdir matters:** Agent wakes up in a focused directory, doesn't wander off reading unrelated files (like your soul.md 😅).
+
+---
+
+## Claude Code (Default)
+
+Claude Code is the **preferred** coding agent. Use it unless user requests otherwise.
+
+```bash
+# One-shot task (with PTY!)
+bash pty:true workdir:~/project command:"claude 'Your task'"
+
+# Background for longer work
+bash pty:true workdir:~/project background:true command:"claude 'Refactor the auth module'"
+
+# Print mode (non-interactive, just outputs plan)
+bash pty:true workdir:~/project command:"claude -p 'Explain how the routing works'"
+```
+
+**Flags:**
+| Flag | Effect |
+|------|--------|
+| `-p, --print` | Print response without interactive mode |
+| `--dangerously-skip-permissions` | Skip all permission prompts (use carefully) |
+| `--allowedTools` | Restrict which tools Claude can use |
 
 ---
 
@@ -146,18 +177,6 @@ process action:list
 
 # Post results to GitHub
 gh pr comment <PR#> --body "<review content>"
-```
-
----
-
-## Claude Code
-
-```bash
-# With PTY for proper terminal output
-bash pty:true workdir:~/project command:"claude 'Your task'"
-
-# Background
-bash pty:true workdir:~/project background:true command:"claude 'Your task'"
 ```
 
 ---
