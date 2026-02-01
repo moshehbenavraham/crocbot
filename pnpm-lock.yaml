@@ -109,6 +109,9 @@ importers:
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      node-edge-tts:
+        specifier: ^1.2.9
+        version: 1.2.9
       osc-progress:
         specifier: ^0.3.0
         version: 0.3.0
@@ -3589,6 +3592,10 @@ packages:
     engines: {node: '>=10.5.0'}
     deprecated: Use your platform's native DOMException instead
 
+  node-edge-tts@1.2.9:
+    resolution: {integrity: sha512-fvfW1dUgJdZAdTniC6MzLTMwnNUFKGKaUdRJ1OsveOYlfnPUETBU973CG89565txvbBowCQ4Czdeu3qSX8bNOg==}
+    hasBin: true
+
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
     engines: {node: 4.x || >=6.0.0}
@@ -4149,6 +4156,7 @@ packages:
   tar@7.5.4:
     resolution: {integrity: sha512-AN04xbWGrSTDmVwlI4/GTlIIwMFk/XEv7uL8aa57zuvRy6s4hdBed+lVq2fAZ89XDa7Us3ANXcE3Tvqvja1kTA==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tdigest@0.1.2:
     resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
@@ -8364,6 +8372,16 @@ snapshots:
     optional: true
 
   node-domexception@1.0.0: {}
+
+  node-edge-tts@1.2.9:
+    dependencies:
+      https-proxy-agent: 7.0.6
+      ws: 8.19.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
 
   node-fetch@2.7.0:
     dependencies:

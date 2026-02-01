@@ -40,14 +40,9 @@
 | Tailscale | Off |
 | Agent | `main` (default) |
 
-### Agent Identity
+### Agent Identity, Soul, etc Set in Markdown files
 
-| Field | Value |
-|-------|-------|
-| Name | **Krox** |
-| Creature | Gunmetal crocodile, exposed circuitry, CRT eyes |
-| User | Max (Israel timezone) |
-| Emoji | 🐊 |
+/home/aiwithapex/croc/
 
 ### Hooks Enabled
 - `boot-md` - Load context on session start
@@ -320,13 +315,68 @@ pnpm build && systemctl --user restart crocbot-gateway
 
 ---
 
+## Session 9: TTS Restoration (2026-02-01)
+
+### Problem
+TTS (Text-to-Speech) functionality was not working. The entire TTS subsystem was deleted during a technical debt cleanup phase (commit `23a860ecb`).
+
+### Files Restored
+Restored from git history (commit `481bd333e`):
+
+| File | Description |
+|------|-------------|
+| `src/tts/tts.ts` | Core TTS module with Edge/OpenAI/ElevenLabs providers |
+| `src/auto-reply/reply/commands-tts.ts` | TTS command handler (/tts on/off/status/audio) |
+| `src/agents/tools/tts-tool.ts` | TTS agent tool for AI-invoked TTS |
+
+### Changes Made
+
+1. **Restored TTS module** - Updated imports from `ClawdbotConfig` to `crocbotConfig`
+2. **Restored command handler** - Wired into `commands-core.ts`
+3. **Restored auto-TTS** - Wired `maybeApplyTtsToPayload` into `dispatch-from-config.ts`
+4. **Installed dependency** - `pnpm add -w node-edge-tts`
+
+### Auto-TTS Modes
+
+| Mode | Behavior |
+|------|----------|
+| `off` | Disabled (default) |
+| `always` | All replies converted to speech |
+| `inbound` | Only when user sends audio/voice |
+| `tagged` | Only when reply includes `[[tts]]` tags |
+
+Enable via `/tts on` or config `messages.tts.auto: "always"`
+
+### TTS Providers Available
+
+| Provider | API Key Required | Config Path |
+|----------|------------------|-------------|
+| Edge (default) | No | `messages.tts.edge.enabled` |
+| OpenAI | Yes (`OPENAI_API_KEY`) | `messages.tts.openai.apiKey` |
+| ElevenLabs | Yes (`ELEVENLABS_API_KEY`) | `messages.tts.elevenlabs.apiKey` |
+
+### TTS Commands
+
+```
+/tts status   - Show current TTS settings
+/tts on       - Enable TTS for replies
+/tts off      - Disable TTS
+/tts provider - View/change provider
+/tts limit    - Set max text length
+/tts summary  - Toggle auto-summarization
+/tts audio    - Generate audio from text
+```
+
+---
+
 ## TODO
 
-- [x] Fix skills probing (added `skills.allowBundled` config) ✅
-- [x] Restore needed extensions ✅
-- [x] Enable memory-lancedb ✅
-- [x] Upgrade Node to >=22.12.0 ✅ (v22.22.0)
-- [x] Configure model fallbacks ✅
+- [x] Fix skills probing (added `skills.allowBundled` config)
+- [x] Restore needed extensions
+- [x] Enable memory-lancedb
+- [x] Upgrade Node to >=22.12.0 (v22.22.0)
+- [x] Configure model fallbacks
+- [x] Restore TTS functionality
 - [ ] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`
