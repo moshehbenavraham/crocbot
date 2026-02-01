@@ -31,11 +31,39 @@ Pronunciation + delivery rules
 - v3: SSML `<break>` not supported; use `[pause]`, `[short pause]`, `[long pause]`.
 - v2/v2.5: SSML `<break time="1.5s" />` supported; `<phoneme>` not exposed in `sag`.
 
-v3 audio tags (put at the entrance of a line)
-- `[whispers]`, `[shouts]`, `[sings]`
-- `[laughs]`, `[starts laughing]`, `[sighs]`, `[exhales]`
-- `[sarcastic]`, `[curious]`, `[excited]`, `[crying]`, `[mischievously]`
-- Example: `sag "[whispers] keep this quiet. [short pause] ok?"`
+## v3 Audio Tags
+
+Audio Tags are inline directives in square brackets `[]` that add emotional nuance, tone shifts, non-verbal sounds, and effects to generated speech. Place them anywhere in the text—before, after, or mid-sentence.
+
+**Syntax:**
+- Use lowercase for consistency (case-insensitive)
+- Combine tags like `[nervous][whispers]` for layered effects
+- Tags persist until overridden by a new tag or the segment ends
+- No explicit terminator like `[/tag]` exists
+- Punctuation like ellipses (…) or CAPS boosts emphasis alongside tags
+- Best results with prompts >250 characters
+
+**Tag Categories:**
+
+| Category | Examples |
+|----------|----------|
+| Emotions | `[happy]`, `[sad]`, `[angry]`, `[curious]`, `[sarcastic]`, `[excited]`, `[nervous]` |
+| Delivery | `[whispers]`, `[shouts]`, `[sings]`, `[strong French accent]` |
+| Non-verbal | `[laughs]`, `[sighs]`, `[clears throat]`, `[breathing heavily]`, `[exhales]` |
+| Pacing | `[pause]`, `[short pause]`, `[long pause]` |
+| Effects | `[gunshot]`, `[applause]`, `[explosion]` (experimental) |
+
+**Examples:**
+```bash
+sag "[whispers] This is secret... [excited] But it works!"
+sag "[nervous][whispers] I'm not sure about this. [pause] Ok, let's do it."
+sag "[sarcastic] Oh wow, that's SO impressive. [laughs]"
+```
+
+**Notes:**
+- Works best with Creative or Natural stability settings
+- Results vary by voice training data
+- v3 does NOT support SSML `<break>` tags; use `[pause]` instead
 
 Voice defaults
 - `ELEVENLABS_VOICE_ID` or `SAG_VOICE_ID`
@@ -44,11 +72,18 @@ Confirm voice + speaker before long output.
 
 ## Chat voice responses
 
-When Peter asks for a "voice" reply (e.g., "crazy scientist voice", "explain in voice"), generate audio and send it:
+> **NOTE: sag skill vs Auto-TTS**
+> This skill is for AGENT-INVOKED voice generation (when the AI explicitly runs `sag`).
+> This is SEPARATE from the built-in Auto-TTS system (`messages.tts.auto` in config).
+> - **sag skill**: AI explicitly generates voice via `sag` CLI command
+> - **Auto-TTS**: Automatic voice conversion of all replies (see `src/tts/tts.ts`)
+> Both should use the same voice ID for consistency.
+
+When the user asks for a "voice" reply (e.g., "crazy scientist voice", "explain in voice"), generate audio and send it:
 
 ```bash
-# Generate audio file
-sag -v Croc -o /tmp/voice-reply.mp3 "Your message here"
+# Generate audio file (use voice ID directly for consistency with auto-TTS)
+sag --voice-id ZD29qZCdYhhdqzBLRKNH -o /tmp/voice-reply.mp3 "Your message here"
 
 # Then include in reply:
 # MEDIA:/tmp/voice-reply.mp3
@@ -59,4 +94,5 @@ Voice character tips:
 - Calm: Use `[whispers]` or slower pacing
 - Dramatic: Use `[sings]` or `[shouts]` sparingly
 
-Default voice for Croc: `lj2rcrvANS3gaWWnczSX` (or just `-v Croc`)
+Default voice: `ZD29qZCdYhhdqzBLRKNH` ("Female Humanoid - Futuristic")
+https://elevenlabs.io/app/voice-library?voiceId=ZD29qZCdYhhdqzBLRKNH

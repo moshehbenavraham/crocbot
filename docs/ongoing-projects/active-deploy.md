@@ -7,7 +7,7 @@
 | OS | Ubuntu 24.04.3 LTS on WSL2 (kernel 6.6.87.2) |
 | Node.js | v22.22.0 |
 | pnpm | 10.23.0 |
-| Version | `2026.1.46` |
+| Version | `2026.1.50` |
 | Approach | From-source (not Docker) |
 
 ---
@@ -201,7 +201,7 @@ Node-based skills (bird, mcporter) may fail with "node: not found" if systemd se
 
 | Component | Status |
 |-----------|--------|
-| Version | `2026.1.47` |
+| Version | `2026.1.50` |
 | Gateway | Running on `ws://127.0.0.1:34219` |
 | Telegram | Connected as `@KroxTheBot` |
 | Model | `google-gemini-cli/gemini-3-flash-preview` (fallback: `openai-codex`) |
@@ -369,6 +369,49 @@ Enable via `/tts on` or config `messages.tts.auto: "always"`
 
 ---
 
+## Session 10: TTS Voice Configuration (2026-02-01)
+
+### Problem
+TTS voice notes were not using the configured ElevenLabs voice. Investigation revealed **two separate TTS systems**:
+
+| System | Purpose | Voice Config Location |
+|--------|---------|----------------------|
+| Auto-TTS | Automatic voice conversion of replies | `src/tts/tts.ts` / `messages.tts.elevenlabs.voiceId` |
+| sag skill | Agent-invoked TTS via `sag` CLI | `skills/sag/SKILL.md` |
+
+### Fix Applied
+
+1. **Updated default voice** in `src/tts/tts.ts`:
+   - Old: `pMsXgVXv3BLzUgSXRplE`
+   - New: `ZD29qZCdYhhdqzBLRKNH` ("Female Humanoid - Futuristic")
+
+2. **Added config** to `~/.crocbot/crocbot.json`:
+   ```json
+   "messages": {
+     "tts": {
+       "auto": "always",
+       "provider": "elevenlabs",
+       "elevenlabs": {
+         "voiceId": "ZD29qZCdYhhdqzBLRKNH"
+       }
+     }
+   }
+   ```
+
+3. **Updated sag skill** (`skills/sag/SKILL.md`):
+   - Changed default voice to match auto-TTS
+   - Added comprehensive v3 audio tags documentation
+   - Added note explaining sag skill vs auto-TTS difference
+
+4. **Added comments** to both locations explaining the distinction
+
+### Voice Reference
+- ID: `ZD29qZCdYhhdqzBLRKNH`
+- Name: "Female Humanoid - Futuristic"
+- URL: https://elevenlabs.io/app/voice-library?voiceId=ZD29qZCdYhhdqzBLRKNH
+
+---
+
 ## TODO
 
 - [x] Fix skills probing (added `skills.allowBundled` config)
@@ -377,6 +420,7 @@ Enable via `/tts on` or config `messages.tts.auto: "always"`
 - [x] Upgrade Node to >=22.12.0 (v22.22.0)
 - [x] Configure model fallbacks
 - [x] Restore TTS functionality
+- [x] Configure TTS voice (ElevenLabs `ZD29qZCdYhhdqzBLRKNH`)
 - [ ] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`

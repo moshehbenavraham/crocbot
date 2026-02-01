@@ -44,7 +44,16 @@ const DEFAULT_MAX_TEXT_LENGTH = 4096;
 const TEMP_FILE_CLEANUP_DELAY_MS = 5 * 60 * 1000; // 5 minutes
 
 const DEFAULT_ELEVENLABS_BASE_URL = "https://api.elevenlabs.io";
-const DEFAULT_ELEVENLABS_VOICE_ID = "pMsXgVXv3BLzUgSXRplE";
+// DEFAULT VOICE FOR AUTO-TTS (built-in TTS module)
+// This voice is used when `messages.tts.auto` is enabled (always/inbound/tagged).
+// The auto-TTS system automatically converts text replies to voice notes.
+//
+// NOTE: This is SEPARATE from the `sag` skill voice (see skills/sag/SKILL.md).
+// - Auto-TTS: Uses this default, configurable via `messages.tts.elevenlabs.voiceId`
+// - sag skill: Used when the AI explicitly invokes `sag` CLI for voice generation
+//
+// Voice: "Female Humanoid - Futuristic" - https://elevenlabs.io/app/voice-library?voiceId=ZD29qZCdYhhdqzBLRKNH
+const DEFAULT_ELEVENLABS_VOICE_ID = "ZD29qZCdYhhdqzBLRKNH";
 const DEFAULT_ELEVENLABS_MODEL_ID = "eleven_multilingual_v2";
 const DEFAULT_OPENAI_MODEL = "gpt-4o-mini-tts";
 const DEFAULT_OPENAI_VOICE = "alloy";
