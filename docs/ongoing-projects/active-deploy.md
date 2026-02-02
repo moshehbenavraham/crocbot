@@ -8,7 +8,7 @@
 
 | Component | Value |
 |-----------|-------|
-| Version | `2026.1.52` |
+| Version | `2026.1.54` |
 | Gateway | `ws://127.0.0.1:34219` |
 | Telegram | `@KroxTheBot` |
 | Primary Model | `google-gemini-cli/gemini-3-flash-preview` |
@@ -25,7 +25,7 @@
 | `gifgrep` | `/skill gifgrep cats` | — | ⬜ |
 | `github` | `/skill github` | — | ⬜ |
 | `goplaces` | `/skill goplaces coffee near me` | Google Places | ⬜ |
-| `himalaya` | `/skill himalaya` | — | ⬜ |
+| `himalaya` | `/skill himalaya` | Gmail App Password | ✅ |
 | `local-places` | `/skill local-places` | Google Places | ⬜ |
 | `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ⬜ |
 | `nano-pdf` | `/skill nano-pdf` | — | ⬜ |
@@ -37,26 +37,35 @@
 | `skill-creator` | `/skill skill-creator` | — | ⬜ |
 | `tmux` | `/skill tmux` | — | ⬜ |
 | `trello` | `/skill trello` | — | ⬜ |
-| `weather` | `/skill weather London` | — | ⬜ |
+| `weather` | `/skill weather Modiin Ilit` | — | ⬜ |
 
 ### Extensions
 
 | Extension | Tested |
 |-----------|--------|
 | `google-gemini-cli-auth` | ⬜ |
-| `lobster` | ⬜ |
+| `lobster` | ✅ |
 | `memory-lancedb` | ✅ |
 
 ---
 
 ## Session 15
 
-*Current session*
+- Configured himalaya (Gmail via App Password)
+- Added exec approvals for all skill binaries (`~/.crocbot/exec-approvals.json`)
+
+---
+
+## Session 16
+
+- Installed `lobster` CLI binary globally via `npm install -g @clawdbot/lobster` (v2026.1.24)
+- Binary available at `/home/aiwithapex/.local/bin/lobster`
 
 ---
 
 ## TODO
 
-- [ ] Install `lobster` binary
+- [x] Install `lobster` binary
 - [ ] Configure web search (Brave API key)
 - [ ] Run security audit: `crocbot security audit --deep`
+- [ ] Remove canvas system (unused - no Mac/iOS/Android node apps in this deployment)
