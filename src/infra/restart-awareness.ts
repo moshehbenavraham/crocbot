@@ -210,6 +210,13 @@ export async function handlePostRestartReport(opts: { defaultUserId?: string }):
     for (const proc of state.pendingProcesses.slice(0, 5)) {
       const cmd = truncateCommand(proc.command);
       message += `\n• \`${proc.id}\`: ${cmd}`;
+      // Include last output if available
+      if (proc.tail) {
+        const tailPreview = formatTailPreview(proc.tail);
+        if (tailPreview) {
+          message += `\n  └ Last output: \`${tailPreview}\``;
+        }
+      }
     }
     if (state.pendingProcesses.length > 5) {
       message += `\n• ... and ${state.pendingProcesses.length - 5} more`;
@@ -229,6 +236,13 @@ export async function handlePostRestartReport(opts: { defaultUserId?: string }):
         const cmd = truncateCommand(proc.command);
         const exitInfo = proc.exitCode != null ? ` (exit ${proc.exitCode})` : "";
         message += `\n${status} \`${proc.id}\`: ${cmd}${exitInfo}`;
+        // Include last output if available
+        if (proc.tail) {
+          const tailPreview = formatTailPreview(proc.tail);
+          if (tailPreview) {
+            message += `\n  └ Result: \`${tailPreview}\``;
+          }
+        }
       }
       if (unnotified.length > 3) {
         message += `\n• ... and ${unnotified.length - 3} more`;
@@ -259,6 +273,20 @@ function truncateCommand(cmd: string, maxLen = 50): string {
   const cleaned = cmd.replace(/\n/g, " ").trim();
   if (cleaned.length <= maxLen) return cleaned;
   return cleaned.slice(0, maxLen - 3) + "...";
+}
+
+/**
+ * Formats the tail output for display in the restart report.
+ * Extracts the last meaningful line and truncates for message display.
+ */
+function formatTailPreview(tail: string, maxLen = 80): string {
+  if (!tail) return "";
+  // Get the last non-empty line
+  const lines = tail.split("\n").filter((line) => line.trim());
+  if (lines.length === 0) return "";
+  const lastLine = lines[lines.length - 1].trim();
+  if (lastLine.length <= maxLen) return lastLine;
+  return lastLine.slice(0, maxLen - 3) + "...";
 }
 
 // Export for testing

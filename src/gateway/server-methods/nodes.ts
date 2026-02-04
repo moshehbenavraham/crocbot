@@ -16,7 +16,8 @@ export const nodesHandlers: GatewayRequestHandlers = {
     respond(false, undefined, FEATURE_DISABLED_ERROR);
   },
   "node.pair.list": async ({ respond }) => {
-    respond(true, { items: [] }, undefined);
+    // Return { pending: [], paired: [] } to match client expectations (format.ts, nodes-utils.ts)
+    respond(true, { pending: [], paired: [] }, undefined);
   },
   "node.pair.approve": async ({ respond }) => {
     respond(false, undefined, FEATURE_DISABLED_ERROR);
@@ -30,7 +31,8 @@ export const nodesHandlers: GatewayRequestHandlers = {
 
   // Device pairing methods
   "device.pair.list": async ({ respond }) => {
-    respond(true, { items: [] }, undefined);
+    // Return { pending: [], paired: [] } to match expected pairing list format
+    respond(true, { pending: [], paired: [] }, undefined);
   },
   "device.pair.approve": async ({ respond }) => {
     respond(false, undefined, FEATURE_DISABLED_ERROR);
@@ -50,7 +52,8 @@ export const nodesHandlers: GatewayRequestHandlers = {
     respond(false, undefined, FEATURE_DISABLED_ERROR);
   },
   "node.list": async ({ respond }) => {
-    respond(true, { items: [] }, undefined);
+    // Return { nodes: [] } to match client expectations (format.ts, nodes-utils.ts)
+    respond(true, { nodes: [] }, undefined);
   },
   "node.describe": async ({ respond }) => {
     respond(false, undefined, FEATURE_DISABLED_ERROR);

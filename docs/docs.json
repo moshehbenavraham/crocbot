@@ -1105,7 +1105,12 @@
           {
             "group": "Runbooks",
             "pages": [
-              "runbooks/incident-response"
+              "runbooks/incident-response",
+              "runbooks/startup-shutdown",
+              "runbooks/telegram-troubleshooting",
+              "runbooks/docker-operations",
+              "runbooks/log-analysis",
+              "runbooks/health-checks"
             ]
           }
         ]

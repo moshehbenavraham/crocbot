@@ -20,8 +20,14 @@
     "2": {
       "name": "Operational Maturity and Observability",
       "description": "Enhanced observability, monitoring, structured logging, and cleanup of remaining technical debt for sustained production operation",
-      "status": "in_progress",
+      "status": "complete",
       "session_count": 5
+    },
+    "3": {
+      "name": "Upstream Features Port",
+      "description": "Selectively port Telegram inline button model selection from upstream OpenClaw and document QMD vector memory architecture",
+      "status": "not_started",
+      "session_count": 3
     }
   },
   "completed_sessions": [
@@ -41,7 +47,8 @@
     "phase02-session01-structured-logging",
     "phase02-session02-metrics-monitoring",
     "phase02-session03-remaining-technical-debt",
-    "phase02-session04-error-reporting-alerting"
+    "phase02-session04-error-reporting-alerting",
+    "phase02-session05-operational-runbooks"
   ],
   "next_session_history": [
     {
@@ -467,6 +474,31 @@
     {
       "date": "2026-01-30",
       "session": "phase02-session04-error-reporting-alerting",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-04",
+      "session": "phase02-session05-operational-runbooks",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-04",
+      "session": "phase02-session05-operational-runbooks",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-04",
+      "session": "phase02-session05-operational-runbooks",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-04",
+      "session": "phase02-session05-operational-runbooks",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-04",
+      "session": "phase02-session05-operational-runbooks",
       "status": "completed"
     }
   ]
