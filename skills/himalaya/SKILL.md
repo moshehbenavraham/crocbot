@@ -215,3 +215,70 @@ RUST_LOG=trace RUST_BACKTRACE=1 himalaya envelope list
 - Message IDs are relative to the current folder; re-list after folder changes.
 - For composing rich emails with attachments, use MML syntax (see `references/message-composition.md`).
 - Store passwords securely using `pass`, system keyring, or a command that outputs the password.
+
+## Handling Send Failures (IMPORTANT)
+
+When `himalaya template send` returns an error, it may be a **"false failure"**:
+
+- SMTP send succeeded (email was delivered)
+- IMAP copy to Sent folder failed (network/auth issue)
+- Himalaya reports failure due to IMAP error
+
+This can cause duplicate emails if you retry without verification!
+
+### Verification Workflow
+
+**Before retrying a failed send, ALWAYS verify it wasn't actually sent:**
+
+1. Check the Sent folder for recent emails:
+   ```bash
+   himalaya envelope list --folder "Sent" --page-size 5
+   ```
+
+2. Look for your email by subject and recipient in the results
+
+3. **Decision logic:**
+   - If found in Sent folder → Email was sent, **DO NOT retry**
+   - If not found in Sent folder → Safe to retry
+
+### Safe Send Wrapper
+
+For automated sending, use the safe send wrapper script that automatically verifies before reporting failure:
+
+```bash
+cat message.txt | scripts/safe-email-send.sh
+```
+
+Or with a specific account:
+```bash
+cat message.txt | HIMALAYA_ACCOUNT=work scripts/safe-email-send.sh
+```
+
+The wrapper:
+1. Attempts to send the email
+2. If the send command returns an error, waits briefly then checks the Sent folder
+3. If the email is found in Sent → Reports success (IMAP save error, not SMTP failure)
+4. If not found → Reports failure (safe to retry)
+
+### Environment Variables for Safe Send
+
+- `VERIFY_DELAY_SECS` - Delay before checking Sent folder (default: 3)
+- `SENT_FOLDER` - Folder name to check (default: "Sent")
+- `HIMALAYA_ACCOUNT` - Himalaya account to use
+
+### Example: Manual Verification After Error
+
+```bash
+# Send attempt fails with error
+echo "From: me@example.com
+To: them@example.com
+Subject: Meeting Tomorrow
+
+Let's meet at 3pm." | himalaya template send
+
+# Error! But was it actually sent? Check:
+himalaya envelope list --folder "Sent" --page-size 3
+
+# If "Meeting Tomorrow" appears in the list, the email was sent
+# despite the error - don't send again!
+```

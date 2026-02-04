@@ -1,16 +1,48 @@
 import type { HeartbeatRunResult } from "../../infra/heartbeat-wake.js";
 import type { CronJob } from "../types.js";
-import { computeJobNextRunAtMs, nextWakeAtMs, resolveJobPayloadTextForMain } from "./jobs.js";
+import {
+  computeJobNextRunAtMs,
+  nextWakeAtMs,
+  recomputeNextRuns,
+  resolveJobPayloadTextForMain,
+} from "./jobs.js";
 import { locked } from "./locked.js";
 import type { CronEvent, CronServiceState } from "./state.js";
 import { ensureLoaded, persist } from "./store.js";
 
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
+const MAX_CLOCK_DRIFT_MS = 5 * 60 * 1000; // 5 minutes - threshold for clock jump detection
+
+// Module-level state for clock jump detection
+let lastTickMs: number | null = null;
+let watchdogTimer: NodeJS.Timeout | null = null;
+let lastWatchdogMs = 0;
 
 export function armTimer(state: CronServiceState) {
   if (state.timer) clearTimeout(state.timer);
   state.timer = null;
   if (!state.deps.cronEnabled) return;
+
+  // Start watchdog timer for clock jump detection if not already running
+  if (!watchdogTimer) {
+    lastWatchdogMs = state.deps.nowMs();
+    watchdogTimer = setInterval(() => {
+      const now = state.deps.nowMs();
+      const expectedInterval = 60_000; // 1 minute
+      const drift = now - lastWatchdogMs - expectedInterval;
+
+      if (drift > MAX_CLOCK_DRIFT_MS) {
+        state.deps.log.info(
+          { drift, lastWatchdogMs, now },
+          "cron: watchdog detected clock jump, recomputing schedules",
+        );
+        void handleClockJump(state);
+      }
+      lastWatchdogMs = now;
+    }, 60_000);
+    watchdogTimer.unref?.();
+  }
+
   const nextAt = nextWakeAtMs(state);
   if (!nextAt) return;
   const delay = Math.max(nextAt - state.deps.nowMs(), 0);
@@ -24,8 +56,41 @@ export function armTimer(state: CronServiceState) {
   state.timer.unref?.();
 }
 
+async function handleClockJump(state: CronServiceState) {
+  state.deps.log.info({}, "cron: handling clock jump - recomputing schedules");
+  await locked(state, async () => {
+    await ensureLoaded(state);
+    recomputeNextRuns(state);
+    await persist(state);
+    armTimer(state);
+  });
+}
+
 export async function onTimer(state: CronServiceState) {
   if (state.running) return;
+
+  const now = state.deps.nowMs();
+
+  // Check for clock jump since last timer tick
+  if (lastTickMs !== null) {
+    const drift = now - lastTickMs;
+    // Expected max drift is the timeout delay plus some buffer
+    const expectedMaxDrift = MAX_TIMEOUT_MS + 60_000;
+    if (drift > expectedMaxDrift || drift < 0) {
+      state.deps.log.info(
+        { lastTickMs, now, drift },
+        "cron: timer detected clock drift, recomputing schedules",
+      );
+      // Recompute schedules before running jobs
+      await locked(state, async () => {
+        await ensureLoaded(state);
+        recomputeNextRuns(state);
+        await persist(state);
+      });
+    }
+  }
+  lastTickMs = now;
+
   state.running = true;
   try {
     await locked(state, async () => {
@@ -230,6 +295,13 @@ export function wake(
 export function stopTimer(state: CronServiceState) {
   if (state.timer) clearTimeout(state.timer);
   state.timer = null;
+  // Clean up watchdog timer
+  if (watchdogTimer) {
+    clearInterval(watchdogTimer);
+    watchdogTimer = null;
+  }
+  lastTickMs = null;
+  lastWatchdogMs = 0;
 }
 
 export function emit(state: CronServiceState, evt: CronEvent) {

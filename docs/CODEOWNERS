@@ -10,7 +10,6 @@
 # - Adding domain experts for specific integrations
 # - Designating infrastructure/DevOps owners for CI/CD and deployment files
 #
-# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Default owner for everything
 * @moshehbenavraham

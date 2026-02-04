@@ -30,6 +30,7 @@ import {
 } from "../infra/skills-remote.js";
 import { scheduleGatewayUpdateCheck } from "../infra/update-startup.js";
 import { setGatewaySigusr1RestartPolicy } from "../infra/restart.js";
+import { handlePostRestartReport } from "../infra/restart-awareness.js";
 import { startDiagnosticHeartbeat, stopDiagnosticHeartbeat } from "../logging/diagnostic.js";
 import { createSubsystemLogger, runtimeForLogger } from "../logging/subsystem.js";
 import type { PluginServicesHandle } from "../plugins/services.js";
@@ -489,6 +490,14 @@ export async function startGatewayServer(
     log,
     isNixMode,
   });
+
+  // Restart Awareness: Check for persisted restart state and send post-restart report
+  // Uses hardcoded user ID for notification (same as in server-close.ts)
+  const RESTART_NOTIFY_USER_ID = "1415494277";
+  void handlePostRestartReport({ defaultUserId: RESTART_NOTIFY_USER_ID }).catch((err) => {
+    log.warn(`post-restart report failed: ${String(err)}`);
+  });
+
   scheduleGatewayUpdateCheck({ cfg: cfgAtStart, log, isNixMode });
   const tailscaleCleanup = await startGatewayTailscaleExposure({
     tailscaleMode,

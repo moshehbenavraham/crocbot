@@ -191,7 +191,7 @@ echo "Telegram (bot token):"
 echo "  ${COMPOSE_HINT} run --rm crocbot-cli providers add --provider telegram --token <token>"
 echo "Discord (bot token):"
 echo "  ${COMPOSE_HINT} run --rm crocbot-cli providers add --provider discord --token <token>"
-echo "Docs: https://docs.github.com/moshehbenavraham/crocbot/providers"
+echo "Docs: https://aiwithapex.mintlify.app/providers
 
 echo ""
 echo "==> Starting gateway"

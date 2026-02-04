@@ -70,3 +70,4 @@ USER.md
 # local tooling
 .serena/
 .001_ORIGINAL/
+__pycache__/

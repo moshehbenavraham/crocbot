@@ -12,3 +12,4 @@ export * from "./runtime-overrides.js";
 export * from "./types.js";
 export { validateConfigObject, validateConfigObjectWithPlugins } from "./validation.js";
 export { crocbotSchema } from "./zod-schema.js";
+export { redactConfigObject, redactConfigSnapshot } from "./redact.js";

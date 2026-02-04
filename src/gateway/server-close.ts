@@ -5,6 +5,13 @@ import { type ChannelId, listChannelPlugins } from "../channels/plugins/index.js
 import { stopGmailWatcher } from "../hooks/gmail-watcher.js";
 import type { HeartbeatRunner } from "../infra/heartbeat-runner.js";
 import type { PluginServicesHandle } from "../plugins/services.js";
+import { sendPreRestartNotification, persistRestartState } from "../infra/restart-awareness.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
+
+const log = createSubsystemLogger("gateway/close");
+
+// Hardcoded notification user ID for restart awareness
+const RESTART_NOTIFY_USER_ID = "1415494277";
 
 export function createGatewayCloseHandler(params: {
   tailscaleCleanup: (() => Promise<void>) | null;
@@ -36,6 +43,35 @@ export function createGatewayCloseHandler(params: {
       typeof opts?.restartExpectedMs === "number" && Number.isFinite(opts.restartExpectedMs)
         ? Math.max(0, Math.floor(opts.restartExpectedMs))
         : null;
+
+    // Restart Awareness: Send pre-restart notification to user BEFORE cleanup begins
+    // This ensures the user knows about the impending restart and any pending processes
+    let notificationSent = false;
+    const isRestart = reason.includes("restart");
+    if (isRestart || restartExpectedMs != null) {
+      log.info("sending pre-restart notification...");
+      try {
+        notificationSent = await sendPreRestartNotification({
+          userId: RESTART_NOTIFY_USER_ID,
+          reason,
+          restartExpectedMs,
+        });
+      } catch (err) {
+        log.warn(`pre-restart notification failed: ${String(err)}`);
+      }
+
+      // Persist restart state for post-restart recovery report
+      try {
+        await persistRestartState({
+          reason,
+          notificationSent,
+          notifiedUserId: notificationSent ? RESTART_NOTIFY_USER_ID : undefined,
+        });
+      } catch (err) {
+        log.warn(`failed to persist restart state: ${String(err)}`);
+      }
+    }
+
     if (params.tailscaleCleanup) {
       await params.tailscaleCleanup();
     }

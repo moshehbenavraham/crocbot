@@ -768,6 +768,7 @@ export function startHeartbeatRunner(opts: {
     agents: new Map<string, HeartbeatAgentState>(),
     timer: null as NodeJS.Timeout | null,
     stopped: false,
+    lastScheduleAt: Date.now(), // Track last schedule time for clock jump detection
   };
   let initialized = false;
 
@@ -789,6 +790,27 @@ export function startHeartbeatRunner(opts: {
     }
     if (state.agents.size === 0) return;
     const now = Date.now();
+
+    // Clock jump detection: check if time since last schedule exceeds expected bounds
+    const minIntervalMs = Math.min(...Array.from(state.agents.values()).map((a) => a.intervalMs));
+    const timeSinceLastSchedule = now - state.lastScheduleAt;
+    const maxExpectedGap = minIntervalMs + 5 * 60 * 1000; // interval + 5 minute buffer
+
+    if (timeSinceLastSchedule > maxExpectedGap) {
+      log.info("heartbeat: clock jump detected, triggering immediate run", {
+        gap: timeSinceLastSchedule,
+        expected: maxExpectedGap,
+      });
+      // Reset all agent nextDueMs to now to trigger immediate heartbeat
+      for (const agent of state.agents.values()) {
+        agent.nextDueMs = now;
+      }
+      state.lastScheduleAt = now;
+      requestHeartbeatNow({ reason: "clock-jump", coalesceMs: 0 });
+      return;
+    }
+    state.lastScheduleAt = now;
+
     let nextDue = Number.POSITIVE_INFINITY;
     for (const agent of state.agents.values()) {
       if (agent.nextDueMs < nextDue) nextDue = agent.nextDueMs;

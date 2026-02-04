@@ -502,7 +502,7 @@ Added to `.env` and `.env.example`:
 - `MINTLIFY_PROJECT_ID`
 
 ### Documentation URL Fix
-Fixed 82 files with bogus `docs.github.com/moshehbenavraham/crocbot` URLs:
+Fixed 82 files with bogus docs URLs:
 - Replaced with `aiwithapex.mintlify.app`
 - Updated `docs/CNAME`
 - Verified all 93 unique URLs return 200

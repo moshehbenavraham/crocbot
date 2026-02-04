@@ -4,6 +4,7 @@ import {
   loadConfig,
   parseConfigJson5,
   readConfigFileSnapshot,
+  redactConfigSnapshot,
   resolveConfigSnapshotHash,
   validateConfigObjectWithPlugins,
   writeConfigFile,
@@ -96,7 +97,9 @@ export const configHandlers: GatewayRequestHandlers = {
       return;
     }
     const snapshot = await readConfigFileSnapshot();
-    respond(true, snapshot, undefined);
+    // Redact sensitive values (API keys, tokens, passwords, secrets) before responding
+    const redactedSnapshot = redactConfigSnapshot(snapshot);
+    respond(true, redactedSnapshot, undefined);
   },
   "config.schema": ({ params, respond }) => {
     if (!validateConfigSchemaParams(params)) {
