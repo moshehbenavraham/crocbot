@@ -71,3 +71,6 @@ USER.md
 .serena/
 .001_ORIGINAL/
 __pycache__/
+# Local symlinks to state/workspace
+.crocbot-state
+.crocbot-workspace

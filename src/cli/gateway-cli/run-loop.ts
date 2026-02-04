@@ -40,6 +40,8 @@ export async function runGatewayLoop(params: {
     }
     shuttingDown = true;
     const isRestart = action === "restart";
+    // SIGTERM from systemctl restart should trigger restart-awareness notifications
+    const isSigtermRestart = signal === "SIGTERM";
     const shutdownStart = Date.now();
     gatewayLog.info(
       `received ${signal}; ${isRestart ? "restarting" : "shutting down"} (${formatMemoryMb()})`,
@@ -53,9 +55,11 @@ export async function runGatewayLoop(params: {
 
     void (async () => {
       try {
+        // Use "restart" reason for SIGTERM too (common from systemctl restart)
+        const reason = isRestart || isSigtermRestart ? "gateway restarting" : "gateway stopping";
         await server?.close({
-          reason: isRestart ? "gateway restarting" : "gateway stopping",
-          restartExpectedMs: isRestart ? 1500 : null,
+          reason,
+          restartExpectedMs: isRestart ? 1500 : isSigtermRestart ? 3000 : null,
         });
       } catch (err) {
         gatewayLog.error(`shutdown error: ${String(err)}`);

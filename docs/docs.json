@@ -830,11 +830,14 @@
           "install/index",
           "install/installer",
           "install/updating",
+          "install/migrating",
           "install/development-channels",
           "install/uninstall",
           "install/ansible",
           "install/nix",
           "install/docker",
+          "install/docker-env-vars",
+          "install/node",
           "install/bun"
         ]
       },
@@ -874,7 +877,12 @@
           "cli/hooks",
           "cli/security",
           "cli/update",
-          "cli/sandbox"
+          "cli/sandbox",
+          "cli/config",
+          "cli/devices",
+          "cli/node",
+          "cli/acp",
+          "cli/webhooks"
         ]
       },
       {
@@ -910,22 +918,25 @@
           "concepts/model-failover",
           "concepts/usage-tracking",
           "concepts/timezone",
+          "concepts/date-time",
           "concepts/typebox"
         ]
       },
       {
         "group": "Gateway & Ops",
         "pages": [
-          "gateway",
+          "gateway/index",
           "gateway/protocol",
           "gateway/bridge-protocol",
           "gateway/gateway-lock",
           "gateway/environment",
+          "gateway/network",
           "gateway/configuration",
           "gateway/multiple-gateways",
           "gateway/configuration-examples",
           "gateway/authentication",
           "gateway/openai-http-api",
+          "gateway/openresponses-http-api",
           "gateway/tools-invoke-http-api",
           "gateway/cli-backends",
           "gateway/local-models",
@@ -936,8 +947,8 @@
           "gateway/heartbeat",
           "gateway/doctor",
           "gateway/logging",
-          "gateway/security",
-          "security/formal-verification",
+          "gateway/security/index",
+          "gateway/security/formal-verification",
           "gateway/sandbox-vs-tool-policy-vs-elevated",
           "gateway/sandboxing",
           "gateway/troubleshooting",
@@ -950,7 +961,7 @@
       {
         "group": "Web & Interfaces",
         "pages": [
-          "web",
+          "web/index",
           "web/control-ui",
           "web/dashboard",
           "web/webchat",
@@ -976,12 +987,18 @@
           "providers/openai",
           "providers/anthropic",
           "providers/bedrock",
+          "providers/ollama",
           "providers/moonshot",
           "providers/minimax",
           "providers/vercel-ai-gateway",
           "providers/openrouter",
+          "providers/deepgram",
+          "providers/github-copilot",
+          "providers/qwen",
+          "providers/venice",
           "providers/synthetic",
           "providers/opencode",
+          "providers/claude-max-api-proxy",
           "providers/glm",
           "providers/zai"
         ]
@@ -989,7 +1006,7 @@
       {
         "group": "Automation & Hooks",
         "pages": [
-          "hooks",
+          "hooks/index",
           "hooks/soul-evil",
           "automation/auth-monitoring",
           "automation/webhook",
@@ -1002,14 +1019,18 @@
       {
         "group": "Tools & Skills",
         "pages": [
-          "tools",
+          "tools/index",
           "tools/lobster",
           "tools/llm-task",
-          "plugins",
+          "plugins/index",
+          "plugins/manifest",
+          "plugins/agent-tools",
           "tools/exec",
+          "tools/exec-approvals",
           "tools/web",
           "tools/brave-search",
           "tools/perplexity",
+          "tools/firecrawl",
           "tools/apply-patch",
           "tools/elevated",
           "tools/browser",
@@ -1024,16 +1045,18 @@
           "tools/reactions",
           "tools/skills",
           "tools/skills-config",
-          "tools/crochub"
+          "tools/creating-skills",
+          "tools/clawdhub"
         ]
       },
       {
         "group": "Nodes & Media",
         "pages": [
-          "nodes",
+          "nodes/index",
           "nodes/camera",
           "nodes/images",
           "nodes/audio",
+          "nodes/media-understanding",
           "nodes/location-command",
           "nodes/voicewake"
         ]
@@ -1041,7 +1064,7 @@
       {
         "group": "Platforms",
         "pages": [
-          "platforms",
+          "platforms/index",
           "platforms/windows",
           "platforms/linux",
           "platforms/raspberry-pi",
@@ -1058,6 +1081,8 @@
           "reference/testing",
           "reference/scripts",
           "reference/session-management-compaction",
+          "reference/transcript-hygiene",
+          "reference/api-usage-costs",
           "reference/rpc",
           "reference/test",
           "reference/RELEASING",

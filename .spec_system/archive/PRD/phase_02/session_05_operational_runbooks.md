@@ -20,7 +20,7 @@ Create comprehensive operational runbooks for common scenarios, enabling efficie
 - Telegram reconnection troubleshooting
 - Docker container management
 - Log analysis and debugging guide
-- Backup and restore procedures (Fly.io volumes)
+- Backup and restore procedures (Coolify / Docker)
 - Health check interpretation guide
 
 ### Out of Scope
@@ -34,7 +34,7 @@ Create comprehensive operational runbooks for common scenarios, enabling efficie
 ## Prerequisites
 
 - [ ] Session 01-04 completed (logging, metrics, alerting in place)
-- [ ] Fly.io deployment experience documented
+- [ ] Coolify/Docker deployment experience documented
 - [ ] Common issues identified from Phase 00/01
 
 ---

@@ -10,24 +10,21 @@ The current codebase supports multiple channels (Discord, Slack, Signal, iMessag
 
 ## Goals
 
-1. Strip codebase to minimal footprint for VPS/Coolify/Ubuntu deployment
+1. Strip codebase to optimal footprint for VPS/Coolify/Docker/Ubuntu deployment
 2. Retain only CLI command-line interface and Telegram channel
 3. Remove all native apps (macOS, iOS, Android)
 4. Remove all non-Telegram channels (Discord, Slack, Signal, iMessage, WhatsApp, Line)
 5. Remove unnecessary extensions and dependencies
-6. Achieve ~60-70% source code reduction
-7. Produce a Docker image under 300MB
+6. Remove the Web UI (making sure CLI has all functionality)
 
 ## Non-Goals
 
 - Adding new features or functionality
 - Supporting multiple channels (only Telegram)
-- Supporting native apps (macOS, iOS, Android)
+- Supporting native apps (macOS, iOS, Android, Windows)
 - Supporting mobile device pairing or Bonjour discovery
 - Supporting WhatsApp Web or QR code login flows
-- Supporting text-to-speech (TTS) functionality
 - Maintaining backwards compatibility with removed features
-- Supporting extensions beyond core functionality
 
 ## Users and Use Cases
 
@@ -57,7 +54,6 @@ The current codebase supports multiple channels (Discord, Slack, Signal, iMessag
 ### Deferred Requirements
 
 - Re-adding channels on demand (post-MVP if needed)
-- Plugin/extension system (stripped for MVP)
 - Canvas/artifact rendering (stripped for MVP)
 
 ## Non-Functional Requirements
@@ -65,7 +61,7 @@ The current codebase supports multiple channels (Discord, Slack, Signal, iMessag
 - **Performance**: Gateway starts in under 10 seconds; message response latency under 2 seconds (excluding AI inference)
 - **Security**: No credentials stored in Docker image; all secrets via environment variables
 - **Reliability**: Gateway handles graceful shutdown; reconnects to Telegram on disconnect
-- **Resource usage**: Docker image under 300MB; runtime memory under 512MB typical
+- **Resource usage**: Docker image reasonably sized; runtime memory under 512MB typical
 
 ## Constraints and Dependencies
 
@@ -83,7 +79,7 @@ This system delivers the product via phases. Each phase is implemented via multi
 |-------|------|----------|--------|
 | 00 | Strip Moltbot to minimal footprint | 8 | Complete |
 | 01 | Production Hardening and Deployment | 5 | Complete |
-| 02 | Operational Maturity and Observability | 5 | Not Started |
+| 02 | Operational Maturity and Observability | 5 | 4/5 Completed |
 
 ## Phase 00: Strip Moltbot to minimal footprint
 
