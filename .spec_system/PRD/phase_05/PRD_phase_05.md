@@ -4,7 +4,7 @@
 **Sessions**: 5 (initial estimate)
 **Estimated Duration**: 3-5 days
 
-**Progress**: 1/5 sessions (20%)
+**Progress**: 2/5 sessions (40%)
 
 ---
 
@@ -19,7 +19,7 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 | Session | Name | Status | Est. Tasks | Validated |
 |---------|------|--------|------------|-----------|
 | 01 | Research Build Tooling Delta | Complete | 18 | 2026-02-05 |
-| 02 | tsdown Migration | Not Started | ~20 | - |
+| 02 | tsdown Migration | Complete | 18 | 2026-02-05 |
 | 03 | TypeScript Config Unification | Not Started | ~15 | - |
 | 04 | Stricter Linting Rules | Not Started | ~20 | - |
 | 05 | Build Validation and CI Integration | Not Started | ~15 | - |
@@ -34,11 +34,20 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 - Entry point mapping, tsconfig delta, oxlint delta, `any` type inventory
 - Prioritized migration plan for Sessions 02-05
 
+### Session 02: tsdown Migration (2026-02-05)
+- Replaced `tsc` with `tsdown` as production build tool (54% faster: 10.3s -> 4.7s)
+- Created `tsdown.config.ts` with 3 entry points (index, entry, plugin-sdk)
+- Updated `tsconfig.json` to `noEmit: true` (tsc now type-checker only)
+- Added `pnpm check` convenience script for unified code quality validation
+- Zero test regressions (3825 passed, 26 pre-existing failures unchanged)
+
 ---
 
 ## Upcoming Sessions
 
-- Session 01: Research Build Tooling Delta
+- Session 03: TypeScript Config Unification
+- Session 04: Stricter Linting Rules
+- Session 05: Build Validation and CI Integration
 
 ---
 

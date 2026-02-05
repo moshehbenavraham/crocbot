@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "noEmitOnError": true,
+    "noEmit": true,
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],

@@ -34,6 +34,8 @@ function resolveControlUiRoot(): string | null {
     execDir ? path.resolve(execDir, "control-ui") : null,
     // Running from dist: dist/gateway/control-ui.js -> dist/control-ui
     path.resolve(here, "../control-ui"),
+    // Flat bundle (tsdown): dist/<chunk>.js -> dist/control-ui
+    path.resolve(here, "control-ui"),
     // Running from source: src/gateway/control-ui.ts -> dist/control-ui
     path.resolve(here, "../../dist/control-ui"),
     // Fallback to cwd (dev)

@@ -67,7 +67,8 @@
     "phase04-session01-grammy-timeout-recovery",
     "phase04-session02-session-transcript-repair",
     "phase04-session03-bug-fix-validation",
-    "phase05-session01-research-build-tooling-delta"
+    "phase05-session01-research-build-tooling-delta",
+    "phase05-session02-tsdown-migration"
   ],
   "next_session_history": [
     {
@@ -698,6 +699,26 @@
     {
       "date": "2026-02-05",
       "session": "phase05-session01-research-build-tooling-delta",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session02-tsdown-migration",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session02-tsdown-migration",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session02-tsdown-migration",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session02-tsdown-migration",
       "status": "completed"
     }
   ]

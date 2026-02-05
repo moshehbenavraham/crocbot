@@ -27,7 +27,7 @@
 
 ## Dev Workflow
 - Runtime: Node 22+. Install: `pnpm install`.
-- Build: `pnpm build`; Lint/format: `pnpm lint`, `pnpm format`; Tests: `pnpm test`.
+- Build: `pnpm build`, UI: `pnpm ui:build`; Lint/format: `pnpm lint`, `pnpm format`; Tests: `pnpm test`.
 - TypeScript is ESM; use `.js` extensions in imports and avoid `any`.
 - Use `scripts/committer "<msg>" <file...>` for commits (scoped staging).
 - **Audit**: `pnpm build` (type errors), `pnpm lint` (code quality), `pnpm test` (tests).
