@@ -3,7 +3,7 @@
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
   "current_phase": 5,
-  "current_session": "phase05-session01-research-build-tooling-delta",
+  "current_session": null,
   "phases": {
     "0": {
       "name": "Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment",
@@ -38,7 +38,7 @@
     "5": {
       "name": "Upstream Build Tooling Port",
       "description": "Migrate from tsc to tsdown bundler, unify TypeScript configuration, enable stricter linting rules, and add convenience scripts",
-      "status": "not_started",
+      "status": "in_progress",
       "session_count": 5
     }
   },
@@ -66,7 +66,8 @@
     "phase03-session03-feature-validation",
     "phase04-session01-grammy-timeout-recovery",
     "phase04-session02-session-transcript-repair",
-    "phase04-session03-bug-fix-validation"
+    "phase04-session03-bug-fix-validation",
+    "phase05-session01-research-build-tooling-delta"
   ],
   "next_session_history": [
     {
@@ -688,6 +689,16 @@
       "date": "2026-02-05",
       "session": "phase05-session01-research-build-tooling-delta",
       "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session01-research-build-tooling-delta",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session01-research-build-tooling-delta",
+      "status": "completed"
     }
   ]
 }
