@@ -93,7 +93,7 @@ const STUCK_RUN_MS = 2 * 60 * 60 * 1000; // same threshold as cron/service/jobs.
 export function detectMissedJobs(
   jobs: CronJob[],
   nowMs: number,
-  lastAliveMs: number | null,
+  _lastAliveMs: number | null,
 ): { missed: MissedCronJob[]; stuckCleared: number } {
   const missed: MissedCronJob[] = [];
   let stuckCleared = 0;

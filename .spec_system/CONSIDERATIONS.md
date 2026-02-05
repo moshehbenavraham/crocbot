@@ -1,7 +1,7 @@
 # Considerations
 
 > Institutional memory for AI assistants. Updated between phases via /carryforward.
-> **Line budget**: 600 max | **Last updated**: Phase 01 (2026-01-30)
+> **Line budget**: 600 max | **Last updated**: Phase 04 (2026-02-05)
 
 ---
 
@@ -60,6 +60,12 @@ Proven patterns and anti-patterns. Reference during implementation.
 
 - [P00] **Conservative dependency removal**: Remove one dependency category at a time (Discord deps, then Slack deps, etc.). Verify build after each removal to catch hidden usages.
 
+- [P04] **Grammy HttpError `.error` traversal**: Grammy wraps errors in `.error` (not `.cause`). When porting upstream error handling, verify library-specific error chain patterns rather than assuming standard `.cause` traversal.
+
+- [P04] **Scoped unhandled rejection handlers**: Register/unregister pattern for process-level handlers keeps error handling modular. Gate handlers on error type (e.g., `isGrammyHttpError`) to avoid suppressing unrelated errors.
+
+- [P04] **Verbatim upstream port pattern**: When porting bug fixes from upstream, match the upstream approach exactly first, then adapt only what the stripped-down architecture requires. Minimizes divergence and simplifies future merges.
+
 ### What to Avoid
 <!-- Max 10 items -->
 
@@ -100,6 +106,9 @@ Recently closed items (buffer - rotates out after 2 phases).
 | P00 | User-facing documentation | Updated for Telegram-only in Session 08 |
 | P01 | Internal docs cleanup | Cleaned 130+ files in Session 05 |
 | P02 | BlueBubbles provider removal | Removed from config schemas and code in Session 03 |
+| P04 | Grammy timeout recovery | HttpError traversal, scoped rejection handler, error codes/patterns |
+| P04 | Session transcript repair | JSONL file repair, tool call sanitization, guarded append |
+| P04 | Bug fix validation | 35 tests verified, 7 integration points confirmed, 0 regressions |
 
 ---
 
