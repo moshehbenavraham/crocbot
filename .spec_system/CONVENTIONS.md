@@ -123,7 +123,6 @@ Platform: GitHub Actions
 | Code Quality | configured | `.github/workflows/ci.yml` (lint, format, typecheck) |
 | Build & Test | configured | `.github/workflows/ci.yml` (build, test with coverage) |
 | Security | configured | `.github/workflows/ci.yml` (detect-secrets), `.github/workflows/security.yml` (CodeQL, dependency-review, npm-audit) |
-| Integration | configured | `.github/workflows/install-smoke.yml` |
 | Operations | configured | `.github/workflows/docker-release.yml`, `.github/dependabot.yml` |
 
 Additional workflows:

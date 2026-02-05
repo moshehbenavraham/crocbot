@@ -2,7 +2,7 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 3,
+  "current_phase": 4,
   "current_session": null,
   "phases": {
     "0": {
@@ -32,7 +32,7 @@
     "4": {
       "name": "Upstream Bug Fixes Port",
       "description": "Port Grammy timeout recovery and session transcript repair from upstream OpenClaw for improved stability",
-      "status": "not_started",
+      "status": "in_progress",
       "session_count": 3
     }
   },
@@ -57,7 +57,8 @@
     "phase02-session05-operational-runbooks",
     "phase03-session01-research-upstream-features",
     "phase03-session02-telegram-model-buttons",
-    "phase03-session03-feature-validation"
+    "phase03-session03-feature-validation",
+    "phase04-session01-grammy-timeout-recovery"
   ],
   "next_session_history": [
     {
@@ -583,6 +584,31 @@
     {
       "date": "2026-02-05",
       "session": "phase03-session03-feature-validation",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session01-grammy-timeout-recovery",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session01-grammy-timeout-recovery",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session01-grammy-timeout-recovery",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session01-grammy-timeout-recovery",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session01-grammy-timeout-recovery",
       "status": "completed"
     }
   ]

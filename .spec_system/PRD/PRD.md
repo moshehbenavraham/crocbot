@@ -81,9 +81,9 @@ This system delivers the product via phases. Each phase is implemented via multi
 |-------|------|----------|--------|
 | 00 | Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment | 8 | Complete |
 | 01 | Production Hardening and Deployment | 5 | Complete |
-| 02 | Operational Maturity and Observability | 5 | Complete |
+| 02 | Operational Maturity and Observability | 4/5 | Session 5 Deferred; Complete |
 | 03 | Upstream Features Port | 3 | Complete |
-| 04 | Upstream Bug Fixes Port | 3 | Not Started |
+| 04 | Upstream Bug Fixes Port | 3 | Started |
 | 05 | Upstream Build Tooling Port | TBD | Not Started |
 | 06 | Upstream Security Hardening Port | TBD | Not Started |
 
@@ -163,7 +163,7 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 
 | Session | Name | Status |
 |---------|------|--------|
-| 01 | Grammy Timeout Recovery | Not Started |
+| 01 | Grammy Timeout Recovery | Complete |
 | 02 | Session Transcript Repair | Not Started |
 | 03 | Bug Fix Validation | Not Started |
 

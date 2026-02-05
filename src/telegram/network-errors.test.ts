@@ -66,4 +66,54 @@ describe("isRecoverableTelegramNetworkError", () => {
     expect(isRecoverableTelegramNetworkError(err400)).toBe(false);
     expect(isRecoverableTelegramNetworkError(err401)).toBe(false);
   });
+
+  it("detects ECONNABORTED error code", () => {
+    const err = Object.assign(new Error("connection aborted"), { code: "ECONNABORTED" });
+    expect(isRecoverableTelegramNetworkError(err)).toBe(true);
+  });
+
+  it("detects ERR_NETWORK error code", () => {
+    const err = Object.assign(new Error("network failure"), { code: "ERR_NETWORK" });
+    expect(isRecoverableTelegramNetworkError(err)).toBe(true);
+  });
+
+  it("detects 'timed out' message pattern", () => {
+    const err = new Error("timed out after 30 seconds");
+    expect(isRecoverableTelegramNetworkError(err, { context: "polling" })).toBe(true);
+  });
+
+  it("detects 'timeout' message pattern", () => {
+    const err = new Error("request timeout exceeded");
+    expect(isRecoverableTelegramNetworkError(err, { context: "polling" })).toBe(true);
+  });
+
+  it("traverses Grammy HttpError .error property", () => {
+    // Grammy's HttpError wraps underlying errors in .error, not .cause
+    const networkError = Object.assign(new Error("connection reset"), { code: "ECONNRESET" });
+    const httpError = Object.assign(new Error("Request failed"), {
+      name: "HttpError",
+      error: networkError,
+    });
+    expect(isRecoverableTelegramNetworkError(httpError)).toBe(true);
+  });
+
+  it("does not traverse .error for non-HttpError objects", () => {
+    // For non-HttpError, .error property should not be traversed
+    const networkError = Object.assign(new Error("connection reset"), { code: "ECONNRESET" });
+    const regularError = Object.assign(new Error("Something failed"), {
+      name: "SomeOtherError",
+      error: networkError,
+    });
+    // The regular error itself is not recoverable, and .error should not be followed
+    expect(isRecoverableTelegramNetworkError(regularError)).toBe(false);
+  });
+
+  it("traverses Grammy HttpError .error with timeout message", () => {
+    const timeoutError = new Error("timed out after 30 seconds");
+    const httpError = Object.assign(new Error("Network error"), {
+      name: "HttpError",
+      error: timeoutError,
+    });
+    expect(isRecoverableTelegramNetworkError(httpError, { context: "polling" })).toBe(true);
+  });
 });

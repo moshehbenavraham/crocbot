@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-05
 **Project**: crocbot
-**Audit Mode**: Phase-Focused (Phase 02 just completed)
+**Audit Mode**: Phase-Focused (Phase 03 just completed)
 
 ## Summary
 
@@ -16,136 +16,99 @@
 
 ## Phase Focus
 
-**Completed Phase**: Phase 02 - Operational Maturity and Observability
-**Sessions Analyzed**: phase02-session05-operational-runbooks
+**Completed Phase**: Phase 03 - Upstream Features Port
+**Sessions Analyzed**: 3 sessions (research, implementation, validation)
 
 ### Change Manifest (from implementation-notes.md)
 
 | Session | Files Created | Files Modified |
 |---------|---------------|----------------|
-| phase02-session05-operational-runbooks | docs/runbooks/startup-shutdown.md (~230 lines), docs/runbooks/telegram-troubleshooting.md (~300 lines), docs/runbooks/docker-operations.md (~320 lines), docs/runbooks/log-analysis.md (~350 lines), docs/runbooks/health-checks.md (~280 lines) | docs/docs.json |
+| session01-research-upstream-features | Research docs in `.spec_system/PRD/phase_03/research/` (4 files) | None |
+| session02-telegram-model-buttons | `src/telegram/model-buttons.ts` (~200 lines), `src/telegram/model-buttons.test.ts` (~300 lines) | `src/telegram/bot-handlers.ts` (+120 lines), `src/auto-reply/reply/commands-models.ts` (+80 lines) |
+| session03-feature-validation | `docs/concepts/model-selection.md` (~137 lines), `CHANGELOG.md` (~85 lines), `TEST_REPORT.md` | `docs/docs.json`, `docs/concepts/models.md`, `docs/cli/models.md` |
 
 ## Actions Taken (This Audit)
 
-### Created
-- `CONTRIBUTING.md` - Root-level contribution guidelines for GitHub
-- `docs/ARCHITECTURE.md` - System architecture overview with dependency graph
-- `docs/onboarding.md` - Zero-to-hero developer checklist
-- `docs/environments.md` - Environment configuration differences
-- `docs/deployment.md` - CI/CD and deployment guide
-
 ### Updated
-- `docs/docs.json` - Added new pages to navigation (ARCHITECTURE, onboarding, environments, deployment)
-
-### Removed (Duplicates)
-- `docs/development.md` - Removed duplicate (docs/reference/development.md already exists with comprehensive content)
+- `docs/ARCHITECTURE.md` - Added inline model selection to Telegram Channel component, added key modules reference (`bot-handlers.ts`, `model-buttons.ts`)
 
 ### Verified (No Changes Needed)
 - `README.md` - Comprehensive, current
+- `CONTRIBUTING.md` - Correct links and conventions
 - `LICENSE` - MIT license present
-- `docs/CODEOWNERS` - Properly configured with ownership assignments
-- `docs/adr/0000-template.md` - ADR template
-- `docs/adr/0001-telegram-only-architecture.md` - Current
-- `docs/adr/0002-multi-stage-docker-build.md` - Current
-- `docs/runbooks/incident-response.md` - Current
-- `docs/runbooks/startup-shutdown.md` - Current (Phase 02)
-- `docs/runbooks/telegram-troubleshooting.md` - Current (Phase 02)
-- `docs/runbooks/docker-operations.md` - Current (Phase 02)
-- `docs/runbooks/log-analysis.md` - Current (Phase 02)
-- `docs/runbooks/health-checks.md` - Current (Phase 02)
-- `docs/runbooks/backup-restore.md` - Current
-- `docs/reference/contributing.md` - Comprehensive contributor guide
-- `docs/reference/development.md` - Comprehensive development guide
+- `CHANGELOG.md` - Already has 2026.1.57 entry for model buttons feature
+- `docs/concepts/model-selection.md` - Created in Phase 03 Session 03
+- `docs/onboarding.md` - Accurate setup steps
+- `docs/reference/development.md` - Complete development guide
+- `docs/environments.md` - Dev/prod differences documented
+- `docs/deployment.md` - Deployment process documented
+- `docs/CODEOWNERS` - Team assignments present
+- `docs/adr/` - 3 ADRs present (template + 2 decisions)
+- `docs/runbooks/` - 7 runbooks covering all operations
 
 ## Standard Files Verification
 
 | File | Status | Location |
 |------|--------|----------|
 | README.md | PASS | Root |
-| CONTRIBUTING.md | PASS | Root (created) |
+| CONTRIBUTING.md | PASS | Root |
 | LICENSE | PASS | Root |
-| ARCHITECTURE.md | PASS | docs/ARCHITECTURE.md (created) |
-| onboarding.md | PASS | docs/onboarding.md (created) |
-| environments.md | PASS | docs/environments.md (created) |
-| deployment.md | PASS | docs/deployment.md (created) |
+| CHANGELOG.md | PASS | Root (Phase 03 entry present) |
+| ARCHITECTURE.md | UPDATED | docs/ARCHITECTURE.md |
+| onboarding.md | PASS | docs/onboarding.md |
+| environments.md | PASS | docs/environments.md |
+| deployment.md | PASS | docs/deployment.md |
+| development.md | PASS | docs/reference/development.md |
 | CODEOWNERS | PASS | docs/CODEOWNERS |
 | adr/ | PASS | docs/adr/ (3 files) |
 | runbooks/ | PASS | docs/runbooks/ (7 files) |
 
+## Phase 03 Documentation Summary
+
+Phase 03 introduced the Telegram inline model selection feature. Key documentation:
+
+1. **Feature Documentation** (Session 03):
+   - `docs/concepts/model-selection.md` - Complete user guide for interactive model selection
+   - Cross-references added to `docs/concepts/models.md` and `docs/cli/models.md`
+
+2. **CHANGELOG** (Session 03):
+   - Created with Keep a Changelog format
+   - Version 2026.1.57 entry documenting model buttons feature
+
+3. **Research Documentation** (Session 01):
+   - `upstream-model-buttons.md` - Callback format, pagination, data flow
+   - `crocbot-integration-map.md` - File/function mapping
+   - `qmd-architecture.md` - QMD reference (for future consideration)
+   - `blockers-mitigations.md` - Risk assessment
+
+4. **Architecture Update** (This audit):
+   - Updated Telegram Channel component description to include inline model selection
+   - Added key module references
+
 ## Documentation Gaps
 
-None. All standard documentation files are present.
-
-## Documentation Structure
-
-```
-Root Level:
-  README.md           # Project overview, quick start
-  CONTRIBUTING.md     # Contribution guidelines (NEW)
-  LICENSE             # MIT license
-
-docs/
-  ARCHITECTURE.md     # System architecture (NEW)
-  onboarding.md       # Developer onboarding (NEW)
-  environments.md     # Environment config (NEW)
-  deployment.md       # CI/CD guide (NEW)
-  CODEOWNERS          # Code ownership
-  adr/
-    0000-template.md
-    0001-telegram-only-architecture.md
-    0002-multi-stage-docker-build.md
-  runbooks/
-    incident-response.md
-    startup-shutdown.md       (Phase 02)
-    telegram-troubleshooting.md (Phase 02)
-    docker-operations.md      (Phase 02)
-    log-analysis.md           (Phase 02)
-    health-checks.md          (Phase 02)
-    backup-restore.md
-  reference/
-    contributing.md   # Detailed contributor guide
-    development.md    # Development guide
-    ...
-```
+None. All standard documentation files are present and current.
 
 ## Quality Checks
 
 - [x] All new files ASCII-encoded
 - [x] Unix LF line endings
 - [x] No duplicate information
-- [x] Links to existing docs where appropriate
-- [x] Navigation updated in docs.json
-
-## Phase 02 Documentation Summary
-
-Phase 02 focused on operational maturity and observability. Key documentation from this phase:
-
-1. **Operational runbooks** (5 new files ~1,480 lines total):
-   - Startup/shutdown procedures
-   - Telegram troubleshooting
-   - Docker operations
-   - Log analysis guides
-   - Health check interpretation
-
-2. **Standard files added** (this audit):
-   - Root CONTRIBUTING.md
-   - Architecture overview
-   - Onboarding checklist
-   - Environment configuration
-   - Deployment guide
+- [x] Links valid in docs.json navigation
+- [x] Phase 03 features documented
 
 ## Next Audit
 
 Recommend re-running `/documents` after:
-- Completing Phase 03 (Upstream Features Port)
+- Completing Phase 04 (Grammy timeout recovery, session transcript repair)
 - Adding new packages/services
 - Making architectural changes
 
 ---
 
-**All Phase 02 documentation requirements are now complete.**
+**All Phase 03 documentation requirements are complete.**
 
 To proceed with the next phase, run:
 ```
-/phasebuild
+/nextsession
 ```

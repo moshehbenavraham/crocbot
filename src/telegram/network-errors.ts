@@ -15,6 +15,8 @@ const RECOVERABLE_ERROR_CODES = new Set([
   "UND_ERR_BODY_TIMEOUT",
   "UND_ERR_SOCKET",
   "UND_ERR_ABORTED",
+  "ECONNABORTED",
+  "ERR_NETWORK",
 ]);
 
 // HTTP status codes that indicate transient Telegram API errors worth retrying
@@ -35,11 +37,15 @@ const RECOVERABLE_ERROR_NAMES = new Set([
 
 const RECOVERABLE_MESSAGE_SNIPPETS = [
   "fetch failed",
+  "typeerror: fetch failed",
+  "undici",
   "network error",
   "network request",
   "client network socket disconnected",
   "socket hang up",
   "getaddrinfo",
+  "timeout", // catch timeout messages not covered by error codes/names
+  "timed out", // grammY getUpdates returns "timed out after X seconds" (not matched by "timeout")
 ];
 
 function normalizeCode(code?: string): string {
@@ -91,6 +97,12 @@ function collectErrorCandidates(err: unknown): unknown[] {
         for (const nested of errors) {
           if (nested && !seen.has(nested)) queue.push(nested);
         }
+      }
+      // Grammy's HttpError wraps the underlying error in .error (not .cause)
+      // Only follow .error for HttpError to avoid widening the search graph
+      if (getErrorName(current) === "HttpError") {
+        const wrappedError = (current as { error?: unknown }).error;
+        if (wrappedError && !seen.has(wrappedError)) queue.push(wrappedError);
       }
     }
   }
