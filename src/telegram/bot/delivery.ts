@@ -91,7 +91,9 @@ export async function deliverReplies(params: {
       const chunks = chunkText(reply.text || "");
       for (let i = 0; i < chunks.length; i += 1) {
         const chunk = chunks[i];
-        if (!chunk) continue;
+        if (!chunk) {
+          continue;
+        }
         // Only attach buttons to the first chunk.
         const shouldAttachButtons = i === 0 && replyMarkup;
         await sendTelegramText(bot, chatId, chunk.html, runtime, {
@@ -278,7 +280,9 @@ export async function resolveMedia(
       logVerbose("telegram: skipping animated/video sticker (only static stickers supported)");
       return null;
     }
-    if (!sticker.file_id) return null;
+    if (!sticker.file_id) {
+      return null;
+    }
 
     try {
       const file = await ctx.getFile();
@@ -349,7 +353,9 @@ export async function resolveMedia(
 
   const m =
     msg.photo?.[msg.photo.length - 1] ?? msg.video ?? msg.document ?? msg.audio ?? msg.voice;
-  if (!m?.file_id) return null;
+  if (!m?.file_id) {
+    return null;
+  }
   const file = await ctx.getFile();
   if (!file.file_path) {
     throw new Error("Telegram getFile returned no file_path");
@@ -366,9 +372,13 @@ export async function resolveMedia(
   });
   const saved = await saveMediaBuffer(fetched.buffer, fetched.contentType, "inbound", maxBytes);
   let placeholder = "<media:document>";
-  if (msg.photo) placeholder = "<media:image>";
-  else if (msg.video) placeholder = "<media:video>";
-  else if (msg.audio || msg.voice) placeholder = "<media:audio>";
+  if (msg.photo) {
+    placeholder = "<media:image>";
+  } else if (msg.video) {
+    placeholder = "<media:video>";
+  } else if (msg.audio || msg.voice) {
+    placeholder = "<media:audio>";
+  }
   return { path: saved.path, contentType: saved.contentType, placeholder };
 }
 

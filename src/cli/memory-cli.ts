@@ -60,13 +60,17 @@ function formatSourceLabel(source: string, workspaceDir: string, agentId: string
 
 function resolveAgent(cfg: ReturnType<typeof loadConfig>, agent?: string) {
   const trimmed = agent?.trim();
-  if (trimmed) return trimmed;
+  if (trimmed) {
+    return trimmed;
+  }
   return resolveDefaultAgentId(cfg);
 }
 
 function resolveAgentIds(cfg: ReturnType<typeof loadConfig>, agent?: string): string[] {
   const trimmed = agent?.trim();
-  if (trimmed) return [trimmed];
+  if (trimmed) {
+    return [trimmed];
+  }
   const list = cfg.agents?.list ?? [];
   if (list.length > 0) {
     return list.map((entry) => entry.id).filter(Boolean);
@@ -80,7 +84,9 @@ async function checkReadableFile(pathname: string): Promise<{ exists: boolean; i
     return { exists: true };
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") return { exists: false };
+    if (code === "ENOENT") {
+      return { exists: false };
+    }
     return {
       exists: true,
       issue: `${shortenHomePath(pathname)} not readable (${code ?? "error"})`,
@@ -118,8 +124,12 @@ async function scanMemoryFiles(workspaceDir: string): Promise<SourceScan> {
 
   const primary = await checkReadableFile(memoryFile);
   const alt = await checkReadableFile(altMemoryFile);
-  if (primary.issue) issues.push(primary.issue);
-  if (alt.issue) issues.push(alt.issue);
+  if (primary.issue) {
+    issues.push(primary.issue);
+  }
+  if (alt.issue) {
+    issues.push(alt.issue);
+  }
 
   let dirReadable: boolean | null = null;
   try {
@@ -159,8 +169,12 @@ async function scanMemoryFiles(workspaceDir: string): Promise<SourceScan> {
   } else {
     const files = new Set<string>(listedOk ? listed : []);
     if (!listedOk) {
-      if (primary.exists) files.add(memoryFile);
-      if (alt.exists) files.add(altMemoryFile);
+      if (primary.exists) {
+        files.add(memoryFile);
+      }
+      if (alt.exists) {
+        files.add(altMemoryFile);
+      }
     }
     totalFiles = files.size;
   }
@@ -246,7 +260,9 @@ export async function runMemoryStatus(opts: MemoryCommandOptions) {
                         total: syncUpdate.total,
                         label: syncUpdate.label,
                       });
-                      if (syncUpdate.label) progress.setLabel(syncUpdate.label);
+                      if (syncUpdate.label) {
+                        progress.setLabel(syncUpdate.label);
+                      }
                     },
                   });
                 } catch (err) {
@@ -497,10 +513,14 @@ export function registerMemoryCli(program: Command) {
                 return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
               };
               const formatEta = () => {
-                if (lastTotal <= 0 || lastCompleted <= 0) return null;
+                if (lastTotal <= 0 || lastCompleted <= 0) {
+                  return null;
+                }
                 const elapsedMs = Math.max(1, Date.now() - startedAt);
                 const rate = lastCompleted / elapsedMs;
-                if (!Number.isFinite(rate) || rate <= 0) return null;
+                if (!Number.isFinite(rate) || rate <= 0) {
+                  return null;
+                }
                 const remainingMs = Math.max(0, (lastTotal - lastCompleted) / rate);
                 const seconds = Math.floor(remainingMs / 1000);
                 const minutes = Math.floor(seconds / 60);
@@ -529,7 +549,9 @@ export function registerMemoryCli(program: Command) {
                       reason: "cli",
                       force: opts.force,
                       progress: (syncUpdate) => {
-                        if (syncUpdate.label) lastLabel = syncUpdate.label;
+                        if (syncUpdate.label) {
+                          lastLabel = syncUpdate.label;
+                        }
                         lastCompleted = syncUpdate.completed;
                         lastTotal = syncUpdate.total;
                         update({

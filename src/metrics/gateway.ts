@@ -102,7 +102,9 @@ export function incrementErrorsWithSeverity(
  * Returns 0 if gateway hasn't started.
  */
 export function getUptimeSeconds(): number {
-  if (gatewayStartTime === null) return 0;
+  if (gatewayStartTime === null) {
+    return 0;
+  }
   return (Date.now() - gatewayStartTime) / 1000;
 }
 

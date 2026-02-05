@@ -81,11 +81,11 @@ export function createSessionsSendTool(opts?: {
       }
 
       const listSessions = async (listParams: Record<string, unknown>) => {
-        const result = (await callGateway({
+        const result = await callGateway<{ sessions?: Array<Record<string, unknown>> }>({
           method: "sessions.list",
           params: listParams,
           timeoutMs: 10_000,
-        })) as { sessions?: Array<Record<string, unknown>> };
+        });
         return Array.isArray(result?.sessions) ? result.sessions : [];
       };
 
@@ -136,11 +136,11 @@ export function createSessionsSendTool(opts?: {
         };
         let resolvedKey = "";
         try {
-          const resolved = (await callGateway({
+          const resolved = await callGateway<{ key?: unknown }>({
             method: "sessions.resolve",
             params: resolveParams,
             timeoutMs: 10_000,
-          })) as { key?: unknown };
+          });
           resolvedKey = typeof resolved?.key === "string" ? resolved.key.trim() : "";
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -208,7 +208,7 @@ export function createSessionsSendTool(opts?: {
           limit: 500,
           spawnedBy: requesterInternalKey,
         });
-        const ok = sessions.some((entry) => entry?.key === resolvedKey);
+        const ok = sessions.some((entry: Record<string, unknown>) => entry?.key === resolvedKey);
         if (!ok) {
           return jsonResult({
             runId: crypto.randomUUID(),
@@ -283,11 +283,11 @@ export function createSessionsSendTool(opts?: {
 
       if (timeoutSeconds === 0) {
         try {
-          const response = (await callGateway({
+          const response = await callGateway<{ runId?: string; acceptedAt?: number }>({
             method: "agent",
             params: sendParams,
             timeoutMs: 10_000,
-          })) as { runId?: string; acceptedAt?: number };
+          });
           if (typeof response?.runId === "string" && response.runId) {
             runId = response.runId;
           }
@@ -311,11 +311,11 @@ export function createSessionsSendTool(opts?: {
       }
 
       try {
-        const response = (await callGateway({
+        const response = await callGateway<{ runId?: string; acceptedAt?: number }>({
           method: "agent",
           params: sendParams,
           timeoutMs: 10_000,
-        })) as { runId?: string; acceptedAt?: number };
+        });
         if (typeof response?.runId === "string" && response.runId) {
           runId = response.runId;
         }
@@ -333,14 +333,14 @@ export function createSessionsSendTool(opts?: {
       let waitStatus: string | undefined;
       let waitError: string | undefined;
       try {
-        const wait = (await callGateway({
+        const wait = await callGateway<{ status?: string; error?: string }>({
           method: "agent.wait",
           params: {
             runId,
             timeoutMs,
           },
           timeoutMs: timeoutMs + 2000,
-        })) as { status?: string; error?: string };
+        });
         waitStatus = typeof wait?.status === "string" ? wait.status : undefined;
         waitError = typeof wait?.error === "string" ? wait.error : undefined;
       } catch (err) {
@@ -371,10 +371,10 @@ export function createSessionsSendTool(opts?: {
         });
       }
 
-      const history = (await callGateway({
+      const history = await callGateway<{ messages?: unknown[] }>({
         method: "chat.history",
         params: { sessionKey: resolvedKey, limit: 50 },
-      })) as { messages?: unknown[] };
+      });
       const filtered = stripToolMessages(Array.isArray(history?.messages) ? history.messages : []);
       const last = filtered.length > 0 ? filtered[filtered.length - 1] : undefined;
       const reply = last ? extractAssistantText(last) : undefined;

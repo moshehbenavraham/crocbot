@@ -5,19 +5,27 @@ import type { ExecToolDefaults } from "../bash-tools.js";
 
 export function mapThinkingLevel(level?: ThinkLevel): ThinkingLevel {
   // pi-agent-core supports "xhigh"; crocbot enables it for specific models.
-  if (!level) return "off";
+  if (!level) {
+    return "off";
+  }
   return level;
 }
 
 export function resolveExecToolDefaults(config?: crocbotConfig): ExecToolDefaults | undefined {
   const tools = config?.tools;
-  if (!tools?.exec) return undefined;
+  if (!tools?.exec) {
+    return undefined;
+  }
   return tools.exec;
 }
 
 export function describeUnknownError(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
   try {
     const serialized = JSON.stringify(error);
     return serialized ?? "Unknown error";

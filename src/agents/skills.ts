@@ -39,7 +39,8 @@ export function resolveSkillsInstallPreferences(config?: crocbotConfig) {
   const manager = managerRaw.toLowerCase();
   const nodeManager =
     manager === "pnpm" || manager === "yarn" || manager === "bun" || manager === "npm"
-      ? (manager as "npm" | "pnpm" | "yarn" | "bun")
+      ? // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- TypeScript cannot narrow .toLowerCase() through equality checks
+        (manager as "npm" | "pnpm" | "yarn" | "bun")
       : "npm";
   return { preferBrew, nodeManager };
 }

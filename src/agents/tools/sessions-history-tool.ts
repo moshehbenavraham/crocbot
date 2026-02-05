@@ -28,7 +28,7 @@ async function isSpawnedSessionAllowed(params: {
   targetSessionKey: string;
 }): Promise<boolean> {
   try {
-    const list = (await callGateway({
+    const list = await callGateway<{ sessions?: Array<Record<string, unknown>> }>({
       method: "sessions.list",
       params: {
         includeGlobal: false,
@@ -36,9 +36,11 @@ async function isSpawnedSessionAllowed(params: {
         limit: 500,
         spawnedBy: params.requesterSessionKey,
       },
-    })) as { sessions?: Array<Record<string, unknown>> };
+    });
     const sessions = Array.isArray(list?.sessions) ? list.sessions : [];
-    return sessions.some((entry) => entry?.key === params.targetSessionKey);
+    return sessions.some(
+      (entry: Record<string, unknown>) => entry?.key === params.targetSessionKey,
+    );
   } catch {
     return false;
   }
@@ -126,10 +128,10 @@ export function createSessionsHistoryTool(opts?: {
           ? Math.max(1, Math.floor(params.limit))
           : undefined;
       const includeTools = Boolean(params.includeTools);
-      const result = (await callGateway({
+      const result = await callGateway<{ messages?: unknown[] }>({
         method: "chat.history",
         params: { sessionKey: resolvedKey, limit },
-      })) as { messages?: unknown[] };
+      });
       const rawMessages = Array.isArray(result?.messages) ? result.messages : [];
       const messages = includeTools ? rawMessages : stripToolMessages(rawMessages);
       return jsonResult({

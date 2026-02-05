@@ -33,7 +33,7 @@ metadata:
     const result = parseFrontmatterBlock(content);
     expect(result.metadata).toBeDefined();
 
-    const parsed = JSON5.parse(result.metadata ?? "") as { crocbot?: { emoji?: string } };
+    const parsed = JSON5.parse(result.metadata ?? "");
     expect(parsed.crocbot?.emoji).toBe("disk");
   });
 
@@ -65,7 +65,7 @@ metadata:
     expect(result.enabled).toBe("true");
     expect(result.retries).toBe("3");
     expect(JSON.parse(result.tags ?? "[]")).toEqual(["alpha", "beta"]);
-    const parsed = JSON5.parse(result.metadata ?? "") as { crocbot?: { events?: string[] } };
+    const parsed = JSON5.parse(result.metadata ?? "");
     expect(parsed.crocbot?.events).toEqual(["command:new"]);
   });
 

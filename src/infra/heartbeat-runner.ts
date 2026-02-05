@@ -115,13 +115,19 @@ function resolveActiveHoursTimezone(cfg: crocbotConfig, raw?: string): string {
 }
 
 function parseActiveHoursTime(opts: { allow24: boolean }, raw?: string): number | null {
-  if (!raw || !ACTIVE_HOURS_TIME_PATTERN.test(raw)) return null;
+  if (!raw || !ACTIVE_HOURS_TIME_PATTERN.test(raw)) {
+    return null;
+  }
   const [hourStr, minuteStr] = raw.split(":");
   const hour = Number(hourStr);
   const minute = Number(minuteStr);
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+    return null;
+  }
   if (hour === 24) {
-    if (!opts.allow24 || minute !== 0) return null;
+    if (!opts.allow24 || minute !== 0) {
+      return null;
+    }
     return 24 * 60;
   }
   return hour * 60 + minute;
@@ -137,11 +143,15 @@ function resolveMinutesInTimeZone(nowMs: number, timeZone: string): number | nul
     }).formatToParts(new Date(nowMs));
     const map: Record<string, string> = {};
     for (const part of parts) {
-      if (part.type !== "literal") map[part.type] = part.value;
+      if (part.type !== "literal") {
+        map[part.type] = part.value;
+      }
     }
     const hour = Number(map.hour);
     const minute = Number(map.minute);
-    if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+    if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+      return null;
+    }
     return hour * 60 + minute;
   } catch {
     return null;
@@ -154,16 +164,24 @@ function isWithinActiveHours(
   nowMs?: number,
 ): boolean {
   const active = heartbeat?.activeHours;
-  if (!active) return true;
+  if (!active) {
+    return true;
+  }
 
   const startMin = parseActiveHoursTime({ allow24: false }, active.start);
   const endMin = parseActiveHoursTime({ allow24: true }, active.end);
-  if (startMin === null || endMin === null) return true;
-  if (startMin === endMin) return true;
+  if (startMin === null || endMin === null) {
+    return true;
+  }
+  if (startMin === endMin) {
+    return true;
+  }
 
   const timeZone = resolveActiveHoursTimezone(cfg, active.timezone);
   const currentMin = resolveMinutesInTimeZone(nowMs ?? Date.now(), timeZone);
-  if (currentMin === null) return true;
+  if (currentMin === null) {
+    return true;
+  }
 
   if (endMin > startMin) {
     return currentMin >= startMin && currentMin < endMin;
@@ -203,9 +221,13 @@ export function isHeartbeatEnabledForAgent(cfg: crocbotConfig, agentId?: string)
 
 function resolveHeartbeatConfig(cfg: crocbotConfig, agentId?: string): HeartbeatConfig | undefined {
   const defaults = cfg.agents?.defaults?.heartbeat;
-  if (!agentId) return defaults;
+  if (!agentId) {
+    return defaults;
+  }
   const overrides = resolveAgentConfig(cfg, agentId)?.heartbeat;
-  if (!defaults && !overrides) return overrides;
+  if (!defaults && !overrides) {
+    return overrides;
+  }
   return { ...defaults, ...overrides };
 }
 
@@ -282,16 +304,22 @@ export function resolveHeartbeatIntervalMs(
     heartbeat?.every ??
     cfg.agents?.defaults?.heartbeat?.every ??
     DEFAULT_HEARTBEAT_EVERY;
-  if (!raw) return null;
+  if (!raw) {
+    return null;
+  }
   const trimmed = String(raw).trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   let ms: number;
   try {
     ms = parseDurationMs(trimmed, { defaultUnit: "m" });
   } catch {
     return null;
   }
-  if (ms <= 0) return null;
+  if (ms <= 0) {
+    return null;
+  }
   return ms;
 }
 
@@ -360,11 +388,17 @@ function resolveHeartbeatSession(
 function resolveHeartbeatReplyPayload(
   replyResult: ReplyPayload | ReplyPayload[] | undefined,
 ): ReplyPayload | undefined {
-  if (!replyResult) return undefined;
-  if (!Array.isArray(replyResult)) return replyResult;
+  if (!replyResult) {
+    return undefined;
+  }
+  if (!Array.isArray(replyResult)) {
+    return replyResult;
+  }
   for (let idx = replyResult.length - 1; idx >= 0; idx -= 1) {
     const payload = replyResult[idx];
-    if (!payload) continue;
+    if (!payload) {
+      continue;
+    }
     if (payload.text || payload.mediaUrl || (payload.mediaUrls && payload.mediaUrls.length > 0)) {
       return payload;
     }
@@ -388,17 +422,27 @@ async function restoreHeartbeatUpdatedAt(params: {
   updatedAt?: number;
 }) {
   const { storePath, sessionKey, updatedAt } = params;
-  if (typeof updatedAt !== "number") return;
+  if (typeof updatedAt !== "number") {
+    return;
+  }
   const store = loadSessionStore(storePath);
   const entry = store[sessionKey];
-  if (!entry) return;
+  if (!entry) {
+    return;
+  }
   const nextUpdatedAt = Math.max(entry.updatedAt ?? 0, updatedAt);
-  if (entry.updatedAt === nextUpdatedAt) return;
+  if (entry.updatedAt === nextUpdatedAt) {
+    return;
+  }
   await updateSessionStore(storePath, (nextStore) => {
     const nextEntry = nextStore[sessionKey] ?? entry;
-    if (!nextEntry) return;
+    if (!nextEntry) {
+      return;
+    }
     const resolvedUpdatedAt = Math.max(nextEntry.updatedAt ?? 0, updatedAt);
-    if (nextEntry.updatedAt === resolvedUpdatedAt) return;
+    if (nextEntry.updatedAt === resolvedUpdatedAt) {
+      return;
+    }
     nextStore[sessionKey] = { ...nextEntry, updatedAt: resolvedUpdatedAt };
   });
 }
@@ -522,7 +566,9 @@ export async function runHeartbeatOnce(opts: {
     visibility.showOk && delivery.channel !== "none" && delivery.to,
   );
   const maybeSendHeartbeatOk = async () => {
-    if (!canAttemptHeartbeatOk || delivery.channel === "none" || !delivery.to) return false;
+    if (!canAttemptHeartbeatOk || delivery.channel === "none" || !delivery.to) {
+      return false;
+    }
     const heartbeatPlugin = getChannelPlugin(delivery.channel);
     if (heartbeatPlugin?.heartbeat?.checkReady) {
       const readiness = await heartbeatPlugin.heartbeat.checkReady({
@@ -530,7 +576,9 @@ export async function runHeartbeatOnce(opts: {
         accountId: delivery.accountId,
         deps: opts.deps,
       });
-      if (!readiness.ok) return false;
+      if (!readiness.ok) {
+        return false;
+      }
     }
     await deliverOutboundPayloads({
       cfg,
@@ -783,12 +831,16 @@ export function startHeartbeatRunner(opts: {
   };
 
   const scheduleNext = () => {
-    if (state.stopped) return;
+    if (state.stopped) {
+      return;
+    }
     if (state.timer) {
       clearTimeout(state.timer);
       state.timer = null;
     }
-    if (state.agents.size === 0) return;
+    if (state.agents.size === 0) {
+      return;
+    }
     const now = Date.now();
 
     // Clock jump detection: check if time since last schedule exceeds expected bounds
@@ -813,9 +865,13 @@ export function startHeartbeatRunner(opts: {
 
     let nextDue = Number.POSITIVE_INFINITY;
     for (const agent of state.agents.values()) {
-      if (agent.nextDueMs < nextDue) nextDue = agent.nextDueMs;
+      if (agent.nextDueMs < nextDue) {
+        nextDue = agent.nextDueMs;
+      }
     }
-    if (!Number.isFinite(nextDue)) return;
+    if (!Number.isFinite(nextDue)) {
+      return;
+    }
     const delay = Math.max(0, nextDue - now);
     state.timer = setTimeout(() => {
       requestHeartbeatNow({ reason: "interval", coalesceMs: 0 });
@@ -824,7 +880,9 @@ export function startHeartbeatRunner(opts: {
   };
 
   const updateConfig = (cfg: crocbotConfig) => {
-    if (state.stopped) return;
+    if (state.stopped) {
+      return;
+    }
     const now = Date.now();
     const prevAgents = state.agents;
     const prevEnabled = prevAgents.size > 0;
@@ -832,7 +890,9 @@ export function startHeartbeatRunner(opts: {
     const intervals: number[] = [];
     for (const agent of resolveHeartbeatAgents(cfg)) {
       const intervalMs = resolveHeartbeatIntervalMs(cfg, undefined, agent.heartbeat);
-      if (!intervalMs) continue;
+      if (!intervalMs) {
+        continue;
+      }
       intervals.push(intervalMs);
       const prevState = prevAgents.get(agent.agentId);
       const nextDueMs = resolveNextDue(now, intervalMs, prevState);
@@ -899,11 +959,15 @@ export function startHeartbeatRunner(opts: {
         agent.lastRunMs = now;
         agent.nextDueMs = now + agent.intervalMs;
       }
-      if (res.status === "ran") ran = true;
+      if (res.status === "ran") {
+        ran = true;
+      }
     }
 
     scheduleNext();
-    if (ran) return { status: "ran", durationMs: Date.now() - startedAt };
+    if (ran) {
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
     return { status: "skipped", reason: isInterval ? "not-due" : "disabled" };
   };
 
@@ -913,7 +977,9 @@ export function startHeartbeatRunner(opts: {
   const cleanup = () => {
     state.stopped = true;
     setHeartbeatWakeHandler(null);
-    if (state.timer) clearTimeout(state.timer);
+    if (state.timer) {
+      clearTimeout(state.timer);
+    }
     state.timer = null;
   };
 

@@ -6,8 +6,12 @@ const FINAL_TAG_RE = /<\s*\/?\s*final\b[^>]*>/gi;
 const THINKING_TAG_RE = /<\s*(\/?)\s*(?:think(?:ing)?|thought|antthinking)\b[^>]*>/gi;
 
 function applyTrim(value: string, mode: ReasoningTagTrim): string {
-  if (mode === "none") return value;
-  if (mode === "start") return value.trimStart();
+  if (mode === "none") {
+    return value;
+  }
+  if (mode === "start") {
+    return value.trimStart();
+  }
   return value.trim();
 }
 
@@ -18,8 +22,12 @@ export function stripReasoningTagsFromText(
     trim?: ReasoningTagTrim;
   },
 ): string {
-  if (!text) return text;
-  if (!QUICK_TAG_RE.test(text)) return text;
+  if (!text) {
+    return text;
+  }
+  if (!QUICK_TAG_RE.test(text)) {
+    return text;
+  }
 
   const mode = options?.mode ?? "strict";
   const trimMode = options?.trim ?? "both";

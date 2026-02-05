@@ -15,10 +15,14 @@ function resolveHomeDir(): string {
 }
 
 export async function noteMacLaunchAgentOverrides() {
-  if (process.platform !== "darwin") return;
+  if (process.platform !== "darwin") {
+    return;
+  }
   const markerPath = path.join(resolveHomeDir(), ".crocbot", "disable-launchagent");
   const hasMarker = fs.existsSync(markerPath);
-  if (!hasMarker) return;
+  if (!hasMarker) {
+    return;
+  }
 
   const displayMarkerPath = shortenHomePath(markerPath);
   const lines = [
@@ -60,13 +64,19 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
   },
 ) {
   const platform = deps?.platform ?? process.platform;
-  if (platform !== "darwin") return;
-  if (!hasConfigGatewayCreds(cfg)) return;
+  if (platform !== "darwin") {
+    return;
+  }
+  if (!hasConfigGatewayCreds(cfg)) {
+    return;
+  }
 
   const getenv = deps?.getenv ?? launchctlGetenv;
   const envToken = await getenv("CROCBOT_GATEWAY_TOKEN");
   const envPassword = await getenv("CROCBOT_GATEWAY_PASSWORD");
-  if (!envToken && !envPassword) return;
+  if (!envToken && !envPassword) {
+    return;
+  }
 
   const lines = [
     "- launchctl environment overrides detected (can cause confusing unauthorized errors).",

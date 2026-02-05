@@ -80,9 +80,8 @@ describe("redactConfigObject", () => {
     };
     const result = redactConfigObject(input);
     const account = (
-      (result.channels as Record<string, Record<string, Record<string, Record<string, unknown>>>>)
-        .telegram.accounts as Record<string, Record<string, unknown>>
-    ).main;
+      result.channels as Record<string, Record<string, Record<string, Record<string, unknown>>>>
+    ).telegram.accounts.main;
     expect(account.botToken).toBe("[REDACTED]");
     expect(account.webhookSecret).toBe("[REDACTED]");
     expect(account.name).toBe("MainBot");

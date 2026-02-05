@@ -16,15 +16,23 @@ export type NormalizedPluginsConfig = {
 export const BUNDLED_ENABLED_BY_DEFAULT = new Set<string>(["telegram"]);
 
 const normalizeList = (value: unknown): string[] => {
-  if (!Array.isArray(value)) return [];
+  if (!Array.isArray(value)) {
+    return [];
+  }
   return value.map((entry) => (typeof entry === "string" ? entry.trim() : "")).filter(Boolean);
 };
 
 const normalizeSlotValue = (value: unknown): string | null | undefined => {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== "string") {
+    return undefined;
+  }
   const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  if (trimmed.toLowerCase() === "none") return null;
+  if (!trimmed) {
+    return undefined;
+  }
+  if (trimmed.toLowerCase() === "none") {
+    return null;
+  }
   return trimmed;
 };
 
@@ -34,7 +42,9 @@ const normalizePluginEntries = (entries: unknown): NormalizedPluginsConfig["entr
   }
   const normalized: NormalizedPluginsConfig["entries"] = {};
   for (const [key, value] of Object.entries(entries)) {
-    if (!key.trim()) continue;
+    if (!key.trim()) {
+      continue;
+    }
     if (!value || typeof value !== "object" || Array.isArray(value)) {
       normalized[key] = {};
       continue;
@@ -103,7 +113,9 @@ export function resolveMemorySlotDecision(params: {
   slot: string | null | undefined;
   selectedId: string | null;
 }): { enabled: boolean; reason?: string; selected?: boolean } {
-  if (params.kind !== "memory") return { enabled: true };
+  if (params.kind !== "memory") {
+    return { enabled: true };
+  }
   if (params.slot === null) {
     return { enabled: false, reason: "memory slot disabled" };
   }

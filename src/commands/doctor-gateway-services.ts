@@ -25,16 +25,24 @@ function detectGatewayRuntime(programArguments: string[] | undefined): GatewayDa
   const first = programArguments?.[0];
   if (first) {
     const base = path.basename(first).toLowerCase();
-    if (base === "bun" || base === "bun.exe") return "bun";
-    if (base === "node" || base === "node.exe") return "node";
+    if (base === "bun" || base === "bun.exe") {
+      return "bun";
+    }
+    if (base === "node" || base === "node.exe") {
+      return "node";
+    }
   }
   return DEFAULT_GATEWAY_DAEMON_RUNTIME;
 }
 
 function findGatewayEntrypoint(programArguments?: string[]): string | null {
-  if (!programArguments || programArguments.length === 0) return null;
+  if (!programArguments || programArguments.length === 0) {
+    return null;
+  }
   const gatewayIndex = programArguments.indexOf("gateway");
-  if (gatewayIndex <= 0) return null;
+  if (gatewayIndex <= 0) {
+    return null;
+  }
   return programArguments[gatewayIndex - 1] ?? null;
 }
 
@@ -49,7 +57,9 @@ export async function maybeMigrateLegacyGatewayService(
   prompter: DoctorPrompter,
 ) {
   const legacyServices = await findLegacyGatewayServices(process.env);
-  if (legacyServices.length === 0) return;
+  if (legacyServices.length === 0) {
+    return;
+  }
 
   note(
     legacyServices.map((svc) => `- ${svc.label} (${svc.platform}, ${svc.detail})`).join("\n"),
@@ -60,7 +70,9 @@ export async function maybeMigrateLegacyGatewayService(
     message: "Migrate legacy gateway services to crocbot now?",
     initialValue: true,
   });
-  if (!migrate) return;
+  if (!migrate) {
+    return;
+  }
 
   try {
     await uninstallLegacyGatewayServices({
@@ -93,7 +105,9 @@ export async function maybeMigrateLegacyGatewayService(
     message: "Install crocbot gateway service now?",
     initialValue: true,
   });
-  if (!install) return;
+  if (!install) {
+    return;
+  }
 
   const daemonRuntime = await prompter.select<GatewayDaemonRuntime>(
     {
@@ -149,7 +163,9 @@ export async function maybeRepairGatewayServiceConfig(
   } catch {
     command = null;
   }
-  if (!command) return;
+  if (!command) {
+    return;
+  }
 
   const audit = await auditGatewayServiceConfig({
     env: process.env,
@@ -162,7 +178,9 @@ export async function maybeRepairGatewayServiceConfig(
   const systemNodePath = systemNodeInfo?.supported ? systemNodeInfo.path : null;
   if (needsNodeRuntime && !systemNodePath) {
     const warning = renderSystemNodeWarning(systemNodeInfo);
-    if (warning) note(warning, "Gateway runtime");
+    if (warning) {
+      note(warning, "Gateway runtime");
+    }
     note(
       "System Node 22+ not found. Install via Homebrew/apt/choco and rerun doctor to migrate off Bun/version managers.",
       "Gateway runtime",
@@ -195,7 +213,9 @@ export async function maybeRepairGatewayServiceConfig(
     });
   }
 
-  if (audit.issues.length === 0) return;
+  if (audit.issues.length === 0) {
+    return;
+  }
 
   note(
     audit.issues
@@ -225,7 +245,9 @@ export async function maybeRepairGatewayServiceConfig(
         message: "Update gateway service config to the recommended defaults now?",
         initialValue: true,
       });
-  if (!repair) return;
+  if (!repair) {
+    return;
+  }
   try {
     await service.install({
       env: process.env,
@@ -243,7 +265,9 @@ export async function maybeScanExtraGatewayServices(options: DoctorOptions) {
   const extraServices = await findExtraGatewayServices(process.env, {
     deep: options.deep,
   });
-  if (extraServices.length === 0) return;
+  if (extraServices.length === 0) {
+    return;
+  }
 
   note(
     extraServices.map((svc) => `- ${svc.label} (${svc.scope}, ${svc.detail})`).join("\n"),

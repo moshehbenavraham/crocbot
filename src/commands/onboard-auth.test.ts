@@ -25,7 +25,9 @@ import {
 const authProfilePathFor = (agentDir: string) => path.join(agentDir, "auth-profiles.json");
 const requireAgentDir = () => {
   const agentDir = process.env.CROCBOT_AGENT_DIR;
-  if (!agentDir) throw new Error("CROCBOT_AGENT_DIR not set");
+  if (!agentDir) {
+    throw new Error("CROCBOT_AGENT_DIR not set");
+  }
   return agentDir;
 };
 

@@ -67,10 +67,14 @@ function matchesMessagingToolDeliveryTarget(
   target: MessagingToolSend,
   delivery: { channel: string; to?: string; accountId?: string },
 ): boolean {
-  if (!delivery.to || !target.to) return false;
+  if (!delivery.to || !target.to) {
+    return false;
+  }
   const channel = delivery.channel.trim().toLowerCase();
   const provider = target.provider?.trim().toLowerCase();
-  if (provider && provider !== "message" && provider !== channel) return false;
+  if (provider && provider !== "message" && provider !== channel) {
+    return false;
+  }
   if (target.accountId && delivery.accountId && target.accountId !== delivery.accountId) {
     return false;
   }
@@ -262,7 +266,7 @@ export async function runCronIsolatedAgentTurn(params: {
       logWarn(
         `[security] Suspicious patterns detected in external hook content ` +
           `(session=${baseSessionKey}, patterns=${suspiciousPatterns.length}): ` +
-          `${suspiciousPatterns.slice(0, 3).join(", ")}`,
+          suspiciousPatterns.slice(0, 3).join(", "),
       );
     }
   }

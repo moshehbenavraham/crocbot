@@ -69,7 +69,8 @@
     "phase04-session03-bug-fix-validation",
     "phase05-session01-research-build-tooling-delta",
     "phase05-session02-tsdown-migration",
-    "phase05-session03-typescript-config-unification"
+    "phase05-session03-typescript-config-unification",
+    "phase05-session04-stricter-linting-rules"
   ],
   "next_session_history": [
     {
@@ -745,6 +746,31 @@
     {
       "date": "2026-02-05",
       "session": "phase05-session03-typescript-config-unification",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session04-stricter-linting-rules",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session04-stricter-linting-rules",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session04-stricter-linting-rules",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session04-stricter-linting-rules",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session04-stricter-linting-rules",
       "status": "completed"
     }
   ]

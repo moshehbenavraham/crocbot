@@ -26,7 +26,9 @@ let defaultMetricsEnabled = false;
  * Call this once during gateway startup.
  */
 export function enableDefaultMetrics(): void {
-  if (defaultMetricsEnabled) return;
+  if (defaultMetricsEnabled) {
+    return;
+  }
   collectDefaultMetrics({ register: registry });
   defaultMetricsEnabled = true;
 }

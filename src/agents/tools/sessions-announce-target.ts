@@ -20,18 +20,18 @@ export async function resolveAnnounceTarget(params: {
   }
 
   try {
-    const list = (await callGateway({
+    const list = await callGateway<{ sessions?: Array<Record<string, unknown>> }>({
       method: "sessions.list",
       params: {
         includeGlobal: true,
         includeUnknown: true,
         limit: 200,
       },
-    })) as { sessions?: Array<Record<string, unknown>> };
+    });
     const sessions = Array.isArray(list?.sessions) ? list.sessions : [];
     const match =
-      sessions.find((entry) => entry?.key === params.sessionKey) ??
-      sessions.find((entry) => entry?.key === params.displayKey);
+      sessions.find((entry: Record<string, unknown>) => entry?.key === params.sessionKey) ??
+      sessions.find((entry: Record<string, unknown>) => entry?.key === params.displayKey);
 
     const deliveryContext =
       match?.deliveryContext && typeof match.deliveryContext === "object"
@@ -46,7 +46,9 @@ export async function resolveAnnounceTarget(params: {
     const accountId =
       (typeof deliveryContext?.accountId === "string" ? deliveryContext.accountId : undefined) ??
       (typeof match?.lastAccountId === "string" ? match.lastAccountId : undefined);
-    if (channel && to) return { channel, to, accountId };
+    if (channel && to) {
+      return { channel, to, accountId };
+    }
   } catch {
     // ignore
   }

@@ -52,11 +52,15 @@ describe("exec tool backgrounding", () => {
   const originalShell = process.env.SHELL;
 
   beforeEach(() => {
-    if (!isWin) process.env.SHELL = "/bin/bash";
+    if (!isWin) {
+      process.env.SHELL = "/bin/bash";
+    }
   });
 
   afterEach(() => {
-    if (!isWin) process.env.SHELL = originalShell;
+    if (!isWin) {
+      process.env.SHELL = originalShell;
+    }
   });
 
   it(
@@ -282,12 +286,16 @@ describe("exec PATH handling", () => {
   const originalShell = process.env.SHELL;
 
   beforeEach(() => {
-    if (!isWin) process.env.SHELL = "/bin/bash";
+    if (!isWin) {
+      process.env.SHELL = "/bin/bash";
+    }
   });
 
   afterEach(() => {
     process.env.PATH = originalPath;
-    if (!isWin) process.env.SHELL = originalShell;
+    if (!isWin) {
+      process.env.SHELL = originalShell;
+    }
   });
 
   it("prepends configured path entries", async () => {

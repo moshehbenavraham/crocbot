@@ -36,10 +36,14 @@ export async function resolveGlobalRoot(
   runCommand: CommandRunner,
   timeoutMs: number,
 ): Promise<string | null> {
-  if (manager === "bun") return resolveBunGlobalRoot();
+  if (manager === "bun") {
+    return resolveBunGlobalRoot();
+  }
   const argv = manager === "pnpm" ? ["pnpm", "root", "-g"] : ["npm", "root", "-g"];
   const res = await runCommand(argv, { timeoutMs }).catch(() => null);
-  if (!res || res.code !== 0) return null;
+  if (!res || res.code !== 0) {
+    return null;
+  }
   const root = res.stdout.trim();
   return root || null;
 }
@@ -50,7 +54,9 @@ export async function resolveGlobalPackageRoot(
   timeoutMs: number,
 ): Promise<string | null> {
   const root = await resolveGlobalRoot(manager, runCommand, timeoutMs);
-  if (!root) return null;
+  if (!root) {
+    return null;
+  }
   return path.join(root, "crocbot");
 }
 
@@ -71,18 +77,26 @@ export async function detectGlobalInstallManagerForRoot(
 
   for (const { manager, argv } of candidates) {
     const res = await runCommand(argv, { timeoutMs }).catch(() => null);
-    if (!res || res.code !== 0) continue;
+    if (!res || res.code !== 0) {
+      continue;
+    }
     const globalRoot = res.stdout.trim();
-    if (!globalRoot) continue;
+    if (!globalRoot) {
+      continue;
+    }
     const globalReal = await tryRealpath(globalRoot);
     const expected = path.join(globalReal, "crocbot");
-    if (path.resolve(expected) === path.resolve(pkgReal)) return manager;
+    if (path.resolve(expected) === path.resolve(pkgReal)) {
+      return manager;
+    }
   }
 
   const bunGlobalRoot = resolveBunGlobalRoot();
   const bunGlobalReal = await tryRealpath(bunGlobalRoot);
   const bunExpected = path.join(bunGlobalReal, "crocbot");
-  if (path.resolve(bunExpected) === path.resolve(pkgReal)) return "bun";
+  if (path.resolve(bunExpected) === path.resolve(pkgReal)) {
+    return "bun";
+  }
 
   return null;
 }
@@ -93,17 +107,27 @@ export async function detectGlobalInstallManagerByPresence(
 ): Promise<GlobalInstallManager | null> {
   for (const manager of ["npm", "pnpm"] as const) {
     const root = await resolveGlobalRoot(manager, runCommand, timeoutMs);
-    if (!root) continue;
-    if (await pathExists(path.join(root, "crocbot"))) return manager;
+    if (!root) {
+      continue;
+    }
+    if (await pathExists(path.join(root, "crocbot"))) {
+      return manager;
+    }
   }
 
   const bunRoot = resolveBunGlobalRoot();
-  if (await pathExists(path.join(bunRoot, "crocbot"))) return "bun";
+  if (await pathExists(path.join(bunRoot, "crocbot"))) {
+    return "bun";
+  }
   return null;
 }
 
 export function globalInstallArgs(manager: GlobalInstallManager, spec: string): string[] {
-  if (manager === "pnpm") return ["pnpm", "add", "-g", spec];
-  if (manager === "bun") return ["bun", "add", "-g", spec];
+  if (manager === "pnpm") {
+    return ["pnpm", "add", "-g", spec];
+  }
+  if (manager === "bun") {
+    return ["bun", "add", "-g", spec];
+  }
   return ["npm", "i", "-g", spec];
 }

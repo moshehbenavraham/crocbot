@@ -82,7 +82,9 @@ function isSensitiveKey(key: string): boolean {
  */
 function looksLikeSecret(value: string): boolean {
   // Skip empty or very short strings
-  if (value.length < 8) return false;
+  if (value.length < 8) {
+    return false;
+  }
 
   // Check for common API key patterns
   const secretPatterns = [

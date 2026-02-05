@@ -415,8 +415,11 @@ describe("doctor command", () => {
         { nonInteractive: true, workspaceSuggestions: false },
       );
     } finally {
-      if (prevToken === undefined) delete process.env.CROCBOT_GATEWAY_TOKEN;
-      else process.env.CROCBOT_GATEWAY_TOKEN = prevToken;
+      if (prevToken === undefined) {
+        delete process.env.CROCBOT_GATEWAY_TOKEN;
+      } else {
+        process.env.CROCBOT_GATEWAY_TOKEN = prevToken;
+      }
     }
 
     const warned = note.mock.calls.some(([message]) =>

@@ -15,7 +15,9 @@ export type PluginHookLoadResult = {
 };
 
 function resolveHookDir(api: crocbotPluginApi, dir: string): string {
-  if (path.isAbsolute(dir)) return dir;
+  if (path.isAbsolute(dir)) {
+    return dir;
+  }
   return path.resolve(path.dirname(api.source), dir);
 }
 

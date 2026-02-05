@@ -371,7 +371,9 @@ describe("doctor command", () => {
 
     expect(
       note.mock.calls.some(([message, title]) => {
-        if (title !== "Sandbox" || typeof message !== "string") return false;
+        if (title !== "Sandbox" || typeof message !== "string") {
+          return false;
+        }
         const normalized = message.replace(/\s+/g, " ").trim();
         return (
           normalized.includes('agents.list (id "work") sandbox docker') &&
@@ -401,8 +403,13 @@ describe("doctor command", () => {
     const legacyPath = path.join("/Users/steipete", "crocbot");
     const legacyAgentsPath = path.join(legacyPath, "AGENTS.md");
     const existsSpy = vi.spyOn(fs, "existsSync").mockImplementation((value) => {
-      if (value === "/Users/steipete/crocbot" || value === legacyPath || value === legacyAgentsPath)
+      if (
+        value === "/Users/steipete/crocbot" ||
+        value === legacyPath ||
+        value === legacyAgentsPath
+      ) {
         return true;
+      }
       return realExists(value as never);
     });
 

@@ -59,7 +59,9 @@ const ANTHROPIC_MAGIC_STRING_TRIGGER_REFUSAL = "ANTHROPIC_MAGIC_STRING_TRIGGER_R
 const ANTHROPIC_MAGIC_STRING_REPLACEMENT = "ANTHROPIC MAGIC STRING TRIGGER REFUSAL (redacted)";
 
 function scrubAnthropicRefusalMagic(prompt: string): string {
-  if (!prompt.includes(ANTHROPIC_MAGIC_STRING_TRIGGER_REFUSAL)) return prompt;
+  if (!prompt.includes(ANTHROPIC_MAGIC_STRING_TRIGGER_REFUSAL)) {
+    return prompt;
+  }
   return prompt.replaceAll(
     ANTHROPIC_MAGIC_STRING_TRIGGER_REFUSAL,
     ANTHROPIC_MAGIC_STRING_REPLACEMENT,
@@ -173,7 +175,9 @@ export async function runEmbeddedPiAgent(
         allInCooldown: boolean;
         message: string;
       }): FailoverReason => {
-        if (params.allInCooldown) return "rate_limit";
+        if (params.allInCooldown) {
+          return "rate_limit";
+        }
         const classified = classifyFailoverReason(params.message);
         return classified ?? "auth";
       };
@@ -201,7 +205,9 @@ export async function runEmbeddedPiAgent(
             cause: params.error,
           });
         }
-        if (params.error instanceof Error) throw params.error;
+        if (params.error instanceof Error) {
+          throw params.error;
+        }
         throw new Error(message);
       };
 
@@ -241,7 +247,9 @@ export async function runEmbeddedPiAgent(
       };
 
       const advanceAuthProfile = async (): Promise<boolean> => {
-        if (lockedProfileId) return false;
+        if (lockedProfileId) {
+          return false;
+        }
         let nextIndex = profileIndex + 1;
         while (nextIndex < profileCandidates.length) {
           const candidate = profileCandidates[nextIndex];
@@ -256,7 +264,9 @@ export async function runEmbeddedPiAgent(
             attemptedThinking.clear();
             return true;
           } catch (err) {
-            if (candidate && candidate === lockedProfileId) throw err;
+            if (candidate && candidate === lockedProfileId) {
+              throw err;
+            }
             nextIndex += 1;
           }
         }
@@ -281,7 +291,9 @@ export async function runEmbeddedPiAgent(
           throwAuthProfileFailover({ allInCooldown: true });
         }
       } catch (err) {
-        if (err instanceof FailoverError) throw err;
+        if (err instanceof FailoverError) {
+          throw err;
+        }
         if (profileCandidates[profileIndex] === lockedProfileId) {
           throwAuthProfileFailover({ allInCooldown: false, error: err });
         }
@@ -549,7 +561,9 @@ export async function runEmbeddedPiAgent(
             }
 
             const rotated = await advanceAuthProfile();
-            if (rotated) continue;
+            if (rotated) {
+              continue;
+            }
 
             if (fallbackConfigured) {
               // Prefer formatted error message (user-friendly) over raw errorMessage

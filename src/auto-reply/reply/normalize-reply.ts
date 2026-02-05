@@ -25,12 +25,16 @@ export function normalizeReplyPayload(
     payload.channelData && Object.keys(payload.channelData).length > 0,
   );
   const trimmed = payload.text?.trim() ?? "";
-  if (!trimmed && !hasMedia && !hasChannelData) return null;
+  if (!trimmed && !hasMedia && !hasChannelData) {
+    return null;
+  }
 
   const silentToken = opts.silentToken ?? SILENT_REPLY_TOKEN;
   let text = payload.text ?? undefined;
   if (text && isSilentReplyText(text, silentToken)) {
-    if (!hasMedia && !hasChannelData) return null;
+    if (!hasMedia && !hasChannelData) {
+      return null;
+    }
     text = "";
   }
   if (text && !trimmed) {
@@ -41,15 +45,21 @@ export function normalizeReplyPayload(
   const shouldStripHeartbeat = opts.stripHeartbeat ?? true;
   if (shouldStripHeartbeat && text?.includes(HEARTBEAT_TOKEN)) {
     const stripped = stripHeartbeatToken(text, { mode: "message" });
-    if (stripped.didStrip) opts.onHeartbeatStrip?.();
-    if (stripped.shouldSkip && !hasMedia && !hasChannelData) return null;
+    if (stripped.didStrip) {
+      opts.onHeartbeatStrip?.();
+    }
+    if (stripped.shouldSkip && !hasMedia && !hasChannelData) {
+      return null;
+    }
     text = stripped.text;
   }
 
   if (text) {
     text = sanitizeUserFacingText(text);
   }
-  if (!text?.trim() && !hasMedia && !hasChannelData) return null;
+  if (!text?.trim() && !hasMedia && !hasChannelData) {
+    return null;
+  }
 
   let enrichedPayload: ReplyPayload = { ...payload, text };
 

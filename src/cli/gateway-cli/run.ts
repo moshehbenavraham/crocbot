@@ -134,7 +134,9 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
   }
   if (opts.token) {
     const token = toOptionString(opts.token);
-    if (token) process.env.CROCBOT_GATEWAY_TOKEN = token;
+    if (token) {
+      process.env.CROCBOT_GATEWAY_TOKEN = token;
+    }
   }
   const authModeRaw = toOptionString(opts.auth);
   const authMode: GatewayAuthMode | null =

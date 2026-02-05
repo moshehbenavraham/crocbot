@@ -25,7 +25,6 @@
 | `gifgrep` | `/skill gifgrep cats` | — | ⬜ |
 | `github` | `/skill github` | — | ⬜ |
 | `goplaces` | `/skill goplaces coffee near me` | Google Places | ⬜ |
-| `himalaya` | `/skill himalaya` | Gmail App Password | ✅ |
 | `local-places` | `/skill local-places` | Google Places | ⬜ |
 | `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ⬜ |
 | `nano-pdf` | `/skill nano-pdf` | — | ⬜ |
@@ -51,8 +50,8 @@
 
 ## Session 15
 
-- Configured himalaya (Gmail via App Password)
 - Added exec approvals for all skill binaries (`~/.crocbot/exec-approvals.json`)
+- *(himalaya email skill removed — replaced by Gmail hook integration)*
 
 ---
 

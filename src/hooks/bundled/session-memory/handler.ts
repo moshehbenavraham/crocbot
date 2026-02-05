@@ -36,7 +36,11 @@ async function getRecentSessionContent(sessionFilePath: string): Promise<string 
           if ((role === "user" || role === "assistant") && msg.content) {
             // Extract text content
             const text = Array.isArray(msg.content)
-              ? msg.content.find((c: any) => c.type === "text")?.text
+              ? (
+                  msg.content.find((c: Record<string, unknown>) => c.type === "text") as
+                    | Record<string, unknown>
+                    | undefined
+                )?.text
               : msg.content;
             if (text && !text.startsWith("/")) {
               messages.push(`${role}: ${text}`);
@@ -121,7 +125,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
 
     // If no slug, use timestamp
     if (!slug) {
-      const timeSlug = now.toISOString().split("T")[1]!.split(".")[0]!.replace(/:/g, "");
+      const timeSlug = now.toISOString().split("T")[1].split(".")[0].replace(/:/g, "");
       slug = timeSlug.slice(0, 4); // HHMM
       console.log("[session-memory] Using fallback timestamp slug:", slug);
     }
@@ -133,7 +137,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     console.log("[session-memory] Full path:", memoryFilePath);
 
     // Format time as HH:MM:SS UTC
-    const timeStr = now.toISOString().split("T")[1]!.split(".")[0];
+    const timeStr = now.toISOString().split("T")[1].split(".")[0];
 
     // Extract context details
     const sessionId = (sessionEntry.sessionId as string) || "unknown";

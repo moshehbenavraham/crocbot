@@ -3,9 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 const githubCopilotLoginCommand = vi.fn();
 
 vi.mock("../commands/models.js", async () => {
-  const actual = (await vi.importActual<typeof import("../commands/models.js")>(
-    "../commands/models.js",
-  )) as typeof import("../commands/models.js");
+  const actual =
+    await vi.importActual<typeof import("../commands/models.js")>("../commands/models.js");
 
   return {
     ...actual,

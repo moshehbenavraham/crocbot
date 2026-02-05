@@ -70,7 +70,9 @@ export async function applyMediaUnderstanding(params: {
     const outputs: MediaUnderstandingOutput[] = [];
     const decisions: MediaUnderstandingDecision[] = [];
     for (const entry of results) {
-      if (!entry) continue;
+      if (!entry) {
+        continue;
+      }
       for (const output of entry.outputs) {
         outputs.push(output);
       }

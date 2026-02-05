@@ -121,7 +121,7 @@ Initial `dmPolicy: "pairing"` blocked all messages with "You are not authorized"
 ### Analysis
 
 **Installed binaries (working):**
-- `bird`, `mcporter`, `gh`, `curl`, `python3`, `jq`, `rg`, `ffmpeg`, `tmux`, `uv`, `whisper`, `himalaya`, `ordercli`, `gifgrep`, `gog`, `goplaces`, `nano-pdf`, `obsidian-cli`, `sag`, `songsee`
+- `bird`, `mcporter`, `gh`, `curl`, `python3`, `jq`, `rg`, `ffmpeg`, `tmux`, `uv`, `whisper`, `ordercli`, `gifgrep`, `gog`, `goplaces`, `nano-pdf`, `obsidian-cli`, `sag`, `songsee`
 
 **Missing binaries:**
 - `spogo` (spotify-player) - not installed
@@ -140,7 +140,7 @@ Added `skills.allowBundled` to `~/.crocbot/crocbot.json` to only load useful ski
 "skills": {
   "allowBundled": [
     "bird", "coding-agent", "gifgrep", "github", "goplaces",
-    "himalaya", "local-places", "nano-banana-pro", "nano-pdf",
+    "local-places", "nano-banana-pro", "nano-pdf",
     "notion", "openai-image-gen", "openai-whisper-api", "sag",
     "session-logs", "skill-creator", "tmux", "trello", "weather"
   ]

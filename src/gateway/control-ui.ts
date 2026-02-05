@@ -42,7 +42,9 @@ function resolveControlUiRoot(): string | null {
     path.resolve(process.cwd(), "dist", "control-ui"),
   ].filter((dir): dir is string => Boolean(dir));
   for (const dir of candidates) {
-    if (fs.existsSync(path.join(dir, "index.html"))) return dir;
+    if (fs.existsSync(path.join(dir, "index.html"))) {
+      return dir;
+    }
   }
   return null;
 }
@@ -105,8 +107,12 @@ export function handleControlUiAvatarRequest(
   opts: { basePath?: string; resolveAvatar: (agentId: string) => ControlUiAvatarResolution },
 ): boolean {
   const urlRaw = req.url;
-  if (!urlRaw) return false;
-  if (req.method !== "GET" && req.method !== "HEAD") return false;
+  if (!urlRaw) {
+    return false;
+  }
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return false;
+  }
 
   const url = new URL(urlRaw, "http://localhost");
   const basePath = normalizeControlUiBasePath(opts.basePath);
@@ -114,7 +120,9 @@ export function handleControlUiAvatarRequest(
   const pathWithBase = basePath
     ? `${basePath}${CONTROL_UI_AVATAR_PREFIX}/`
     : `${CONTROL_UI_AVATAR_PREFIX}/`;
-  if (!pathname.startsWith(pathWithBase)) return false;
+  if (!pathname.startsWith(pathWithBase)) {
+    return false;
+  }
 
   const agentIdParts = pathname.slice(pathWithBase.length).split("/").filter(Boolean);
   const agentId = agentIdParts[0] ?? "";
@@ -187,7 +195,9 @@ function injectControlUiConfig(html: string, opts: ControlUiInjectionOpts): stri
     )};` +
     `</script>`;
   // Check if already injected
-  if (html.includes("__CROCBOT_ASSISTANT_NAME__")) return html;
+  if (html.includes("__CROCBOT_ASSISTANT_NAME__")) {
+    return html;
+  }
   const headClose = html.indexOf("</head>");
   if (headClose !== -1) {
     return `${html.slice(0, headClose)}${script}${html.slice(headClose)}`;
@@ -229,10 +239,16 @@ function serveIndexHtml(res: ServerResponse, indexPath: string, opts: ServeIndex
 }
 
 function isSafeRelativePath(relPath: string) {
-  if (!relPath) return false;
+  if (!relPath) {
+    return false;
+  }
   const normalized = path.posix.normalize(relPath);
-  if (normalized.startsWith("../") || normalized === "..") return false;
-  if (normalized.includes("\0")) return false;
+  if (normalized.startsWith("../") || normalized === "..") {
+    return false;
+  }
+  if (normalized.includes("\0")) {
+    return false;
+  }
   return true;
 }
 
@@ -242,7 +258,9 @@ export function handleControlUiHttpRequest(
   opts?: ControlUiRequestOptions,
 ): boolean {
   const urlRaw = req.url;
-  if (!urlRaw) return false;
+  if (!urlRaw) {
+    return false;
+  }
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.statusCode = 405;
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -268,7 +286,9 @@ export function handleControlUiHttpRequest(
       res.end();
       return true;
     }
-    if (!pathname.startsWith(`${basePath}/`)) return false;
+    if (!pathname.startsWith(`${basePath}/`)) {
+      return false;
+    }
   }
 
   const root = resolveControlUiRoot();
@@ -284,9 +304,13 @@ export function handleControlUiHttpRequest(
   const uiPath =
     basePath && pathname.startsWith(`${basePath}/`) ? pathname.slice(basePath.length) : pathname;
   const rel = (() => {
-    if (uiPath === ROOT_PREFIX) return "";
+    if (uiPath === ROOT_PREFIX) {
+      return "";
+    }
     const assetsIndex = uiPath.indexOf("/assets/");
-    if (assetsIndex >= 0) return uiPath.slice(assetsIndex + 1);
+    if (assetsIndex >= 0) {
+      return uiPath.slice(assetsIndex + 1);
+    }
     return uiPath.slice(1);
   })();
   const requested = rel && !rel.endsWith("/") ? rel : `${rel}index.html`;

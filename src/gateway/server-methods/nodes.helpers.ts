@@ -12,7 +12,9 @@ export function requireBrowserNode(_ctx: GatewayRequestContext, _nodeHint?: stri
 }
 
 export function safeParseJson(raw: unknown): unknown {
-  if (typeof raw !== "string") return raw;
+  if (typeof raw !== "string") {
+    return raw;
+  }
   try {
     return JSON.parse(raw);
   } catch {

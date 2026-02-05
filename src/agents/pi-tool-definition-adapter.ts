@@ -9,7 +9,7 @@ import { logDebug, logError } from "../logger.js";
 import { normalizeToolName } from "./tool-policy.js";
 import { jsonResult } from "./tools/common.js";
 
-// biome-ignore lint/suspicious/noExplicitAny: TypeBox schema type from pi-agent-core uses a different module instance.
+// oxlint-disable-next-line typescript/no-explicit-any -- TypeBox schema type from pi-agent-core uses a different module instance
 type AnyAgentTool = AgentTool<any, unknown>;
 
 function describeToolExecutionError(err: unknown): {
@@ -32,7 +32,7 @@ export function toToolDefinitions(tools: AnyAgentTool[]): ToolDefinition[] {
       label: tool.label ?? name,
       description: tool.description ?? "",
       // biome-ignore lint/suspicious/noExplicitAny: TypeBox schema from pi-agent-core uses a different module instance.
-      parameters: tool.parameters as any,
+      parameters: tool.parameters,
       execute: async (
         toolCallId,
         params,
@@ -45,12 +45,16 @@ export function toToolDefinitions(tools: AnyAgentTool[]): ToolDefinition[] {
         try {
           return await tool.execute(toolCallId, params, signal, onUpdate);
         } catch (err) {
-          if (signal?.aborted) throw err;
+          if (signal?.aborted) {
+            throw err;
+          }
           const name =
             err && typeof err === "object" && "name" in err
               ? String((err as { name?: unknown }).name)
               : "";
-          if (name === "AbortError") throw err;
+          if (name === "AbortError") {
+            throw err;
+          }
           const described = describeToolExecutionError(err);
           if (described.stack && described.stack !== described.message) {
             logDebug(`tools: ${normalizedName} failed stack:\n${described.stack}`);
@@ -79,6 +83,7 @@ export function toClientToolDefinitions(
       name: func.name,
       label: func.name,
       description: func.description ?? "",
+      // oxlint-disable-next-line typescript/no-explicit-any -- OpenResponses client tool parameter JSON schema not typed as TSchema
       parameters: func.parameters as any,
       execute: async (
         toolCallId,

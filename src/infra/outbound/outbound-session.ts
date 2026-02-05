@@ -36,9 +36,13 @@ export type ResolveOutboundSessionRouteParams = {
 };
 
 function normalizeThreadId(value?: string | number | null): string | undefined {
-  if (value == null) return undefined;
+  if (value == null) {
+    return undefined;
+  }
   if (typeof value === "number") {
-    if (!Number.isFinite(value)) return undefined;
+    if (!Number.isFinite(value)) {
+      return undefined;
+    }
     return String(Math.trunc(value));
   }
   const trimmed = value.trim();
@@ -49,7 +53,9 @@ function stripProviderPrefix(raw: string, channel: string): string {
   const trimmed = raw.trim();
   const lower = trimmed.toLowerCase();
   const prefix = `${channel.toLowerCase()}:`;
-  if (lower.startsWith(prefix)) return trimmed.slice(prefix.length).trim();
+  if (lower.startsWith(prefix)) {
+    return trimmed.slice(prefix.length).trim();
+  }
   return trimmed;
 }
 
@@ -62,14 +68,20 @@ function inferPeerKind(params: {
   resolvedTarget?: ResolvedMessagingTarget;
 }): RoutePeerKind {
   const resolvedKind = params.resolvedTarget?.kind;
-  if (resolvedKind === "user") return "dm";
-  if (resolvedKind === "channel") return "channel";
+  if (resolvedKind === "user") {
+    return "dm";
+  }
+  if (resolvedKind === "channel") {
+    return "channel";
+  }
   if (resolvedKind === "group") {
     const plugin = getChannelPlugin(params.channel);
     const chatTypes = plugin?.capabilities?.chatTypes ?? [];
     const supportsChannel = chatTypes.includes("channel");
     const supportsGroup = chatTypes.includes("group");
-    if (supportsChannel && !supportsGroup) return "channel";
+    if (supportsChannel && !supportsGroup) {
+      return "channel";
+    }
     return "group";
   }
   return "dm";
@@ -95,7 +107,9 @@ function resolveTelegramSession(
 ): OutboundSessionRoute | null {
   const parsed = parseTelegramTarget(params.target);
   const chatId = parsed.chatId.trim();
-  if (!chatId) return null;
+  if (!chatId) {
+    return null;
+  }
   const parsedThreadId = parsed.messageThreadId;
   const fallbackThreadId = normalizeThreadId(params.threadId);
   const resolvedThreadId =
@@ -137,7 +151,9 @@ function resolveMatrixSession(
   const isUser =
     params.resolvedTarget?.kind === "user" || stripped.startsWith("@") || /^user:/i.test(stripped);
   const rawId = stripKindPrefix(stripped);
-  if (!rawId) return null;
+  if (!rawId) {
+    return null;
+  }
   const peer: RoutePeer = { kind: isUser ? "dm" : "channel", id: rawId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -159,7 +175,9 @@ function resolveMattermostSession(
   params: ResolveOutboundSessionRouteParams,
 ): OutboundSessionRoute | null {
   let trimmed = params.target.trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   trimmed = trimmed.replace(/^mattermost:/i, "").trim();
   const lower = trimmed.toLowerCase();
   const isUser = lower.startsWith("user:") || trimmed.startsWith("@");
@@ -167,7 +185,9 @@ function resolveMattermostSession(
     trimmed = trimmed.slice(1).trim();
   }
   const rawId = stripKindPrefix(trimmed);
-  if (!rawId) return null;
+  if (!rawId) {
+    return null;
+  }
   const peer: RoutePeer = { kind: isUser ? "dm" : "channel", id: rawId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -195,10 +215,14 @@ function resolveNextcloudTalkSession(
   params: ResolveOutboundSessionRouteParams,
 ): OutboundSessionRoute | null {
   let trimmed = params.target.trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   trimmed = trimmed.replace(/^(nextcloud-talk|nc-talk|nc):/i, "").trim();
   trimmed = trimmed.replace(/^room:/i, "").trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const peer: RoutePeer = { kind: "group", id: trimmed };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -222,7 +246,9 @@ function resolveZaloSession(
   const trimmed = stripProviderPrefix(params.target, "zalo")
     .replace(/^(zl):/i, "")
     .trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const isGroup = trimmed.toLowerCase().startsWith("group:");
   const peerId = stripKindPrefix(trimmed);
   const peer: RoutePeer = { kind: isGroup ? "group" : "dm", id: peerId };
@@ -248,7 +274,9 @@ function resolveZalouserSession(
   const trimmed = stripProviderPrefix(params.target, "zalouser")
     .replace(/^(zlu):/i, "")
     .trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const isGroup = trimmed.toLowerCase().startsWith("group:");
   const peerId = stripKindPrefix(trimmed);
   // Keep DM vs group aligned with inbound sessions for Zalo Personal.
@@ -273,7 +301,9 @@ function resolveNostrSession(
   params: ResolveOutboundSessionRouteParams,
 ): OutboundSessionRoute | null {
   const trimmed = stripProviderPrefix(params.target, "nostr").trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const peer: RoutePeer = { kind: "dm", id: trimmed };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -293,7 +323,9 @@ function resolveNostrSession(
 
 function normalizeTlonShip(raw: string): string {
   const trimmed = raw.trim();
-  if (!trimmed) return trimmed;
+  if (!trimmed) {
+    return trimmed;
+  }
   return trimmed.startsWith("~") ? trimmed : `~${trimmed}`;
 }
 
@@ -302,7 +334,9 @@ function resolveTlonSession(
 ): OutboundSessionRoute | null {
   let trimmed = stripProviderPrefix(params.target, "tlon");
   trimmed = trimmed.trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const lower = trimmed.toLowerCase();
   let isGroup =
     lower.startsWith("group:") || lower.startsWith("room:") || lower.startsWith("chat/");
@@ -353,13 +387,17 @@ function resolveFallbackSession(
   params: ResolveOutboundSessionRouteParams,
 ): OutboundSessionRoute | null {
   const trimmed = stripProviderPrefix(params.target, params.channel).trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
   const peerKind = inferPeerKind({
     channel: params.channel,
     resolvedTarget: params.resolvedTarget,
   });
   const peerId = stripKindPrefix(trimmed);
-  if (!peerId) return null;
+  if (!peerId) {
+    return null;
+  }
   const peer: RoutePeer = { kind: peerKind, id: peerId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -385,7 +423,9 @@ export async function resolveOutboundSessionRoute(
   params: ResolveOutboundSessionRouteParams,
 ): Promise<OutboundSessionRoute | null> {
   const target = params.target.trim();
-  if (!target) return null;
+  if (!target) {
+    return null;
+  }
   switch (params.channel) {
     case "telegram":
       return resolveTelegramSession({ ...params, target });

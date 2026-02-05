@@ -12,21 +12,27 @@ describe("parseCliProfileArgs", () => {
       "--dev",
       "--allow-unconfigured",
     ]);
-    if (!res.ok) throw new Error(res.error);
+    if (!res.ok) {
+      throw new Error(res.error);
+    }
     expect(res.profile).toBeNull();
     expect(res.argv).toEqual(["node", "crocbot", "gateway", "--dev", "--allow-unconfigured"]);
   });
 
   it("still accepts global --dev before subcommand", () => {
     const res = parseCliProfileArgs(["node", "crocbot", "--dev", "gateway"]);
-    if (!res.ok) throw new Error(res.error);
+    if (!res.ok) {
+      throw new Error(res.error);
+    }
     expect(res.profile).toBe("dev");
     expect(res.argv).toEqual(["node", "crocbot", "gateway"]);
   });
 
   it("parses --profile value and strips it", () => {
     const res = parseCliProfileArgs(["node", "crocbot", "--profile", "work", "status"]);
-    if (!res.ok) throw new Error(res.error);
+    if (!res.ok) {
+      throw new Error(res.error);
+    }
     expect(res.profile).toBe("work");
     expect(res.argv).toEqual(["node", "crocbot", "status"]);
   });

@@ -66,13 +66,23 @@ function isSurfaceGroupKey(key: string): boolean {
 
 function isLegacyGroupKey(key: string): boolean {
   const trimmed = key.trim();
-  if (!trimmed) return false;
-  if (trimmed.startsWith("group:")) return true;
+  if (!trimmed) {
+    return false;
+  }
+  if (trimmed.startsWith("group:")) {
+    return true;
+  }
   const lower = trimmed.toLowerCase();
-  if (!lower.includes("@g.us")) return false;
+  if (!lower.includes("@g.us")) {
+    return false;
+  }
   // Legacy WhatsApp group keys: bare JID or "whatsapp:<jid>" without explicit ":group:" kind.
-  if (!trimmed.includes(":")) return true;
-  if (lower.startsWith("whatsapp:") && !trimmed.includes(":group:")) return true;
+  if (!trimmed.includes(":")) {
+    return true;
+  }
+  if (lower.startsWith("whatsapp:") && !trimmed.includes(":group:")) {
+    return true;
+  }
   return false;
 }
 
@@ -84,24 +94,34 @@ function canonicalizeSessionKeyForAgent(params: {
 }): string {
   const agentId = normalizeAgentId(params.agentId);
   const raw = params.key.trim();
-  if (!raw) return raw;
-  if (raw.toLowerCase() === "global" || raw.toLowerCase() === "unknown") return raw.toLowerCase();
+  if (!raw) {
+    return raw;
+  }
+  if (raw.toLowerCase() === "global" || raw.toLowerCase() === "unknown") {
+    return raw.toLowerCase();
+  }
 
   const canonicalMain = canonicalizeMainSessionAlias({
     cfg: { session: { scope: params.scope, mainKey: params.mainKey } },
     agentId,
     sessionKey: raw,
   });
-  if (canonicalMain !== raw) return canonicalMain.toLowerCase();
+  if (canonicalMain !== raw) {
+    return canonicalMain.toLowerCase();
+  }
 
-  if (raw.toLowerCase().startsWith("agent:")) return raw.toLowerCase();
+  if (raw.toLowerCase().startsWith("agent:")) {
+    return raw.toLowerCase();
+  }
   if (raw.toLowerCase().startsWith("subagent:")) {
     const rest = raw.slice("subagent:".length);
     return `agent:${agentId}:subagent:${rest}`.toLowerCase();
   }
   if (raw.startsWith("group:")) {
     const id = raw.slice("group:".length).trim();
-    if (!id) return raw;
+    if (!id) {
+      return raw;
+    }
     const channel = id.toLowerCase().includes("@g.us") ? "whatsapp" : "unknown";
     return `agent:${agentId}:${channel}:group:${id}`.toLowerCase();
   }
@@ -127,13 +147,25 @@ function pickLatestLegacyDirectEntry(
   let best: SessionEntryLike | null = null;
   let bestUpdated = -1;
   for (const [key, entry] of Object.entries(store)) {
-    if (!entry || typeof entry !== "object") continue;
+    if (!entry || typeof entry !== "object") {
+      continue;
+    }
     const normalized = key.trim();
-    if (!normalized) continue;
-    if (normalized === "global") continue;
-    if (normalized.startsWith("agent:")) continue;
-    if (normalized.toLowerCase().startsWith("subagent:")) continue;
-    if (isLegacyGroupKey(normalized) || isSurfaceGroupKey(normalized)) continue;
+    if (!normalized) {
+      continue;
+    }
+    if (normalized === "global") {
+      continue;
+    }
+    if (normalized.startsWith("agent:")) {
+      continue;
+    }
+    if (normalized.toLowerCase().startsWith("subagent:")) {
+      continue;
+    }
+    if (isLegacyGroupKey(normalized) || isSurfaceGroupKey(normalized)) {
+      continue;
+    }
     const updatedAt = typeof entry.updatedAt === "number" ? entry.updatedAt : 0;
     if (updatedAt > bestUpdated) {
       bestUpdated = updatedAt;
@@ -145,7 +177,9 @@ function pickLatestLegacyDirectEntry(
 
 function normalizeSessionEntry(entry: SessionEntryLike): SessionEntry | null {
   const sessionId = typeof entry.sessionId === "string" ? entry.sessionId : null;
-  if (!sessionId) return null;
+  if (!sessionId) {
+    return null;
+  }
   const updatedAt =
     typeof entry.updatedAt === "number" && Number.isFinite(entry.updatedAt)
       ? entry.updatedAt
@@ -170,11 +204,17 @@ function mergeSessionEntry(params: {
   incoming: SessionEntryLike;
   preferIncomingOnTie?: boolean;
 }): SessionEntryLike {
-  if (!params.existing) return params.incoming;
+  if (!params.existing) {
+    return params.incoming;
+  }
   const existingUpdated = resolveUpdatedAt(params.existing);
   const incomingUpdated = resolveUpdatedAt(params.incoming);
-  if (incomingUpdated > existingUpdated) return params.incoming;
-  if (incomingUpdated < existingUpdated) return params.existing;
+  if (incomingUpdated > existingUpdated) {
+    return params.incoming;
+  }
+  if (incomingUpdated < existingUpdated) {
+    return params.existing;
+  }
   return params.preferIncomingOnTie ? params.incoming : params.existing;
 }
 
@@ -189,7 +229,9 @@ function canonicalizeSessionStore(params: {
   const legacyKeys: string[] = [];
 
   for (const [key, entry] of Object.entries(params.store)) {
-    if (!entry || typeof entry !== "object") continue;
+    if (!entry || typeof entry !== "object") {
+      continue;
+    }
     const canonicalKey = canonicalizeSessionKeyForAgent({
       key,
       agentId: params.agentId,
@@ -197,7 +239,9 @@ function canonicalizeSessionStore(params: {
       scope: params.scope,
     });
     const isCanonical = canonicalKey === key;
-    if (!isCanonical) legacyKeys.push(key);
+    if (!isCanonical) {
+      legacyKeys.push(key);
+    }
     const existing = canonical[canonicalKey];
     if (!existing) {
       canonical[canonicalKey] = entry;
@@ -213,8 +257,12 @@ function canonicalizeSessionStore(params: {
       meta.set(canonicalKey, { isCanonical, updatedAt: incomingUpdated });
       continue;
     }
-    if (incomingUpdated < existingUpdated) continue;
-    if (existingMeta?.isCanonical && !isCanonical) continue;
+    if (incomingUpdated < existingUpdated) {
+      continue;
+    }
+    if (existingMeta?.isCanonical && !isCanonical) {
+      continue;
+    }
     if (!existingMeta?.isCanonical && isCanonical) {
       canonical[canonicalKey] = entry;
       meta.set(canonicalKey, { isCanonical, updatedAt: incomingUpdated });
@@ -239,19 +287,27 @@ function listLegacySessionKeys(params: {
       mainKey: params.mainKey,
       scope: params.scope,
     });
-    if (canonical !== key) legacy.push(key);
+    if (canonical !== key) {
+      legacy.push(key);
+    }
   }
   return legacy;
 }
 
 function emptyDirOrMissing(dir: string): boolean {
-  if (!existsDir(dir)) return true;
+  if (!existsDir(dir)) {
+    return true;
+  }
   return safeReadDir(dir).length === 0;
 }
 
 function removeDirIfEmpty(dir: string) {
-  if (!existsDir(dir)) return;
-  if (!emptyDirOrMissing(dir)) return;
+  if (!existsDir(dir)) {
+    return;
+  }
+  if (!emptyDirOrMissing(dir)) {
+    return;
+  }
   try {
     fs.rmdirSync(dir);
   } catch {
@@ -363,7 +419,9 @@ async function migrateLegacySessions(
 ): Promise<{ changes: string[]; warnings: string[] }> {
   const changes: string[] = [];
   const warnings: string[] = [];
-  if (!detected.sessions.hasLegacy) return { changes, warnings };
+  if (!detected.sessions.hasLegacy) {
+    return { changes, warnings };
+  }
 
   ensureDir(detected.sessions.targetDir);
 
@@ -423,7 +481,9 @@ async function migrateLegacySessions(
     const normalized: Record<string, SessionEntry> = {};
     for (const [key, entry] of Object.entries(merged)) {
       const normalizedEntry = normalizeSessionEntry(entry);
-      if (!normalizedEntry) continue;
+      if (!normalizedEntry) {
+        continue;
+      }
       normalized[key] = normalizedEntry;
     }
     await saveSessionStore(detected.sessions.targetStorePath, normalized);
@@ -435,11 +495,17 @@ async function migrateLegacySessions(
 
   const entries = safeReadDir(detected.sessions.legacyDir);
   for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    if (entry.name === "sessions.json") continue;
+    if (!entry.isFile()) {
+      continue;
+    }
+    if (entry.name === "sessions.json") {
+      continue;
+    }
     const from = path.join(detected.sessions.legacyDir, entry.name);
     const to = path.join(detected.sessions.targetDir, entry.name);
-    if (fileExists(to)) continue;
+    if (fileExists(to)) {
+      continue;
+    }
     try {
       fs.renameSync(from, to);
       changes.push(`Moved ${entry.name} → agents/${detected.targetAgentId}/sessions`);
@@ -479,7 +545,9 @@ export async function migrateLegacyAgentDir(
 ): Promise<{ changes: string[]; warnings: string[] }> {
   const changes: string[] = [];
   const warnings: string[] = [];
-  if (!detected.agentDir.hasLegacy) return { changes, warnings };
+  if (!detected.agentDir.hasLegacy) {
+    return { changes, warnings };
+  }
 
   ensureDir(detected.agentDir.targetDir);
 
@@ -487,7 +555,9 @@ export async function migrateLegacyAgentDir(
   for (const entry of entries) {
     const from = path.join(detected.agentDir.legacyDir, entry.name);
     const to = path.join(detected.agentDir.targetDir, entry.name);
-    if (fs.existsSync(to)) continue;
+    if (fs.existsSync(to)) {
+      continue;
+    }
     try {
       fs.renameSync(from, to);
       changes.push(`Moved agent file ${entry.name} → agents/${detected.targetAgentId}/agent`);
@@ -520,18 +590,28 @@ async function migrateLegacyWhatsAppAuth(
 ): Promise<{ changes: string[]; warnings: string[] }> {
   const changes: string[] = [];
   const warnings: string[] = [];
-  if (!detected.whatsappAuth.hasLegacy) return { changes, warnings };
+  if (!detected.whatsappAuth.hasLegacy) {
+    return { changes, warnings };
+  }
 
   ensureDir(detected.whatsappAuth.targetDir);
 
   const entries = safeReadDir(detected.whatsappAuth.legacyDir);
   for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    if (entry.name === "oauth.json") continue;
-    if (!isLegacyWhatsAppAuthFile(entry.name)) continue;
+    if (!entry.isFile()) {
+      continue;
+    }
+    if (entry.name === "oauth.json") {
+      continue;
+    }
+    if (!isLegacyWhatsAppAuthFile(entry.name)) {
+      continue;
+    }
     const from = path.join(detected.whatsappAuth.legacyDir, entry.name);
     const to = path.join(detected.whatsappAuth.targetDir, entry.name);
-    if (fileExists(to)) continue;
+    if (fileExists(to)) {
+      continue;
+    }
     try {
       fs.renameSync(from, to);
       changes.push(`Moved WhatsApp auth ${entry.name} → whatsapp/default`);

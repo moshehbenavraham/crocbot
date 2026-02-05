@@ -30,7 +30,6 @@ import type {
 } from "./types.core.js";
 
 // Channel docking: implement this contract in src/channels/plugins/<id>.ts.
-// biome-ignore lint/suspicious/noExplicitAny: registry aggregates heterogeneous account types.
 export type ChannelConfigUiHint = {
   label?: string;
   help?: string;
@@ -45,7 +44,7 @@ export type ChannelConfigSchema = {
   uiHints?: Record<string, ChannelConfigUiHint>;
 };
 
-export type ChannelPlugin<ResolvedAccount = any> = {
+export type ChannelPlugin<ResolvedAccount = unknown> = {
   id: ChannelId;
   meta: ChannelMeta;
   capabilities: ChannelCapabilities;

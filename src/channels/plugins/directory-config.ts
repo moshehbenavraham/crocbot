@@ -28,8 +28,12 @@ export async function listTelegramDirectoryPeersFromConfig(
   )
     .map((entry) => {
       const trimmed = entry.trim();
-      if (!trimmed) return null;
-      if (/^-?\d+$/.test(trimmed)) return trimmed;
+      if (!trimmed) {
+        return null;
+      }
+      if (/^-?\d+$/.test(trimmed)) {
+        return trimmed;
+      }
       const withAt = trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
       return withAt;
     })

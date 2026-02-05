@@ -43,7 +43,9 @@ type ToolsInvokeBody = {
 };
 
 function resolveSessionKeyFromBody(body: ToolsInvokeBody): string | undefined {
-  if (typeof body.sessionKey === "string" && body.sessionKey.trim()) return body.sessionKey.trim();
+  if (typeof body.sessionKey === "string" && body.sessionKey.trim()) {
+    return body.sessionKey.trim();
+  }
   return undefined;
 }
 
@@ -53,8 +55,12 @@ function mergeActionIntoArgsIfSupported(params: {
   args: Record<string, unknown>;
 }): Record<string, unknown> {
   const { toolSchema, action, args } = params;
-  if (!action) return args;
-  if (args.action !== undefined) return args;
+  if (!action) {
+    return args;
+  }
+  if (args.action !== undefined) {
+    return args;
+  }
   // TypeBox schemas are plain objects; many tools define an `action` property.
   const schemaObj = toolSchema as { properties?: Record<string, unknown> } | null;
   const hasAction = Boolean(
@@ -63,7 +69,9 @@ function mergeActionIntoArgsIfSupported(params: {
     schemaObj.properties &&
     "action" in schemaObj.properties,
   );
-  if (!hasAction) return args;
+  if (!hasAction) {
+    return args;
+  }
   return { ...args, action };
 }
 
@@ -73,7 +81,9 @@ export async function handleToolsInvokeHttpRequest(
   opts: { auth: ResolvedGatewayAuth; maxBodyBytes?: number; trustedProxies?: string[] },
 ): Promise<boolean> {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
-  if (url.pathname !== "/tools/invoke") return false;
+  if (url.pathname !== "/tools/invoke") {
+    return false;
+  }
 
   if (req.method !== "POST") {
     sendMethodNotAllowed(res, "POST");
@@ -94,7 +104,9 @@ export async function handleToolsInvokeHttpRequest(
   }
 
   const bodyUnknown = await readJsonBodyOrError(req, res, opts.maxBodyBytes ?? DEFAULT_BODY_BYTES);
-  if (bodyUnknown === undefined) return true;
+  if (bodyUnknown === undefined) {
+    return true;
+  }
   const body = (bodyUnknown ?? {}) as ToolsInvokeBody;
 
   const toolName = typeof body.tool === "string" ? body.tool.trim() : "";
@@ -106,11 +118,10 @@ export async function handleToolsInvokeHttpRequest(
   const action = typeof body.action === "string" ? body.action.trim() : undefined;
 
   const argsRaw = body.args;
-  const args = (
+  const args =
     argsRaw && typeof argsRaw === "object" && !Array.isArray(argsRaw)
       ? (argsRaw as Record<string, unknown>)
-      : {}
-  ) as Record<string, unknown>;
+      : {};
 
   const rawSessionKey = resolveSessionKeyFromBody(body);
   const sessionKey =
@@ -135,7 +146,9 @@ export async function handleToolsInvokeHttpRequest(
   const providerProfilePolicy = resolveToolProfilePolicy(providerProfile);
 
   const mergeAlsoAllow = (policy: typeof profilePolicy, alsoAllow?: string[]) => {
-    if (!policy?.allow || !Array.isArray(alsoAllow) || alsoAllow.length === 0) return policy;
+    if (!policy?.allow || !Array.isArray(alsoAllow) || alsoAllow.length === 0) {
+      return policy;
+    }
     return { ...policy, allow: Array.from(new Set([...policy.allow, ...alsoAllow])) };
   };
 
@@ -174,13 +187,13 @@ export async function handleToolsInvokeHttpRequest(
 
   const coreToolNames = new Set(
     allTools
-      .filter((tool) => !getPluginToolMeta(tool as any))
+      .filter((tool) => !getPluginToolMeta(tool))
       .map((tool) => normalizeToolName(tool.name))
       .filter(Boolean),
   );
   const pluginGroups = buildPluginToolGroups({
     tools: allTools,
-    toolMeta: (tool) => getPluginToolMeta(tool as any),
+    toolMeta: (tool) => getPluginToolMeta(tool),
   });
   const resolvePolicy = (policy: typeof profilePolicy, label: string) => {
     const resolved = stripPluginOnlyAllowlist(policy, pluginGroups, coreToolNames);
@@ -250,11 +263,11 @@ export async function handleToolsInvokeHttpRequest(
 
   try {
     const toolArgs = mergeActionIntoArgsIfSupported({
-      toolSchema: (tool as any).parameters,
+      toolSchema: tool.parameters,
       action,
       args,
     });
-    const result = await (tool as any).execute?.(`http-${Date.now()}`, toolArgs);
+    const result = await tool.execute?.(`http-${Date.now()}`, toolArgs);
     sendJson(res, 200, { ok: true, result });
   } catch (err) {
     sendJson(res, 400, {

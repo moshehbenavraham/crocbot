@@ -34,9 +34,13 @@ function resolveTemplateDir(): string {
   let cursor = path.dirname(fileURLToPath(import.meta.url));
   for (let i = 0; i < 6; i += 1) {
     const candidate = path.join(cursor, "docs", "reference", "templates");
-    if (fsSync.existsSync(candidate)) return candidate;
+    if (fsSync.existsSync(candidate)) {
+      return candidate;
+    }
     const parent = path.dirname(cursor);
-    if (parent === cursor) break;
+    if (parent === cursor) {
+      break;
+    }
     cursor = parent;
   }
   // Fallback to the old relative path for error messaging
@@ -49,9 +53,13 @@ function resolveTemplateDir(): string {
 const TEMPLATE_DIR = resolveTemplateDir();
 
 function stripFrontMatter(content: string): string {
-  if (!content.startsWith("---")) return content;
+  if (!content.startsWith("---")) {
+    return content;
+  }
   const endIndex = content.indexOf("\n---", 3);
-  if (endIndex === -1) return content;
+  if (endIndex === -1) {
+    return content;
+  }
   const start = endIndex + "\n---".length;
   let trimmed = content.slice(start);
   trimmed = trimmed.replace(/^\s+/, "");
@@ -96,7 +104,9 @@ async function writeFileIfMissing(filePath: string, content: string) {
     });
   } catch (err) {
     const anyErr = err as { code?: string };
-    if (anyErr.code !== "EEXIST") throw err;
+    if (anyErr.code !== "EEXIST") {
+      throw err;
+    }
   }
 }
 
@@ -119,9 +129,15 @@ async function isGitAvailable(): Promise<boolean> {
 }
 
 async function ensureGitRepo(dir: string, isBrandNewWorkspace: boolean) {
-  if (!isBrandNewWorkspace) return;
-  if (await hasGitRepo(dir)) return;
-  if (!(await isGitAvailable())) return;
+  if (!isBrandNewWorkspace) {
+    return;
+  }
+  if (await hasGitRepo(dir)) {
+    return;
+  }
+  if (!(await isGitAvailable())) {
+    return;
+  }
   try {
     await runCommandWithTimeout(["git", "init"], { cwd: dir, timeoutMs: 10_000 });
   } catch {
@@ -146,7 +162,9 @@ export async function ensureAgentWorkspace(params?: {
   const dir = resolveUserPath(rawDir);
   await fs.mkdir(dir, { recursive: true });
 
-  if (!params?.ensureBootstrapFiles) return { dir };
+  if (!params?.ensureBootstrapFiles) {
+    return { dir };
+  }
 
   const agentsPath = path.join(dir, DEFAULT_AGENTS_FILENAME);
   const soulPath = path.join(dir, DEFAULT_SOUL_FILENAME);
@@ -219,7 +237,9 @@ async function resolveMemoryBootstrapEntries(
       // optional
     }
   }
-  if (entries.length <= 1) return entries;
+  if (entries.length <= 1) {
+    return entries;
+  }
 
   const seen = new Set<string>();
   const deduped: Array<{ name: WorkspaceBootstrapFileName; filePath: string }> = [];
@@ -228,7 +248,9 @@ async function resolveMemoryBootstrapEntries(
     try {
       key = await fs.realpath(entry.filePath);
     } catch {}
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {
+      continue;
+    }
     seen.add(key);
     deduped.push(entry);
   }
@@ -297,6 +319,8 @@ export function filterBootstrapFilesForSession(
   files: WorkspaceBootstrapFile[],
   sessionKey?: string,
 ): WorkspaceBootstrapFile[] {
-  if (!sessionKey || !isSubagentSessionKey(sessionKey)) return files;
+  if (!sessionKey || !isSubagentSessionKey(sessionKey)) {
+    return files;
+  }
   return files.filter((file) => SUBAGENT_BOOTSTRAP_ALLOWLIST.has(file.name));
 }

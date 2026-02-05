@@ -1,6 +1,7 @@
 import { randomToken } from "../commands/onboard-helpers.js";
 import type { GatewayAuthChoice } from "../commands/onboard-types.js";
 import type { crocbotConfig } from "../config/config.js";
+import type { GatewayBindMode, GatewayTailscaleMode } from "../config/types.gateway.js";
 import { findTailscaleBinary } from "../infra/tailscale.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type {
@@ -48,7 +49,7 @@ export async function configureGatewayForOnboarding(
   let bind = (
     flow === "quickstart"
       ? quickstartGateway.bind
-      : ((await prompter.select({
+      : await prompter.select({
           message: "Gateway bind",
           options: [
             { value: "loopback", label: "Loopback (127.0.0.1)" },
@@ -57,8 +58,8 @@ export async function configureGatewayForOnboarding(
             { value: "auto", label: "Auto (Loopback → LAN)" },
             { value: "custom", label: "Custom IP" },
           ],
-        })) as "loopback" | "lan" | "auto" | "custom" | "tailnet")
-  ) as "loopback" | "lan" | "auto" | "custom" | "tailnet";
+        })
+  ) as GatewayBindMode;
 
   let customBindHost = quickstartGateway.customBindHost;
   if (bind === "custom") {
@@ -69,17 +70,22 @@ export async function configureGatewayForOnboarding(
         placeholder: "192.168.1.100",
         initialValue: customBindHost ?? "",
         validate: (value) => {
-          if (!value) return "IP address is required for custom bind mode";
+          if (!value) {
+            return "IP address is required for custom bind mode";
+          }
           const trimmed = value.trim();
           const parts = trimmed.split(".");
-          if (parts.length !== 4) return "Invalid IPv4 address (e.g., 192.168.1.100)";
+          if (parts.length !== 4) {
+            return "Invalid IPv4 address (e.g., 192.168.1.100)";
+          }
           if (
             parts.every((part) => {
               const n = parseInt(part, 10);
               return !Number.isNaN(n) && n >= 0 && n <= 255 && part === String(n);
             })
-          )
+          ) {
             return undefined;
+          }
           return "Invalid IPv4 address (each octet must be 0-255)";
         },
       });
@@ -87,7 +93,7 @@ export async function configureGatewayForOnboarding(
     }
   }
 
-  let authMode = (
+  let authMode =
     flow === "quickstart"
       ? quickstartGateway.authMode
       : ((await prompter.select({
@@ -101,13 +107,12 @@ export async function configureGatewayForOnboarding(
             { value: "password", label: "Password" },
           ],
           initialValue: "token",
-        })) as GatewayAuthChoice)
-  ) as GatewayAuthChoice;
+        })) as GatewayAuthChoice);
 
   const tailscaleMode = (
     flow === "quickstart"
       ? quickstartGateway.tailscaleMode
-      : ((await prompter.select({
+      : await prompter.select({
           message: "Tailscale exposure",
           options: [
             { value: "off", label: "Off", hint: "No Tailscale exposure" },
@@ -122,8 +127,8 @@ export async function configureGatewayForOnboarding(
               hint: "Public HTTPS via Tailscale Funnel (internet)",
             },
           ],
-        })) as "off" | "serve" | "funnel")
-  ) as "off" | "serve" | "funnel";
+        })
+  ) as GatewayTailscaleMode;
 
   // Detect Tailscale binary before proceeding with serve/funnel setup.
   if (tailscaleMode !== "off") {

@@ -15,7 +15,9 @@ let cachedFormat: LogFormat | null = null;
  * Returns "json" if CROCBOT_LOG_FORMAT=json, otherwise "pretty".
  */
 export function resolveLogFormat(): LogFormat {
-  if (cachedFormat !== null) return cachedFormat;
+  if (cachedFormat !== null) {
+    return cachedFormat;
+  }
 
   const envValue = process.env[ENV_VAR_NAME]?.toLowerCase().trim();
   if (envValue === "json") {

@@ -19,7 +19,9 @@ type GroupMentionParams = {
 
 function parseTelegramGroupId(value?: string | null) {
   const raw = value?.trim() ?? "";
-  if (!raw) return { chatId: undefined, topicId: undefined };
+  if (!raw) {
+    return { chatId: undefined, topicId: undefined };
+  }
   const parts = raw.split(":").filter(Boolean);
   if (
     parts.length >= 3 &&
@@ -41,7 +43,9 @@ function resolveTelegramRequireMention(params: {
   topicId?: string;
 }): boolean | undefined {
   const { cfg, chatId, topicId } = params;
-  if (!chatId) return undefined;
+  if (!chatId) {
+    return undefined;
+  }
   const groupConfig = cfg.channels?.telegram?.groups?.[chatId];
   const groupDefault = cfg.channels?.telegram?.groups?.["*"];
   const topicConfig = topicId && groupConfig?.topics ? groupConfig.topics[topicId] : undefined;
@@ -71,7 +75,9 @@ export function resolveTelegramGroupRequireMention(
     chatId,
     topicId,
   });
-  if (typeof requireMention === "boolean") return requireMention;
+  if (typeof requireMention === "boolean") {
+    return requireMention;
+  }
   return resolveChannelGroupRequireMention({
     cfg: params.cfg,
     channel: "telegram",

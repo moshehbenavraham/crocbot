@@ -32,8 +32,12 @@ export function normalizeRelPath(value: string): string {
 
 export function isMemoryPath(relPath: string): boolean {
   const normalized = normalizeRelPath(relPath);
-  if (!normalized) return false;
-  if (normalized === "MEMORY.md" || normalized === "memory.md") return true;
+  if (!normalized) {
+    return false;
+  }
+  if (normalized === "MEMORY.md" || normalized === "memory.md") {
+    return true;
+  }
   return normalized.startsWith("memory/");
 }
 
@@ -54,8 +58,12 @@ async function walkDir(dir: string, files: string[]) {
       await walkDir(full, files);
       continue;
     }
-    if (!entry.isFile()) continue;
-    if (!entry.name.endsWith(".md")) continue;
+    if (!entry.isFile()) {
+      continue;
+    }
+    if (!entry.name.endsWith(".md")) {
+      continue;
+    }
     files.push(full);
   }
 }
@@ -64,13 +72,19 @@ export async function listMemoryFiles(workspaceDir: string): Promise<string[]> {
   const result: string[] = [];
   const memoryFile = path.join(workspaceDir, "MEMORY.md");
   const altMemoryFile = path.join(workspaceDir, "memory.md");
-  if (await exists(memoryFile)) result.push(memoryFile);
-  if (await exists(altMemoryFile)) result.push(altMemoryFile);
+  if (await exists(memoryFile)) {
+    result.push(memoryFile);
+  }
+  if (await exists(altMemoryFile)) {
+    result.push(altMemoryFile);
+  }
   const memoryDir = path.join(workspaceDir, "memory");
   if (await exists(memoryDir)) {
     await walkDir(memoryDir, result);
   }
-  if (result.length <= 1) return result;
+  if (result.length <= 1) {
+    return result;
+  }
   const seen = new Set<string>();
   const deduped: string[] = [];
   for (const entry of result) {
@@ -78,7 +92,9 @@ export async function listMemoryFiles(workspaceDir: string): Promise<string[]> {
     try {
       key = await fs.realpath(entry);
     } catch {}
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {
+      continue;
+    }
     seen.add(key);
     deduped.push(entry);
   }
@@ -110,7 +126,9 @@ export function chunkMarkdown(
   chunking: { tokens: number; overlap: number },
 ): MemoryChunk[] {
   const lines = content.split("\n");
-  if (lines.length === 0) return [];
+  if (lines.length === 0) {
+    return [];
+  }
   const maxChars = Math.max(32, chunking.tokens * 4);
   const overlapChars = Math.max(0, chunking.overlap * 4);
   const chunks: MemoryChunk[] = [];
@@ -119,10 +137,14 @@ export function chunkMarkdown(
   let currentChars = 0;
 
   const flush = () => {
-    if (current.length === 0) return;
+    if (current.length === 0) {
+      return;
+    }
     const firstEntry = current[0];
     const lastEntry = current[current.length - 1];
-    if (!firstEntry || !lastEntry) return;
+    if (!firstEntry || !lastEntry) {
+      return;
+    }
     const text = current.map((entry) => entry.line).join("\n");
     const startLine = firstEntry.lineNo;
     const endLine = lastEntry.lineNo;
@@ -144,10 +166,14 @@ export function chunkMarkdown(
     const kept: Array<{ line: string; lineNo: number }> = [];
     for (let i = current.length - 1; i >= 0; i -= 1) {
       const entry = current[i];
-      if (!entry) continue;
+      if (!entry) {
+        continue;
+      }
       acc += entry.line.length + 1;
       kept.unshift(entry);
-      if (acc >= overlapChars) break;
+      if (acc >= overlapChars) {
+        break;
+      }
     }
     current = kept;
     currentChars = kept.reduce((sum, entry) => sum + entry.line.length + 1, 0);
@@ -188,7 +214,9 @@ export function parseEmbedding(raw: string): number[] {
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length === 0 || b.length === 0) return 0;
+  if (a.length === 0 || b.length === 0) {
+    return 0;
+  }
   const len = Math.min(a.length, b.length);
   let dot = 0;
   let normA = 0;
@@ -200,6 +228,8 @@ export function cosineSimilarity(a: number[], b: number[]): number {
     normA += av * av;
     normB += bv * bv;
   }
-  if (normA === 0 || normB === 0) return 0;
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }

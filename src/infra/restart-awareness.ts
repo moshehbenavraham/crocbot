@@ -271,7 +271,9 @@ export async function handlePostRestartReport(opts: { defaultUserId?: string }):
 
 function truncateCommand(cmd: string, maxLen = 50): string {
   const cleaned = cmd.replace(/\n/g, " ").trim();
-  if (cleaned.length <= maxLen) return cleaned;
+  if (cleaned.length <= maxLen) {
+    return cleaned;
+  }
   return cleaned.slice(0, maxLen - 3) + "...";
 }
 
@@ -280,12 +282,18 @@ function truncateCommand(cmd: string, maxLen = 50): string {
  * Extracts the last meaningful line and truncates for message display.
  */
 function formatTailPreview(tail: string, maxLen = 80): string {
-  if (!tail) return "";
+  if (!tail) {
+    return "";
+  }
   // Get the last non-empty line
   const lines = tail.split("\n").filter((line) => line.trim());
-  if (lines.length === 0) return "";
+  if (lines.length === 0) {
+    return "";
+  }
   const lastLine = lines[lines.length - 1].trim();
-  if (lastLine.length <= maxLen) return lastLine;
+  if (lastLine.length <= maxLen) {
+    return lastLine;
+  }
   return lastLine.slice(0, maxLen - 3) + "...";
 }
 

@@ -99,7 +99,9 @@ function createPluginHandler(params: {
   gifPlayback?: boolean;
 }): ChannelHandler | null {
   const outbound = params.outbound;
-  if (!outbound?.sendText || !outbound?.sendMedia) return null;
+  if (!outbound?.sendText || !outbound?.sendMedia) {
+    return null;
+  }
   const sendText = outbound.sendText;
   const sendMedia = outbound.sendMedia;
   const chunker = outbound.chunker ?? null;
@@ -205,10 +207,14 @@ export async function deliverOutboundPayloads(params: {
           ? chunkMarkdownTextWithMode(text, textLimit, "newline")
           : chunkByParagraph(text, textLimit);
 
-      if (!blockChunks.length && text) blockChunks.push(text);
+      if (!blockChunks.length && text) {
+        blockChunks.push(text);
+      }
       for (const blockChunk of blockChunks) {
         const chunks = handler.chunker(blockChunk, textLimit);
-        if (!chunks.length && blockChunk) chunks.push(blockChunk);
+        if (!chunks.length && blockChunk) {
+          chunks.push(blockChunk);
+        }
         for (const chunk of chunks) {
           throwIfAborted(abortSignal);
           results.push(await handler.sendText(chunk));
@@ -250,7 +256,9 @@ export async function deliverOutboundPayloads(params: {
         results.push(await handler.sendMedia(caption, url));
       }
     } catch (err) {
-      if (!params.bestEffort) throw err;
+      if (!params.bestEffort) {
+        throw err;
+      }
       params.onError?.(err, payloadSummary);
     }
   }

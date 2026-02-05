@@ -34,7 +34,9 @@ export async function shouldSuggestMemorySystem(workspaceDir: string): Promise<b
   const agentsPath = path.join(workspaceDir, DEFAULT_AGENTS_FILENAME);
   try {
     const content = await fs.promises.readFile(agentsPath, "utf-8");
-    if (/memory\.md/i.test(content)) return false;
+    if (/memory\.md/i.test(content)) {
+      return false;
+    }
   } catch {
     // no AGENTS.md or unreadable; treat as missing memory guidance
   }
@@ -69,7 +71,9 @@ export function detectLegacyWorkspaceDirs(params: {
   const candidates = [path.join(home, "crocbot")];
   const legacyDirs = candidates
     .filter((candidate) => {
-      if (!exists(candidate)) return false;
+      if (!exists(candidate)) {
+        return false;
+      }
       return path.resolve(candidate) !== activeWorkspace;
     })
     .filter((candidate) => {

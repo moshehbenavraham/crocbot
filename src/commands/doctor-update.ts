@@ -10,7 +10,9 @@ async function detectcrocbotGitCheckout(root: string): Promise<"git" | "not-git"
   const res = await runCommandWithTimeout(["git", "-C", root, "rev-parse", "--show-toplevel"], {
     timeoutMs: 5000,
   }).catch(() => null);
-  if (!res) return "unknown";
+  if (!res) {
+    return "unknown";
+  }
   if (res.code !== 0) {
     // Avoid noisy "Update via package manager" notes when git is missing/broken,
     // but do show it when this is clearly not a git checkout.
@@ -36,7 +38,9 @@ export async function maybeOfferUpdateBeforeDoctor(params: {
     params.options.yes !== true &&
     params.options.repair !== true &&
     Boolean(process.stdin.isTTY);
-  if (!canOfferUpdate || !params.root) return { updated: false };
+  if (!canOfferUpdate || !params.root) {
+    return { updated: false };
+  }
 
   const git = await detectcrocbotGitCheckout(params.root);
   if (git === "git") {
@@ -44,7 +48,9 @@ export async function maybeOfferUpdateBeforeDoctor(params: {
       message: "Update crocbot from git before running doctor?",
       initialValue: true,
     });
-    if (!shouldUpdate) return { updated: false };
+    if (!shouldUpdate) {
+      return { updated: false };
+    }
     note("Running update (fetch/rebase/build/ui:build/doctor)…", "Update");
     const result = await runGatewayUpdate({
       cwd: params.root,

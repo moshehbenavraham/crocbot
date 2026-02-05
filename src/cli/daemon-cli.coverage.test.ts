@@ -96,21 +96,29 @@ describe("daemon-cli coverage", () => {
   });
 
   afterEach(() => {
-    if (originalEnv.CROCBOT_STATE_DIR !== undefined)
+    if (originalEnv.CROCBOT_STATE_DIR !== undefined) {
       process.env.CROCBOT_STATE_DIR = originalEnv.CROCBOT_STATE_DIR;
-    else delete process.env.CROCBOT_STATE_DIR;
+    } else {
+      delete process.env.CROCBOT_STATE_DIR;
+    }
 
-    if (originalEnv.CROCBOT_CONFIG_PATH !== undefined)
+    if (originalEnv.CROCBOT_CONFIG_PATH !== undefined) {
       process.env.CROCBOT_CONFIG_PATH = originalEnv.CROCBOT_CONFIG_PATH;
-    else delete process.env.CROCBOT_CONFIG_PATH;
+    } else {
+      delete process.env.CROCBOT_CONFIG_PATH;
+    }
 
-    if (originalEnv.CROCBOT_GATEWAY_PORT !== undefined)
+    if (originalEnv.CROCBOT_GATEWAY_PORT !== undefined) {
       process.env.CROCBOT_GATEWAY_PORT = originalEnv.CROCBOT_GATEWAY_PORT;
-    else delete process.env.CROCBOT_GATEWAY_PORT;
+    } else {
+      delete process.env.CROCBOT_GATEWAY_PORT;
+    }
 
-    if (originalEnv.CROCBOT_PROFILE !== undefined)
+    if (originalEnv.CROCBOT_PROFILE !== undefined) {
       process.env.CROCBOT_PROFILE = originalEnv.CROCBOT_PROFILE;
-    else delete process.env.CROCBOT_PROFILE;
+    } else {
+      delete process.env.CROCBOT_PROFILE;
+    }
   });
 
   it("probes gateway status by default", async () => {

@@ -12,9 +12,13 @@ export function listChannelSupportedActions(params: {
   cfg?: crocbotConfig;
   channel?: string;
 }): ChannelMessageActionName[] {
-  if (!params.channel) return [];
+  if (!params.channel) {
+    return [];
+  }
   const plugin = getChannelPlugin(params.channel as Parameters<typeof getChannelPlugin>[0]);
-  if (!plugin?.actions?.listActions) return [];
+  if (!plugin?.actions?.listActions) {
+    return [];
+  }
   const cfg = params.cfg ?? ({} as crocbotConfig);
   return plugin.actions.listActions({ cfg });
 }
@@ -27,7 +31,9 @@ export function listAllChannelSupportedActions(params: {
 }): ChannelMessageActionName[] {
   const actions = new Set<ChannelMessageActionName>();
   for (const plugin of listChannelPlugins()) {
-    if (!plugin.actions?.listActions) continue;
+    if (!plugin.actions?.listActions) {
+      continue;
+    }
     const cfg = params.cfg ?? ({} as crocbotConfig);
     const channelActions = plugin.actions.listActions({ cfg });
     for (const action of channelActions) {
@@ -42,9 +48,13 @@ export function listChannelAgentTools(params: { cfg?: crocbotConfig }): ChannelA
   const tools: ChannelAgentTool[] = [];
   for (const plugin of listChannelPlugins()) {
     const entry = plugin.agentTools;
-    if (!entry) continue;
+    if (!entry) {
+      continue;
+    }
     const resolved = typeof entry === "function" ? entry(params) : entry;
-    if (Array.isArray(resolved)) tools.push(...resolved);
+    if (Array.isArray(resolved)) {
+      tools.push(...resolved);
+    }
   }
   return tools;
 }
@@ -55,10 +65,14 @@ export function resolveChannelMessageToolHints(params: {
   accountId?: string | null;
 }): string[] {
   const channelId = normalizeAnyChannelId(params.channel);
-  if (!channelId) return [];
+  if (!channelId) {
+    return [];
+  }
   const dock = getChannelDock(channelId);
   const resolve = dock?.agentPrompt?.messageToolHints;
-  if (!resolve) return [];
+  if (!resolve) {
+    return [];
+  }
   const cfg = params.cfg ?? ({} as crocbotConfig);
   return (resolve({ cfg, accountId: params.accountId }) ?? [])
     .map((entry) => entry.trim())

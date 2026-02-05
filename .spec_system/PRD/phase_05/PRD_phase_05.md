@@ -4,7 +4,7 @@
 **Sessions**: 5 (initial estimate)
 **Estimated Duration**: 3-5 days
 
-**Progress**: 3/5 sessions (60%)
+**Progress**: 4/5 sessions (80%)
 
 ---
 
@@ -21,7 +21,7 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 | 01 | Research Build Tooling Delta | Complete | 18 | 2026-02-05 |
 | 02 | tsdown Migration | Complete | 18 | 2026-02-05 |
 | 03 | TypeScript Config Unification | Complete | 15 | 2026-02-05 |
-| 04 | Stricter Linting Rules | Not Started | ~20 | - |
+| 04 | Stricter Linting Rules | Complete | 20 | 2026-02-05 |
 | 05 | Build Validation and CI Integration | Not Started | ~15 | - |
 
 ---
@@ -48,11 +48,18 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 - Root type checking clean (0 errors), UI at baseline (70 pre-existing, no regressions)
 - All 200 tests pass, `pnpm check` clean
 
+### Session 04: Stricter Linting Rules (2026-02-05)
+- Enabled `perf` and `suspicious` oxlint categories as error
+- Enabled `typescript/no-explicit-any` as error with test file override
+- Added `curly` rule as error and 11 upstream-aligned rule overrides
+- Remediated 26 active-code `any` occurrences across `src/`
+- Updated oxlint `^1.43.0`, oxfmt `0.28.0`, oxlint-tsgolint `^0.11.2`
+- Zero lint errors across 2153 files with 134 rules
+
 ---
 
 ## Upcoming Sessions
 
-- Session 04: Stricter Linting Rules
 - Session 05: Build Validation and CI Integration
 
 ---

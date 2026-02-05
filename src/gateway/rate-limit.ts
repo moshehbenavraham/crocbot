@@ -57,7 +57,9 @@ export function createRateLimiter(config?: RateLimitConfig): RateLimiter {
 
   function cleanup(now: number): void {
     // Only run cleanup every windowMs to avoid O(n) on every request
-    if (now - lastCleanup < windowMs) return;
+    if (now - lastCleanup < windowMs) {
+      return;
+    }
     lastCleanup = now;
     for (const [key, entry] of windows) {
       if (now - entry.start >= windowMs) {

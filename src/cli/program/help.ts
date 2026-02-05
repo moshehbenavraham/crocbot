@@ -70,7 +70,9 @@ export function configureProgramHelp(program: Command, ctx: ProgramContext) {
   }
 
   program.addHelpText("beforeAll", () => {
-    if (hasEmittedCliBanner()) return "";
+    if (hasEmittedCliBanner()) {
+      return "";
+    }
     const rich = isRich();
     const line = formatCliBannerLine(ctx.programVersion, { richTty: rich });
     return `\n${line}\n`;
@@ -81,7 +83,9 @@ export function configureProgramHelp(program: Command, ctx: ProgramContext) {
   ).join("\n");
 
   program.addHelpText("afterAll", ({ command }) => {
-    if (command !== program) return "";
+    if (command !== program) {
+      return "";
+    }
     const docs = formatDocsLink("/cli", "aiwithapex.mintlify.app/cli");
     return `\n${theme.heading("Examples:")}\n${fmtExamples}\n\n${theme.muted("Docs:")} ${docs}\n`;
   });

@@ -78,9 +78,12 @@ async function dockerImageExists(image: string): Promise<boolean> {
   try {
     await runExec("docker", ["image", "inspect", image], { timeoutMs: 5_000 });
     return true;
-  } catch (error: any) {
-    const stderr = error?.stderr || error?.message || "";
-    if (String(stderr).includes("No such image")) {
+  } catch (error: unknown) {
+    const rawStderr = (error as Record<string, unknown>)?.stderr;
+    const rawMessage = (error as Error)?.message;
+    const stderr: string =
+      typeof rawStderr === "string" ? rawStderr : typeof rawMessage === "string" ? rawMessage : "";
+    if (stderr.includes("No such image")) {
       return false;
     }
     throw error;
@@ -148,7 +151,9 @@ async function handleMissingSandboxImage(
   prompter: DoctorPrompter,
 ) {
   const exists = await dockerImageExists(params.image);
-  if (exists) return;
+  if (exists) {
+    return;
+  }
 
   const buildHint = params.buildScript
     ? `Build it with ${params.buildScript}.`
@@ -166,7 +171,9 @@ async function handleMissingSandboxImage(
     }
   }
 
-  if (built) return;
+  if (built) {
+    return;
+  }
 }
 
 export async function maybeRepairSandboxImages(
@@ -176,7 +183,9 @@ export async function maybeRepairSandboxImages(
 ): Promise<crocbotConfig> {
   const sandbox = cfg.agents?.defaults?.sandbox;
   const mode = sandbox?.mode ?? "off";
-  if (!sandbox || mode === "off") return cfg;
+  if (!sandbox || mode === "off") {
+    return cfg;
+  }
 
   const dockerAvailable = await isDockerAvailable();
   if (!dockerAvailable) {
@@ -238,14 +247,18 @@ export function noteSandboxScopeWarnings(cfg: crocbotConfig) {
   for (const agent of agents) {
     const agentId = agent.id;
     const agentSandbox = agent.sandbox;
-    if (!agentSandbox) continue;
+    if (!agentSandbox) {
+      continue;
+    }
 
     const scope = resolveSandboxScope({
       scope: agentSandbox.scope ?? globalSandbox?.scope,
       perSession: agentSandbox.perSession ?? globalSandbox?.perSession,
     });
 
-    if (scope !== "shared") continue;
+    if (scope !== "shared") {
+      continue;
+    }
 
     const overrides: string[] = [];
     if (agentSandbox.docker && Object.keys(agentSandbox.docker).length > 0) {
@@ -258,7 +271,9 @@ export function noteSandboxScopeWarnings(cfg: crocbotConfig) {
       overrides.push("prune");
     }
 
-    if (overrides.length === 0) continue;
+    if (overrides.length === 0) {
+      continue;
+    }
 
     warnings.push(
       [

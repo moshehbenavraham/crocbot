@@ -63,8 +63,11 @@ describe("browser extension install", () => {
 
       expect(copyToClipboard).toHaveBeenCalledWith(dir);
     } finally {
-      if (prev === undefined) delete process.env.CROCBOT_STATE_DIR;
-      else process.env.CROCBOT_STATE_DIR = prev;
+      if (prev === undefined) {
+        delete process.env.CROCBOT_STATE_DIR;
+      } else {
+        process.env.CROCBOT_STATE_DIR = prev;
+      }
     }
   });
 });

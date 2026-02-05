@@ -92,7 +92,9 @@ export function getTelegramSequentialKey(ctx: {
     rawText &&
     isControlCommandMessage(rawText, undefined, botUsername ? { botUsername } : undefined)
   ) {
-    if (typeof chatId === "number") return `telegram:${chatId}:control`;
+    if (typeof chatId === "number") {
+      return `telegram:${chatId}:control`;
+    }
     return "telegram:control";
   }
   const isForum = (msg?.chat as { is_forum?: boolean } | undefined)?.is_forum;
@@ -166,8 +168,12 @@ export function createTelegramBot(opts: TelegramBotOptions) {
 
   const recordUpdateId = (ctx: TelegramUpdateKeyContext) => {
     const updateId = resolveTelegramUpdateId(ctx);
-    if (typeof updateId !== "number") return;
-    if (lastUpdateId !== null && updateId <= lastUpdateId) return;
+    if (typeof updateId !== "number") {
+      return;
+    }
+    if (lastUpdateId !== null && updateId <= lastUpdateId) {
+      return;
+    }
     lastUpdateId = updateId;
     void opts.updateOffset?.onUpdateId?.(updateId);
   };
@@ -175,7 +181,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
   const shouldSkipUpdate = (ctx: TelegramUpdateKeyContext) => {
     const updateId = resolveTelegramUpdateId(ctx);
     if (typeof updateId === "number" && lastUpdateId !== null) {
-      if (updateId <= lastUpdateId) return true;
+      if (updateId <= lastUpdateId) {
+        return true;
+      }
     }
     const key = buildTelegramUpdateKey(ctx);
     const skipped = recentUpdates.check(key);
@@ -203,7 +211,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
       }
       if (value && typeof value === "object") {
         const obj = value as object;
-        if (seen.has(obj)) return "[Circular]";
+        if (seen.has(obj)) {
+          return "[Circular]";
+        }
         seen.add(obj);
       }
       return value;
@@ -269,7 +279,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
       botHasTopicsEnabled = fromCtx.has_topics_enabled;
       return botHasTopicsEnabled;
     }
-    if (typeof botHasTopicsEnabled === "boolean") return botHasTopicsEnabled;
+    if (typeof botHasTopicsEnabled === "boolean") {
+      return botHasTopicsEnabled;
+    }
     try {
       const me = (await withTelegramApiErrorLogging({
         operation: "getMe",
@@ -304,8 +316,12 @@ export function createTelegramBot(opts: TelegramBotOptions) {
     try {
       const store = loadSessionStore(storePath);
       const entry = store[sessionKey];
-      if (entry?.groupActivation === "always") return false;
-      if (entry?.groupActivation === "mention") return true;
+      if (entry?.groupActivation === "always") {
+        return false;
+      }
+      if (entry?.groupActivation === "mention") {
+        return true;
+      }
     } catch (err) {
       logVerbose(`Failed to load session for activation check: ${String(err)}`);
     }
@@ -322,7 +338,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
     });
   const resolveTelegramGroupConfig = (chatId: string | number, messageThreadId?: number) => {
     const groups = telegramCfg.groups;
-    if (!groups) return { groupConfig: undefined, topicConfig: undefined };
+    if (!groups) {
+      return { groupConfig: undefined, topicConfig: undefined };
+    }
     const groupKey = String(chatId);
     const groupConfig = groups[groupKey] ?? groups["*"];
     const topicConfig =
@@ -377,8 +395,12 @@ export function createTelegramBot(opts: TelegramBotOptions) {
   bot.on("message_reaction", async (ctx) => {
     try {
       const reaction = ctx.messageReaction;
-      if (!reaction) return;
-      if (shouldSkipUpdate(ctx)) return;
+      if (!reaction) {
+        return;
+      }
+      if (shouldSkipUpdate(ctx)) {
+        return;
+      }
 
       const chatId = reaction.chat.id;
       const messageId = reaction.message_id;
@@ -386,9 +408,15 @@ export function createTelegramBot(opts: TelegramBotOptions) {
 
       // Resolve reaction notification mode (default: "own")
       const reactionMode = telegramCfg.reactionNotifications ?? "own";
-      if (reactionMode === "off") return;
-      if (user?.is_bot) return;
-      if (reactionMode === "own" && !wasSentByBot(chatId, messageId)) return;
+      if (reactionMode === "off") {
+        return;
+      }
+      if (user?.is_bot) {
+        return;
+      }
+      if (reactionMode === "own" && !wasSentByBot(chatId, messageId)) {
+        return;
+      }
 
       // Detect added reactions
       const oldEmojis = new Set(
@@ -400,7 +428,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
         .filter((r): r is { type: "emoji"; emoji: string } => r.type === "emoji")
         .filter((r) => !oldEmojis.has(r.emoji));
 
-      if (addedReactions.length === 0) return;
+      if (addedReactions.length === 0) {
+        return;
+      }
 
       // Build sender label
       const senderName = user
@@ -419,7 +449,9 @@ export function createTelegramBot(opts: TelegramBotOptions) {
       senderLabel = senderLabel || "unknown";
 
       // Extract forum thread info (similar to message processing)
+      // oxlint-disable-next-line typescript/no-explicit-any -- Grammy reaction type omits message_thread_id; present at runtime
       const messageThreadId = (reaction as any).message_thread_id;
+      // oxlint-disable-next-line typescript/no-explicit-any -- Grammy Chat type omits is_forum for supergroup chats
       const isForum = (reaction.chat as any).is_forum === true;
       const resolvedThreadId = resolveTelegramForumThreadId({
         isForum,

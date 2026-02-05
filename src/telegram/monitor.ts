@@ -59,7 +59,9 @@ const TELEGRAM_POLL_RESTART_POLICY = {
 };
 
 const isGetUpdatesConflict = (err: unknown) => {
-  if (!err || typeof err !== "object") return false;
+  if (!err || typeof err !== "object") {
+    return false;
+  }
   const typed = err as {
     error_code?: number;
     errorCode?: number;
@@ -68,7 +70,9 @@ const isGetUpdatesConflict = (err: unknown) => {
     message?: string;
   };
   const errorCode = typed.error_code ?? typed.errorCode;
-  if (errorCode !== 409) return false;
+  if (errorCode !== 409) {
+    return false;
+  }
   const haystack = [typed.method, typed.description, typed.message]
     .filter((value): value is string => typeof value === "string")
     .join(" ")
@@ -78,7 +82,9 @@ const isGetUpdatesConflict = (err: unknown) => {
 
 /** Check if error is a Grammy HttpError (used to scope unhandled rejection handling) */
 const isGrammyHttpError = (err: unknown): boolean => {
-  if (!err || typeof err !== "object") return false;
+  if (!err || typeof err !== "object") {
+    return false;
+  }
   return (err as { name?: string }).name === "HttpError";
 };
 
@@ -111,14 +117,15 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
     }
 
     const proxyFetch =
-      opts.proxyFetch ??
-      (account.config.proxy ? makeProxyFetch(account.config.proxy as string) : undefined);
+      opts.proxyFetch ?? (account.config.proxy ? makeProxyFetch(account.config.proxy) : undefined);
 
     let lastUpdateId = await readTelegramUpdateOffset({
       accountId: account.accountId,
     });
     const persistUpdateId = async (updateId: number) => {
-      if (lastUpdateId !== null && updateId <= lastUpdateId) return;
+      if (lastUpdateId !== null && updateId <= lastUpdateId) {
+        return;
+      }
       lastUpdateId = updateId;
       try {
         await writeTelegramUpdateOffset({
@@ -210,7 +217,9 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
         try {
           await sleepWithAbort(delayMs, opts.abortSignal);
         } catch (sleepErr) {
-          if (opts.abortSignal?.aborted) return;
+          if (opts.abortSignal?.aborted) {
+            return;
+          }
           throw sleepErr;
         }
       } finally {

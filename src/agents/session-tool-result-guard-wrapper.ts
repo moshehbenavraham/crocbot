@@ -1,3 +1,4 @@
+import type { AgentMessage } from "@mariozechner/pi-agent-core";
 import type { SessionManager } from "@mariozechner/pi-coding-agent";
 
 import { getGlobalHookRunner } from "../plugins/hook-runner-global.js";
@@ -26,7 +27,10 @@ export function guardSessionManager(
 
   const hookRunner = getGlobalHookRunner();
   const transform = hookRunner?.hasHooks("tool_result_persist")
-    ? (message: any, meta: { toolCallId?: string; toolName?: string; isSynthetic?: boolean }) => {
+    ? (
+        message: AgentMessage,
+        meta: { toolCallId?: string; toolName?: string; isSynthetic?: boolean },
+      ) => {
         const out = hookRunner.runToolResultPersist(
           {
             toolName: meta.toolName,

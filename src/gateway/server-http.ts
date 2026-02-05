@@ -70,7 +70,9 @@ export function createHooksRequestHandler(
   const { getHooksConfig, bindHost, port, logHooks, dispatchAgentHook, dispatchWakeHook } = opts;
   return async (req, res) => {
     const hooksConfig = getHooksConfig();
-    if (!hooksConfig) return false;
+    if (!hooksConfig) {
+      return false;
+    }
     const url = new URL(req.url ?? "/", `http://${bindHost}:${port}`);
     const basePath = hooksConfig.basePath;
     if (url.pathname !== basePath && !url.pathname.startsWith(`${basePath}/`)) {
@@ -236,7 +238,9 @@ export function createGatewayHttpServer(opts: {
 
   async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     // Don't interfere with WebSocket upgrades; ws handles the 'upgrade' event.
-    if (String(req.headers.upgrade ?? "").toLowerCase() === "websocket") return;
+    if (String(req.headers.upgrade ?? "").toLowerCase() === "websocket") {
+      return;
+    }
 
     // Lightweight HTTP health endpoint for platform probes (Fly.io, Docker, k8s)
     if (req.method === "GET" && req.url === "/health") {
@@ -309,15 +313,20 @@ export function createGatewayHttpServer(opts: {
     try {
       const configSnapshot = loadConfig();
       const trustedProxies = configSnapshot.gateway?.trustedProxies ?? [];
-      if (await handleHooksRequest(req, res)) return;
+      if (await handleHooksRequest(req, res)) {
+        return;
+      }
       if (
         await handleToolsInvokeHttpRequest(req, res, {
           auth: resolvedAuth,
           trustedProxies,
         })
-      )
+      ) {
         return;
-      if (handlePluginRequest && (await handlePluginRequest(req, res))) return;
+      }
+      if (handlePluginRequest && (await handlePluginRequest(req, res))) {
+        return;
+      }
       if (openResponsesEnabled) {
         if (
           await handleOpenResponsesHttpRequest(req, res, {
@@ -325,8 +334,9 @@ export function createGatewayHttpServer(opts: {
             config: openResponsesConfig,
             trustedProxies,
           })
-        )
+        ) {
           return;
+        }
       }
       if (openAiChatCompletionsEnabled) {
         if (
@@ -334,12 +344,17 @@ export function createGatewayHttpServer(opts: {
             auth: resolvedAuth,
             trustedProxies,
           })
-        )
+        ) {
           return;
+        }
       }
       if (canvasHost) {
-        if (await handleA2uiHttpRequest(req, res)) return;
-        if (await canvasHost.handleHttpRequest(req, res)) return;
+        if (await handleA2uiHttpRequest(req, res)) {
+          return;
+        }
+        if (await canvasHost.handleHttpRequest(req, res)) {
+          return;
+        }
       }
       if (controlUiEnabled) {
         if (
@@ -347,15 +362,17 @@ export function createGatewayHttpServer(opts: {
             basePath: controlUiBasePath,
             resolveAvatar: (agentId) => resolveAgentAvatar(configSnapshot, agentId),
           })
-        )
+        ) {
           return;
+        }
         if (
           handleControlUiHttpRequest(req, res, {
             basePath: controlUiBasePath,
             config: configSnapshot,
           })
-        )
+        ) {
           return;
+        }
       }
 
       res.statusCode = 404;
@@ -378,7 +395,9 @@ export function attachGatewayUpgradeHandler(opts: {
 }) {
   const { httpServer, wss, canvasHost } = opts;
   httpServer.on("upgrade", (req, socket, head) => {
-    if (canvasHost?.handleUpgrade(req, socket, head)) return;
+    if (canvasHost?.handleUpgrade(req, socket, head)) {
+      return;
+    }
     wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit("connection", ws, req);
     });

@@ -89,7 +89,9 @@ export const createGenericTestPlugin = (params?: {
       collectStatusIssues: (accounts) =>
         accounts.flatMap((account) => {
           const lastError = typeof account.lastError === "string" ? account.lastError.trim() : "";
-          if (!lastError) return [];
+          if (!lastError) {
+            return [];
+          }
           return [
             {
               channel: id,

@@ -77,22 +77,46 @@ describe("models-config", () => {
         await expect(fs.stat(path.join(agentDir, "models.json"))).rejects.toThrow();
         expect(result.wrote).toBe(false);
       } finally {
-        if (previous === undefined) delete process.env.COPILOT_GITHUB_TOKEN;
-        else process.env.COPILOT_GITHUB_TOKEN = previous;
-        if (previousGh === undefined) delete process.env.GH_TOKEN;
-        else process.env.GH_TOKEN = previousGh;
-        if (previousGithub === undefined) delete process.env.GITHUB_TOKEN;
-        else process.env.GITHUB_TOKEN = previousGithub;
-        if (previousKimiCode === undefined) delete process.env.KIMICODE_API_KEY;
-        else process.env.KIMICODE_API_KEY = previousKimiCode;
-        if (previousMinimax === undefined) delete process.env.MINIMAX_API_KEY;
-        else process.env.MINIMAX_API_KEY = previousMinimax;
-        if (previousMoonshot === undefined) delete process.env.MOONSHOT_API_KEY;
-        else process.env.MOONSHOT_API_KEY = previousMoonshot;
-        if (previousSynthetic === undefined) delete process.env.SYNTHETIC_API_KEY;
-        else process.env.SYNTHETIC_API_KEY = previousSynthetic;
-        if (previousVenice === undefined) delete process.env.VENICE_API_KEY;
-        else process.env.VENICE_API_KEY = previousVenice;
+        if (previous === undefined) {
+          delete process.env.COPILOT_GITHUB_TOKEN;
+        } else {
+          process.env.COPILOT_GITHUB_TOKEN = previous;
+        }
+        if (previousGh === undefined) {
+          delete process.env.GH_TOKEN;
+        } else {
+          process.env.GH_TOKEN = previousGh;
+        }
+        if (previousGithub === undefined) {
+          delete process.env.GITHUB_TOKEN;
+        } else {
+          process.env.GITHUB_TOKEN = previousGithub;
+        }
+        if (previousKimiCode === undefined) {
+          delete process.env.KIMICODE_API_KEY;
+        } else {
+          process.env.KIMICODE_API_KEY = previousKimiCode;
+        }
+        if (previousMinimax === undefined) {
+          delete process.env.MINIMAX_API_KEY;
+        } else {
+          process.env.MINIMAX_API_KEY = previousMinimax;
+        }
+        if (previousMoonshot === undefined) {
+          delete process.env.MOONSHOT_API_KEY;
+        } else {
+          process.env.MOONSHOT_API_KEY = previousMoonshot;
+        }
+        if (previousSynthetic === undefined) {
+          delete process.env.SYNTHETIC_API_KEY;
+        } else {
+          process.env.SYNTHETIC_API_KEY = previousSynthetic;
+        }
+        if (previousVenice === undefined) {
+          delete process.env.VENICE_API_KEY;
+        } else {
+          process.env.VENICE_API_KEY = previousVenice;
+        }
       }
     });
   });
@@ -142,8 +166,11 @@ describe("models-config", () => {
         expect(ids).toContain("MiniMax-M2.1");
         expect(ids).toContain("MiniMax-VL-01");
       } finally {
-        if (prevKey === undefined) delete process.env.MINIMAX_API_KEY;
-        else process.env.MINIMAX_API_KEY = prevKey;
+        if (prevKey === undefined) {
+          delete process.env.MINIMAX_API_KEY;
+        } else {
+          process.env.MINIMAX_API_KEY = prevKey;
+        }
       }
     });
   });
@@ -175,8 +202,11 @@ describe("models-config", () => {
         const ids = parsed.providers.synthetic?.models?.map((model) => model.id);
         expect(ids).toContain("hf:MiniMaxAI/MiniMax-M2.1");
       } finally {
-        if (prevKey === undefined) delete process.env.SYNTHETIC_API_KEY;
-        else process.env.SYNTHETIC_API_KEY = prevKey;
+        if (prevKey === undefined) {
+          delete process.env.SYNTHETIC_API_KEY;
+        } else {
+          process.env.SYNTHETIC_API_KEY = prevKey;
+        }
       }
     });
   });

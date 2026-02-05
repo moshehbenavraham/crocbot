@@ -99,7 +99,9 @@ export function detectMissedJobs(
   let stuckCleared = 0;
 
   for (const job of jobs) {
-    if (!job.enabled) continue;
+    if (!job.enabled) {
+      continue;
+    }
 
     // Count stuck jobs (runningAtMs older than threshold)
     if (typeof job.state.runningAtMs === "number") {
@@ -109,7 +111,9 @@ export function detectMissedJobs(
     }
 
     const next = job.state.nextRunAtMs;
-    if (typeof next !== "number") continue;
+    if (typeof next !== "number") {
+      continue;
+    }
 
     // Job is overdue
     if (next <= nowMs) {
@@ -139,8 +143,12 @@ export function detectMissedJobs(
 // ── Recovery report builder ──────────────────────────────────────────
 
 function formatDuration(ms: number): string {
-  if (ms < 60_000) return `${Math.round(ms / 1000)}s`;
-  if (ms < 3_600_000) return `${Math.round(ms / 60_000)}m`;
+  if (ms < 60_000) {
+    return `${Math.round(ms / 1000)}s`;
+  }
+  if (ms < 3_600_000) {
+    return `${Math.round(ms / 60_000)}m`;
+  }
   const hours = Math.floor(ms / 3_600_000);
   const mins = Math.round((ms % 3_600_000) / 60_000);
   return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;

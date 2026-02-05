@@ -43,7 +43,9 @@ const externalTransports = new Set<LogTransport>();
 
 function attachExternalTransport(logger: TsLogger<LogObj>, transport: LogTransport): void {
   logger.attachTransport((logObj: LogObj) => {
-    if (!externalTransports.has(transport)) return;
+    if (!externalTransports.has(transport)) {
+      return;
+    }
     try {
       transport(logObj as LogTransportRecord);
     } catch {
@@ -71,14 +73,20 @@ function resolveSettings(): ResolvedSettings {
 }
 
 function settingsChanged(a: ResolvedSettings | null, b: ResolvedSettings) {
-  if (!a) return true;
+  if (!a) {
+    return true;
+  }
   return a.level !== b.level || a.file !== b.file;
 }
 
 export function isFileLogLevelEnabled(level: LogLevel): boolean {
   const settings = (loggingState.cachedSettings as ResolvedSettings | null) ?? resolveSettings();
-  if (!loggingState.cachedSettings) loggingState.cachedSettings = settings;
-  if (settings.level === "silent") return false;
+  if (!loggingState.cachedSettings) {
+    loggingState.cachedSettings = settings;
+  }
+  if (settings.level === "silent") {
+    return false;
+  }
   return levelToMinLevel(level) <= levelToMinLevel(settings.level);
 }
 
@@ -102,9 +110,15 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
       const entry: Record<string, unknown> = { ...logObj, time };
       if (correlationCtx) {
         entry.correlation_id = correlationCtx.correlationId;
-        if (correlationCtx.chatId !== undefined) entry.chat_id = correlationCtx.chatId;
-        if (correlationCtx.userId !== undefined) entry.user_id = correlationCtx.userId;
-        if (correlationCtx.messageId !== undefined) entry.message_id = correlationCtx.messageId;
+        if (correlationCtx.chatId !== undefined) {
+          entry.chat_id = correlationCtx.chatId;
+        }
+        if (correlationCtx.userId !== undefined) {
+          entry.user_id = correlationCtx.userId;
+        }
+        if (correlationCtx.messageId !== undefined) {
+          entry.message_id = correlationCtx.messageId;
+        }
       }
       const line = JSON.stringify(entry);
       fs.appendFileSync(settings.file, `${line}\n`, { encoding: "utf8" });
@@ -233,8 +247,12 @@ function pruneOldRollingLogs(dir: string): void {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     const cutoff = Date.now() - MAX_LOG_AGE_MS;
     for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      if (!entry.name.startsWith(`${LOG_PREFIX}-`) || !entry.name.endsWith(LOG_SUFFIX)) continue;
+      if (!entry.isFile()) {
+        continue;
+      }
+      if (!entry.name.startsWith(`${LOG_PREFIX}-`) || !entry.name.endsWith(LOG_SUFFIX)) {
+        continue;
+      }
       const fullPath = path.join(dir, entry.name);
       try {
         const stat = fs.statSync(fullPath);

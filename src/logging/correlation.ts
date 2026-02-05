@@ -80,11 +80,19 @@ export function updateCorrelationContext(
   updates: Partial<Omit<CorrelationContext, "correlationId">>,
 ): boolean {
   const current = correlationStorage.getStore();
-  if (!current) return false;
+  if (!current) {
+    return false;
+  }
 
-  if (updates.chatId !== undefined) current.chatId = updates.chatId;
-  if (updates.userId !== undefined) current.userId = updates.userId;
-  if (updates.messageId !== undefined) current.messageId = updates.messageId;
+  if (updates.chatId !== undefined) {
+    current.chatId = updates.chatId;
+  }
+  if (updates.userId !== undefined) {
+    current.userId = updates.userId;
+  }
+  if (updates.messageId !== undefined) {
+    current.messageId = updates.messageId;
+  }
 
   return true;
 }

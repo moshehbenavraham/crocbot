@@ -24,7 +24,9 @@ function isErrno(err: unknown): err is NodeJS.ErrnoException {
 
 export function parseSshTarget(raw: string): SshParsedTarget | null {
   const trimmed = raw.trim().replace(/^ssh\s+/, "");
-  if (!trimmed) return null;
+  if (!trimmed) {
+    return null;
+  }
 
   const [userPart, hostPart] = trimmed.includes("@")
     ? ((): [string | undefined, string] => {
@@ -40,11 +42,15 @@ export function parseSshTarget(raw: string): SshParsedTarget | null {
     const host = hostPart.slice(0, colonIdx).trim();
     const portRaw = hostPart.slice(colonIdx + 1).trim();
     const port = Number.parseInt(portRaw, 10);
-    if (!host || !Number.isFinite(port) || port <= 0) return null;
+    if (!host || !Number.isFinite(port) || port <= 0) {
+      return null;
+    }
     return { user: userPart, host, port };
   }
 
-  if (!hostPart) return null;
+  if (!hostPart) {
+    return null;
+  }
   return { user: userPart, host: hostPart, port: 22 };
 }
 
@@ -82,7 +88,9 @@ async function canConnectLocal(port: number): Promise<boolean> {
 async function waitForLocalListener(port: number, timeoutMs: number): Promise<void> {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
-    if (await canConnectLocal(port)) return;
+    if (await canConnectLocal(port)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 50));
   }
   throw new Error(`ssh tunnel did not start listening on localhost:${port}`);
@@ -96,7 +104,9 @@ export async function startSshPortForward(opts: {
   timeoutMs: number;
 }): Promise<SshTunnel> {
   const parsed = parseSshTarget(opts.target);
-  if (!parsed) throw new Error(`invalid SSH target: ${opts.target}`);
+  if (!parsed) {
+    throw new Error(`invalid SSH target: ${opts.target}`);
+  }
 
   let localPort = opts.localPortPreferred;
   try {
@@ -150,7 +160,9 @@ export async function startSshPortForward(opts: {
   });
 
   const stop = async () => {
-    if (child.killed) return;
+    if (child.killed) {
+      return;
+    }
     child.kill("SIGTERM");
     await new Promise<void>((resolve) => {
       const t = setTimeout(() => {
@@ -179,7 +191,7 @@ export async function startSshPortForward(opts: {
   } catch (err) {
     await stop();
     const suffix = stderr.length > 0 ? `\n${stderr.join("\n")}` : "";
-    throw new Error(`${err instanceof Error ? err.message : String(err)}${suffix}`);
+    throw new Error(`${err instanceof Error ? err.message : String(err)}${suffix}`, { cause: err });
   }
 
   return {
