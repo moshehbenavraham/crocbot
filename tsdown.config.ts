@@ -6,6 +6,10 @@ const env = {
 
 const shared = {
   env,
+  external: [
+    "@napi-rs/canvas",
+    "@reflink/reflink",
+  ],
   fixedExtension: false,
   platform: "node" as const,
   skipNodeModulesBundle: true,
