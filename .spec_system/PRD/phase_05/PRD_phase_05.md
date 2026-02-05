@@ -4,7 +4,7 @@
 **Sessions**: 5 (initial estimate)
 **Estimated Duration**: 3-5 days
 
-**Progress**: 2/5 sessions (40%)
+**Progress**: 3/5 sessions (60%)
 
 ---
 
@@ -20,7 +20,7 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 |---------|------|--------|------------|-----------|
 | 01 | Research Build Tooling Delta | Complete | 18 | 2026-02-05 |
 | 02 | tsdown Migration | Complete | 18 | 2026-02-05 |
-| 03 | TypeScript Config Unification | Not Started | ~15 | - |
+| 03 | TypeScript Config Unification | Complete | 15 | 2026-02-05 |
 | 04 | Stricter Linting Rules | Not Started | ~20 | - |
 | 05 | Build Validation and CI Integration | Not Started | ~15 | - |
 
@@ -41,11 +41,17 @@ Port upstream OpenClaw build tooling improvements to crocbot. This phase replace
 - Added `pnpm check` convenience script for unified code quality validation
 - Zero test regressions (3825 passed, 26 pre-existing failures unchanged)
 
+### Session 03: TypeScript Config Unification (2026-02-05)
+- Upgraded root `tsconfig.json` target from ES2022 to ES2023 with 7 upstream delta options
+- Upgraded `ui/tsconfig.json` target and lib to ES2023
+- Added `allowImportingTsExtensions`, `declaration`, `experimentalDecorators`, `useDefineForClassFields`, `noEmitOnError`
+- Root type checking clean (0 errors), UI at baseline (70 pre-existing, no regressions)
+- All 200 tests pass, `pnpm check` clean
+
 ---
 
 ## Upcoming Sessions
 
-- Session 03: TypeScript Config Unification
 - Session 04: Stricter Linting Rules
 - Session 05: Build Validation and CI Integration
 
