@@ -12,6 +12,23 @@ import { detectMime, extensionForMime } from "./mime.js";
 const resolveMediaDir = () => path.join(resolveConfigDir(), "media");
 export const MEDIA_MAX_BYTES = 5 * 1024 * 1024; // 5MB default
 const MAX_BYTES = MEDIA_MAX_BYTES;
+const DOWNLOAD_TIMEOUT_MS = 60_000;
+
+/**
+ * Validate that a resolved path does not escape the media root directory.
+ * Throws if the path traverses outside via `../` or absolute escape.
+ */
+export function assertMediaPath(resolvedPath: string, mediaRoot: string): void {
+  const canonical = path.resolve(resolvedPath);
+  const root = path.resolve(mediaRoot);
+  if (canonical === root) {
+    return;
+  }
+  const relative = path.relative(root, canonical);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(`Path escapes media root: ${resolvedPath}`);
+  }
+}
 const DEFAULT_TTL_MS = 2 * 60 * 1000; // 2 minutes
 
 /**
@@ -94,6 +111,7 @@ async function downloadToFile(
   dest: string,
   headers?: Record<string, string>,
   maxRedirects = 5,
+  timeoutMs = DOWNLOAD_TIMEOUT_MS,
 ): Promise<{ headerMime?: string; sniffBuffer: Buffer; size: number }> {
   return await new Promise((resolve, reject) => {
     let parsedUrl: URL;
@@ -113,16 +131,18 @@ async function downloadToFile(
         const req = requestImpl(parsedUrl, { headers, lookup: pinned.lookup }, (res) => {
           // Follow redirects
           if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400) {
+            clearTimeout(timer);
             const location = res.headers.location;
             if (!location || maxRedirects <= 0) {
               reject(new Error(`Redirect loop or missing Location header`));
               return;
             }
             const redirectUrl = new URL(location, url).href;
-            resolve(downloadToFile(redirectUrl, dest, headers, maxRedirects - 1));
+            resolve(downloadToFile(redirectUrl, dest, headers, maxRedirects - 1, timeoutMs));
             return;
           }
           if (!res.statusCode || res.statusCode >= 400) {
+            clearTimeout(timer);
             reject(new Error(`HTTP ${res.statusCode ?? "?"} downloading media`));
             return;
           }
@@ -137,11 +157,13 @@ async function downloadToFile(
               sniffLen += chunk.length;
             }
             if (total > MAX_BYTES) {
+              clearTimeout(timer);
               req.destroy(new Error("Media exceeds 5MB limit"));
             }
           });
           pipeline(res, out)
             .then(() => {
+              clearTimeout(timer);
               const sniffBuffer = Buffer.concat(sniffChunks, Math.min(sniffLen, 16384));
               const rawHeader = res.headers["content-type"];
               const headerMime = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
@@ -151,9 +173,18 @@ async function downloadToFile(
                 size: total,
               });
             })
-            .catch(reject);
+            .catch((err) => {
+              clearTimeout(timer);
+              reject(err);
+            });
         });
-        req.on("error", reject);
+        const timer = setTimeout(() => {
+          req.destroy(new Error("Download timed out"));
+        }, timeoutMs);
+        req.on("error", (err) => {
+          clearTimeout(timer);
+          reject(err);
+        });
         req.end();
       })
       .catch(reject);
@@ -174,6 +205,7 @@ export async function saveMediaSource(
 ): Promise<SavedMedia> {
   const baseDir = resolveMediaDir();
   const dir = subdir ? path.join(baseDir, subdir) : baseDir;
+  assertMediaPath(dir, baseDir);
   await fs.mkdir(dir, { recursive: true, mode: 0o700 });
   await cleanOldMedia();
   const baseId = crypto.randomUUID();
@@ -218,7 +250,9 @@ export async function saveMediaBuffer(
   if (buffer.byteLength > maxBytes) {
     throw new Error(`Media exceeds ${(maxBytes / (1024 * 1024)).toFixed(0)}MB limit`);
   }
-  const dir = path.join(resolveMediaDir(), subdir);
+  const baseDir = resolveMediaDir();
+  const dir = path.join(baseDir, subdir);
+  assertMediaPath(dir, baseDir);
   await fs.mkdir(dir, { recursive: true, mode: 0o700 });
   const uuid = crypto.randomUUID();
   const headerExt = extensionForMime(contentType?.split(";")[0]?.trim() ?? undefined);

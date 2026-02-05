@@ -4,7 +4,7 @@
 **Sessions**: 4 (initial estimate)
 **Estimated Duration**: 2-3 days
 
-**Progress**: 2/4 sessions (50%)
+**Progress**: 3/4 sessions (75%)
 
 ---
 
@@ -22,7 +22,7 @@ The exec allowlist hardening and TLS 1.3 minimum have been descoped — exec sec
 |---------|------|--------|------------|-----------|
 | 01 | Research Security Hardening Delta | Complete | 18 | 2026-02-05 |
 | 02 | SSRF Guards | Complete | 20 | 2026-02-06 |
-| 03 | Download Timeouts and Path Traversal | Not Started | ~18 | - |
+| 03 | Download Timeouts and Path Traversal | Complete | 20 | 2026-02-06 |
 | 04 | Security Validation | Not Started | ~15 | - |
 
 ---
@@ -41,11 +41,17 @@ The exec allowlist hardening and TLS 1.3 minimum have been descoped — exec sec
 - **Deliverables**: `src/infra/net/fetch-guard.ts` (171 lines), `src/infra/net/fetch-guard.test.ts` (269 lines), `src/infra/net/ssrf.test.ts` (196 lines), plus modifications to `ssrf.ts`, `notifier-webhook.ts`, `skills-install.ts`, `media/fetch.ts`
 - **Key outcomes**: Complete SSRF defense layer with DNS pinning, redirect validation, and guarded fetch wrapper integrated into all 3 unprotected call sites. 38 new tests added.
 
+### Session 03: Download Timeouts and Path Traversal
+- **Completed**: 2026-02-06
+- **Tasks**: 20/20
+- **Deliverables**: `assertMediaPath()` guard in `src/media/store.ts`, `AbortSignal.timeout()` on both Telegram download functions, `downloadToFile` timeout via `setTimeout`+`req.destroy()`, path traversal validation on `saveMediaBuffer`/`saveMediaSource`, 14 new tests across `download.test.ts` and `store.test.ts`
+- **Key outcomes**: All Telegram download operations now abort on timeout (30s metadata, 60s content). Media store rejects path traversal attempts. All 5 agent tool files audited and confirmed already guarded. `originalFilename` pass-through for upstream parity.
+
 ---
 
 ## Upcoming Sessions
 
-- Session 03: Download Timeouts and Path Traversal
+- Session 04: Security Validation
 
 ---
 

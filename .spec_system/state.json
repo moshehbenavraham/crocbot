@@ -79,7 +79,8 @@
     "phase05-session04-stricter-linting-rules",
     "phase05-session05-build-validation-ci-integration",
     "phase06-session01-research-security-hardening-delta",
-    "phase06-session02-ssrf-guards"
+    "phase06-session02-ssrf-guards",
+    "phase06-session03-download-timeouts-and-path-traversal"
   ],
   "next_session_history": [
     {
@@ -855,6 +856,31 @@
     {
       "date": "2026-02-06",
       "session": "phase06-session02-ssrf-guards",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase06-session03-download-timeouts-and-path-traversal",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase06-session03-download-timeouts-and-path-traversal",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase06-session03-download-timeouts-and-path-traversal",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase06-session03-download-timeouts-and-path-traversal",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase06-session03-download-timeouts-and-path-traversal",
       "status": "completed"
     }
   ]

@@ -206,6 +206,89 @@ describe("media store", () => {
     });
   });
 
+  describe("assertMediaPath", () => {
+    it("allows paths within media root", async () => {
+      await withTempStore(async (store) => {
+        const mediaRoot = store.getMediaDir();
+        // Should not throw for valid subdirectory
+        expect(() =>
+          store.assertMediaPath(path.join(mediaRoot, "inbound"), mediaRoot),
+        ).not.toThrow();
+        expect(() =>
+          store.assertMediaPath(path.join(mediaRoot, "subdir", "nested"), mediaRoot),
+        ).not.toThrow();
+      });
+    });
+
+    it("allows the media root itself", async () => {
+      await withTempStore(async (store) => {
+        const mediaRoot = store.getMediaDir();
+        expect(() => store.assertMediaPath(mediaRoot, mediaRoot)).not.toThrow();
+      });
+    });
+
+    it("rejects paths with ../ traversal", async () => {
+      await withTempStore(async (store) => {
+        const mediaRoot = store.getMediaDir();
+        expect(() =>
+          store.assertMediaPath(path.join(mediaRoot, "..", "escape"), mediaRoot),
+        ).toThrow("Path escapes media root");
+      });
+    });
+
+    it("rejects absolute paths outside media root", async () => {
+      await withTempStore(async (store) => {
+        const mediaRoot = store.getMediaDir();
+        expect(() => store.assertMediaPath("/tmp/evil", mediaRoot)).toThrow(
+          "Path escapes media root",
+        );
+      });
+    });
+
+    it("rejects deeply nested traversal attempts", async () => {
+      await withTempStore(async (store) => {
+        const mediaRoot = store.getMediaDir();
+        expect(() =>
+          store.assertMediaPath(
+            path.join(mediaRoot, "a", "b", "..", "..", "..", "escape"),
+            mediaRoot,
+          ),
+        ).toThrow("Path escapes media root");
+      });
+    });
+  });
+
+  describe("saveMediaBuffer path traversal rejection", () => {
+    it("rejects subdir with ../ traversal", async () => {
+      await withTempStore(async (store) => {
+        const buf = Buffer.from("test");
+        await expect(store.saveMediaBuffer(buf, "text/plain", "../escape")).rejects.toThrow(
+          "Path escapes media root",
+        );
+      });
+    });
+
+    it("allows valid subdir", async () => {
+      await withTempStore(async (store) => {
+        const buf = Buffer.from("test");
+        const saved = await store.saveMediaBuffer(buf, "text/plain", "inbound");
+        expect(saved.path).toBeTruthy();
+      });
+    });
+  });
+
+  describe("saveMediaSource path traversal rejection", () => {
+    it("rejects subdir with ../ traversal", async () => {
+      await withTempStore(async (store, home) => {
+        const srcFile = path.join(home, "tmp-traversal.txt");
+        await fs.writeFile(srcFile, "test content");
+        await expect(store.saveMediaSource(srcFile, undefined, "../escape")).rejects.toThrow(
+          "Path escapes media root",
+        );
+      });
+    });
+  });
+
   describe("saveMediaBuffer with originalFilename", () => {
     it("embeds original filename in stored path when provided", async () => {
       await withTempStore(async (store) => {
