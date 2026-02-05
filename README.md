@@ -13,6 +13,8 @@
 **Crocbot** is a *personal AI assistant* you run on your own VPS or server.
 It answers you on Telegram with full bot integration via grammY. The Gateway is the control plane for your always-on assistant.
 
+**This is a Fork of the OpenClaw Project:  https://openclaw.ai/**
+
 If you want a personal, single-user assistant that is lean, fast, and always-on, this is it.
 
 [Repository](https://github.com/moshehbenavraham/crocbot) · [Docs](https://aiwithapex.mintlify.app) · [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · [Docker](https://aiwithapex.mintlify.app/install/docker)

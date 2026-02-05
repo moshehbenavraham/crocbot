@@ -26,22 +26,22 @@
 | `github` | `/skill github` | — | ✅ |
 | `goplaces` | `/skill goplaces coffee near me` | Google Places | ✅ |
 | `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ✅ |
-| `nano-pdf` | `/skill nano-pdf` | — | ⬜ |
-| `notion` | `/skill notion` | Notion API | ⬜ |
+| `nano-pdf` | `/skill nano-pdf` | — | ✅ |
 | `openai-image-gen` | `/skill openai-image-gen a cat` | OpenAI | ✅ |
-| `openai-whisper-api` | *(send voice note)* | OpenAI | ⬜ |
-| `sag` | `/skill sag hello world` | ElevenLabs | ⬜ |
-| `session-logs` | `/skill session-logs` | — | ⬜ |
+| `openai-whisper-api` | *(send voice note)* | OpenAI | ✅ |
+| `sag` | `/skill sag hello world` | ElevenLabs | ✅ |
 | `skill-creator` | `/skill skill-creator` | — | ✅ |
-| `tmux` | `/skill tmux` | — | ⬜ |
-| `trello` | `/skill trello` | — | ⬜ |
 | `weather` | `/skill weather Modiin Ilit` | — | ✅ |
+| `notion` | `/skill notion` | Notion API | ⬜ |
+| `trello` | `/skill trello` | — | ⬜ |
+| `tmux` | `/skill tmux` | — | ⬜ |
+| `session-logs` | `/skill session-logs` | — | ⬜ |
 
 ### Extensions
 
 | Extension | Tested |
 |-----------|--------|
-| `google-gemini-cli-auth` | ⬜ |
+| `google-gemini-cli-auth` | ✅ |
 | `lobster` | ✅ |
 | `memory-lancedb` | ✅ |
 

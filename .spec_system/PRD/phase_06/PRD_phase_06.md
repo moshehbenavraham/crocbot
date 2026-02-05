@@ -4,7 +4,7 @@
 **Sessions**: 4 (initial estimate)
 **Estimated Duration**: 2-3 days
 
-**Progress**: 1/4 sessions (25%)
+**Progress**: 2/4 sessions (50%)
 
 ---
 
@@ -21,7 +21,7 @@ The exec allowlist hardening and TLS 1.3 minimum have been descoped — exec sec
 | Session | Name | Status | Est. Tasks | Validated |
 |---------|------|--------|------------|-----------|
 | 01 | Research Security Hardening Delta | Complete | 18 | 2026-02-05 |
-| 02 | SSRF Guards | Not Started | ~20 | - |
+| 02 | SSRF Guards | Complete | 20 | 2026-02-06 |
 | 03 | Download Timeouts and Path Traversal | Not Started | ~18 | - |
 | 04 | Security Validation | Not Started | ~15 | - |
 
@@ -35,11 +35,17 @@ The exec allowlist hardening and TLS 1.3 minimum have been descoped — exec sec
 - **Deliverable**: `.spec_system/PRD/phase_06/research/security-hardening-delta.md` (539 lines)
 - **Key findings**: 70 fetch call sites inventoried, 5 need SSRF guards, fetch-guard.ts entirely missing, message-tool.ts sandbox regression identified, Grammy v1.39.3 supports AbortSignal natively
 
+### Session 02: SSRF Guards
+- **Completed**: 2026-02-06
+- **Tasks**: 20/20
+- **Deliverables**: `src/infra/net/fetch-guard.ts` (171 lines), `src/infra/net/fetch-guard.test.ts` (269 lines), `src/infra/net/ssrf.test.ts` (196 lines), plus modifications to `ssrf.ts`, `notifier-webhook.ts`, `skills-install.ts`, `media/fetch.ts`
+- **Key outcomes**: Complete SSRF defense layer with DNS pinning, redirect validation, and guarded fetch wrapper integrated into all 3 unprotected call sites. 38 new tests added.
+
 ---
 
 ## Upcoming Sessions
 
-- Session 02: SSRF Guards
+- Session 03: Download Timeouts and Path Traversal
 
 ---
 

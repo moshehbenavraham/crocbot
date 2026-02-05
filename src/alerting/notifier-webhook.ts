@@ -5,6 +5,8 @@
  */
 
 import type { AlertingWebhookConfig } from "../config/types.alerting.js";
+import { fetchWithSsrFGuard } from "../infra/net/fetch-guard.js";
+import { SsrFBlockedError } from "../infra/net/ssrf.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { AlertPayload, Notifier, NotifyResult } from "./notifier.js";
 
@@ -33,8 +35,6 @@ export class WebhookNotifier implements Notifier {
     }
 
     const timeoutMs = this.config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const headers: Record<string, string> = {
@@ -53,29 +53,39 @@ export class WebhookNotifier implements Notifier {
         metadata: payload.metadata,
       });
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body,
-        signal: controller.signal,
+      const { response, release } = await fetchWithSsrFGuard({
+        url,
+        timeoutMs,
+        init: {
+          method: "POST",
+          headers,
+          body,
+        },
       });
 
-      if (!response.ok) {
-        const status = response.status;
-        log.warn(`Webhook request failed: ${status}`, { url, status });
-        return { success: false, error: `HTTP ${status}` };
-      }
+      try {
+        if (!response.ok) {
+          const status = response.status;
+          log.warn(`Webhook request failed: ${status}`, { url, status });
+          return { success: false, error: `HTTP ${status}` };
+        }
 
-      log.debug(`Webhook alert sent: ${payload.id}`, { url });
-      return { success: true };
+        log.debug(`Webhook alert sent: ${payload.id}`, { url });
+        return { success: true };
+      } finally {
+        await release();
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       const isAbort = err instanceof Error && err.name === "AbortError";
+      const isSsrf = err instanceof SsrFBlockedError;
       const errorMsg = isAbort ? "Request timed out" : message;
-      log.warn(`Webhook request error: ${errorMsg}`, { url });
+      if (isSsrf) {
+        log.warn(`Webhook request blocked (SSRF): ${message}`, { url });
+      } else {
+        log.warn(`Webhook request error: ${errorMsg}`, { url });
+      }
       return { success: false, error: errorMsg };
-    } finally {
-      clearTimeout(timeoutId);
     }
   }
 }

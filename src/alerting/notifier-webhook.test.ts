@@ -3,6 +3,28 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AlertPayload } from "./notifier.js";
 import { createWebhookNotifier, WebhookNotifier } from "./notifier-webhook.js";
 
+// Mock SSRF module so DNS resolution resolves instantly under fake timers.
+// fetchWithSsrFGuard calls resolvePinnedHostname which does real DNS -- we
+// need that to complete synchronously so the mock globalThis.fetch is reached.
+vi.mock("../infra/net/ssrf.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../infra/net/ssrf.js")>();
+  return {
+    ...actual,
+    resolvePinnedHostname: vi.fn(async () => ({
+      hostname: "example.com",
+      addresses: ["93.184.216.34"],
+      lookup: vi.fn(),
+    })),
+    resolvePinnedHostnameWithPolicy: vi.fn(async () => ({
+      hostname: "example.com",
+      addresses: ["93.184.216.34"],
+      lookup: vi.fn(),
+    })),
+    createPinnedDispatcher: vi.fn(() => ({ close: vi.fn() })),
+    closeDispatcher: vi.fn(async () => {}),
+  };
+});
+
 describe("WebhookNotifier", () => {
   const mockPayload: AlertPayload = {
     id: "test-id-123",
