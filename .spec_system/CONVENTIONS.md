@@ -141,7 +141,9 @@ Additional workflows:
 | Security (CI) | GitHub Actions | CodeQL, dependency-review, npm-audit (`.github/workflows/security.yml`) |
 | Rate Limiting | In-memory per-IP | `src/gateway/rate-limit.ts`, 60 req/min default, configurable via `gateway.rateLimit` |
 | Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
+| Deploy Trigger | Manual / Coolify | Auto-deploy webhook not yet configured; requires Coolify webhook setup |
 | Backup | Docker volume / config export | `scripts/backup.sh`, config export via `/setup/export`, docs: `docs/runbooks/backup-restore.md` |
+| Config Export | HTTP `/setup/export` | `src/gateway/setup-http.ts`, Bearer token auth, returns redacted config snapshot |
 
 ## When In Doubt
 

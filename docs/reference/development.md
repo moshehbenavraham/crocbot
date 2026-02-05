@@ -41,8 +41,9 @@ pnpm build
 | `pnpm crocbot <cmd>` | Run CLI commands via tsx |
 | `pnpm gateway:watch` | Gateway with auto-reload |
 | `pnpm gateway:dev` | Gateway in dev mode (skip channels) |
-| `pnpm build` | TypeScript compilation |
-| `pnpm lint` | Lint with oxlint |
+| `pnpm build` | Production build (tsdown bundler, ~5s) |
+| `pnpm check` | Type-check + lint + format (no emit) |
+| `pnpm lint` | Lint with oxlint (134 type-aware rules) |
 | `pnpm format` | Format check with oxfmt |
 | `pnpm test` | Run tests with Vitest |
 | `pnpm test:coverage` | Tests with coverage report |
@@ -90,12 +91,11 @@ Coverage thresholds (enforced via Vitest):
 - **Linting**: oxlint
 - **Formatting**: oxfmt
 - **Comments**: Add brief comments for tricky logic
-- **File size**: Aim for under ~700 LOC
+- **File size**: Aim for under 500 LOC
 
 Run before commits:
 ```bash
-pnpm lint
-pnpm format
+pnpm check
 ```
 
 ## Pre-commit Hooks

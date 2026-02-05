@@ -1,18 +1,12 @@
 # 🐊 Crocbot — Personal AI Assistant
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/crocbot/crocbot/main/docs/whatsapp-croc.jpg" alt="Crocbot" width="400">
-</p>
-
-<p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/moshehbenavraham/crocbot/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/crocbot/crocbot/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://github.com/moshehbenavraham/crocbot/releases"><img src="https://img.shields.io/github/v/release/crocbot/crocbot?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
-  <a href="https://deepwiki.com/crocbot/crocbot"><img src="https://img.shields.io/badge/DeepWiki-crocbot-111111?style=for-the-badge" alt="DeepWiki"></a>
-  <a href="https://discord.gg/croc"><img src="https://img.shields.io/discord/1456350064065904867?label=Discord&logo=discord&logoColor=white&color=5865F2&style=for-the-badge" alt="Discord"></a>
+  <a href="https://github.com/moshehbenavraham/crocbot/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/moshehbenavraham/crocbot/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
+  <a href="https://github.com/moshehbenavraham/crocbot/releases"><img src="https://img.shields.io/github/v/release/moshehbenavraham/crocbot?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
@@ -21,7 +15,7 @@ It answers you on Telegram with full bot integration via grammY. The Gateway is 
 
 If you want a personal, single-user assistant that is lean, fast, and always-on, this is it.
 
-[Website](https://github.com/moshehbenavraham/crocbot) · [Docs](https://aiwithapex.mintlify.app) · [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · [Updating](https://aiwithapex.mintlify.app/install/updating) · [Showcase](https://aiwithapex.mintlify.app/start/showcase) · [FAQ](https://aiwithapex.mintlify.app/start/faq) · [Wizard](https://aiwithapex.mintlify.app/start/wizard) · [Nix](https://github.com/moshehbenavraham/nix-crocbot) · [Docker](https://aiwithapex.mintlify.app/install/docker) · [Discord](https://discord.gg/croc)
+[Repository](https://github.com/moshehbenavraham/crocbot) · [Docs](https://aiwithapex.mintlify.app) · [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · [Docker](https://aiwithapex.mintlify.app/install/docker)
 
 Preferred setup: run the onboarding wizard (`crocbot onboard`). It walks through gateway, workspace, Telegram configuration, and skills. The CLI wizard is the recommended path and works on **Linux and Windows (via WSL2; strongly recommended)**.
 Works with npm, pnpm, or bun.
@@ -119,10 +113,6 @@ Run `crocbot doctor` to surface risky/misconfigured DM policies.
 - **[First-class tools](https://aiwithapex.mintlify.app/tools)** - browser, cron, sessions, and automation.
 - **[Onboarding](https://aiwithapex.mintlify.app/start/wizard) + [skills](https://aiwithapex.mintlify.app/tools/skills)** - wizard-driven setup with bundled/managed/workspace skills.
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=crocbot/crocbot&type=date&legend=top-left)](https://www.star-history.com/#crocbot/crocbot&type=date&legend=top-left)
-
 ## Everything we built so far
 
 ### Core platform
@@ -208,12 +198,6 @@ Details: [Remote access](https://aiwithapex.mintlify.app/gateway/remote) · [Sec
 - `sessions_send` — message another session; optional reply‑back ping‑pong + announce step (`REPLY_SKIP`, `ANNOUNCE_SKIP`).
 
 Details: [Session tools](https://aiwithapex.mintlify.app/concepts/session-tool)
-
-## Skills registry (CrocHub)
-
-CrocHub is a minimal skill registry. With CrocHub enabled, the agent can search for skills automatically and pull in new ones as needed.
-
-[CrocHub](https://CrocHub.com)
 
 ## Chat commands
 

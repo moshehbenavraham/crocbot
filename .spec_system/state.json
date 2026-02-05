@@ -2,7 +2,7 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 5,
+  "current_phase": 6,
   "current_session": null,
   "phases": {
     "0": {
@@ -40,6 +40,12 @@
       "description": "Migrate from tsc to tsdown bundler, unify TypeScript configuration, enable stricter linting rules, and add convenience scripts",
       "status": "complete",
       "session_count": 5
+    },
+    "6": {
+      "name": "Upstream Security Hardening Port",
+      "description": "Port SSRF guards, Telegram download timeouts, and path traversal validation from upstream OpenClaw",
+      "status": "in_progress",
+      "session_count": 4
     }
   },
   "completed_sessions": [
@@ -71,7 +77,8 @@
     "phase05-session02-tsdown-migration",
     "phase05-session03-typescript-config-unification",
     "phase05-session04-stricter-linting-rules",
-    "phase05-session05-build-validation-ci-integration"
+    "phase05-session05-build-validation-ci-integration",
+    "phase06-session01-research-security-hardening-delta"
   ],
   "next_session_history": [
     {
@@ -797,6 +804,31 @@
     {
       "date": "2026-02-05",
       "session": "phase05-session05-build-validation-ci-integration",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase06-session01-research-security-hardening-delta",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase06-session01-research-security-hardening-delta",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase06-session01-research-security-hardening-delta",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase06-session01-research-security-hardening-delta",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase06-session01-research-security-hardening-delta",
       "status": "completed"
     }
   ]

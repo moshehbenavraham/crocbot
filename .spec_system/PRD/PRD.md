@@ -81,11 +81,11 @@ This system delivers the product via phases. Each phase is implemented via multi
 |-------|------|----------|--------|
 | 00 | Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment | 8 | Complete |
 | 01 | Production Hardening and Deployment | 5 | Complete |
-| 02 | Operational Maturity and Observability | 4/5 | Session 5 Deferred; Complete |
+| 02 | Operational Maturity and Observability | 5 | Complete |
 | 03 | Upstream Features Port | 3 | Complete |
 | 04 | Upstream Bug Fixes Port | 3 | Complete |
 | 05 | Upstream Build Tooling Port | 5 | Complete |
-| 06 | Upstream Security Hardening Port | TBD | Not Started |
+| 06 | Upstream Security Hardening Port | 4 | In Progress |
 
 ## Phase 03: Upstream Features Port
 
@@ -254,16 +254,21 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 - `src/telegram/download.ts` - Telegram file operations
 - `src/agents/tools/message-tool.ts` - File path validation
 
-### Sessions (To Be Defined)
+### Sessions
 
-Sessions are defined via `/phasebuild` as `session_NN_name.md` stubs under `.spec_system/PRD/phase_06/`.
+| Session | Name | Status |
+|---------|------|--------|
+| 01 | Research Security Hardening Delta | Complete |
+| 02 | SSRF Guards | Not Started |
+| 03 | Download Timeouts and Path Traversal | Not Started |
+| 04 | Security Validation | Not Started |
 
 ## Technical Stack
 
 - **Language**: TypeScript (strict mode, ESM)
 - **Runtime**: Node.js 22+
 - **Package Manager**: pnpm
-- **Build Tool**: tsdown (to be migrated)
+- **Build Tool**: tsdown (rolldown-based bundler, ~5s builds)
 - **Linter**: oxlint
 - **Formatter**: oxfmt
 - **Test Framework**: Vitest

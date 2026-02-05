@@ -33,7 +33,7 @@ scripts/committer "feat: add new feature" path/to/files...
 
 ## Development Setup
 
-See [docs/development.md](docs/development.md) for local environment setup.
+See [docs/reference/development.md](docs/reference/development.md) for local environment setup.
 
 ## Code Style
 

@@ -16,11 +16,14 @@ GitHub Actions workflow runs on push to `main`:
 ## Build Process
 
 ```bash
-# Full build
+# Full build (tsdown bundler, ~5s)
 pnpm build
 
+# Type-check + lint + format (no emit)
+pnpm check
+
 # Output
-dist/           # Compiled JavaScript
+dist/           # Bundled JavaScript (code-split chunks)
 ```
 
 ## Release Process

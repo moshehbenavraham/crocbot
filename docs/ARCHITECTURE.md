@@ -69,11 +69,12 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 | Technology | Purpose | Why Chosen |
 |------------|---------|------------|
 | Node.js 22+ | Runtime | Modern ESM support, stable LTS |
-| TypeScript | Language | Type safety, developer experience |
+| TypeScript (ES2023) | Language | Type safety, strict mode, NodeNext modules |
+| tsdown (rolldown) | Bundler | ~5s builds, replaces tsc emit |
 | pnpm | Package manager | Fast, disk-efficient |
 | grammY | Telegram SDK | Modern, well-maintained, middleware support |
 | Vitest | Testing | Fast, ESM-native, good DX |
-| oxlint | Linting | Fast Rust-based linter |
+| oxlint + oxfmt | Lint + Format | Fast Rust-based toolchain, 134 type-aware rules |
 
 ## Data Flow
 

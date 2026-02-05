@@ -24,7 +24,7 @@
 | `coding-agent` | `/skill coding-agent` | — | ✅ |
 | `gifgrep` | `/skill gifgrep cats` | — | ✅ |
 | `github` | `/skill github` | — | ✅ |
-| `goplaces` | `/skill goplaces coffee near me` | Google Places | ⬜ |
+| `goplaces` | `/skill goplaces coffee near me` | Google Places | ✅ |
 | `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ✅ |
 | `nano-pdf` | `/skill nano-pdf` | — | ⬜ |
 | `notion` | `/skill notion` | Notion API | ⬜ |
