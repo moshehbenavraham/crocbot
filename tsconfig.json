@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2023",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
@@ -11,7 +12,12 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true
+    "noEmitOnError": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   },
   "include": ["src/**/*"],
   "exclude": [
@@ -19,6 +25,7 @@
     "dist",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
-    "src/**/test-helpers.ts"
+    "src/**/test-helpers.ts",
+    "src/**/test-helpers.*.ts"
   ]
 }

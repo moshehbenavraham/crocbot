@@ -1,3 +1,4 @@
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -29,10 +30,23 @@ export const DEFAULT_BOOTSTRAP_FILENAME = "BOOTSTRAP.md";
 export const DEFAULT_MEMORY_FILENAME = "MEMORY.md";
 export const DEFAULT_MEMORY_ALT_FILENAME = "memory.md";
 
-const TEMPLATE_DIR = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../docs/reference/templates",
-);
+function resolveTemplateDir(): string {
+  let cursor = path.dirname(fileURLToPath(import.meta.url));
+  for (let i = 0; i < 6; i += 1) {
+    const candidate = path.join(cursor, "docs", "reference", "templates");
+    if (fsSync.existsSync(candidate)) return candidate;
+    const parent = path.dirname(cursor);
+    if (parent === cursor) break;
+    cursor = parent;
+  }
+  // Fallback to the old relative path for error messaging
+  return path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../../docs/reference/templates",
+  );
+}
+
+const TEMPLATE_DIR = resolveTemplateDir();
 
 function stripFrontMatter(content: string): string {
   if (!content.startsWith("---")) return content;

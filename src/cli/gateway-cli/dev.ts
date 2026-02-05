@@ -13,10 +13,20 @@ const DEV_IDENTITY_THEME = "protocol droid";
 const DEV_IDENTITY_EMOJI = "🤖";
 const DEV_AGENT_WORKSPACE_SUFFIX = "dev";
 
-const DEV_TEMPLATE_DIR = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname),
-  "../../../docs/reference/templates",
-);
+const DEV_TEMPLATE_DIR = (() => {
+  let cursor = path.dirname(new URL(import.meta.url).pathname);
+  for (let i = 0; i < 6; i += 1) {
+    const candidate = path.join(cursor, "docs", "reference", "templates");
+    if (fs.existsSync(candidate)) return candidate;
+    const parent = path.dirname(cursor);
+    if (parent === cursor) break;
+    cursor = parent;
+  }
+  return path.resolve(
+    path.dirname(new URL(import.meta.url).pathname),
+    "../../../docs/reference/templates",
+  );
+})();
 
 async function loadDevTemplate(name: string, fallback: string): Promise<string> {
   try {

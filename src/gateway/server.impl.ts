@@ -503,14 +503,20 @@ export async function startGatewayServer(
     log.warn(`post-restart report failed: ${String(err)}`);
   });
 
-  // Startup Recovery: Detect missed cron jobs from downtime/WSL suspend and report
-  startAliveHeartbeat();
+  // Startup Recovery: Detect missed cron jobs from downtime/WSL suspend and report.
+  // IMPORTANT: runStartupRecovery() must execute BEFORE startAliveHeartbeat(),
+  // because the heartbeat immediately persists Date.now() as last-alive,
+  // which would overwrite the stale timestamp that recovery reads to detect downtime.
   void runStartupRecovery({
     cronStorePath,
     userId: RESTART_NOTIFY_USER_ID,
-  }).catch((err) => {
-    log.warn(`startup recovery failed: ${String(err)}`);
-  });
+  })
+    .catch((err) => {
+      log.warn(`startup recovery failed: ${String(err)}`);
+    })
+    .finally(() => {
+      startAliveHeartbeat();
+    });
 
   scheduleGatewayUpdateCheck({ cfg: cfgAtStart, log, isNixMode });
   const tailscaleCleanup = await startGatewayTailscaleExposure({

@@ -61,6 +61,16 @@ export function recomputeNextRuns(state: CronServiceState) {
       );
       job.state.runningAtMs = undefined;
     }
+
+    // Preserve overdue nextRunAtMs so runDueJobs() can pick it up immediately.
+    // Without this, recomputing pushes overdue jobs to the next future occurrence,
+    // silently skipping the missed run (e.g. 08:00 cron recomputed to tomorrow).
+    const existing = job.state.nextRunAtMs;
+    if (typeof existing === "number" && existing <= now) {
+      // Job is already overdue — keep the existing timestamp so it fires on the next tick.
+      continue;
+    }
+
     job.state.nextRunAtMs = computeJobNextRunAtMs(job, now);
   }
 }
