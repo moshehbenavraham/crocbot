@@ -61,7 +61,7 @@ const SENSITIVE_KEY_EXACT: Set<string> = new Set([
  * Keys that contain nested objects with sensitive data.
  * These are recursively redacted but structure is preserved.
  */
-const SENSITIVE_NESTED_KEYS: Set<string> = new Set(["auth", "remote", "tls"]);
+const _SENSITIVE_NESTED_KEYS: Set<string> = new Set(["auth", "remote", "tls"]);
 
 /**
  * Determines if a key name indicates a sensitive value.

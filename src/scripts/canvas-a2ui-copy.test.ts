@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { copyA2uiAssets } from "../../scripts/canvas-a2ui-copy.js";
+import { copyA2uiAssets } from "../../scripts/build/canvas-a2ui-copy.js";
 
 describe("canvas a2ui copy", () => {
   it("throws a helpful error when assets are missing", async () => {

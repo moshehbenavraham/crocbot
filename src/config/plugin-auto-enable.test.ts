@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { applyPluginAutoEnable } from "./plugin-auto-enable.js";
 
 describe("applyPluginAutoEnable", () => {
-  it("enables configured channel plugins and updates allowlist", () => {
+  it("skips core channels (like telegram) since they are handled directly", () => {
+    // Core channels (telegram) don't need plugin auto-enable - they're built-in
     const result = applyPluginAutoEnable({
       config: {
         channels: { telegram: { token: "x" } },
@@ -11,9 +12,11 @@ describe("applyPluginAutoEnable", () => {
       env: {},
     });
 
-    expect(result.config.plugins?.entries?.telegram?.enabled).toBe(true);
-    expect(result.config.plugins?.allow).toEqual(["msteams", "telegram"]);
-    expect(result.changes.join("\n")).toContain("Telegram configured, not enabled yet.");
+    // Telegram is a core channel, so it should NOT be auto-enabled as a plugin
+    expect(result.config.plugins?.entries?.telegram?.enabled).toBeUndefined();
+    // Allowlist remains unchanged since no plugins were auto-enabled
+    expect(result.config.plugins?.allow).toEqual(["msteams"]);
+    expect(result.changes).toEqual([]);
   });
 
   it("respects explicit disable", () => {

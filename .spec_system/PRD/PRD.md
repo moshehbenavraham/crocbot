@@ -83,7 +83,7 @@ This system delivers the product via phases. Each phase is implemented via multi
 | 01 | Production Hardening and Deployment | 5 | Complete |
 | 02 | Operational Maturity and Observability | 5 | Complete |
 | 03 | Upstream Features Port | 3 | Not Started |
-| 04 | Upstream Bug Fixes Port | TBD | Not Started |
+| 04 | Upstream Bug Fixes Port | 3 | Not Started |
 | 05 | Upstream Build Tooling Port | TBD | Not Started |
 | 06 | Upstream Security Hardening Port | TBD | Not Started |
 
@@ -159,9 +159,15 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 - `src/agents/session-transcript-repair.ts` - Transcript repair logic
 - `src/agents/session-file-repair.ts` - Session file repair logic
 
-### Sessions (To Be Defined)
+### Sessions
 
-Sessions are defined via `/phasebuild` as `session_NN_name.md` stubs under `.spec_system/PRD/phase_04/`.
+| Session | Name | Status |
+|---------|------|--------|
+| 01 | Grammy Timeout Recovery | Not Started |
+| 02 | Session Transcript Repair | Not Started |
+| 03 | Bug Fix Validation | Not Started |
+
+Session stubs defined in `.spec_system/PRD/phase_04/`.
 
 ## Phase 05: Upstream Build Tooling Port
 

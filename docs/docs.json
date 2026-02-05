@@ -811,7 +811,8 @@
           "start/showcase",
           "start/hubs",
           "start/onboarding",
-          "start/lore"
+          "start/lore",
+          "onboarding"
         ]
       },
       {
@@ -925,6 +926,9 @@
       {
         "group": "Gateway & Ops",
         "pages": [
+          "ARCHITECTURE",
+          "environments",
+          "deployment",
           "gateway/index",
           "gateway/protocol",
           "gateway/bridge-protocol",
@@ -1109,6 +1113,7 @@
               "runbooks/startup-shutdown",
               "runbooks/telegram-troubleshooting",
               "runbooks/docker-operations",
+              "runbooks/backup-restore",
               "runbooks/log-analysis",
               "runbooks/health-checks"
             ]

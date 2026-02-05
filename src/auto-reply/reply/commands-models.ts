@@ -11,6 +11,11 @@ import type { crocbotConfig } from "../../config/config.js";
 import type { ReplyPayload } from "../types.js";
 import type { CommandHandler } from "./commands-types.js";
 
+export interface ModelsProviderData {
+  byProvider: Map<string, Set<string>>;
+  providers: string[];
+}
+
 const PAGE_SIZE_DEFAULT = 20;
 const PAGE_SIZE_MAX = 100;
 
@@ -67,6 +72,91 @@ function parseModelsArgs(raw: string): {
     pageSize,
     all,
   };
+}
+
+/**
+ * Build provider data for model buttons and commands.
+ * Returns a map of providers to their model sets, plus a sorted list of provider names.
+ */
+export async function buildModelsProviderData(cfg: crocbotConfig): Promise<ModelsProviderData> {
+  const resolvedDefault = resolveConfiguredModelRef({
+    cfg,
+    defaultProvider: DEFAULT_PROVIDER,
+    defaultModel: DEFAULT_MODEL,
+  });
+
+  const catalog = await loadModelCatalog({ config: cfg });
+  const allowed = buildAllowedModelSet({
+    cfg,
+    catalog,
+    defaultProvider: resolvedDefault.provider,
+    defaultModel: resolvedDefault.model,
+  });
+
+  const aliasIndex = buildModelAliasIndex({
+    cfg,
+    defaultProvider: resolvedDefault.provider,
+  });
+
+  const byProvider = new Map<string, Set<string>>();
+  const add = (p: string, m: string) => {
+    const key = normalizeProviderId(p);
+    const set = byProvider.get(key) ?? new Set<string>();
+    set.add(m);
+    byProvider.set(key, set);
+  };
+
+  const addRawModelRef = (raw?: string) => {
+    const trimmed = raw?.trim();
+    if (!trimmed) return;
+    const resolved = resolveModelRefFromString({
+      raw: trimmed,
+      defaultProvider: resolvedDefault.provider,
+      aliasIndex,
+    });
+    if (!resolved) return;
+    add(resolved.ref.provider, resolved.ref.model);
+  };
+
+  const addModelConfigEntries = () => {
+    const modelConfig = cfg.agents?.defaults?.model;
+    if (typeof modelConfig === "string") {
+      addRawModelRef(modelConfig);
+    } else if (modelConfig && typeof modelConfig === "object") {
+      addRawModelRef(modelConfig.primary);
+      for (const fallback of modelConfig.fallbacks ?? []) {
+        addRawModelRef(fallback);
+      }
+    }
+
+    const imageConfig = cfg.agents?.defaults?.imageModel;
+    if (typeof imageConfig === "string") {
+      addRawModelRef(imageConfig);
+    } else if (imageConfig && typeof imageConfig === "object") {
+      addRawModelRef(imageConfig.primary);
+      for (const fallback of imageConfig.fallbacks ?? []) {
+        addRawModelRef(fallback);
+      }
+    }
+  };
+
+  for (const entry of allowed.allowedCatalog) {
+    add(entry.provider, entry.id);
+  }
+
+  // Include config-only allowlist keys that aren't in the curated catalog.
+  for (const raw of Object.keys(cfg.agents?.defaults?.models ?? {})) {
+    addRawModelRef(raw);
+  }
+
+  // Ensure configured defaults/fallbacks/image models show up even when the
+  // curated catalog doesn't know about them (custom providers, dev builds, etc.).
+  add(resolvedDefault.provider, resolvedDefault.model);
+  addModelConfigEntries();
+
+  const providers = [...byProvider.keys()].sort();
+
+  return { byProvider, providers };
 }
 
 export async function resolveModelsCommandReply(params: {

@@ -135,12 +135,12 @@ Additional workflows:
 
 | Component | Provider | Details |
 |-----------|----------|---------|
-| Hosting | Fly.io / Docker | `fly.toml`, `docker-compose.yml` |
-| Health Endpoint | HTTP `/health` | `src/gateway/server-http.ts`, returns `{status, timestamp, uptime}` |
-| Health Probes | Fly.io / Docker | Fly: 30s interval, Docker: healthcheck |
+| Hosting | Coolify / Docker | `docker-compose.coolify.yml`, `docker-compose.yml` |
+| Health Endpoint | HTTP `/health` | `src/gateway/server-http.ts`, returns `{status, timestamp, uptime, memory}` |
+| Health Probes | Docker healthcheck | 30s interval, 3 retries, 10s timeout |
 | Security (CI) | GitHub Actions | CodeQL, dependency-review, npm-audit (`.github/workflows/security.yml`) |
 | Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
-| Backup | Fly.io volume snapshots | Auto daily (5-day retention), manual via `fly volumes snapshots create`, docs: `docs/platforms/fly-backups.md`, script: `scripts/fly-backup.sh` |
+| Backup | Docker volume / config export | `scripts/backup.sh`, config export via `/setup/export`, docs: `docs/runbooks/backup-restore.md` |
 
 ## When In Doubt
 

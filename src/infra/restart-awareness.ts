@@ -132,7 +132,7 @@ export async function sendPreRestartNotification(opts: {
   restartExpectedMs?: number | null;
 }): Promise<boolean> {
   const { userId, reason, restartExpectedMs } = opts;
-  const cfg = loadConfig();
+  const _cfg = loadConfig();
 
   // Collect info about running/finished processes
   const running = listRunningSessions();

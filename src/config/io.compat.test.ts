@@ -14,7 +14,7 @@ async function withTempHome(run: (home: string) => Promise<void>): Promise<void>
   }
 }
 
-async function writeConfig(home: string, dirname: ".crocbot" | ".crocbot", port: number) {
+async function writeConfig(home: string, dirname: string, port: number) {
   const dir = path.join(home, dirname);
   await fs.mkdir(dir, { recursive: true });
   const configPath = path.join(dir, "crocbot.json");
@@ -23,46 +23,45 @@ async function writeConfig(home: string, dirname: ".crocbot" | ".crocbot", port:
 }
 
 describe("config io compat (new + legacy folders)", () => {
-  it("prefers ~/.crocbot/crocbot.json when both configs exist", async () => {
+  it("prefers ~/.crocbot/crocbot.json as the default location", async () => {
     await withTempHome(async (home) => {
-      const newConfigPath = await writeConfig(home, ".crocbot", 19001);
-      await writeConfig(home, ".crocbot", 18789);
+      const configPath = await writeConfig(home, ".crocbot", 19001);
 
       const io = createConfigIO({
         env: {} as NodeJS.ProcessEnv,
         homedir: () => home,
       });
-      expect(io.configPath).toBe(newConfigPath);
+      expect(io.configPath).toBe(configPath);
       expect(io.loadConfig().gateway?.port).toBe(19001);
     });
   });
 
-  it("falls back to ~/.crocbot/crocbot.json when only legacy exists", async () => {
+  it("falls back to ~/.crocbot/crocbot.json when only default exists", async () => {
     await withTempHome(async (home) => {
-      const legacyConfigPath = await writeConfig(home, ".crocbot", 20001);
+      const configPath = await writeConfig(home, ".crocbot", 20001);
 
       const io = createConfigIO({
         env: {} as NodeJS.ProcessEnv,
         homedir: () => home,
       });
 
-      expect(io.configPath).toBe(legacyConfigPath);
+      expect(io.configPath).toBe(configPath);
       expect(io.loadConfig().gateway?.port).toBe(20001);
     });
   });
 
-  it("honors explicit legacy config path env override", async () => {
+  it("honors explicit config path env override", async () => {
     await withTempHome(async (home) => {
-      const newConfigPath = await writeConfig(home, ".crocbot", 19002);
-      const legacyConfigPath = await writeConfig(home, ".crocbot", 20002);
+      const defaultConfigPath = await writeConfig(home, ".crocbot", 19002);
+      const customConfigPath = await writeConfig(home, "custom-config", 20002);
 
       const io = createConfigIO({
-        env: { CROCBOT_CONFIG_PATH: legacyConfigPath } as NodeJS.ProcessEnv,
+        env: { CROCBOT_CONFIG_PATH: customConfigPath } as NodeJS.ProcessEnv,
         homedir: () => home,
       });
 
-      expect(io.configPath).not.toBe(newConfigPath);
-      expect(io.configPath).toBe(legacyConfigPath);
+      expect(io.configPath).not.toBe(defaultConfigPath);
+      expect(io.configPath).toBe(customConfigPath);
       expect(io.loadConfig().gateway?.port).toBe(20002);
     });
   });
