@@ -58,7 +58,8 @@
     "phase03-session01-research-upstream-features",
     "phase03-session02-telegram-model-buttons",
     "phase03-session03-feature-validation",
-    "phase04-session01-grammy-timeout-recovery"
+    "phase04-session01-grammy-timeout-recovery",
+    "phase04-session02-session-transcript-repair"
   ],
   "next_session_history": [
     {
@@ -609,6 +610,31 @@
     {
       "date": "2026-02-05",
       "session": "phase04-session01-grammy-timeout-recovery",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session02-session-transcript-repair",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session02-session-transcript-repair",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session02-session-transcript-repair",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session02-session-transcript-repair",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase04-session02-session-transcript-repair",
       "status": "completed"
     }
   ]

@@ -4,7 +4,7 @@
 **Sessions**: 3
 **Estimated Duration**: 2-3 days
 
-**Progress**: 1/3 sessions (33%)
+**Progress**: 2/3 sessions (67%)
 
 ---
 
@@ -19,7 +19,7 @@ Phase 04 ports critical bug fixes from the upstream OpenClaw repository to impro
 | Session | Name | Status | Est. Tasks | Validated |
 |---------|------|--------|------------|-----------|
 | 01 | Grammy Timeout Recovery | Complete | 18 | 2026-02-05 |
-| 02 | Session Transcript Repair | Not Started | ~12-18 | - |
+| 02 | Session Transcript Repair | Complete | 18 | 2026-02-05 |
 | 03 | Bug Fix Validation | Not Started | ~12-15 | - |
 
 ---
@@ -33,11 +33,18 @@ Phase 04 ports critical bug fixes from the upstream OpenClaw repository to impro
   - Registered scoped unhandled rejection handler in monitor.ts
   - 7 new tests, all 3811 tests passing
 
+- **Session 02: Session Transcript Repair** - Completed 2026-02-05
+  - Ported `sanitizeToolCallInputs()` and `repairToolCallInputs()` to drop malformed tool calls
+  - Created `session-file-repair.ts` with JSONL repair, atomic writes, and backup
+  - Integrated file repair into `attempt.ts` before `SessionManager.open()`
+  - Integrated tool call sanitization into `session-tool-result-guard.ts`
+  - 10 new tests, all 3825 tests passing
+
 ---
 
 ## Upcoming Sessions
 
-- Session 02: Session Transcript Repair
+- Session 03: Bug Fix Validation
 
 ---
 

@@ -185,4 +185,20 @@ export const __testing = {
   cleanupSignals: [...CLEANUP_SIGNALS],
   handleTerminationSignal,
   releaseAllLocksSync,
+  /**
+   * Deregister all signal/exit handlers and reset module state so the
+   * Vitest forks worker can exit cleanly after tests complete.
+   */
+  reset(): void {
+    releaseAllLocksSync();
+    for (const [signal, handler] of cleanupHandlers) {
+      try {
+        process.off(signal, handler);
+      } catch {
+        // Ignore if already removed.
+      }
+    }
+    cleanupHandlers.clear();
+    cleanupRegistered = false;
+  },
 };

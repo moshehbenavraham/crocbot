@@ -31,6 +31,11 @@ import {
 import { scheduleGatewayUpdateCheck } from "../infra/update-startup.js";
 import { setGatewaySigusr1RestartPolicy } from "../infra/restart.js";
 import { handlePostRestartReport } from "../infra/restart-awareness.js";
+import {
+  runStartupRecovery,
+  startAliveHeartbeat,
+  stopAliveHeartbeat,
+} from "../infra/startup-recovery.js";
 import { startDiagnosticHeartbeat, stopDiagnosticHeartbeat } from "../logging/diagnostic.js";
 import { createSubsystemLogger, runtimeForLogger } from "../logging/subsystem.js";
 import type { PluginServicesHandle } from "../plugins/services.js";
@@ -498,6 +503,15 @@ export async function startGatewayServer(
     log.warn(`post-restart report failed: ${String(err)}`);
   });
 
+  // Startup Recovery: Detect missed cron jobs from downtime/WSL suspend and report
+  startAliveHeartbeat();
+  void runStartupRecovery({
+    cronStorePath,
+    userId: RESTART_NOTIFY_USER_ID,
+  }).catch((err) => {
+    log.warn(`startup recovery failed: ${String(err)}`);
+  });
+
   scheduleGatewayUpdateCheck({ cfg: cfgAtStart, log, isNixMode });
   const tailscaleCleanup = await startGatewayTailscaleExposure({
     tailscaleMode,
@@ -585,6 +599,7 @@ export async function startGatewayServer(
 
   return {
     close: async (opts) => {
+      stopAliveHeartbeat();
       if (diagnosticsEnabled) {
         stopDiagnosticHeartbeat();
       }

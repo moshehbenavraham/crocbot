@@ -1,9 +1,13 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { __testing, acquireSessionWriteLock } from "./session-write-lock.js";
+
+afterAll(() => {
+  __testing.reset();
+});
 
 describe("acquireSessionWriteLock", () => {
   it("reuses locks across symlinked session paths", async () => {
@@ -81,17 +85,15 @@ describe("acquireSessionWriteLock", () => {
         const sessionFile = path.join(root, "sessions.json");
         const lockPath = `${sessionFile}.lock`;
         await acquireSessionWriteLock({ sessionFile, timeoutMs: 500 });
+        // Prevent handleTerminationSignal from re-raising the real signal
+        // which would kill the Vitest worker process.
         const keepAlive = () => {};
-        if (signal === "SIGINT") {
-          process.on(signal, keepAlive);
-        }
+        process.on(signal, keepAlive);
 
         __testing.handleTerminationSignal(signal);
 
         await expect(fs.stat(lockPath)).rejects.toThrow();
-        if (signal === "SIGINT") {
-          process.off(signal, keepAlive);
-        }
+        process.off(signal, keepAlive);
       } finally {
         await fs.rm(root, { recursive: true, force: true });
       }

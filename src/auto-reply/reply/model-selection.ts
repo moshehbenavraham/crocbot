@@ -106,7 +106,7 @@ function resolveParentSessionKeyCandidate(params: {
   return null;
 }
 
-function resolveStoredModelOverride(params: {
+export function resolveStoredModelOverride(params: {
   sessionEntry?: SessionEntry;
   sessionStore?: Record<string, SessionEntry>;
   sessionKey?: string;
