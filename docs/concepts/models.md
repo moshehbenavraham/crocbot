@@ -88,7 +88,9 @@ Example allowlist config:
 
 ## Switching models in chat (`/model`)
 
-You can switch models for the current session without restarting:
+You can switch models for the current session without restarting.
+
+**Telegram users**: See [Interactive Model Selection](/concepts/model-selection) for the inline button interface that lets you browse providers and select models visually.
 
 ```
 /model

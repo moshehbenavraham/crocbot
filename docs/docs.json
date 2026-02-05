@@ -916,6 +916,7 @@
           "concepts/retry",
           "concepts/model-providers",
           "concepts/models",
+          "concepts/model-selection",
           "concepts/model-failover",
           "concepts/usage-tracking",
           "concepts/timezone",
