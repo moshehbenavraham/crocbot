@@ -28,6 +28,7 @@ import {
 import { applyHookMappings } from "./hooks-mapping.js";
 import { getMetrics, getMetricsContentType } from "../metrics/index.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
+import type { RateLimiter } from "./rate-limit.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
@@ -211,6 +212,7 @@ export function createGatewayHttpServer(opts: {
   handlePluginRequest?: HooksRequestHandler;
   resolvedAuth: import("./auth.js").ResolvedGatewayAuth;
   tlsOptions?: TlsOptions;
+  rateLimiter?: RateLimiter;
 }): HttpServer {
   const {
     canvasHost,
@@ -222,6 +224,7 @@ export function createGatewayHttpServer(opts: {
     handleHooksRequest,
     handlePluginRequest,
     resolvedAuth,
+    rateLimiter,
   } = opts;
   const httpServer: HttpServer = opts.tlsOptions
     ? createHttpsServer(opts.tlsOptions, (req, res) => {
@@ -265,6 +268,22 @@ export function createGatewayHttpServer(opts: {
         res.end("Failed to collect metrics");
       }
       return;
+    }
+
+    // Rate limiting (exempt: /health, /metrics above)
+    if (rateLimiter) {
+      const clientIp = req.socket?.remoteAddress ?? "unknown";
+      const result = rateLimiter.check(clientIp);
+      res.setHeader("X-RateLimit-Limit", String(result.limit));
+      res.setHeader("X-RateLimit-Remaining", String(result.remaining));
+      res.setHeader("X-RateLimit-Reset", String(result.resetAt));
+      if (!result.allowed) {
+        res.statusCode = 429;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Retry-After", String(result.resetAt - Math.floor(Date.now() / 1000)));
+        res.end(JSON.stringify({ error: "Too Many Requests" }));
+        return;
+      }
     }
 
     // Alert webhook test endpoint (for testing webhook delivery)

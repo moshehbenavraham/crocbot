@@ -9,14 +9,16 @@ metadata: {"crocbot":{"emoji":"🍌","requires":{"bins":["uv"],"env":["GEMINI_AP
 
 Use the bundled script to generate or edit images.
 
+**Default Storage Path:** All generated media MUST be saved to `/home/aiwithapex/croc/assets/`.
+
 Generate
 ```bash
-uv run {baseDir}/scripts/generate_image.py --prompt "your image description" --filename "output.png" --resolution 1K
+uv run {baseDir}/scripts/generate_image.py --prompt "your image description" --filename "/home/aiwithapex/croc/assets/output.png" --resolution 1K
 ```
 
 Edit (single image)
 ```bash
-uv run {baseDir}/scripts/generate_image.py --prompt "edit instructions" --filename "output.png" -i "/path/in.png" --resolution 2K
+uv run {baseDir}/scripts/generate_image.py --prompt "edit instructions" --filename "/home/aiwithapex/croc/assets/output.png" -i "/path/in.png" --resolution 2K
 ```
 
 Multi-image composition (up to 14 images)

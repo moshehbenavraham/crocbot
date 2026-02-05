@@ -51,12 +51,13 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Purpose**: Full bot integration via grammY with groups, DMs, media, and inline model selection
 - **Tech**: grammY, @grammyjs/runner
 - **Location**: `src/telegram/`, `src/channels/`
-- **Key modules**: `bot-handlers.ts` (callbacks), `model-buttons.ts` (inline keyboards)
+- **Key modules**: `bot-handlers.ts` (callbacks), `model-buttons.ts` (inline keyboards), `network-errors.ts` (Grammy timeout recovery), `monitor.ts` (scoped rejection handler)
 
 ### Agent Runtime
 - **Purpose**: Pi embedded runtime with tool streaming and block streaming
 - **Tech**: TypeScript, RPC mode
 - **Location**: `src/agents/`
+- **Key modules**: `session-transcript-repair.ts` (JSONL repair, tool call sanitization), `session-file-repair.ts` (crash-resilient file recovery)
 
 ### Media Pipeline
 - **Purpose**: Image/audio/video processing, transcription, size caps

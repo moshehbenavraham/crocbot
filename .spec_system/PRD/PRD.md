@@ -83,8 +83,8 @@ This system delivers the product via phases. Each phase is implemented via multi
 | 01 | Production Hardening and Deployment | 5 | Complete |
 | 02 | Operational Maturity and Observability | 4/5 | Session 5 Deferred; Complete |
 | 03 | Upstream Features Port | 3 | Complete |
-| 04 | Upstream Bug Fixes Port | 3 | Started |
-| 05 | Upstream Build Tooling Port | TBD | Not Started |
+| 04 | Upstream Bug Fixes Port | 3 | Complete |
+| 05 | Upstream Build Tooling Port | 5 | Not Started |
 | 06 | Upstream Security Hardening Port | TBD | Not Started |
 
 ## Phase 03: Upstream Features Port
@@ -165,9 +165,9 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 |---------|------|--------|
 | 01 | Grammy Timeout Recovery | Complete |
 | 02 | Session Transcript Repair | Complete |
-| 03 | Bug Fix Validation | Not Started |
+| 03 | Bug Fix Validation | Complete |
 
-Session stubs defined in `.spec_system/PRD/phase_04/`.
+**Phase Completed**: 2026-02-05
 
 ## Phase 05: Upstream Build Tooling Port
 
@@ -196,9 +196,15 @@ Session stubs defined in `.spec_system/PRD/phase_04/`.
 - `.oxlintrc.json` - Oxlint rule configuration
 - `package.json` - Script definitions
 
-### Sessions (To Be Defined)
+### Sessions
 
-Sessions are defined via `/phasebuild` as `session_NN_name.md` stubs under `.spec_system/PRD/phase_05/`.
+| Session | Name | Status |
+|---------|------|--------|
+| 01 | Research Build Tooling Delta | Not Started |
+| 02 | tsdown Migration | Not Started |
+| 03 | TypeScript Config Unification | Not Started |
+| 04 | Stricter Linting Rules | Not Started |
+| 05 | Build Validation and CI Integration | Not Started |
 
 ## Phase 06: Upstream Security Hardening Port
 

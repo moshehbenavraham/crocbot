@@ -31,6 +31,18 @@ vi.mock("../../infra/outbound/deliver.js", () => ({
   deliverOutboundPayloads: mocks.deliverOutboundPayloads,
 }));
 
+vi.mock("../../infra/outbound/outbound-session.js", () => ({
+  resolveOutboundSessionRoute: async () => ({
+    sessionKey: "agent:main:slack:channel:resolved",
+    baseSessionKey: "agent:main:slack:channel:resolved",
+    peer: { kind: "channel", id: "resolved" },
+    chatType: "channel",
+  }),
+  ensureOutboundSessionEntry: async () => {
+    await mocks.recordSessionMetaFromInbound();
+  },
+}));
+
 vi.mock("../../config/sessions.js", async () => {
   const actual = await vi.importActual<typeof import("../../config/sessions.js")>(
     "../../config/sessions.js",

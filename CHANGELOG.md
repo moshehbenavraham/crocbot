@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026.1.63] - 2026-02-05
+
+### Fixed
+
+- **Grammy timeout recovery**: Added `.error` property traversal in `collectErrorCandidates()` for Grammy HttpError, "timed out" message pattern to recoverable snippets, and scoped unhandled rejection handler in Telegram monitor. Prevents bot crashes from network timeouts.
+- **Session transcript repair**: Ported JSONL file repair, tool call sanitization (missing input fields), and guarded append for crash-resilient session files. Prevents API rejections from malformed transcripts.
+
 ## [2026.1.57] - 2026-02-05
 
 ### Added

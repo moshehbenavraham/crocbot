@@ -2,49 +2,39 @@
 
 **Date**: 2026-02-05
 **Project**: crocbot
-**Audit Mode**: Phase-Focused (Phase 03 just completed)
+**Audit Mode**: Full Audit (All phases 00-04 complete, 24 sessions)
 
 ## Summary
 
 | Category | Required | Found | Status |
 |----------|----------|-------|--------|
-| Root files | 3 | 3 | PASS |
-| /docs/ core | 6 | 6 | PASS |
+| Root files (README, CONTRIBUTING, LICENSE) | 3 | 3 | PASS |
+| CHANGELOG.md | 1 | 1 | UPDATED |
+| /docs/ core files | 6 | 6 | PASS |
 | ADRs | N/A | 3 | INFO |
 | Runbooks | 1+ | 7 | PASS |
-| CODEOWNERS | 1 | 1 | PASS |
+| CODEOWNERS | 1 | 1 | UPDATED |
 
-## Phase Focus
-
-**Completed Phase**: Phase 03 - Upstream Features Port
-**Sessions Analyzed**: 3 sessions (research, implementation, validation)
-
-### Change Manifest (from implementation-notes.md)
-
-| Session | Files Created | Files Modified |
-|---------|---------------|----------------|
-| session01-research-upstream-features | Research docs in `.spec_system/PRD/phase_03/research/` (4 files) | None |
-| session02-telegram-model-buttons | `src/telegram/model-buttons.ts` (~200 lines), `src/telegram/model-buttons.test.ts` (~300 lines) | `src/telegram/bot-handlers.ts` (+120 lines), `src/auto-reply/reply/commands-models.ts` (+80 lines) |
-| session03-feature-validation | `docs/concepts/model-selection.md` (~137 lines), `CHANGELOG.md` (~85 lines), `TEST_REPORT.md` | `docs/docs.json`, `docs/concepts/models.md`, `docs/cli/models.md` |
-
-## Actions Taken (This Audit)
+## Actions Taken
 
 ### Updated
-- `docs/ARCHITECTURE.md` - Added inline model selection to Telegram Channel component, added key modules reference (`bot-handlers.ts`, `model-buttons.ts`)
+- `CHANGELOG.md` - Added Phase 04 entry (v2026.1.63): Grammy timeout recovery and session transcript repair bug fixes
+- `docs/ARCHITECTURE.md` - Added Phase 04 key modules to Telegram Channel (`network-errors.ts`, `monitor.ts`) and Agent Runtime (`session-transcript-repair.ts`, `session-file-repair.ts`)
+- `docs/CODEOWNERS` - Removed stale `fly.toml`/`fly.private.toml` references (only exist in upstream `.001_ORIGINAL/`)
+- `.spec_system/PRD/PRD.md` - Updated Phase 04 status from "Started" to "Complete", session 03 from "Not Started" to "Complete", added phase completion date
 
 ### Verified (No Changes Needed)
-- `README.md` - Comprehensive, current
-- `CONTRIBUTING.md` - Correct links and conventions
+- `README.md` - Comprehensive (299 lines), current with project description, install, quick start, security, highlights
+- `CONTRIBUTING.md` - Correct branch conventions, commit style, PR process, code style references
 - `LICENSE` - MIT license present
-- `CHANGELOG.md` - Already has 2026.1.57 entry for model buttons feature
-- `docs/concepts/model-selection.md` - Created in Phase 03 Session 03
-- `docs/onboarding.md` - Accurate setup steps
-- `docs/reference/development.md` - Complete development guide
-- `docs/environments.md` - Dev/prod differences documented
-- `docs/deployment.md` - Deployment process documented
-- `docs/CODEOWNERS` - Team assignments present
-- `docs/adr/` - 3 ADRs present (template + 2 decisions)
-- `docs/runbooks/` - 7 runbooks covering all operations
+- `docs/onboarding.md` - Accurate setup steps, prerequisites, secrets table, verify checklist
+- `docs/reference/development.md` - Complete dev guide with scripts, testing, debugging, project structure
+- `docs/environments.md` - Dev/prod differences, env vars documented, Coolify deployment notes
+- `docs/deployment.md` - CI/CD pipeline, Docker deployment, Coolify, rollback, health monitoring, runbook links
+- `docs/adr/` - 3 ADRs present (template, telegram-only architecture, multi-stage Docker build)
+- `docs/runbooks/` - 7 runbooks (backup-restore, docker-ops, health-checks, incident-response, log-analysis, startup-shutdown, telegram-troubleshooting)
+- `.spec_system/CONVENTIONS.md` - 151 lines covering TypeScript, naming, files, CLI, testing, git, dependencies, Docker, CI/CD, infrastructure
+- `.spec_system/CONSIDERATIONS.md` - 116 lines, updated for Phase 04 with Grammy and session repair lessons learned
 
 ## Standard Files Verification
 
@@ -53,62 +43,57 @@
 | README.md | PASS | Root |
 | CONTRIBUTING.md | PASS | Root |
 | LICENSE | PASS | Root |
-| CHANGELOG.md | PASS | Root (Phase 03 entry present) |
+| CHANGELOG.md | UPDATED | Root (Phase 04 entry added) |
 | ARCHITECTURE.md | UPDATED | docs/ARCHITECTURE.md |
 | onboarding.md | PASS | docs/onboarding.md |
 | environments.md | PASS | docs/environments.md |
 | deployment.md | PASS | docs/deployment.md |
 | development.md | PASS | docs/reference/development.md |
-| CODEOWNERS | PASS | docs/CODEOWNERS |
+| CODEOWNERS | UPDATED | docs/CODEOWNERS |
 | adr/ | PASS | docs/adr/ (3 files) |
 | runbooks/ | PASS | docs/runbooks/ (7 files) |
 
-## Phase 03 Documentation Summary
+## Phase Completion Summary
 
-Phase 03 introduced the Telegram inline model selection feature. Key documentation:
+All 5 phases are now complete and documented:
 
-1. **Feature Documentation** (Session 03):
-   - `docs/concepts/model-selection.md` - Complete user guide for interactive model selection
-   - Cross-references added to `docs/concepts/models.md` and `docs/cli/models.md`
-
-2. **CHANGELOG** (Session 03):
-   - Created with Keep a Changelog format
-   - Version 2026.1.57 entry documenting model buttons feature
-
-3. **Research Documentation** (Session 01):
-   - `upstream-model-buttons.md` - Callback format, pagination, data flow
-   - `crocbot-integration-map.md` - File/function mapping
-   - `qmd-architecture.md` - QMD reference (for future consideration)
-   - `blockers-mitigations.md` - Risk assessment
-
-4. **Architecture Update** (This audit):
-   - Updated Telegram Channel component description to include inline model selection
-   - Added key module references
-
-## Documentation Gaps
-
-None. All standard documentation files are present and current.
+| Phase | Name | Sessions | Status |
+|-------|------|----------|--------|
+| 00 | Strip to minimal footprint | 8 | Complete |
+| 01 | Production Hardening | 5 | Complete |
+| 02 | Operational Maturity | 5 | Complete |
+| 03 | Upstream Features Port | 3 | Complete |
+| 04 | Upstream Bug Fixes Port | 3 | Complete |
 
 ## Quality Checks
 
-- [x] All new files ASCII-encoded
+- [x] All updated files use ASCII-only characters
 - [x] Unix LF line endings
-- [x] No duplicate information
-- [x] Links valid in docs.json navigation
-- [x] Phase 03 features documented
+- [x] No duplicate information across files
+- [x] Phase 04 changes documented in CHANGELOG and ARCHITECTURE
+- [x] PRD phase/session statuses synced with state.json
+- [x] Stale references removed (fly.toml in CODEOWNERS)
+- [x] No TODO placeholders left in standard files
+
+## Documentation Gaps
+
+None critical. Optional improvements for future consideration:
+
+- **docs/api/**: No dedicated API documentation directory. Gateway HTTP API is documented across scattered files in docs/gateway/. Consider consolidating if API surface grows.
+- **Per-module READMEs**: Major src/ subdirectories (gateway, telegram, agents) lack local README_*.md files. These are optional for a single-maintainer project but would help onboarding if the team expands.
 
 ## Next Audit
 
 Recommend re-running `/documents` after:
-- Completing Phase 04 (Grammy timeout recovery, session transcript repair)
-- Adding new packages/services
+- Completing Phase 05 (Build Tooling Port) or Phase 06 (Security Hardening Port)
+- Adding new packages or services
 - Making architectural changes
 
 ---
 
-**All Phase 03 documentation requirements are complete.**
+**All standard documentation requirements are met. Phases 00-04 fully documented.**
 
 To proceed with the next phase, run:
 ```
-/nextsession
+/phasebuild
 ```

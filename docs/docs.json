@@ -3,10 +3,10 @@
   "name": "crocbot",
   "theme": "mint",
   "logo": {
-    "light": "/assets/pixel-lobster.svg",
-    "dark": "/assets/pixel-lobster.svg"
+    "light": "/assets/crocbot.png",
+    "dark": "/assets/crocbot.png"
   },
-  "favicon": "/assets/pixel-lobster.svg",
+  "favicon": "/assets/crocbot.png",
   "colors": {
     "primary": "#FF5A36"
   },

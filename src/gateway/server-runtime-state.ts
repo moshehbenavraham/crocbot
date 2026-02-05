@@ -13,6 +13,7 @@ import { listenGatewayHttpServer } from "./server/http-listen.js";
 import { resolveGatewayListenHosts } from "./net.js";
 import { createGatewayPluginRequestHandler } from "./server/plugins-http.js";
 import type { GatewayWsClient } from "./server/ws-types.js";
+import { createRateLimiter } from "./rate-limit.js";
 import { createGatewayBroadcaster } from "./server-broadcast.js";
 import { type ChatRunEntry, createChatRunState } from "./server-chat.js";
 import { MAX_PAYLOAD_BYTES } from "./server-constants.js";
@@ -104,6 +105,9 @@ export async function createGatewayRuntimeState(params: {
     log: params.logPlugins,
   });
 
+  const rateLimitConfig = params.cfg.gateway?.rateLimit;
+  const rateLimiter = createRateLimiter(rateLimitConfig);
+
   const bindHosts = await resolveGatewayListenHosts(params.bindHost);
   const httpServers: HttpServer[] = [];
   const httpBindHosts: string[] = [];
@@ -119,6 +123,7 @@ export async function createGatewayRuntimeState(params: {
       handlePluginRequest,
       resolvedAuth: params.resolvedAuth,
       tlsOptions: params.gatewayTls?.enabled ? params.gatewayTls.tlsOptions : undefined,
+      rateLimiter,
     });
     try {
       await listenGatewayHttpServer({

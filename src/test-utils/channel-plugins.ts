@@ -53,6 +53,7 @@ export const createGenericTestPlugin = (params?: {
   id?: ChannelId;
   outbound?: ChannelOutboundAdapter;
   label?: string;
+  aliases?: string[];
   capabilities?: ChannelCapabilities;
 }): ChannelPlugin => {
   const id = params?.id ?? "telegram";
@@ -77,6 +78,7 @@ export const createGenericTestPlugin = (params?: {
       selectionLabel: params?.label ?? "Test Channel",
       docsPath: `/channels/${id}`,
       blurb: "Test channel stub.",
+      aliases: params?.aliases,
     },
     capabilities: params?.capabilities ?? { chatTypes: ["direct", "group"], media: true },
     config: {

@@ -15,7 +15,7 @@ const emailToLogin = normalizeMap(mapConfig.emailToLogin ?? {});
 const ensureLogins = (mapConfig.ensureLogins ?? []).map((login) => login.toLowerCase());
 
 const readmePath = resolve("README.md");
-const placeholderAvatar = mapConfig.placeholderAvatar ?? "assets/avatar-placeholder.svg";
+const placeholderAvatar = mapConfig.placeholderAvatar ?? "assets/avatar-crocbot.png";
 const seedCommit = mapConfig.seedCommit ?? null;
 const seedEntries = seedCommit ? parseReadmeEntries(run(`git show ${seedCommit}:README.md`)) : [];
 const raw = run(`gh api "repos/${REPO}/contributors?per_page=100&anon=1" --paginate`);

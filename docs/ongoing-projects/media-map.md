@@ -58,8 +58,8 @@ Complete inventory of all media files in the crocbot project (excluding `node_mo
 
 | Path | Description |
 |------|-------------|
-| `assets/avatar-placeholder.svg` | Default avatar placeholder |
-| `docs/assets/pixel-lobster.svg` | Pixel lobster graphic |
+| `assets/avatar-crocbot.png` | Default avatar placeholder |
+| `docs/assets/crocbot.png` | Pixel lobster graphic |
 | `docs/assets/showcase/padel-cli.svg` | Showcase: Padel CLI |
 | `docs/assets/showcase/roborock-status.svg` | Showcase: Roborock Status |
 | `docs/images/groups-flow.svg` | Groups flow diagram |

@@ -62,7 +62,8 @@ export const nodesHandlers: GatewayRequestHandlers = {
     respond(false, undefined, FEATURE_DISABLED_ERROR);
   },
   "node.invoke.result": async ({ respond }) => {
-    respond(false, undefined, FEATURE_DISABLED_ERROR);
+    // Late-arriving invoke results are silently accepted to reduce log noise.
+    respond(true, { ok: true, ignored: true }, undefined);
   },
   "node.event": async ({ respond }) => {
     respond(false, undefined, FEATURE_DISABLED_ERROR);

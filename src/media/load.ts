@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { logVerbose, shouldLogVerbose } from "../globals.js";
 import { type MediaKind, maxBytesForKind, mediaKindFromMime } from "./constants.js";
 import { resolveUserPath } from "../utils.js";
+import { sanitizeMediaPath } from "./parse.js";
 import { fetchRemoteMedia } from "./fetch.js";
 import {
   convertHeicToJpeg,
@@ -112,6 +113,12 @@ async function loadWebMediaInternal(
   options: WebMediaOptions = {},
 ): Promise<WebMediaResult> {
   const { maxBytes, optimizeImages = true } = options;
+
+  // Defense-in-depth: strip trailing emoji/whitespace that LLMs sometimes append to paths.
+  // The primary cleanup happens in parse.ts cleanCandidate(), but we guard here too
+  // since loadWebMedia is a public API that can be called with unsanitized paths.
+  mediaUrl = sanitizeMediaPath(mediaUrl);
+
   // Use fileURLToPath for proper handling of file:// URLs (handles file://localhost/path, etc.)
   if (mediaUrl.startsWith("file://")) {
     try {

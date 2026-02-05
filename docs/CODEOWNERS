@@ -43,8 +43,6 @@
 /.github/ @moshehbenavraham
 /Dockerfile* @moshehbenavraham
 /docker-compose.yml @moshehbenavraham
-/fly.toml @moshehbenavraham
-/fly.private.toml @moshehbenavraham
 
 # Package configuration
 /package.json @moshehbenavraham

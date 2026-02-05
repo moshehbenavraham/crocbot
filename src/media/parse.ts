@@ -10,8 +10,25 @@ export function normalizeMediaSource(src: string) {
   return src.startsWith("file://") ? src.replace("file://", "") : src;
 }
 
+// Strip trailing emoji codepoints, variation selectors, zero-width joiners, skin-tone
+// modifiers, and other non-path Unicode decorations that LLMs sometimes append to paths.
+// Uses Unicode property escapes (ES2018) to match any Emoji presentation character.
+const TRAILING_EMOJI_RE =
+  /[\p{Emoji_Presentation}\p{Extended_Pictographic}\u200D\uFE0E\uFE0F\u{1F3FB}-\u{1F3FF}]+$/u;
+
+/**
+ * Sanitize a media path/URL by stripping trailing whitespace and emoji characters
+ * that LLMs sometimes append (e.g. 🐊, 📸, ✨). Exported so downstream consumers
+ * (like loadWebMedia) can apply the same cleanup as a defense-in-depth measure.
+ */
+export function sanitizeMediaPath(input: string): string {
+  // Trim whitespace first, then strip trailing emojis, then trim again
+  // in case emojis were preceded by a space.
+  return input.trim().replace(TRAILING_EMOJI_RE, "").trim();
+}
+
 function cleanCandidate(raw: string) {
-  return raw.replace(/^[`"'[{(]+/, "").replace(/[`"'\\})\],]+$/, "");
+  return sanitizeMediaPath(raw.replace(/^[`"'[{(]+/, "").replace(/[`"'\\})\],]+$/, ""));
 }
 
 function isValidMedia(candidate: string, opts?: { allowSpaces?: boolean }) {

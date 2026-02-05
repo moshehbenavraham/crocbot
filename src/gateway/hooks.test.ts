@@ -96,7 +96,7 @@ describe("gateway hooks helpers", () => {
         {
           pluginId: "imessage",
           source: "test",
-          plugin: createIMessageTestPlugin(),
+          plugin: createIMessageTestPlugin({ id: "imessage", aliases: ["imsg"] }),
         },
       ]),
     );

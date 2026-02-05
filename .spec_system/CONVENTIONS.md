@@ -123,6 +123,7 @@ Platform: GitHub Actions
 | Code Quality | configured | `.github/workflows/ci.yml` (lint, format, typecheck) |
 | Build & Test | configured | `.github/workflows/ci.yml` (build, test with coverage) |
 | Security | configured | `.github/workflows/ci.yml` (detect-secrets), `.github/workflows/security.yml` (CodeQL, dependency-review, npm-audit) |
+| Integration | configured | `.github/workflows/integration.yml` (E2E tests on PR to main) |
 | Operations | configured | `.github/workflows/docker-release.yml`, `.github/dependabot.yml` |
 
 Additional workflows:
@@ -138,6 +139,7 @@ Additional workflows:
 | Health Endpoint | HTTP `/health` | `src/gateway/server-http.ts`, returns `{status, timestamp, uptime, memory}` |
 | Health Probes | Docker healthcheck | 30s interval, 3 retries, 10s timeout |
 | Security (CI) | GitHub Actions | CodeQL, dependency-review, npm-audit (`.github/workflows/security.yml`) |
+| Rate Limiting | In-memory per-IP | `src/gateway/rate-limit.ts`, 60 req/min default, configurable via `gateway.rateLimit` |
 | Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
 | Backup | Docker volume / config export | `scripts/backup.sh`, config export via `/setup/export`, docs: `docs/runbooks/backup-restore.md` |
 

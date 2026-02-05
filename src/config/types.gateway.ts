@@ -205,6 +205,13 @@ export type GatewayNodesConfig = {
   denyCommands?: string[];
 };
 
+export type GatewayRateLimitConfig = {
+  /** Max requests per window per client IP. Default: 60. */
+  maxRequests?: number;
+  /** Window duration in milliseconds. Default: 60_000 (1 minute). */
+  windowMs?: number;
+};
+
 export type GatewayConfig = {
   /** Single multiplexed port for Gateway WS + HTTP (default: 18789). */
   port?: number;
@@ -239,6 +246,8 @@ export type GatewayConfig = {
    * `x-real-ip`) to determine the client IP for local pairing and HTTP checks.
    */
   trustedProxies?: string[];
+  /** HTTP rate limiting per client IP (applied to non-health endpoints). */
+  rateLimit?: GatewayRateLimitConfig;
   /** Alerting configuration for error notifications. */
   alerting?: import("./types.alerting.js").AlertingConfig;
 };
