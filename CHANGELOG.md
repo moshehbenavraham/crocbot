@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Build tooling migration (Phase 05)**: Replaced tsc production builds with tsdown bundler powered by rolldown. Three entry points (index, CLI entry, plugin-sdk) now produce optimized flat output in dist/ with ~5s total build time. Unified tsconfig.json targets ES2023 with NodeNext module resolution and noEmit-only type checking. Stricter oxlint rules enabled (134 rules, type-aware) with oxfmt replacing Prettier for formatting. Zero `any` types remain in source. CI workflows, Docker multi-stage builds, and plugin-sdk .d.ts generation validated end-to-end.
+
 ## [2026.1.63] - 2026-02-05
 
 ### Fixed

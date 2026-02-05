@@ -38,7 +38,7 @@
     "5": {
       "name": "Upstream Build Tooling Port",
       "description": "Migrate from tsc to tsdown bundler, unify TypeScript configuration, enable stricter linting rules, and add convenience scripts",
-      "status": "in_progress",
+      "status": "complete",
       "session_count": 5
     }
   },
@@ -70,7 +70,8 @@
     "phase05-session01-research-build-tooling-delta",
     "phase05-session02-tsdown-migration",
     "phase05-session03-typescript-config-unification",
-    "phase05-session04-stricter-linting-rules"
+    "phase05-session04-stricter-linting-rules",
+    "phase05-session05-build-validation-ci-integration"
   ],
   "next_session_history": [
     {
@@ -771,6 +772,31 @@
     {
       "date": "2026-02-05",
       "session": "phase05-session04-stricter-linting-rules",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session05-build-validation-ci-integration",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session05-build-validation-ci-integration",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session05-build-validation-ci-integration",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session05-build-validation-ci-integration",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-05",
+      "session": "phase05-session05-build-validation-ci-integration",
       "status": "completed"
     }
   ]

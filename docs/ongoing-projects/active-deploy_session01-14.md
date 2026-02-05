@@ -140,7 +140,7 @@ Added `skills.allowBundled` to `~/.crocbot/crocbot.json` to only load useful ski
 "skills": {
   "allowBundled": [
     "bird", "coding-agent", "gifgrep", "github", "goplaces",
-    "local-places", "nano-banana-pro", "nano-pdf",
+    "nano-banana-pro", "nano-pdf",
     "notion", "openai-image-gen", "openai-whisper-api", "sag",
     "session-logs", "skill-creator", "tmux", "trello", "weather"
   ]

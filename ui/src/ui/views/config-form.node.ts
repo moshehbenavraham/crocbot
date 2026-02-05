@@ -54,9 +54,22 @@ export function renderNode(params: {
   const key = pathKey(path);
 
   if (unsupported.has(key)) {
-    return html`<div class="cfg-field cfg-field--error">
-      <div class="cfg-field__label">${label}</div>
-      <div class="cfg-field__error">Unsupported schema node. Use Raw mode.</div>
+    const raw = value !== undefined ? JSON.stringify(value, null, 2) : "";
+    return html`<div class="cfg-field">
+      ${showLabel ? html`<div class="cfg-field__label">${label}</div>` : nothing}
+      ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+      <textarea
+        class="cfg-field__json"
+        .value=${raw}
+        ?disabled=${disabled}
+        rows=${Math.min(Math.max((raw.match(/\n/g)?.length ?? 0) + 2, 3), 20)}
+        @change=${(e: Event) => {
+          const text = (e.target as HTMLTextAreaElement).value.trim();
+          try {
+            onPatch(path, text ? JSON.parse(text) : undefined);
+          } catch { /* leave as-is until valid */ }
+        }}
+      ></textarea>
     </div>`;
   }
 
@@ -206,11 +219,24 @@ export function renderNode(params: {
     return renderTextInput({ ...params, inputType: "text" });
   }
 
-  // Fallback
+  // Fallback: inline JSON editor for unsupported types
+  const rawFallback = value !== undefined ? JSON.stringify(value, null, 2) : "";
   return html`
-    <div class="cfg-field cfg-field--error">
-      <div class="cfg-field__label">${label}</div>
-      <div class="cfg-field__error">Unsupported type: ${type}. Use Raw mode.</div>
+    <div class="cfg-field">
+      ${showLabel ? html`<div class="cfg-field__label">${label}</div>` : nothing}
+      ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+      <textarea
+        class="cfg-field__json"
+        .value=${rawFallback}
+        ?disabled=${disabled}
+        rows=${Math.min(Math.max((rawFallback.match(/\n/g)?.length ?? 0) + 2, 3), 20)}
+        @change=${(e: Event) => {
+          const text = (e.target as HTMLTextAreaElement).value.trim();
+          try {
+            onPatch(path, text ? JSON.parse(text) : undefined);
+          } catch { /* leave as-is until valid */ }
+        }}
+      ></textarea>
     </div>
   `;
 }
@@ -485,10 +511,23 @@ function renderArray(params: {
 
   const itemsSchema = Array.isArray(schema.items) ? schema.items[0] : schema.items;
   if (!itemsSchema) {
+    const rawArr = value !== undefined ? JSON.stringify(value, null, 2) : "[]";
     return html`
-      <div class="cfg-field cfg-field--error">
-        <div class="cfg-field__label">${label}</div>
-        <div class="cfg-field__error">Unsupported array schema. Use Raw mode.</div>
+      <div class="cfg-field">
+        ${showLabel ? html`<div class="cfg-field__label">${label}</div>` : nothing}
+        ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+        <textarea
+          class="cfg-field__json"
+          .value=${rawArr}
+          ?disabled=${disabled}
+          rows=${Math.min(Math.max((rawArr.match(/\n/g)?.length ?? 0) + 2, 3), 20)}
+          @change=${(e: Event) => {
+            const text = (e.target as HTMLTextAreaElement).value.trim();
+            try {
+              onPatch(path, text ? JSON.parse(text) : undefined);
+            } catch { /* leave as-is until valid */ }
+          }}
+        ></textarea>
       </div>
     `;
   }

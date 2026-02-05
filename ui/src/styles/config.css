@@ -484,6 +484,19 @@
   line-height: 1.55;
 }
 
+.cfg-field__json {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text);
+  resize: vertical;
+}
+
 /* Loading State */
 .config-loading {
   display: flex;
@@ -1368,7 +1381,9 @@
   }
 
   .config-sidebar__footer {
-    display: none;
+    padding: 10px 14px;
+    border-top: none;
+    border-bottom: 1px solid var(--border);
   }
 
   .config-actions {

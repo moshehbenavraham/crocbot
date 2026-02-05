@@ -84,7 +84,7 @@ This system delivers the product via phases. Each phase is implemented via multi
 | 02 | Operational Maturity and Observability | 4/5 | Session 5 Deferred; Complete |
 | 03 | Upstream Features Port | 3 | Complete |
 | 04 | Upstream Bug Fixes Port | 3 | Complete |
-| 05 | Upstream Build Tooling Port | 5 | Not Started |
+| 05 | Upstream Build Tooling Port | 5 | Complete |
 | 06 | Upstream Security Hardening Port | TBD | Not Started |
 
 ## Phase 03: Upstream Features Port
@@ -200,11 +200,13 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 
 | Session | Name | Status |
 |---------|------|--------|
-| 01 | Research Build Tooling Delta | Not Started |
-| 02 | tsdown Migration | Not Started |
-| 03 | TypeScript Config Unification | Not Started |
-| 04 | Stricter Linting Rules | Not Started |
-| 05 | Build Validation and CI Integration | Not Started |
+| 01 | Research Build Tooling Delta | Complete |
+| 02 | tsdown Migration | Complete |
+| 03 | TypeScript Config Unification | Complete |
+| 04 | Stricter Linting Rules | Complete |
+| 05 | Build Validation and CI Integration | Complete |
+
+**Phase Completed**: 2026-02-05
 
 ## Phase 06: Upstream Security Hardening Port
 

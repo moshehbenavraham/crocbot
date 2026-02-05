@@ -33,7 +33,7 @@ RUN pnpm install --frozen-lockfile
 
 # Layer 3: Copy source and static assets
 COPY src ./src
-COPY tsconfig.json ./
+COPY tsconfig.json tsdown.config.ts ./
 COPY ui ./ui
 COPY docs ./docs
 COPY assets ./assets

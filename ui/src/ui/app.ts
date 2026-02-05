@@ -170,7 +170,7 @@ export class crocbotApp extends LitElement {
   @state() configForm: Record<string, unknown> | null = null;
   @state() configFormOriginal: Record<string, unknown> | null = null;
   @state() configFormDirty = false;
-  @state() configFormMode: "form" | "raw" = "form";
+  @state() configFormMode: "form" | "raw" = "raw";
   @state() configSearchQuery = "";
   @state() configActiveSection: string | null = null;
   @state() configActiveSubsection: string | null = null;

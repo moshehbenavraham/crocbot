@@ -21,22 +21,21 @@
 | Skill | Test Command | API Key | Tested |
 |-------|--------------|---------|--------|
 | `bird` | `/skill bird` | — | ⚠️ considering removal |
-| `coding-agent` | `/skill coding-agent` | — | ⬜ |
-| `gifgrep` | `/skill gifgrep cats` | — | ⬜ |
-| `github` | `/skill github` | — | ⬜ |
+| `coding-agent` | `/skill coding-agent` | — | ✅ |
+| `gifgrep` | `/skill gifgrep cats` | — | ✅ |
+| `github` | `/skill github` | — | ✅ |
 | `goplaces` | `/skill goplaces coffee near me` | Google Places | ⬜ |
-| `local-places` | `/skill local-places` | Google Places | ⬜ |
-| `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ⬜ |
+| `nano-banana-pro` | `/skill nano-banana-pro` | Google Places | ✅ |
 | `nano-pdf` | `/skill nano-pdf` | — | ⬜ |
 | `notion` | `/skill notion` | Notion API | ⬜ |
-| `openai-image-gen` | `/skill openai-image-gen a cat` | OpenAI | ⬜ |
+| `openai-image-gen` | `/skill openai-image-gen a cat` | OpenAI | ✅ |
 | `openai-whisper-api` | *(send voice note)* | OpenAI | ⬜ |
 | `sag` | `/skill sag hello world` | ElevenLabs | ⬜ |
 | `session-logs` | `/skill session-logs` | — | ⬜ |
-| `skill-creator` | `/skill skill-creator` | — | ⬜ |
+| `skill-creator` | `/skill skill-creator` | — | ✅ |
 | `tmux` | `/skill tmux` | — | ⬜ |
 | `trello` | `/skill trello` | — | ⬜ |
-| `weather` | `/skill weather Modiin Ilit` | — | ⬜ |
+| `weather` | `/skill weather Modiin Ilit` | — | ✅ |
 
 ### Extensions
 
@@ -62,9 +61,20 @@
 
 ---
 
+## Session 17
+
+- Configured Brave Search API key (`BRAVE_API_KEY`) in both `.env` locations (`~/.crocbot/.env` and project `.env`)
+- Configured headless browser: set `browser.executablePath` to Playwright Chromium (`~/.cache/ms-playwright/chromium-1200/chrome-linux64/chrome`) with `headless: true` and `noSandbox: true` in `crocbot.json`
+- Symlinked `crocbot` CLI to `~/.local/bin/crocbot` → `dist/entry.js` (fixes orchestration tools, cron, session_status)
+- Remaining audit issues: canvas (no node), message react target
+
+---
+
 ## TODO
 
 - [x] Install `lobster` binary
-- [ ] Configure web search (Brave API key)
+- [x] Configure web search (Brave API key)
+- [x] Configure headless browser (Playwright Chromium)
+- [x] Fix `crocbot` CLI PATH for orchestration/exec tools
 - [ ] Run security audit: `crocbot security audit --deep`
 - [ ] Remove canvas system (unused - no Mac/iOS/Android node apps in this deployment)
