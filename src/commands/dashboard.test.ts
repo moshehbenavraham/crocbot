@@ -64,7 +64,7 @@ describe("dashboardCommand", () => {
     });
     expect(runtime.log).toHaveBeenCalledWith("Gateway WS: ws://127.0.0.1:18789");
     expect(runtime.log).toHaveBeenCalledWith(
-      "The browser-based Control UI has been removed. Use the TUI or Telegram to interact with crocbot.",
+      "The browser-based UI has been removed. Use the TUI or Telegram to interact with crocbot.",
     );
   });
 

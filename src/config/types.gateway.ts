@@ -50,13 +50,13 @@ export type TalkConfig = {
 };
 
 export type GatewayControlUiConfig = {
-  /** If false, the Gateway will not serve the Control UI (default /). */
+  /** If false, the Gateway will not serve its HTTP endpoints (default /). */
   enabled?: boolean;
-  /** Optional base path prefix for the Control UI (e.g. "/crocbot"). */
+  /** Optional base path prefix for the gateway HTTP server (e.g. "/crocbot"). */
   basePath?: string;
   /** Allow token-only auth over insecure HTTP (default: false). */
   allowInsecureAuth?: boolean;
-  /** DANGEROUS: Disable device identity checks for the Control UI (default: false). */
+  /** DANGEROUS: Disable device identity checks for the gateway (default: false). */
   dangerouslyDisableDeviceAuth?: boolean;
 };
 
@@ -211,7 +211,7 @@ export type GatewayConfig = {
    */
   mode?: "local" | "remote";
   /**
-   * Bind address policy for the Gateway WebSocket + Control UI HTTP server.
+   * Bind address policy for the Gateway WebSocket + HTTP server.
    * - auto: Loopback (127.0.0.1) if available, else 0.0.0.0 (fallback to all interfaces)
    * - lan: 0.0.0.0 (all interfaces, no fallback)
    * - loopback: 127.0.0.1 (local-only)

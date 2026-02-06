@@ -199,9 +199,9 @@ const FIELD_LABELS: Record<string, string> = {
   "tools.web.fetch.cacheTtlMinutes": "Web Fetch Cache TTL (min)",
   "tools.web.fetch.maxRedirects": "Web Fetch Max Redirects",
   "tools.web.fetch.userAgent": "Web Fetch User-Agent",
-  "gateway.controlUi.basePath": "Control UI Base Path",
-  "gateway.controlUi.allowInsecureAuth": "Allow Insecure Control UI Auth",
-  "gateway.controlUi.dangerouslyDisableDeviceAuth": "Dangerously Disable Control UI Device Auth",
+  "gateway.controlUi.basePath": "Gateway HTTP Base Path",
+  "gateway.controlUi.allowInsecureAuth": "Allow Insecure Gateway Auth",
+  "gateway.controlUi.dangerouslyDisableDeviceAuth": "Dangerously Disable Gateway Device Auth",
   "gateway.http.endpoints.chatCompletions.enabled": "OpenAI Chat Completions Endpoint",
   "gateway.reload.mode": "Config Reload Mode",
   "gateway.reload.debounceMs": "Config Reload Debounce (ms)",
@@ -379,12 +379,11 @@ const FIELD_HELP: Record<string, string> = {
   "gateway.auth.token":
     "Required by default for gateway access (unless using Tailscale Serve identity); required for non-loopback binds.",
   "gateway.auth.password": "Required for Tailscale funnel.",
-  "gateway.controlUi.basePath":
-    "Optional URL prefix where the Control UI is served (e.g. /crocbot).",
+  "gateway.controlUi.basePath": "Optional URL prefix for the gateway HTTP server (e.g. /crocbot).",
   "gateway.controlUi.allowInsecureAuth":
-    "Allow Control UI auth over insecure HTTP (token-only; not recommended).",
+    "Allow gateway auth over insecure HTTP (token-only; not recommended).",
   "gateway.controlUi.dangerouslyDisableDeviceAuth":
-    "DANGEROUS. Disable Control UI device identity checks (token/password only).",
+    "DANGEROUS. Disable gateway device identity checks (token/password only).",
   "gateway.http.endpoints.chatCompletions.enabled":
     "Enable the OpenAI-compatible `POST /v1/chat/completions` endpoint (default: false).",
   "gateway.reload.mode": 'Hot reload strategy for config changes ("hybrid" recommended).',

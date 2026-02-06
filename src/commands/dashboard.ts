@@ -20,6 +20,6 @@ export async function dashboardCommand(
   const wsUrl = resolveGatewayWsUrl({ port, bind, customBindHost });
   runtime.log(`Gateway WS: ${wsUrl}`);
   runtime.log(
-    "The browser-based Control UI has been removed. Use the TUI or Telegram to interact with crocbot.",
+    "The browser-based UI has been removed. Use the TUI or Telegram to interact with crocbot.",
   );
 }

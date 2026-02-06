@@ -15,12 +15,18 @@ export function resolveBundledSkillsDir(): string | undefined {
     // ignore
   }
 
-  // npm/dev: resolve `<packageRoot>/skills` relative to this module.
+  // npm/dev: walk up from this module until we find a directory containing `skills/`.
+  // Works both in source layout (src/agents/skills/) and flat dist output (dist/).
   try {
-    const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-    const root = path.resolve(moduleDir, "..", "..", "..");
-    const candidate = path.join(root, "skills");
-    if (fs.existsSync(candidate)) return candidate;
+    let dir = path.dirname(fileURLToPath(import.meta.url));
+    const root = path.parse(dir).root;
+    while (dir !== root) {
+      const candidate = path.join(dir, "skills");
+      if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+        return candidate;
+      }
+      dir = path.dirname(dir);
+    }
   } catch {
     // ignore
   }

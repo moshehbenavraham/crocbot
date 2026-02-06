@@ -291,10 +291,9 @@ function collectGatewayConfigFindings(
       title: "Reverse proxy headers are not trusted",
       detail:
         "gateway.bind is loopback and gateway.trustedProxies is empty. " +
-        "If you expose the Control UI through a reverse proxy, configure trusted proxies " +
+        "If you expose the gateway through a reverse proxy, configure trusted proxies " +
         "so local-client checks cannot be spoofed.",
-      remediation:
-        "Set gateway.trustedProxies to your proxy IPs or keep the Control UI local-only.",
+      remediation: "Set gateway.trustedProxies to your proxy IPs or keep the gateway local-only.",
     });
   }
 
@@ -305,8 +304,8 @@ function collectGatewayConfigFindings(
       title: "Gateway auth missing on loopback",
       detail:
         "gateway.bind is loopback but no gateway auth secret is configured. " +
-        "If the Control UI is exposed through a reverse proxy, unauthenticated access is possible.",
-      remediation: "Set gateway.auth (token recommended) or keep the Control UI local-only.",
+        "If the gateway is exposed through a reverse proxy, unauthenticated access is possible.",
+      remediation: "Set gateway.auth (token recommended) or keep the gateway local-only.",
     });
   }
 
@@ -331,7 +330,7 @@ function collectGatewayConfigFindings(
     findings.push({
       checkId: "gateway.control_ui.insecure_auth",
       severity: "critical",
-      title: "Control UI allows insecure HTTP auth",
+      title: "Gateway allows insecure HTTP auth",
       detail:
         "gateway.controlUi.allowInsecureAuth=true allows token-only auth over HTTP and skips device identity.",
       remediation: "Disable it or switch to HTTPS (Tailscale Serve) or localhost.",
@@ -342,9 +341,9 @@ function collectGatewayConfigFindings(
     findings.push({
       checkId: "gateway.control_ui.device_auth_disabled",
       severity: "critical",
-      title: "DANGEROUS: Control UI device auth disabled",
+      title: "DANGEROUS: Gateway device auth disabled",
       detail:
-        "gateway.controlUi.dangerouslyDisableDeviceAuth=true disables device identity checks for the Control UI.",
+        "gateway.controlUi.dangerouslyDisableDeviceAuth=true disables device identity checks for the gateway.",
       remediation: "Disable it unless you are in a short-lived break-glass scenario.",
     });
   }

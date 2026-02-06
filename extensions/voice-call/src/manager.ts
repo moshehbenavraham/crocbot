@@ -7,6 +7,7 @@ import path from "node:path";
 import { resolveUserPath } from "./utils.js";
 import type { CallMode, VoiceCallConfig } from "./config.js";
 import type { VoiceCallProvider } from "./providers/base.js";
+import { isAllowlistedCaller, normalizePhoneNumber } from "./allowlist.js";
 import {
   type CallId,
   type CallRecord,
@@ -18,6 +19,24 @@ import {
   type TranscriptEntry,
 } from "./types.js";
 import { escapeXml, mapVoiceToPolly } from "./voice-mapping.js";
+
+function resolveDefaultStoreBase(config: VoiceCallConfig, storePath?: string): string {
+  const rawOverride = storePath?.trim() || config.store?.trim();
+  if (rawOverride) {
+    return resolveUserPath(rawOverride);
+  }
+  const preferred = path.join(os.homedir(), ".crocbot", "voice-calls");
+  const candidates = [preferred].map((dir) => resolveUserPath(dir));
+  const existing =
+    candidates.find((dir) => {
+      try {
+        return fs.existsSync(path.join(dir, "calls.jsonl")) || fs.existsSync(dir);
+      } catch {
+        return false;
+      }
+    }) ?? resolveUserPath(preferred);
+  return existing;
+}
 
 /**
  * Manages voice calls: state machine, persistence, and provider coordination.
@@ -43,12 +62,7 @@ export class CallManager {
 
   constructor(config: VoiceCallConfig, storePath?: string) {
     this.config = config;
-    // Resolve store path with tilde expansion (like other config values)
-    const rawPath =
-      storePath ||
-      config.store ||
-      path.join(os.homedir(), "clawd", "voice-calls");
-    this.storePath = resolveUserPath(rawPath);
+    this.storePath = resolveDefaultStoreBase(config, storePath);
   }
 
   /**
@@ -476,14 +490,12 @@ export class CallManager {
 
       case "allowlist":
       case "pairing": {
-        const normalized = from?.replace(/\D/g, "") || "";
-        const allowed = (allowFrom || []).some((num) => {
-          const normalizedAllow = num.replace(/\D/g, "");
-          return (
-            normalized.endsWith(normalizedAllow) ||
-            normalizedAllow.endsWith(normalized)
-          );
-        });
+        const normalized = normalizePhoneNumber(from);
+        if (!normalized) {
+          console.log("[voice-call] Inbound call rejected: missing caller ID");
+          return false;
+        }
+        const allowed = isAllowlistedCaller(normalized, allowFrom);
         const status = allowed ? "accepted" : "rejected";
         console.log(
           `[voice-call] Inbound call ${status}: ${from} ${allowed ? "is in" : "not in"} allowlist`,

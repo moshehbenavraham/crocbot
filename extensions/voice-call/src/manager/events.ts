@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import type { CallId, CallRecord, CallState, NormalizedEvent } from "../types.js";
 import { TerminalStates } from "../types.js";
+import { isAllowlistedCaller, normalizePhoneNumber } from "../allowlist.js";
 import type { CallManagerContext } from "./context.js";
 import { findCall } from "./lookup.js";
 import { addTranscriptEntry, transitionState } from "./state.js";
@@ -28,11 +29,12 @@ function shouldAcceptInbound(config: CallManagerContext["config"], from: string 
 
     case "allowlist":
     case "pairing": {
-      const normalized = from?.replace(/\D/g, "") || "";
-      const allowed = (allowFrom || []).some((num) => {
-        const normalizedAllow = num.replace(/\D/g, "");
-        return normalized.endsWith(normalizedAllow) || normalizedAllow.endsWith(normalized);
-      });
+      const normalized = normalizePhoneNumber(from);
+      if (!normalized) {
+        console.log("[voice-call] Inbound call rejected: missing caller ID");
+        return false;
+      }
+      const allowed = isAllowlistedCaller(normalized, allowFrom);
       const status = allowed ? "accepted" : "rejected";
       console.log(
         `[voice-call] Inbound call ${status}: ${from} ${allowed ? "is in" : "not in"} allowlist`,

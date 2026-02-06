@@ -1,7 +1,7 @@
 ---
 name: slack
 description: Use when you need to control Slack from crocbot via the slack tool, including reacting to messages or pinning/unpinning items in Slack channels or DMs.
-metadata: {"crocbot":{"emoji":"💬","requires":{"config":["channels.slack"]}}}
+metadata: {"crocbot":{"emoji":"💬","requires":{"config":["skills.entries.slack"]},"primaryEnv":"SLACK_BOT_TOKEN"}}
 ---
 
 # Slack Actions
