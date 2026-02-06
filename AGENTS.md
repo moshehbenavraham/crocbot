@@ -9,6 +9,9 @@
 >
 > **API Keys & Secrets**: Read `.env` in this repo — it contains credentials and paths to external config. Do NOT grep the codebase for credentials.
 
+## Main Entry Point of App
+ - run `crocbot -h`: you will see all the sysems of the assistant
+
 ## Project Snapshot
 - crocbot is a strip-down, sipmlification and customization of OpenClaw (details in "Source Project" below) specifically for only two interaction channels with crocobt (CLI & Telegram) and primary deployment is Coolify/Docker on a remote server
 - crocbot is a Telegram-first personal AI assistant and gateway CLI (`crocbot` binary).

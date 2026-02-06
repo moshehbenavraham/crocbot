@@ -138,3 +138,15 @@ In process of checking still:
 - First live test: call placed to `+972525936481`, phone rang and was answered, but **dropped immediately (~1.8s) with no audio** — likely webhook signature verification or TwiML serving issue
 - Documented status and next steps in `docs/ongoing-projects/voice-call-upstream-sync.md`
 - **Next session**: add request-level webhook logging, test with `skipSignatureVerification: true`, inspect ngrok traffic
+
+---
+
+## Session 23 — Verbose Logging & Slack Fix
+
+- Enabled max-verbosity logging in `crocbot.json`:
+  - `logging.level: "trace"`, `logging.consoleLevel: "debug"`, `logging.consoleStyle: "pretty"`
+  - `diagnostics.enabled: true` with full `cacheTrace` (messages, prompt, system)
+- Added env vars to `.env`: `CROCBOT_CACHE_TRACE=1`, `CROCBOT_CACHE_TRACE_FILE`, `CROCBOT_CACHE_TRACE_MESSAGES=1`, `CROCBOT_CACHE_TRACE_PROMPT=1`, `CROCBOT_CACHE_TRACE_SYSTEM=1`, `CROCBOT_LOG_FORMAT=json`
+- **Slack extension crash**: `(0, _pluginSdk.listEnabledSlackAccounts) is not a function` — the Slack extension (`extensions/slack/`) imports ~15 functions from `crocbot/plugin-sdk` that were stripped during the OpenClaw→crocbot simplification (`src/slack/` was removed). Original implementations live in `.001_ORIGINAL/src/slack/`.
+- **Fix**: disabled Slack in config (`channels.slack.enabled: false`, `plugins.entries.slack.enabled: false`)
+- **TODO**: port `src/slack/accounts.ts` and related helpers from `.001_ORIGINAL/` back into `src/slack/` and re-export from `src/plugin-sdk/index.ts` to restore Slack support
