@@ -257,7 +257,7 @@ describe("gateway node command allowlist", () => {
       const emptyNodeId = await getConnectedNodeId();
       const missingRes = await rpcReq(ws, "node.invoke", {
         nodeId: emptyNodeId,
-        command: "canvas.snapshot",
+        command: "camera.snap",
         params: {},
         idempotencyKey: "allowlist-2",
       });
@@ -273,7 +273,7 @@ describe("gateway node command allowlist", () => {
         });
       allowedClient = await connectNodeClient({
         port,
-        commands: ["canvas.snapshot"],
+        commands: ["camera.snap"],
         instanceId: "node-allowed",
         displayName: "node-allowed",
         onEvent: (evt) => {
@@ -287,7 +287,7 @@ describe("gateway node command allowlist", () => {
 
       const invokeResP = rpcReq(ws, "node.invoke", {
         nodeId: allowedNodeId,
-        command: "canvas.snapshot",
+        command: "camera.snap",
         params: { format: "png" },
         idempotencyKey: "allowlist-3",
       });
@@ -305,7 +305,7 @@ describe("gateway node command allowlist", () => {
 
       const invokeNullResP = rpcReq(ws, "node.invoke", {
         nodeId: allowedNodeId,
-        command: "canvas.snapshot",
+        command: "camera.snap",
         params: { format: "png" },
         idempotencyKey: "allowlist-null-payloadjson",
       });

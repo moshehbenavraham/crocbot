@@ -1,7 +1,7 @@
 ---
-summary: "CLI reference for `crocbot nodes` (list/status/invoke, camera/canvas/screen)"
+summary: "CLI reference for `crocbot nodes` (list/status/invoke, camera/screen)"
 read_when:
-  - You’re managing nodes (cameras, screen, canvas)
+  - You're managing nodes (cameras, screen)
   - You need to invoke node commands
 ---
 

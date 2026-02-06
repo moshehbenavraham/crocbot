@@ -10,33 +10,23 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
-**Crocbot** is a *personal AI assistant* you run on your own VPS or server.
-It answers you on Telegram with full bot integration via grammY. The Gateway is the control plane for your always-on assistant.
+**Crocbot** is a personal AI assistant you run on your own VPS. It answers you on **Telegram** via a full grammY bot integration, with an always-on **Gateway** control plane managing sessions, agents, tools, and automation.
 
-**This is a Fork of the OpenClaw Project:  https://openclaw.ai/**
-
-If you want a personal, single-user assistant that is lean, fast, and always-on, this is it.
+Fork of [OpenClaw](https://openclaw.ai/), stripped down to **CLI + Telegram** for lean, single-user deployment.
 
 [Repository](https://github.com/moshehbenavraham/crocbot) · [Docs](https://aiwithapex.mintlify.app) · [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · [Docker](https://aiwithapex.mintlify.app/install/docker)
 
-Preferred setup: run the onboarding wizard (`crocbot onboard`). It walks through gateway, workspace, Telegram configuration, and skills. The CLI wizard is the recommended path and works on **Linux and Windows (via WSL2; strongly recommended)**.
-Works with npm, pnpm, or bun.
-New install? Start here: [Getting started](https://aiwithapex.mintlify.app/start/getting-started)
+---
 
-**Subscriptions (OAuth):**
-- **[Anthropic](https://www.anthropic.com/)** (Claude Pro/Max)
-- **[OpenAI](https://openai.com/)** (ChatGPT/Codex)
+## What is Crocbot?
 
-Model note: while any model is supported, I strongly recommend **Anthropic Pro/Max (100/200) + Opus 4.5** for long‑context strength and better prompt‑injection resistance. See [Onboarding](https://aiwithapex.mintlify.app/start/onboarding).
+Crocbot is a Telegram-first personal AI assistant that runs as a background service on your server. The Gateway is the always-on control plane — it manages your Telegram bot connection, agent sessions, cron jobs, webhooks, and tools. You interact with it via Telegram DMs/groups or the `crocbot` CLI.
 
-## Models (selection + auth)
+---
 
-- Models config + CLI: [Models](https://aiwithapex.mintlify.app/concepts/models)
-- Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://aiwithapex.mintlify.app/concepts/model-failover)
+## Quick Start
 
-## Install (recommended)
-
-Runtime: **Node ≥22**.
+**Runtime:** Node >= 22
 
 ```bash
 npm install -g crocbot@latest
@@ -45,45 +35,29 @@ npm install -g crocbot@latest
 crocbot onboard --install-daemon
 ```
 
-The wizard installs the Gateway daemon (launchd/systemd user service) so it stays running.
-Legacy note: `crocbot` remains available as a compatibility shim.
-
-## Quick start (TL;DR)
-
-Runtime: **Node ≥22**.
-
-Full beginner guide (auth, pairing, channels): [Getting started](https://aiwithapex.mintlify.app/start/getting-started)
+The onboarding wizard walks through API keys, Telegram bot setup, workspace configuration, and skills. It installs the Gateway as a systemd user service so it stays running.
 
 ```bash
-crocbot onboard --install-daemon
-
+# Start the gateway manually (if not using the daemon)
 crocbot gateway --port 18789 --verbose
 
-# Talk to the assistant (optionally deliver back to Telegram)
+# Send a message from the CLI
 crocbot agent --message "Ship checklist" --thinking high
 ```
 
-Upgrading? [Updating guide](https://aiwithapex.mintlify.app/install/updating) (and run `crocbot doctor`).
+Full beginner guide: [Getting Started](https://aiwithapex.mintlify.app/start/getting-started) · Upgrading? [Update guide](https://aiwithapex.mintlify.app/install/updating) + `crocbot doctor`
 
-## Development channels
+---
 
-- **stable**: tagged releases (`vYYYY.M.D` or `vYYYY.M.D-<patch>`), npm dist-tag `latest`.
-- **beta**: prerelease tags (`vYYYY.M.D-beta.N`), npm dist-tag `beta` (macOS app may be missing).
-- **dev**: moving head of `main`, npm dist-tag `dev` (when published).
+## Install from Source
 
-Switch channels (git + npm): `crocbot update --channel stable|beta|dev`.
-Details: [Development channels](https://aiwithapex.mintlify.app/install/development-channels).
-
-## From source (development)
-
-Prefer `pnpm` for builds from source. Bun is optional for running TypeScript directly.
+Prefer **pnpm** for source builds. Bun is optional for running TypeScript directly.
 
 ```bash
 git clone https://github.com/moshehbenavraham/crocbot.git
 cd crocbot
 
 pnpm install
-pnpm ui:build # auto-installs UI deps on first run
 pnpm build
 
 pnpm crocbot onboard --install-daemon
@@ -92,137 +66,108 @@ pnpm crocbot onboard --install-daemon
 pnpm gateway:watch
 ```
 
-Note: `pnpm crocbot ...` runs TypeScript directly (via `tsx`). `pnpm build` produces `dist/` for running via Node / the packaged `crocbot` binary.
+`pnpm crocbot ...` runs TypeScript directly via `tsx`. `pnpm build` produces `dist/` for the packaged `crocbot` binary.
 
-## Security defaults (DM access)
+---
 
-Crocbot connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
+## Docker
 
-Full security guide: [Security](https://aiwithapex.mintlify.app/gateway/security)
+### Local testing
 
-Default behavior on Telegram:
-- **DM pairing** (`dmPolicy="pairing"`): unknown senders receive a short pairing code and the bot does not process their message.
-- Approve with: `crocbot pairing approve telegram <code>` (then the sender is added to a local allowlist store).
-- Public inbound DMs require an explicit opt-in: set `dmPolicy="open"` and include `"*"` in `channels.telegram.allowFrom`.
+```bash
+docker compose up -d crocbot-gateway
 
-Run `crocbot doctor` to surface risky/misconfigured DM policies.
+# CLI access
+docker compose run --rm crocbot-cli status
+```
+
+Environment variables (`ANTHROPIC_API_KEY`, `TELEGRAM_BOT_TOKEN`, etc.) are read from `.env` or exported. Volumes mount `~/.crocbot` (config) and `~/croc` (workspace).
+
+### Coolify production deployment
+
+The repo includes a Coolify-optimized compose file:
+
+```bash
+# docker-compose.coolify.yml
+# - Multi-stage build from Dockerfile
+# - Persistent volume at /data
+# - Health checks, memory limits, auto-restart
+# - Set CROCBOT_GATEWAY_TOKEN + ANTHROPIC_API_KEY in Coolify UI
+```
+
+See [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml), and [`docker-compose.coolify.yml`](docker-compose.coolify.yml). Full docs: [Docker install](https://aiwithapex.mintlify.app/install/docker)
+
+---
+
+## Architecture
+
+```
+              Telegram
+             (grammY bot)
+                  │
+                  ▼
+     ┌────────────────────────┐
+     │        Gateway         │
+     │   (WebSocket + HTTP)   │
+     │  ws://127.0.0.1:18789  │
+     └────────────┬───────────┘
+                  │
+     ┌────────────┼────────────┐
+     │            │            │
+     ▼            ▼            ▼
+  Agents      Sessions       Cron
+  (Pi RT)     (Storage)     (Jobs)
+     │
+     ▼
+    LLM Providers
+  (Claude, GPT, Gemini, …)
+```
+
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket.
+
+Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
+
+---
 
 ## Highlights
 
-- **[Local-first Gateway](https://aiwithapex.mintlify.app/gateway)** - single control plane for sessions, Telegram, tools, and events.
-- **[Telegram integration](https://aiwithapex.mintlify.app/channels/telegram)** - full bot integration via grammY with groups, DMs, and media support.
-- **[Multi-agent routing](https://aiwithapex.mintlify.app/gateway/configuration)** - route inbound messages to isolated agents (workspaces + per-agent sessions).
-- **[First-class tools](https://aiwithapex.mintlify.app/tools)** - browser, cron, sessions, and automation.
-- **[Onboarding](https://aiwithapex.mintlify.app/start/wizard) + [skills](https://aiwithapex.mintlify.app/tools/skills)** - wizard-driven setup with bundled/managed/workspace skills.
+- **[Gateway control plane](https://aiwithapex.mintlify.app/gateway)** — single WebSocket + HTTP server for sessions, tools, events, presence, and config
+- **[Telegram integration](https://aiwithapex.mintlify.app/channels/telegram)** — full grammY bot with groups, DMs, media support, and inline model selection
+- **[Agent runtime](https://aiwithapex.mintlify.app/concepts/agent)** — Pi embedded runtime with tool streaming and block streaming (RPC mode)
+- **[Browser automation](https://aiwithapex.mintlify.app/tools/browser)** — dedicated Chrome/Chromium via CDP with snapshots, actions, uploads, and profiles
+- **[Cron scheduler](https://aiwithapex.mintlify.app/automation/cron-jobs)** + **[webhooks](https://aiwithapex.mintlify.app/automation/webhook)** — scheduled jobs and external triggers
+- **[Skills platform](https://aiwithapex.mintlify.app/tools/skills)** — 31 bundled skills (weather, GitHub, Spotify, PDF, image gen, transcription, and more)
+- **[Plugin system](https://aiwithapex.mintlify.app/tools/plugins)** — extensible runtime with SDK (`crocbot/plugin-sdk`)
+- **[Multi-model support](https://aiwithapex.mintlify.app/concepts/models)** — Anthropic, OpenAI, Google Gemini, Bedrock, Ollama, OpenRouter, and more
+- **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
+- **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
+- **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, DM pairing
 
-## Everything we built so far
+---
 
-### Core platform
-- [Gateway WS control plane](https://aiwithapex.mintlify.app/gateway) with sessions, presence, config, cron, webhooks, and [Control UI](https://aiwithapex.mintlify.app/web).
-- [CLI surface](https://aiwithapex.mintlify.app/tools/agent-send): gateway, agent, send, [wizard](https://aiwithapex.mintlify.app/start/wizard), and [doctor](https://aiwithapex.mintlify.app/gateway/doctor).
-- [Pi agent runtime](https://aiwithapex.mintlify.app/concepts/agent) in RPC mode with tool streaming and block streaming.
-- [Session model](https://aiwithapex.mintlify.app/concepts/session): `main` for direct chats, group isolation, activation modes, queue modes, reply-back. Group rules: [Groups](https://aiwithapex.mintlify.app/concepts/groups).
-- [Media pipeline](https://aiwithapex.mintlify.app/nodes/images): images/audio/video, transcription hooks, size caps, temp file lifecycle. Audio details: [Audio](https://aiwithapex.mintlify.app/nodes/audio).
+## Models
 
-### Channels
-- [Telegram](https://aiwithapex.mintlify.app/channels/telegram) (grammY) - full bot integration with groups, DMs, and media support.
-- [Group routing](https://aiwithapex.mintlify.app/concepts/group-messages): mention gating, reply tags, chunking and routing.
+Crocbot supports multiple LLM providers with auth profile rotation and failover:
 
-### Tools + automation
-- [Browser control](https://aiwithapex.mintlify.app/tools/browser): dedicated croc Chrome/Chromium, snapshots, actions, uploads, profiles.
-- [Cron + wakeups](https://aiwithapex.mintlify.app/automation/cron-jobs); [webhooks](https://aiwithapex.mintlify.app/automation/webhook); [Gmail Pub/Sub](https://aiwithapex.mintlify.app/automation/gmail-pubsub).
-- [Skills platform](https://aiwithapex.mintlify.app/tools/skills): bundled, managed, and workspace skills with install gating + UI.
+| Provider | Examples |
+|----------|----------|
+| **Anthropic** | Claude Opus, Sonnet, Haiku |
+| **OpenAI** | GPT-4o, o3, Codex |
+| **Google Gemini** | Gemini 2.5 Pro/Flash |
+| **AWS Bedrock** | Claude via Bedrock |
+| **Ollama** | Local models |
+| **OpenRouter** | Multi-provider gateway |
+| + more | GitHub Copilot, Moonshot, Qwen, Venice, … |
 
-### Runtime + safety
-- [Channel routing](https://aiwithapex.mintlify.app/concepts/channel-routing), [retry policy](https://aiwithapex.mintlify.app/concepts/retry), and [streaming/chunking](https://aiwithapex.mintlify.app/concepts/streaming).
-- [Presence](https://aiwithapex.mintlify.app/concepts/presence), [typing indicators](https://aiwithapex.mintlify.app/concepts/typing-indicators), and [usage tracking](https://aiwithapex.mintlify.app/concepts/usage-tracking).
-- [Models](https://aiwithapex.mintlify.app/concepts/models), [model failover](https://aiwithapex.mintlify.app/concepts/model-failover), and [session pruning](https://aiwithapex.mintlify.app/concepts/session-pruning).
-- [Security](https://aiwithapex.mintlify.app/gateway/security) and [troubleshooting](https://aiwithapex.mintlify.app/channels/troubleshooting).
+**Recommended:** Anthropic Pro/Max subscription + Opus for long-context strength and prompt-injection resistance.
 
-### Ops + packaging
-- [Control UI](https://aiwithapex.mintlify.app/web) + [WebChat](https://aiwithapex.mintlify.app/web/webchat) served directly from the Gateway.
-- [Tailscale Serve/Funnel](https://aiwithapex.mintlify.app/gateway/tailscale) or [SSH tunnels](https://aiwithapex.mintlify.app/gateway/remote) with token/password auth.
-- [Nix mode](https://aiwithapex.mintlify.app/install/nix) for declarative config; [Docker](https://aiwithapex.mintlify.app/install/docker)-based installs.
-- [Doctor](https://aiwithapex.mintlify.app/gateway/doctor) migrations, [logging](https://aiwithapex.mintlify.app/logging).
+Docs: [Models](https://aiwithapex.mintlify.app/concepts/models) · [Model failover](https://aiwithapex.mintlify.app/concepts/model-failover) · [Onboarding](https://aiwithapex.mintlify.app/start/onboarding)
 
-## How it works (short)
-
-```
-                Telegram
-                   │
-                   ▼
-┌───────────────────────────────┐
-│            Gateway            │
-│       (control plane)         │
-│     ws://127.0.0.1:18789      │
-└──────────────┬────────────────┘
-               │
-               ├─ Pi agent (RPC)
-               ├─ CLI (crocbot ...)
-               └─ WebChat UI
-```
-
-## Key subsystems
-
-- **[Gateway WebSocket network](https://aiwithapex.mintlify.app/concepts/architecture)** - single WS control plane for clients, tools, and events (plus ops: [Gateway runbook](https://aiwithapex.mintlify.app/gateway)).
-- **[Tailscale exposure](https://aiwithapex.mintlify.app/gateway/tailscale)** - Serve/Funnel for the Gateway dashboard + WS (remote access: [Remote](https://aiwithapex.mintlify.app/gateway/remote)).
-- **[Browser control](https://aiwithapex.mintlify.app/tools/browser)** - croc-managed Chrome/Chromium with CDP control.
-
-## Tailscale access (Gateway dashboard)
-
-Crocbot can auto-configure Tailscale **Serve** (tailnet-only) or **Funnel** (public) while the Gateway stays bound to loopback. Configure `gateway.tailscale.mode`:
-
-- `off`: no Tailscale automation (default).
-- `serve`: tailnet-only HTTPS via `tailscale serve` (uses Tailscale identity headers by default).
-- `funnel`: public HTTPS via `tailscale funnel` (requires shared password auth).
-
-Notes:
-- `gateway.bind` must stay `loopback` when Serve/Funnel is enabled (Crocbot enforces this).
-- Serve can be forced to require a password by setting `gateway.auth.mode: "password"` or `gateway.auth.allowTailscale: false`.
-- Funnel refuses to start unless `gateway.auth.mode: "password"` is set.
-- Optional: `gateway.tailscale.resetOnExit` to undo Serve/Funnel on shutdown.
-
-Details: [Tailscale guide](https://aiwithapex.mintlify.app/gateway/tailscale) · [Web surfaces](https://aiwithapex.mintlify.app/web)
-
-## Remote Gateway (Linux VPS)
-
-Running the Gateway on a small Linux VPS is the recommended deployment. Clients (CLI, WebChat) can connect over **Tailscale Serve/Funnel** or **SSH tunnels**.
-
-- **Gateway host** runs the exec tool and Telegram connection.
-
-Details: [Remote access](https://aiwithapex.mintlify.app/gateway/remote) · [Security](https://aiwithapex.mintlify.app/gateway/security)
-
-## Agent to Agent (sessions_* tools)
-
-- Use these to coordinate work across sessions without jumping between chat surfaces.
-- `sessions_list` — discover active sessions (agents) and their metadata.
-- `sessions_history` — fetch transcript logs for a session.
-- `sessions_send` — message another session; optional reply‑back ping‑pong + announce step (`REPLY_SKIP`, `ANNOUNCE_SKIP`).
-
-Details: [Session tools](https://aiwithapex.mintlify.app/concepts/session-tool)
-
-## Chat commands
-
-Send these in Telegram or WebChat (group commands are owner-only):
-
-- `/status` — compact session status (model + tokens, cost when available)
-- `/new` or `/reset` — reset the session
-- `/compact` — compact session context (summary)
-- `/think <level>` — off|minimal|low|medium|high|xhigh (GPT-5.2 + Codex models only)
-- `/verbose on|off`
-- `/usage off|tokens|full` — per-response usage footer
-- `/restart` — restart the gateway (owner-only in groups)
-- `/activation mention|always` — group activation toggle (groups only)
-
-## Agent workspace + skills
-
-- Workspace root: `~/croc` (configurable via `agents.defaults.workspace`).
-- Injected prompt files: `AGENTS.md`, `SOUL.md`, `TOOLS.md`.
-- Skills: `~/croc/skills/<skill>/SKILL.md`.
+---
 
 ## Configuration
 
-Minimal `~/.crocbot/crocbot.json` (model + defaults):
+Minimal `~/.crocbot/crocbot.json`:
 
 ```json5
 {
@@ -232,20 +177,23 @@ Minimal `~/.crocbot/crocbot.json` (model + defaults):
 }
 ```
 
-[Full configuration reference (all keys + examples).](https://aiwithapex.mintlify.app/gateway/configuration)
+Key environment variables:
 
-## Security model (important)
+| Variable | Purpose |
+|----------|---------|
+| `CROCBOT_STATE_DIR` | Runtime state directory (config, credentials, logs, memory) |
+| `CROCBOT_CONFIG_PATH` | Path to main config file |
+| `CROCBOT_WORKSPACE` | Agent working directory (prompts, skills, hooks) |
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token |
 
-- **Default:** tools run on the host for the **main** session, so the agent has full access when it's just you.
-- **Group/channel safety:** set `agents.defaults.sandbox.mode: "non-main"` to run **non-main sessions** (groups) inside per-session Docker sandboxes; bash then runs in Docker for those sessions.
-- **Sandbox defaults:** allowlist `bash`, `process`, `read`, `write`, `edit`, `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`; denylist `browser`, `cron`, `gateway`.
+Full reference: [Configuration](https://aiwithapex.mintlify.app/gateway/configuration)
 
-Details: [Security guide](https://aiwithapex.mintlify.app/gateway/security) · [Docker + sandboxing](https://aiwithapex.mintlify.app/install/docker) · [Sandbox config](https://aiwithapex.mintlify.app/gateway/configuration)
+---
 
-### [Telegram](https://aiwithapex.mintlify.app/channels/telegram)
+## Telegram Setup
 
-- Set `TELEGRAM_BOT_TOKEN` or `channels.telegram.botToken` (env wins).
-- Optional: set `channels.telegram.groups` (with `channels.telegram.groups."*".requireMention`); when set, it is a group allowlist (include `"*"` to allow all). Also `channels.telegram.allowFrom` or `channels.telegram.webhookUrl` as needed.
+Set your bot token via environment or config:
 
 ```json5
 {
@@ -257,84 +205,140 @@ Details: [Security guide](https://aiwithapex.mintlify.app/gateway/security) · [
 }
 ```
 
-### [WebChat](https://aiwithapex.mintlify.app/web/webchat)
+Or set `TELEGRAM_BOT_TOKEN` in your environment (env takes precedence).
 
-- Uses the Gateway WebSocket; no separate WebChat port/config.
+### DM security
 
-Browser control (optional):
+Default: **pairing mode** — unknown senders receive a pairing code. Approve with:
 
-```json5
-{
-  browser: {
-    enabled: true,
-    color: "#FF4500"
-  }
-}
+```bash
+crocbot pairing approve telegram <code>
 ```
 
-## Docs
+### Chat commands
 
-Use these when you’re past the onboarding flow and want the deeper reference.
-- [Start with the docs index for navigation and “what’s where.”](https://aiwithapex.mintlify.app)
-- [Read the architecture overview for the gateway + protocol model.](https://aiwithapex.mintlify.app/concepts/architecture)
-- [Use the full configuration reference when you need every key and example.](https://aiwithapex.mintlify.app/gateway/configuration)
-- [Run the Gateway by the book with the operational runbook.](https://aiwithapex.mintlify.app/gateway)
-- [Learn how the Control UI/Web surfaces work and how to expose them safely.](https://aiwithapex.mintlify.app/web)
-- [Understand remote access over SSH tunnels or tailnets.](https://aiwithapex.mintlify.app/gateway/remote)
-- [Follow the onboarding wizard flow for a guided setup.](https://aiwithapex.mintlify.app/start/wizard)
-- [Wire external triggers via the webhook surface.](https://aiwithapex.mintlify.app/automation/webhook)
-- [Set up Gmail Pub/Sub triggers.](https://aiwithapex.mintlify.app/automation/gmail-pubsub)
-- [Platform guides: Windows (WSL2)](https://aiwithapex.mintlify.app/platforms/windows), [Linux](https://aiwithapex.mintlify.app/platforms/linux)
-- [Debug common failures with the troubleshooting guide.](https://aiwithapex.mintlify.app/channels/troubleshooting)
-- [Review security guidance before exposing anything.](https://aiwithapex.mintlify.app/gateway/security)
+| Command | Description |
+|---------|-------------|
+| `/status` | Session status (model, tokens, cost) |
+| `/new` / `/reset` | Reset the session |
+| `/compact` | Compact session context (summary) |
+| `/think <level>` | Set thinking level (off/minimal/low/medium/high/xhigh) |
+| `/verbose on\|off` | Toggle verbose output |
+| `/usage off\|tokens\|full` | Per-response usage footer |
+| `/tts on\|off` | Control text-to-speech |
+| `/skill <name>` | Run a skill by name |
+| `/whoami` | Show your sender ID |
+| `/help` | Show available commands |
 
-## Advanced docs (discovery + control)
+Groups: configure `channels.telegram.groups` for allowlisting, mention gating, and activation modes.
 
-- [Discovery + transports](https://aiwithapex.mintlify.app/gateway/discovery)
-- [Bonjour/mDNS](https://aiwithapex.mintlify.app/gateway/bonjour)
-- [Gateway pairing](https://aiwithapex.mintlify.app/gateway/pairing)
-- [Remote gateway README](https://aiwithapex.mintlify.app/gateway/remote-gateway-readme)
-- [Control UI](https://aiwithapex.mintlify.app/web/control-ui)
-- [Dashboard](https://aiwithapex.mintlify.app/web/dashboard)
+Docs: [Telegram](https://aiwithapex.mintlify.app/channels/telegram) · [Groups](https://aiwithapex.mintlify.app/concepts/groups)
 
-## Operations & troubleshooting
+---
 
-- [Health checks](https://aiwithapex.mintlify.app/gateway/health)
-- [Gateway lock](https://aiwithapex.mintlify.app/gateway/gateway-lock)
-- [Background process](https://aiwithapex.mintlify.app/gateway/background-process)
-- [Browser troubleshooting (Linux)](https://aiwithapex.mintlify.app/tools/browser-linux-troubleshooting)
-- [Logging](https://aiwithapex.mintlify.app/logging)
+## Security Defaults
 
-## Deep dives
+Crocbot connects to real messaging surfaces — treat inbound DMs as **untrusted input**.
 
-- [Agent loop](https://aiwithapex.mintlify.app/concepts/agent-loop)
-- [Presence](https://aiwithapex.mintlify.app/concepts/presence)
-- [TypeBox schemas](https://aiwithapex.mintlify.app/concepts/typebox)
-- [RPC adapters](https://aiwithapex.mintlify.app/reference/rpc)
-- [Queue](https://aiwithapex.mintlify.app/concepts/queue)
+- **DM pairing** (`dmPolicy="pairing"`) — unknown senders must pair before the bot responds
+- **Exec allowlisting** — shell commands are gated by an allowlist
+- **SSRF protection** — private IP/hostname blocking on all outbound fetches
+- **Sandbox mode** — run non-main sessions (groups) in per-session Docker sandboxes
+- **`crocbot doctor`** — audit tool that surfaces risky or misconfigured policies
 
-## Workspace & skills
+Details: [Security](https://aiwithapex.mintlify.app/gateway/security) · [Sandboxing](https://aiwithapex.mintlify.app/install/docker)
 
-- [Skills config](https://aiwithapex.mintlify.app/tools/skills-config)
-- [Default AGENTS](https://aiwithapex.mintlify.app/reference/AGENTS.default)
-- [Templates: AGENTS](https://aiwithapex.mintlify.app/reference/templates/AGENTS)
-- [Templates: BOOTSTRAP](https://aiwithapex.mintlify.app/reference/templates/BOOTSTRAP)
-- [Templates: IDENTITY](https://aiwithapex.mintlify.app/reference/templates/IDENTITY)
-- [Templates: SOUL](https://aiwithapex.mintlify.app/reference/templates/SOUL)
-- [Templates: TOOLS](https://aiwithapex.mintlify.app/reference/templates/TOOLS)
-- [Templates: USER](https://aiwithapex.mintlify.app/reference/templates/USER)
+---
 
-## Platform guides
+## Agent Workspace & Skills
 
-- [Linux](https://aiwithapex.mintlify.app/platforms/linux)
+- **Workspace root:** `~/croc` (configurable via `agents.defaults.workspace`)
+- **Prompt files:** `AGENTS.md`, `SOUL.md`, `USER.md`, `MEMORY.md`, `TOOLS.md`
+- **Skills:** `~/croc/skills/<skill>/SKILL.md`
+- **31 bundled skills** including weather, GitHub, Spotify, Notion, Trello, Obsidian, PDF generation, image generation, transcription, browser automation, and more
 
-## Email hooks (Gmail)
+Docs: [Skills](https://aiwithapex.mintlify.app/tools/skills) · [Skills config](https://aiwithapex.mintlify.app/tools/skills-config)
 
-- [aiwithapex.mintlify.app/gmail-pubsub](https://aiwithapex.mintlify.app/automation/gmail-pubsub)
+---
 
-## Community
+## Tech Stack
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, maintainers, and how to submit PRs.
-AI/vibe-coded PRs welcome! 🤖
+| Technology | Purpose |
+|------------|---------|
+| Node.js 22+ | Runtime (ESM) |
+| TypeScript (ES2023) | Strict mode, NodeNext modules |
+| tsdown (rolldown) | Bundler (~5s builds) |
+| pnpm | Package manager |
+| grammY | Telegram SDK |
+| Vitest | Testing |
+| oxlint + oxfmt | Lint + format (Rust-based, fast) |
 
-Special thanks to all contributors!  May this project grow and stay open-source and serve the public well!
+---
+
+## Development
+
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install dependencies |
+| `pnpm build` | Production build (~5s via tsdown) |
+| `pnpm gateway:watch` | Dev loop with auto-reload |
+| `pnpm check` | Type check + lint + format |
+| `pnpm lint` | Lint (oxlint, type-aware) |
+| `pnpm lint:fix` | Auto-fix lint issues |
+| `pnpm format` | Check formatting (oxfmt) |
+| `pnpm format:fix` | Auto-fix formatting |
+| `pnpm test` | Run all tests (Vitest, parallel) |
+| `pnpm test:e2e` | End-to-end tests |
+| `pnpm test:coverage` | Coverage report |
+| `pnpm docs:dev` | Local Mintlify docs server |
+
+### Commit convention
+
+Use [conventional commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`). The repo provides a scoped staging helper:
+
+```bash
+scripts/committer "feat: add cron retry logic" src/cron/retry.ts
+```
+
+### Deploy
+
+```bash
+pnpm build && systemctl --user restart crocbot-gateway
+systemctl --user status crocbot-gateway
+```
+
+Docs: [Development reference](https://aiwithapex.mintlify.app/reference/development)
+
+---
+
+## Documentation
+
+- [Getting started](https://aiwithapex.mintlify.app/start/getting-started) — onboarding flow
+- [Architecture](https://aiwithapex.mintlify.app/concepts/architecture) — gateway + protocol model
+- [Configuration](https://aiwithapex.mintlify.app/gateway/configuration) — full reference (all keys + examples)
+- [Telegram](https://aiwithapex.mintlify.app/channels/telegram) — bot setup, groups, media
+- [Security](https://aiwithapex.mintlify.app/gateway/security) — DM policies, sandboxing, exec guards
+- [Models](https://aiwithapex.mintlify.app/concepts/models) — provider setup, failover, rotation
+- [Skills](https://aiwithapex.mintlify.app/tools/skills) — bundled, managed, and workspace skills
+- [Browser](https://aiwithapex.mintlify.app/tools/browser) — CDP automation
+- [Cron & webhooks](https://aiwithapex.mintlify.app/automation/cron-jobs) — scheduled jobs, triggers
+- [Docker](https://aiwithapex.mintlify.app/install/docker) — container deployment
+- [Troubleshooting](https://aiwithapex.mintlify.app/channels/troubleshooting) — common failures
+- [Doctor](https://aiwithapex.mintlify.app/gateway/doctor) — health audit tool
+- [Platform: Linux](https://aiwithapex.mintlify.app/platforms/linux) — VPS deployment guide
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, branch conventions, and how to submit PRs.
+
+AI-assisted PRs welcome.
+
+---
+
+## License & Attribution
+
+[MIT License](LICENSE) — Copyright (c) 2025 Peter Steinberger
+
+Forked from [OpenClaw](https://openclaw.ai/) ([github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)). Crocbot is an independent fork stripped down for single-user Telegram deployment.

@@ -32,10 +32,10 @@
 | `sag` | `/skill sag hello world` | ElevenLabs | ✅ |
 | `skill-creator` | `/skill skill-creator` | — | ✅ |
 | `weather` | `/skill weather Modiin Ilit` | — | ✅ |
-| `notion` | `/skill notion` | Notion API | ⬜ |
-| `trello` | `/skill trello` | — | ⬜ |
-| `tmux` | `/skill tmux` | — | ⬜ |
-| `session-logs` | `/skill session-logs` | — | ⬜ |
+| `notion` | `/skill notion` | Notion API | ✅ |
+| `trello` | `/skill trello` | — | ✅ |
+| `tmux` | `/skill tmux` | — | ✅ |
+| `session-logs` | `/skill session-logs` | — | ✅ |
 
 ### Extensions
 
@@ -66,7 +66,7 @@
 - Configured Brave Search API key (`BRAVE_API_KEY`) in both `.env` locations (`~/.crocbot/.env` and project `.env`)
 - Configured headless browser: set `browser.executablePath` to Playwright Chromium (`~/.cache/ms-playwright/chromium-1200/chrome-linux64/chrome`) with `headless: true` and `noSandbox: true` in `crocbot.json`
 - Symlinked `crocbot` CLI to `~/.local/bin/crocbot` → `dist/entry.js` (fixes orchestration tools, cron, session_status)
-- Remaining audit issues: canvas (no node), message react target
+- Remaining audit issues: message react target
 
 ---
 
@@ -77,4 +77,4 @@
 - [x] Configure headless browser (Playwright Chromium)
 - [x] Fix `crocbot` CLI PATH for orchestration/exec tools
 - [ ] Run security audit: `crocbot security audit --deep`
-- [ ] Remove canvas system (unused - no Mac/iOS/Android node apps in this deployment)
+- [x] Remove canvas system (unused - no Mac/iOS/Android node apps in this deployment)

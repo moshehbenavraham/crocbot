@@ -10,12 +10,14 @@
 # Options:
 #   --output-dir    Directory to store backups (default: ./backups)
 #   --gateway-url   Gateway URL (default: http://localhost:8080 or $CROCBOT_GATEWAY_URL)
+#   --retention     Days to keep old backups (default: 7, 0 = disable cleanup)
 #   --help          Show this help message
 #
 # Environment Variables:
-#   CROCBOT_GATEWAY_URL   Gateway URL (e.g., https://your-domain.com)
-#   CROCBOT_GATEWAY_TOKEN Gateway auth token (optional, for authenticated endpoints)
-#   CROCBOT_STATE_DIR     State directory for volume backups (default: /data or ~/.crocbot)
+#   CROCBOT_GATEWAY_URL    Gateway URL (e.g., https://your-domain.com)
+#   CROCBOT_GATEWAY_TOKEN  Gateway auth token (optional, for authenticated endpoints)
+#   CROCBOT_STATE_DIR      State directory for volume backups (default: /data or ~/.crocbot)
+#   BACKUP_RETENTION_DAYS  Days to keep old backups (default: 7)
 #
 # Examples:
 #   # Local Docker Compose
@@ -37,6 +39,7 @@ OUTPUT_DIR="${BACKUP_OUTPUT_DIR:-./backups}"
 GATEWAY_URL="${CROCBOT_GATEWAY_URL:-http://localhost:8080}"
 GATEWAY_TOKEN="${CROCBOT_GATEWAY_TOKEN:-}"
 STATE_DIR="${CROCBOT_STATE_DIR:-}"
+RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-7}"
 
 print_help() {
   head -30 "$0" | tail -28 | sed 's/^# //' | sed 's/^#//'
@@ -63,6 +66,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --gateway-url)
       GATEWAY_URL="$2"
+      shift 2
+      ;;
+    --retention)
+      RETENTION_DAYS="$2"
       shift 2
       ;;
     --help|-h)
@@ -163,10 +170,20 @@ rm -rf "$BACKUP_DIR"
 
 ARCHIVE_SIZE=$(du -h "$ARCHIVE_PATH" | cut -f1)
 
+# Step 6: Rotate old backups
+if [[ "$RETENTION_DAYS" -gt 0 ]]; then
+  OLD_COUNT=$(find "$OUTPUT_DIR" -name "crocbot-backup-*.tar.gz" -mtime +"$RETENTION_DAYS" 2>/dev/null | wc -l)
+  if [[ "$OLD_COUNT" -gt 0 ]]; then
+    log_info "Cleaning up $OLD_COUNT backup(s) older than $RETENTION_DAYS days..."
+    find "$OUTPUT_DIR" -name "crocbot-backup-*.tar.gz" -mtime +"$RETENTION_DAYS" -delete
+  fi
+fi
+
 log_info "Backup complete!"
 echo ""
 echo "Backup archive: $ARCHIVE_PATH"
 echo "Size: $ARCHIVE_SIZE"
+echo "Retention: $RETENTION_DAYS days"
 echo ""
 echo "To restore:"
 echo "  1. Extract: tar -xzf $ARCHIVE_PATH"

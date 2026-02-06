@@ -34,7 +34,6 @@ describe("gateway e2e", () => {
         skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
         skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
         skipCron: process.env.CROCBOT_SKIP_CRON,
-        skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
         skipBrowser: process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER,
       };
 
@@ -45,7 +44,6 @@ describe("gateway e2e", () => {
       process.env.CROCBOT_SKIP_CHANNELS = "1";
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
       process.env.CROCBOT_SKIP_CRON = "1";
-      process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
       process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
 
       const token = `test-${randomUUID()}`;
@@ -97,7 +95,6 @@ describe("gateway e2e", () => {
       const server = await startGatewayServer(port, {
         bind: "loopback",
         auth: { mode: "token", token },
-        controlUiEnabled: false,
       });
 
       const client = await connectGatewayClient({
@@ -146,7 +143,6 @@ describe("gateway e2e", () => {
         process.env.CROCBOT_SKIP_CHANNELS = prev.skipChannels;
         process.env.CROCBOT_SKIP_GMAIL_WATCHER = prev.skipGmail;
         process.env.CROCBOT_SKIP_CRON = prev.skipCron;
-        process.env.CROCBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
         process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER = prev.skipBrowser;
       }
     },
@@ -161,14 +157,12 @@ describe("gateway e2e", () => {
       skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
       skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
       skipCron: process.env.CROCBOT_SKIP_CRON,
-      skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
       skipBrowser: process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER,
     };
 
     process.env.CROCBOT_SKIP_CHANNELS = "1";
     process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
     process.env.CROCBOT_SKIP_CRON = "1";
-    process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
     process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
     delete process.env.CROCBOT_GATEWAY_TOKEN;
 
@@ -182,7 +176,6 @@ describe("gateway e2e", () => {
     const server = await startGatewayServer(port, {
       bind: "loopback",
       auth: { mode: "token", token: wizardToken },
-      controlUiEnabled: false,
       wizardRunner: async (_opts, _runtime, prompter) => {
         await prompter.intro("Wizard E2E");
         await prompter.note("write token");
@@ -249,7 +242,6 @@ describe("gateway e2e", () => {
     const port2 = await getFreeGatewayPort();
     const server2 = await startGatewayServer(port2, {
       bind: "loopback",
-      controlUiEnabled: false,
     });
     try {
       const resNoToken = await connectDeviceAuthReq({
@@ -273,7 +265,6 @@ describe("gateway e2e", () => {
       process.env.CROCBOT_SKIP_CHANNELS = prev.skipChannels;
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = prev.skipGmail;
       process.env.CROCBOT_SKIP_CRON = prev.skipCron;
-      process.env.CROCBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
       process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER = prev.skipBrowser;
     }
   });

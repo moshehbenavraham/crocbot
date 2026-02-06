@@ -24,7 +24,6 @@ async function startServerWithDefaultConfig(port: number) {
   return await startGatewayServer(port, {
     host: "127.0.0.1",
     auth: { mode: "token", token: "secret" },
-    controlUiEnabled: false,
   });
 }
 
@@ -33,7 +32,6 @@ async function startServer(port: number, opts?: { openResponsesEnabled?: boolean
   return await startGatewayServer(port, {
     host: "127.0.0.1",
     auth: { mode: "token", token: "secret" },
-    controlUiEnabled: false,
     openResponsesEnabled: opts?.openResponsesEnabled ?? true,
   });
 }

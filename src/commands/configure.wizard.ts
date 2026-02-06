@@ -2,7 +2,6 @@ import { formatCliCommand } from "../cli/command-format.js";
 import type { crocbotConfig } from "../config/config.js";
 import { readConfigFileSnapshot, resolveGatewayPort, writeConfigFile } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
-import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { defaultRuntime } from "../runtime.js";
 import { note } from "../terminal/note.js";
@@ -36,7 +35,7 @@ import {
   guardCancel,
   printWizardHeader,
   probeGatewayReachable,
-  resolveControlUiLinks,
+  resolveGatewayWsUrl,
   summarizeExistingConfig,
   waitForGatewayReachable,
 } from "./onboard-helpers.js";
@@ -368,19 +367,18 @@ export async function runConfigureWizard(
       }
 
       if (selected.includes("health")) {
-        const localLinks = resolveControlUiLinks({
+        const wsUrl = resolveGatewayWsUrl({
           bind: nextConfig.gateway?.bind ?? "loopback",
           port: gatewayPort,
           customBindHost: nextConfig.gateway?.customBindHost,
-          basePath: undefined,
         });
         const remoteUrl = nextConfig.gateway?.remote?.url?.trim();
-        const wsUrl =
-          nextConfig.gateway?.mode === "remote" && remoteUrl ? remoteUrl : localLinks.wsUrl;
+        const effectiveWsUrl =
+          nextConfig.gateway?.mode === "remote" && remoteUrl ? remoteUrl : wsUrl;
         const token = nextConfig.gateway?.auth?.token ?? process.env.CROCBOT_GATEWAY_TOKEN;
         const password = nextConfig.gateway?.auth?.password ?? process.env.CROCBOT_GATEWAY_PASSWORD;
         await waitForGatewayReachable({
-          url: wsUrl,
+          url: effectiveWsUrl,
           token,
           password,
           deadlineMs: 15_000,
@@ -494,20 +492,19 @@ export async function runConfigureWizard(
         }
 
         if (choice === "health") {
-          const localLinks = resolveControlUiLinks({
+          const wsUrl = resolveGatewayWsUrl({
             bind: nextConfig.gateway?.bind ?? "loopback",
             port: gatewayPort,
             customBindHost: nextConfig.gateway?.customBindHost,
-            basePath: undefined,
           });
           const remoteUrl = nextConfig.gateway?.remote?.url?.trim();
-          const wsUrl =
-            nextConfig.gateway?.mode === "remote" && remoteUrl ? remoteUrl : localLinks.wsUrl;
+          const effectiveWsUrl =
+            nextConfig.gateway?.mode === "remote" && remoteUrl ? remoteUrl : wsUrl;
           const token = nextConfig.gateway?.auth?.token ?? process.env.CROCBOT_GATEWAY_TOKEN;
           const password =
             nextConfig.gateway?.auth?.password ?? process.env.CROCBOT_GATEWAY_PASSWORD;
           await waitForGatewayReachable({
-            url: wsUrl,
+            url: effectiveWsUrl,
             token,
             password,
             deadlineMs: 15_000,
@@ -539,17 +536,11 @@ export async function runConfigureWizard(
       }
     }
 
-    const controlUiAssets = await ensureControlUiAssetsBuilt(runtime);
-    if (!controlUiAssets.ok && controlUiAssets.message) {
-      runtime.error(controlUiAssets.message);
-    }
-
     const bind = nextConfig.gateway?.bind ?? "loopback";
-    const links = resolveControlUiLinks({
+    const wsUrl = resolveGatewayWsUrl({
       bind,
       port: gatewayPort,
       customBindHost: nextConfig.gateway?.customBindHost,
-      basePath: nextConfig.gateway?.controlUi?.basePath,
     });
     // Try both new and old passwords since gateway may still have old config.
     const newPassword = nextConfig.gateway?.auth?.password ?? process.env.CROCBOT_GATEWAY_PASSWORD;
@@ -557,14 +548,14 @@ export async function runConfigureWizard(
     const token = nextConfig.gateway?.auth?.token ?? process.env.CROCBOT_GATEWAY_TOKEN;
 
     let gatewayProbe = await probeGatewayReachable({
-      url: links.wsUrl,
+      url: wsUrl,
       token,
       password: newPassword,
     });
     // If new password failed and it's different from old password, try old too.
     if (!gatewayProbe.ok && newPassword !== oldPassword && oldPassword) {
       gatewayProbe = await probeGatewayReachable({
-        url: links.wsUrl,
+        url: wsUrl,
         token,
         password: oldPassword,
       });
@@ -573,15 +564,7 @@ export async function runConfigureWizard(
       ? "Gateway: reachable"
       : `Gateway: not detected${gatewayProbe.detail ? ` (${gatewayProbe.detail})` : ""}`;
 
-    note(
-      [
-        `Web UI: ${links.httpUrl}`,
-        `Gateway WS: ${links.wsUrl}`,
-        gatewayStatusLine,
-        "Docs: https://aiwithapex.mintlify.app/web/control-ui",
-      ].join("\n"),
-      "Control UI",
-    );
+    note([`Gateway WS: ${wsUrl}`, gatewayStatusLine].join("\n"), "Gateway");
 
     outro("Configure complete.");
   } catch (err) {

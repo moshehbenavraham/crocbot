@@ -318,7 +318,7 @@ async function isPortFree(port: number): Promise<boolean> {
 }
 
 async function getFreeGatewayPort(): Promise<number> {
-  // Gateway uses derived ports (browser/canvas). Avoid flaky collisions by
+  // Gateway uses derived ports (browser). Avoid flaky collisions by
   // ensuring the common derived offsets are free too.
   for (let attempt = 0; attempt < 25; attempt += 1) {
     const port = await getFreePort();
@@ -497,7 +497,6 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
     skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
     skipCron: process.env.CROCBOT_SKIP_CRON,
-    skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
     agentDir: process.env.CROCBOT_AGENT_DIR,
     piAgentDir: process.env.PI_CODING_AGENT_DIR,
     stateDir: process.env.CROCBOT_STATE_DIR,
@@ -508,7 +507,6 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   process.env.CROCBOT_SKIP_CHANNELS = "1";
   process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
   process.env.CROCBOT_SKIP_CRON = "1";
-  process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 
   const token = `test-${randomUUID()}`;
   process.env.CROCBOT_GATEWAY_TOKEN = token;
@@ -566,7 +564,6 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   const server = await startGatewayServer(port, {
     bind: "loopback",
     auth: { mode: "token", token },
-    controlUiEnabled: false,
   });
 
   const client = await connectClient({
@@ -1003,7 +1000,6 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     process.env.CROCBOT_SKIP_CHANNELS = previous.skipChannels;
     process.env.CROCBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
     process.env.CROCBOT_SKIP_CRON = previous.skipCron;
-    process.env.CROCBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
     process.env.CROCBOT_AGENT_DIR = previous.agentDir;
     process.env.PI_CODING_AGENT_DIR = previous.piAgentDir;
     process.env.CROCBOT_STATE_DIR = previous.stateDir;
@@ -1111,13 +1107,11 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
       skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
       skipCron: process.env.CROCBOT_SKIP_CRON,
-      skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
     };
 
     process.env.CROCBOT_SKIP_CHANNELS = "1";
     process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
     process.env.CROCBOT_SKIP_CRON = "1";
-    process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 
     const token = `test-${randomUUID()}`;
     process.env.CROCBOT_GATEWAY_TOKEN = token;
@@ -1242,7 +1236,6 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       process.env.CROCBOT_SKIP_CHANNELS = previous.skipChannels;
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
       process.env.CROCBOT_SKIP_CRON = previous.skipCron;
-      process.env.CROCBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
     }
   }, 180_000);
 });

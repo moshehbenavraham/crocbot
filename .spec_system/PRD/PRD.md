@@ -86,6 +86,7 @@ This system delivers the product via phases. Each phase is implemented via multi
 | 04 | Upstream Bug Fixes Port | 3 | Complete |
 | 05 | Upstream Build Tooling Port | 5 | Complete |
 | 06 | Upstream Security Hardening Port | 4 | Complete |
+| 07 | Test Suite Stabilization and CI Restoration | 5 | Not Started |
 
 ## Phase 03: Upstream Features Port
 
@@ -264,6 +265,46 @@ If cron delivery issues arise, they must be fixed within crocbot's simplified mo
 | 04 | Security Validation | Complete |
 
 **Phase Completed**: 2026-02-06
+
+## Phase 07: Test Suite Stabilization and CI Restoration
+
+### Objectives
+
+1. Achieve 100% E2E test pass rate (resolve all 18 pre-existing failures)
+2. Restore all GitHub Actions CI pipelines to operational status
+3. Resolve or mitigate transitive dependency vulnerabilities
+4. Establish a documented green baseline that gates all future development
+
+### Scope
+
+- **E2E Test Audit and Triage** - Classify all 18 failures by root cause, map fixture dependencies, create prioritized fix plan
+- **Config Redaction and Stub Fixes** - Update tests expecting plaintext tokens to handle `[REDACTED]`, update node stub response expectations from `FEATURE_DISABLED_ERROR` to `{ ok: true, ignored: true }`
+- **Auth Drift and Remaining Failures** - Fix stale auth/connection expectations, resolve 2 skipped tests, achieve 0 E2E failures
+- **CI Pipeline Restoration** - Resolve GitHub billing blocker, enable CodeQL code scanning, triage npm audit vulnerabilities, verify all 5 pipeline bundles
+- **Green Baseline Validation** - Full local + CI validation, update known-issues.md, document quality metrics baseline
+
+### Root Causes (from known-issues.md)
+
+1. **Config redaction** - Tests written before redaction feature expect plaintext token values but now receive `[REDACTED]`
+2. **Node stub response change** - `node.invoke.result` changed from `FEATURE_DISABLED_ERROR` rejection to `{ ok: true, ignored: true }` acceptance
+3. **Connection/auth drift** - Stale auth or connection expectations that no longer match current gateway behavior
+
+### Key Files
+
+- `src/gateway/server.*.e2e.test.ts` - Gateway E2E tests
+- `src/auto-reply/reply.*.e2e.test.ts` - Auto-reply E2E tests
+- `.github/workflows/*.yml` - CI pipeline configurations
+- `package.json` - pnpm overrides for vulnerability mitigation
+
+### Sessions
+
+| Session | Name | Status |
+|---------|------|--------|
+| 01 | E2E Test Audit and Triage | Not Started |
+| 02 | E2E Config Redaction and Stub Response Fixes | Not Started |
+| 03 | E2E Auth Drift and Remaining Failures | Not Started |
+| 04 | CI Pipeline Restoration | Not Started |
+| 05 | Test Suite Validation and Green Baseline | Not Started |
 
 ## Technical Stack
 

@@ -703,7 +703,7 @@ Docs: [Nodes](/nodes).
 
 Yes. The **Mac mini can run the Gateway**, and your MacBook Pro can connect as a
 **node** (companion device). Nodes don’t run the Gateway - they provide extra
-capabilities like screen/camera/canvas and `system.run` on that device.
+capabilities like screen/camera and `system.run` on that device.
 
 Common pattern:
 - Gateway on the Mac mini (always‑on).
@@ -1437,7 +1437,7 @@ setup is an always‑on host plus your laptop as a node.
 
 - **No inbound SSH required.** Nodes connect out to the Gateway WebSocket and use gateway auth.
 - **Safer execution controls.** `system.run` is gated by node allowlists/approvals on that laptop.
-- **More device tools.** Nodes expose `canvas`, `camera`, and `screen` in addition to `system.run`.
+- **More device tools.** Nodes expose `camera` and `screen` in addition to `system.run`.
 - **Local browser automation.** Keep the Gateway on a VPS, but run Chrome locally and relay control
   with the Chrome extension + a node host on the laptop.
 
@@ -1461,7 +1461,7 @@ Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes), [Multiple gateways](/gateway/mul
 No. Only **one gateway** should run per host unless you intentionally run isolated profiles (see [Multiple gateways](/gateway/multiple-gateways)). Nodes are peripherals that connect
 to the gateway. For headless node hosts and CLI control, see [Node host CLI](/cli/node).
 
-A full restart is required for `gateway`, `discovery`, and `canvasHost` changes.
+A full restart is required for `gateway` and `discovery` changes.
 
 ### Is there an API RPC way to apply config
 

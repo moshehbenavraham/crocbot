@@ -8,7 +8,6 @@ Complete inventory of all media files in the crocbot project (excluding `node_mo
 
 | Path | Description |
 |------|-------------|
-| `README-header.png` | Repository header image |
 | `assets/dmg-background.png` | macOS DMG installer background |
 | `assets/dmg-background-small.png` | macOS DMG installer background (small) |
 | `assets/chrome-extension/icons/icon16.png` | Chrome extension icon 16x16 |

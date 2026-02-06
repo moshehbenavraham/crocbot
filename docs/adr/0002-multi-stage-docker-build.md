@@ -9,7 +9,7 @@ The initial Docker image was 2.61GB, primarily due to:
 - Full node:22-bookworm base image
 - Bun included in final image
 - Dev dependencies in production build
-- Optional heavy dependencies (node-llama-cpp, canvas)
+- Optional heavy dependencies (node-llama-cpp)
 
 ## Decision
 
@@ -21,7 +21,6 @@ Implement a 3-stage Docker build:
 
 Key optimizations:
 - Remove node-llama-cpp optional dependency (700MB+)
-- Remove @napi-rs/canvas optional dependency
 - Use node:22-slim instead of node:22-bookworm
 
 ## Consequences

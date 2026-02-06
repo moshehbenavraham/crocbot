@@ -128,8 +128,8 @@ curl http://localhost:18789/health
 # Check channel status
 crocbot channels status --probe
 
-# View gateway logs
-tail -f /tmp/crocbot-gateway.log
+# View gateway logs (systemd)
+journalctl --user -u crocbot-gateway --since "1 hour ago"
 ```
 
 ### Test Failures
@@ -146,18 +146,27 @@ pnpm vitest run --reporter=verbose
 
 ```
 src/
-  agents/           # Pi agent runtime
+  agents/           # Pi agent runtime, tools, session repair
+  alerting/         # Error reporting and alerting
   auto-reply/       # Message dispatch
   cli/              # CLI commands
   config/           # Configuration
+  cron/             # Scheduled jobs
   gateway/          # Gateway server
-  telegram/         # Telegram channel
-  infra/            # Infrastructure utilities
-  media/            # Media processing
   hooks/            # Hook system
+  infra/            # Infrastructure (exec, net/SSRF, utilities)
+  logging/          # Structured logging (tslog)
+  media/            # Media processing
+  memory/           # Memory management
+  metrics/          # Metrics and monitoring
   plugins/          # Plugin runtime
+  plugin-sdk/       # Plugin SDK
+  providers/        # LLM provider integrations
+  telegram/         # Telegram channel (grammY)
 
 docs/               # Documentation (Mintlify)
 scripts/            # Build and dev scripts
+test/               # Shared and e2e tests
+ui/                 # Control UI
 dist/               # Built output
 ```

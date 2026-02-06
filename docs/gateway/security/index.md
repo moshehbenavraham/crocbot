@@ -592,7 +592,7 @@ Common use cases:
         },
         tools: {
           allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "telegram"],
-          deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "canvas", "nodes", "cron", "gateway", "image"]
+          deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "nodes", "cron", "gateway", "image"]
         }
       }
     ]

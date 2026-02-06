@@ -2,8 +2,8 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 6,
-  "current_session": null,
+  "current_phase": 7,
+  "current_session": "phase07-session01-e2e-test-audit-and-triage",
   "phases": {
     "0": {
       "name": "Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment",
@@ -46,6 +46,12 @@
       "description": "Port SSRF guards, Telegram download timeouts, and path traversal validation from upstream OpenClaw",
       "status": "complete",
       "session_count": 4
+    },
+    "7": {
+      "name": "Test Suite Stabilization and CI Restoration",
+      "description": "Fix 18 pre-existing E2E test failures, restore GitHub Actions CI pipelines, address dependency vulnerabilities, and establish a green baseline",
+      "status": "in_progress",
+      "session_count": 5
     }
   },
   "completed_sessions": [
@@ -908,6 +914,21 @@
       "date": "2026-02-06",
       "session": "phase06-session04-security-validation",
       "status": "completed"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase07-session01-e2e-test-audit-and-triage",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase07-session01-e2e-test-audit-and-triage",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-06",
+      "session": "phase07-session01-e2e-test-audit-and-triage",
+      "status": "tasks_created"
     }
   ]
 }

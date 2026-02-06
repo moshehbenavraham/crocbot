@@ -1,7 +1,6 @@
 import { withProgress } from "../cli/progress.js";
 import { loadConfig } from "../config/config.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
-import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
@@ -91,9 +90,7 @@ export async function scanStatus(
               runExec(cmd, args, { timeoutMs: 1200, maxBuffer: 200_000 }),
             ).catch(() => null);
       const tailscaleHttpsUrl =
-        tailscaleMode !== "off" && tailscaleDns
-          ? `https://${tailscaleDns}${normalizeControlUiBasePath(cfg.gateway?.controlUi?.basePath)}`
-          : null;
+        tailscaleMode !== "off" && tailscaleDns ? `https://${tailscaleDns}` : null;
       progress.tick();
 
       progress.setLabel("Checking for updates…");

@@ -6,7 +6,6 @@ export async function startGatewayDiscovery(params: {
   machineDisplayName: string;
   port: number;
   gatewayTls?: { enabled: boolean; fingerprintSha256?: string };
-  canvasPort?: number;
   wideAreaDiscoveryEnabled: boolean;
   tailscaleMode: "off" | "serve" | "funnel";
   logDiscovery: { info: (msg: string) => void; warn: (msg: string) => void };

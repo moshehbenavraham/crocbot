@@ -9,7 +9,7 @@ import {
   applyWizardMetadata,
   DEFAULT_WORKSPACE,
   ensureWorkspaceAndSessions,
-  resolveControlUiLinks,
+  resolveGatewayWsUrl,
   waitForGatewayReachable,
 } from "../onboard-helpers.js";
 import type { OnboardOptions } from "../onboard-types.js";
@@ -95,14 +95,13 @@ export async function runNonInteractiveOnboardingLocal(params: {
 
   const daemonRuntimeRaw = opts.daemonRuntime ?? DEFAULT_GATEWAY_DAEMON_RUNTIME;
   if (!opts.skipHealth) {
-    const links = resolveControlUiLinks({
+    const wsUrl = resolveGatewayWsUrl({
       bind: gatewayResult.bind as "auto" | "lan" | "loopback" | "custom" | "tailnet",
       port: gatewayResult.port,
       customBindHost: nextConfig.gateway?.customBindHost,
-      basePath: undefined,
     });
     await waitForGatewayReachable({
-      url: links.wsUrl,
+      url: wsUrl,
       token: gatewayResult.gatewayToken,
       deadlineMs: 15_000,
     });

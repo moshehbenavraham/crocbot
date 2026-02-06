@@ -130,6 +130,7 @@ Additional workflows:
 - `.github/workflows/workflow-sanity.yml` - Validates workflow files
 - `.github/workflows/labeler.yml` - Auto-labels PRs
 - `.github/workflows/auto-response.yml` - Automated issue/PR responses
+- `.github/workflows/backup.yml` - Scheduled config backup (daily 02:00 UTC)
 
 Runners: `ubuntu-latest` (Linux), `windows-latest` (Windows), `macos-latest` (macOS PR-only), `ubuntu-24.04-arm` (Docker arm64 builds)
 
@@ -144,7 +145,8 @@ Runners: `ubuntu-latest` (Linux), `windows-latest` (Windows), `macos-latest` (ma
 | Rate Limiting | In-memory per-IP | `src/gateway/rate-limit.ts`, 60 req/min default, configurable via `gateway.rateLimit` |
 | Deploy (CD) | GitHub Actions | Docker images on push to main (`.github/workflows/docker-release.yml`) |
 | Deploy Trigger | Manual / Coolify | Auto-deploy webhook not yet configured; requires Coolify webhook setup |
-| Backup | Docker volume / config export | `scripts/backup.sh`, config export via `/setup/export`, docs: `docs/runbooks/backup-restore.md` |
+| Backup | Docker volume / config export | `scripts/backup.sh` (retention: 7d default), config export via `/setup/export`, docs: `docs/runbooks/backup-restore.md` |
+| Backup Schedule | GitHub Actions | `.github/workflows/backup.yml`, daily 02:00 UTC, 30-day artifact retention |
 | Config Export | HTTP `/setup/export` | `src/gateway/setup-http.ts`, Bearer token auth, returns redacted config snapshot |
 
 ## When In Doubt

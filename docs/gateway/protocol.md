@@ -105,8 +105,8 @@ When a device token is issued, `hello-ok` also includes:
     },
     "role": "node",
     "scopes": [],
-    "caps": ["camera", "canvas", "screen", "location", "voice"],
-    "commands": ["camera.snap", "canvas.navigate", "screen.record", "location.get"],
+    "caps": ["camera", "screen", "location", "voice"],
+    "commands": ["camera.snap", "screen.record", "location.get"],
     "permissions": { "camera.capture": true, "screen.record": false },
     "auth": { "token": "…" },
     "locale": "en-US",
@@ -134,7 +134,7 @@ Side-effecting methods require **idempotency keys** (see schema).
 
 ### Roles
 - `operator` = control plane client (CLI/UI/automation).
-- `node` = capability host (camera/screen/canvas/system.run).
+- `node` = capability host (camera/screen/system.run).
 
 ### Scopes (operator)
 Common scopes:

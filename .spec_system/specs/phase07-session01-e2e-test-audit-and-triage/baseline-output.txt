@@ -1,0 +1,347 @@
+
+> crocbot@2026.1.74 test:e2e /home/aiwithapex/projects/crocbot
+> vitest run --config vitest.e2e.config.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/aiwithapex/projects/crocbot[39m
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mdefault auth (token)
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mpassword auth
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mpassword auth
+[22m[39m[heartbeat] started
+[gateway] agent model: anthropic/claude-opus-4-5
+[gateway] listening on ws://127.0.0.1:32008 (PID 1742659)
+[gateway] listening on ws://[::1]:32008
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mpassword auth
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mpassword auth
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mtoken auth
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mtoken auth
+[22m[39m[heartbeat] started
+[gateway] agent model: anthropic/claude-opus-4-5
+[gateway] listening on ws://127.0.0.1:32016 (PID 1742659)
+[gateway] listening on ws://[::1]:32016
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mtoken auth
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts[2m > [22m[2mgateway server auth/connect[2m > [22m[2mtoken auth
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/server.auth.e2e.test.ts
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+ [31m❯[39m src/gateway/server.auth.e2e.test.ts [2m([22m[2m18 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 4340[2mms[22m[39m
+       [32m✓[39m closes silent handshakes after timeout[32m 61[2mms[22m[39m
+       [32m✓[39m connect (req) handshake returns hello-ok payload[32m 8[2mms[22m[39m
+       [32m✓[39m sends connect challenge on open[32m 2[2mms[22m[39m
+       [32m✓[39m rejects protocol mismatch[32m 4[2mms[22m[39m
+       [32m✓[39m rejects non-connect first request[32m 3[2mms[22m[39m
+       [32m✓[39m requires nonce when host is non-local[32m 3[2mms[22m[39m
+       [32m✓[39m invalid connect params surface in response and close reason[32m 2[2mms[22m[39m
+       [32m✓[39m accepts password auth when configured[32m 4[2mms[22m[39m
+[31m       [31m×[31m rejects invalid password[39m[32m 7[2mms[22m[39m
+[31m       [31m×[31m rejects invalid token[39m[32m 4[2mms[22m[39m
+       [32m✓[39m returns control ui hint when token is missing[32m 5[2mms[22m[39m
+       [32m✓[39m rejects control ui without device identity by default[32m 3[2mms[22m[39m
+     [32m✓[39m allows control ui without device identity when insecure auth is enabled[32m 10[2mms[22m[39m
+     [32m✓[39m allows control ui with device identity when insecure auth is enabled[32m 10[2mms[22m[39m
+     [32m✓[39m allows control ui with stale device identity when device auth is disabled[32m 10[2mms[22m[39m
+[31m     [31m×[31m accepts device token auth for paired device[39m[32m 9[2mms[22m[39m
+[31m     [31m×[31m requires pairing for scope upgrades[39m[32m 12[2mms[22m[39m
+[31m     [31m×[31m rejects revoked device token[39m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.agent.gateway-server-agent-a.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [31m❯[39m src/gateway/server.agent.gateway-server-agent-a.e2e.test.ts [2m([22m[2m16 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 841[2mms[22m[39m
+     [32m✓[39m agent marks implicit delivery when lastTo is stale[32m 9[2mms[22m[39m
+     [32m✓[39m agent forwards sessionKey to agentCommand[32m 10[2mms[22m[39m
+     [32m✓[39m agent derives sessionKey from agentId[32m 13[2mms[22m[39m
+     [32m✓[39m agent rejects unknown reply channel[32m 5[2mms[22m[39m
+     [32m✓[39m agent rejects mismatched agentId and sessionKey[32m 2[2mms[22m[39m
+     [32m✓[39m agent forwards accountId to agentCommand[32m 4[2mms[22m[39m
+     [32m✓[39m agent avoids lastAccountId when explicit to is provided[32m 4[2mms[22m[39m
+     [32m✓[39m agent keeps explicit accountId when explicit to is provided[32m 4[2mms[22m[39m
+     [32m✓[39m agent falls back to lastAccountId for implicit delivery[32m 4[2mms[22m[39m
+     [32m✓[39m agent forwards image attachments as images[][32m 5[2mms[22m[39m
+[31m     [31m×[31m agent falls back to whatsapp when delivery requested and no last channel exists[39m[32m 6[2mms[22m[39m
+     [32m✓[39m agent routes main last-channel whatsapp[32m 3[2mms[22m[39m
+     [32m✓[39m agent routes main last-channel telegram[32m 3[2mms[22m[39m
+     [32m✓[39m agent routes main last-channel discord[32m 2[2mms[22m[39m
+     [32m✓[39m agent routes main last-channel slack[32m 3[2mms[22m[39m
+     [32m✓[39m agent routes main last-channel signal[32m 3[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.config-patch.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [31m❯[39m src/gateway/server.config-patch.e2e.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1156[2mms[22m[39m
+[31m     [31m×[31m merges patches without clobbering unrelated config[39m[32m 18[2mms[22m[39m
+     [32m✓[39m writes config, stores sentinel, and schedules restart[32m 106[2mms[22m[39m
+     [32m✓[39m requires base hash when config exists[32m 6[2mms[22m[39m
+     [32m✓[39m requires base hash for config.set when config exists[32m 4[2mms[22m[39m
+     [32m✓[39m filters sessions by agentId[32m 8[2mms[22m[39m
+     [32m✓[39m resolves and patches main alias to default agent main key[32m 8[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.roles-allowlist-update.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [31m❯[39m src/gateway/server.roles-allowlist-update.e2e.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1108[2mms[22m[39m
+     [32m✓[39m enforces operator and node permissions[32m 41[2mms[22m[39m
+     [32m✓[39m writes sentinel and schedules restart[32m 17[2mms[22m[39m
+[31m     [31m×[31m enforces command allowlists across node clients[39m[32m 7[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.health.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [31m❯[39m src/gateway/server.health.e2e.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1098[2mms[22m[39m
+     [32m✓[39m HTTP /health endpoint returns healthy status[32m 11[2mms[22m[39m
+     [32m✓[39m connect + health + presence + status succeed[32m 24[2mms[22m[39m
+     [32m✓[39m broadcasts heartbeat events and serves last-heartbeat[32m 6[2mms[22m[39m
+     [32m✓[39m presence events carry seq + stateVersion[32m 4[2mms[22m[39m
+     [32m✓[39m agent events stream with seq[32m 4[2mms[22m[39m
+     [32m✓[39m shutdown event is broadcast on close[32m 11[2mms[22m[39m
+     [32m✓[39m presence broadcast reaches multiple clients[32m 8[2mms[22m[39m
+[31m     [31m×[31m presence includes client fingerprint[39m[32m 8[2mms[22m[39m
+     [32m✓[39m cli connections are not tracked as instances[32m 5[2mms[22m[39m
+ [31m❯[39m src/gateway/server.chat.gateway-server-chat-b.e2e.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 12359[2mms[22m[39m
+[31m     [31m×[31m handles history, abort, idempotency, and ordering flows[39m[33m 8650[2mms[22m[39m
+ [31m❯[39m test/gateway.multi.e2e.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 14252[2mms[22m[39m
+[31m     [31m×[31m spins up two gateways and exercises WS + HTTP + node pairing[39m[33m 14198[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.models-voicewake-misc.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/server.models-voicewake-misc.e2e.test.ts
+[22m[39m[restart-awareness] no restart state found - clean startup
+
+[90mstdout[2m | src/gateway/server.models-voicewake-misc.e2e.test.ts
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+ [31m❯[39m src/gateway/server.models-voicewake-misc.e2e.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1050[2mms[22m[39m
+     [32m✓[39m voicewake.get returns defaults and voicewake.set broadcasts[32m 9[2mms[22m[39m
+     [32m✓[39m pushes voicewake.changed to nodes on connect and on updates[32m 7[2mms[22m[39m
+     [32m✓[39m models.list returns model catalog[32m 4[2mms[22m[39m
+     [32m✓[39m models.list rejects unknown params[32m 3[2mms[22m[39m
+     [32m✓[39m hello-ok advertises the gateway port for canvas host[32m 2[2mms[22m[39m
+[31m     [31m×[31m send dedupes by idempotencyKey[39m[32m 4[2mms[22m[39m
+     [32m✓[39m auto-enables configured channel plugins on startup[32m 11[2mms[22m[39m
+     [32m✓[39m refuses to start when port already bound[32m 4[2mms[22m[39m
+     [32m✓[39m releases port after close[32m 4[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.chat.gateway-server-chat.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [31m❯[39m src/gateway/server.chat.gateway-server-chat.e2e.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1081[2mms[22m[39m
+     [32m✓[39m handles chat send and history flows[32m 35[2mms[22m[39m
+[31m     [31m×[31m routes chat.send slash commands without agent runs[39m[32m 3[2mms[22m[39m
+     [32m✓[39m agent events include sessionKey and agent.wait covers lifecycle flows[32m 55[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.ios-client-id.e2e.test.ts
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+ [31m❯[39m src/gateway/server.ios-client-id.e2e.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m[33m 951[2mms[22m[39m
+   [2m[90m↓[39m[22m accepts crocbot-ios as a valid gateway client id
+   [2m[90m↓[39m[22m accepts crocbot-android as a valid gateway client id
+ [31m❯[39m src/auto-reply/reply.directive.directive-behavior.lists-allowlisted-models-model-list.e2e.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 175[2mms[22m[39m
+     [32m✓[39m aliases /model list to /models[32m 51[2mms[22m[39m
+     [32m✓[39m shows current model when catalog is unavailable[32m 25[2mms[22m[39m
+     [32m✓[39m includes catalog providers when no allowlist is set[32m 23[2mms[22m[39m
+[31m     [31m×[31m lists config-only providers when catalog is present[39m[32m 23[2mms[22m[39m
+     [32m✓[39m does not repeat missing auth labels on /model list[32m 19[2mms[22m[39m
+     [32m✓[39m sets model override on /model directive[32m 16[2mms[22m[39m
+     [32m✓[39m supports model aliases on /model directive[32m 17[2mms[22m[39m
+ [31m❯[39m src/auto-reply/reply.triggers.trigger-handling.keeps-inline-status-unauthorized-senders.e2e.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 157[2mms[22m[39m
+     [32m✓[39m keeps inline /status for unauthorized senders[32m 79[2mms[22m[39m
+     [32m✓[39m keeps inline /help for unauthorized senders[32m 37[2mms[22m[39m
+[31m     [31m×[31m returns help without invoking the agent[39m[32m 22[2mms[22m[39m
+     [32m✓[39m allows owner to set send policy[32m 18[2mms[22m[39m
+ [31m❯[39m src/auto-reply/reply.triggers.trigger-handling.runs-greeting-prompt-bare-reset.e2e.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 149[2mms[22m[39m
+     [32m✓[39m runs a greeting prompt for a bare /reset[32m 86[2mms[22m[39m
+     [32m✓[39m does not reset for unauthorized /reset[32m 27[2mms[22m[39m
+[31m     [31m×[31m blocks /reset for non-owner senders[39m[32m 35[2mms[22m[39m
+ [31m❯[39m src/gateway/server.agent.gateway-server-agent-b.e2e.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/auto-reply/reply.triggers.trigger-handling.allows-activation-from-allowfrom-groups.e2e.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 133[2mms[22m[39m
+     [32m✓[39m allows /activation from allowFrom in groups[32m 53[2mms[22m[39m
+[31m     [31m×[31m injects group activation context into the system prompt[39m[32m 41[2mms[22m[39m
+     [32m✓[39m runs a greeting prompt for a bare /new[32m 39[2mms[22m[39m
+ [31m❯[39m src/auto-reply/reply.triggers.group-intro-prompts.e2e.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 127[2mms[22m[39m
+     [32m✓[39m labels Discord groups using the surface metadata[32m 66[2mms[22m[39m
+[31m     [31m×[31m keeps WhatsApp labeling for WhatsApp group chats[39m[32m 34[2mms[22m[39m
+     [32m✓[39m labels Telegram groups using their own surface[32m 26[2mms[22m[39m
+[90mstdout[2m | src/gateway/openresponses-http.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/openresponses-http.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1031[2mms[22m[39m
+ [32m✓[39m src/gateway/openresponses-parity.e2e.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1164[2mms[22m[39m
+       [33m[2m✓[22m[39m should convert function_call_output to tool entry [33m 1129[2mms[22m[39m
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[heartbeat] started
+[gateway] agent model: primary/gpt-5.2
+[gateway] listening on ws://127.0.0.1:47000 (PID 1744387)
+[gateway] listening on ws://[::1]:47000
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[browser/service] Browser control service ready (profiles=2)
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[restart-awareness] no restart state found - clean startup
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+[90mstdout[2m | src/gateway/server.config-apply.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/server.config-apply.e2e.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1098[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.sessions.gateway-server-sessions-a.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/server.sessions.gateway-server-sessions-a.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1056[2mms[22m[39m
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39mfallback-ok
+
+[90mstdout[2m | test/provider-timeout.e2e.test.ts[2m > [22m[2mprovider timeouts (e2e)[2m > [22m[2mfalls back when the primary provider aborts with a timeout-like AbortError
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m test/provider-timeout.e2e.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 2259[2mms[22m[39m
+     [33m[2m✓[22m[39m falls back when the primary provider aborts with a timeout-like AbortError [33m 2258[2mms[22m[39m
+ [32m✓[39m src/gateway/server.cron.e2e.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1010[2mms[22m[39m
+     [33m[2m✓[22m[39m handles cron CRUD, normalization, and patch semantics [33m 379[2mms[22m[39m
+[90mstdout[2m | src/gateway/openai-http.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/openai-http.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 989[2mms[22m[39m
+ [32m✓[39m src/gateway/server.hooks.e2e.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 988[2mms[22m[39m
+     [33m[2m✓[22m[39m handles auth, wake, and agent flows [33m 383[2mms[22m[39m
+ [32m✓[39m test/media-understanding.auto.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 904[2mms[22m[39m
+     [33m[2m✓[22m[39m uses sherpa-onnx-offline when available [33m 739[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.reload.e2e.test.ts
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+ [32m✓[39m src/gateway/server.reload.e2e.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1006[2mms[22m[39m
+     [33m[2m✓[22m[39m applies hot reload actions and emits restart signal [33m 321[2mms[22m[39m
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[heartbeat] started
+[gateway] agent model: anthropic/claude-opus-4-5
+[gateway] listening on ws://127.0.0.1:56000 (PID 1744886)
+[gateway] listening on ws://[::1]:56000
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[restart-awareness] no restart state found - clean startup
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m90975809-e845-4956-a483-51bde184e94b 4853ec87-f2ca-4e43-abbb-e3ff62ebc054
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns a mock OpenAI tool call end-to-end via gateway agent loop
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[heartbeat] started
+[gateway] agent model: anthropic/claude-opus-4-5
+[gateway] listening on ws://127.0.0.1:56008 (PID 1744886)
+[gateway] listening on ws://[::1]:56008
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[restart-awareness] no restart state found - clean startup
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[alerting/reporter] No alert notifiers configured
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[heartbeat] started
+[gateway] agent model: anthropic/claude-opus-4-5
+[gateway] listening on ws://127.0.0.1:56016 (PID 1744886)
+[gateway] listening on ws://[::1]:56016
+[gateway] log file: /tmp/crocbot/crocbot-2026-02-06.log
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[gateway/channels] skipping channel start (CROCBOT_SKIP_CHANNELS=1 or CROCBOT_SKIP_PROVIDERS=1)
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[restart-awareness] no restart state found - clean startup
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[startup-recovery] startup recovery: clean startup, no recovery report needed
+
+[90mstdout[2m | src/gateway/gateway.e2e.test.ts[2m > [22m[2mgateway e2e[2m > [22m[2mruns wizard over ws and writes auth token config
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/gateway.e2e.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 551[2mms[22m[39m
+     [33m[2m✓[22m[39m runs a mock OpenAI tool call end-to-end via gateway agent loop [33m 515[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.sessions-send.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/server.sessions-send.e2e.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 662[2mms[22m[39m
+[90mstdout[2m | src/gateway/server.channels.e2e.test.ts
+[22m[39m[gmail-watcher] gmail watcher stopped
+
+ [32m✓[39m src/gateway/server.channels.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 687[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.filters-usage-summary-current-model-provider.e2e.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 237[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.accepts-thinking-xhigh-codex-models.e2e.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 218[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.applies-inline-reasoning-mixed-messages-acks-immediately.e2e.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 212[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.defaults-think-low-reasoning-capable-models-no.e2e.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 199[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.shows-current-verbose-level-verbose-has-no.e2e.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 194[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.returns-status-alongside-directive-only-acks.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 171[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.ignores-inline-elevated-directive-unapproved-sender.e2e.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 154[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.updates-tool-verbose-during-flight-run-toggle.e2e.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 177[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.includes-error-cause-embedded-agent-throws.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 175[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.shows-quick-model-picker-grouped-by-model.e2e.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 204[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.handles-inline-commands-strips-it-before-agent.e2e.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 164[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.prefers-alias-matches-fuzzy-selection-is-ambiguous.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 140[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.supports-fuzzy-model-matches-model-directive.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 150[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.targets-active-session-native-stop.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 144[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.reports-active-auth-profile-key-snippet-status.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 159[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.shows-current-elevated-level-as-off-after.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 160[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.ignores-inline-model-uses-default-model.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 140[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.directive.directive-behavior.requires-per-agent-allowlist-addition-global.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 143[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.shows-endpoint-default-model-status-not-configured.e2e.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 142[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.runs-compact-as-gated-command.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+[90mstdout[2m | src/hooks/hooks-install.e2e.test.ts[2m > [22m[2mhooks install (e2e)[2m > [22m[2minstalls a hook pack and triggers the handler
+[22m[39mRegistered hook: hello-hook -> command:new
+
+ [32m✓[39m src/hooks/hooks-install.e2e.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 99[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.allows-elevated-off-groups-without-mention.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 123[2mms[22m[39m
+ [32m✓[39m src/auto-reply/reply.triggers.trigger-handling.allows-approved-sender-toggle-elevated-mode.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m16 failed[39m[22m[2m | [22m[1m[32m36 passed[39m[22m[90m (52)[39m
+[2m      Tests [22m [1m[31m18 failed[39m[22m[2m | [22m[1m[32m215 passed[39m[22m[2m | [22m[33m2 skipped[39m[90m (235)[39m
+[2m   Start at [22m 03:02:14
+[2m   Duration [22m 37.22s[2m (transform 8.81s, setup 584ms, import 49.54s, tests 56.16s, environment 4ms)[22m
+
+ ELIFECYCLE  Command failed with exit code 1.

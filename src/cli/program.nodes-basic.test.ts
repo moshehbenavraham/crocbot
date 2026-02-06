@@ -155,7 +155,7 @@ describe("cli program (nodes basics)", () => {
           remoteIp: "192.168.0.88",
           deviceFamily: "iPad",
           modelIdentifier: "iPad16,6",
-          caps: ["canvas", "camera"],
+          caps: ["camera"],
           paired: true,
           connected: true,
         },
@@ -179,7 +179,7 @@ describe("cli program (nodes basics)", () => {
     expect(output).toContain("paired");
     expect(output).toContain("Caps");
     expect(output).toContain("camera");
-    expect(output).toContain("canvas");
+    expect(output).toContain("camera");
   });
 
   it("runs nodes status and shows unpaired nodes", async () => {
@@ -192,7 +192,7 @@ describe("cli program (nodes basics)", () => {
           remoteIp: "192.168.0.99",
           deviceFamily: "Android",
           modelIdentifier: "samsung SM-X926B",
-          caps: ["canvas", "camera"],
+          caps: ["camera"],
           paired: false,
           connected: true,
         },
@@ -215,7 +215,7 @@ describe("cli program (nodes basics)", () => {
     expect(output).toContain("connected");
     expect(output).toContain("Caps");
     expect(output).toContain("camera");
-    expect(output).toContain("canvas");
+    expect(output).toContain("camera");
   });
 
   it("runs nodes describe and calls node.describe", async () => {
@@ -238,8 +238,8 @@ describe("cli program (nodes basics)", () => {
           ts: Date.now(),
           nodeId: "ios-node",
           displayName: "iOS Node",
-          caps: ["canvas", "camera"],
-          commands: ["canvas.eval", "canvas.snapshot", "camera.snap"],
+          caps: ["camera"],
+          commands: ["camera.snap"],
           connected: true,
         };
       }
@@ -264,7 +264,7 @@ describe("cli program (nodes basics)", () => {
 
     const out = runtime.log.mock.calls.map((c) => String(c[0] ?? "")).join("\n");
     expect(out).toContain("Commands");
-    expect(out).toContain("canvas.eval");
+    expect(out).toContain("camera.snap");
   });
 
   it("runs nodes approve and calls node.pair.approve", async () => {
@@ -303,7 +303,7 @@ describe("cli program (nodes basics)", () => {
         return {
           ok: true,
           nodeId: "ios-node",
-          command: "canvas.eval",
+          command: "camera.snap",
           payload: { result: "ok" },
         };
       }
@@ -319,9 +319,9 @@ describe("cli program (nodes basics)", () => {
         "--node",
         "ios-node",
         "--command",
-        "canvas.eval",
+        "camera.snap",
         "--params",
-        '{"javaScript":"1+1"}',
+        '{"facing":"front"}',
       ],
       { from: "user" },
     );
@@ -334,8 +334,8 @@ describe("cli program (nodes basics)", () => {
         method: "node.invoke",
         params: {
           nodeId: "ios-node",
-          command: "canvas.eval",
-          params: { javaScript: "1+1" },
+          command: "camera.snap",
+          params: { facing: "front" },
           timeoutMs: 15000,
           idempotencyKey: "idem-test",
         },

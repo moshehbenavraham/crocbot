@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { openUrl, resolveBrowserOpenCommand, resolveControlUiLinks } from "./onboard-helpers.js";
+import { openUrl, resolveBrowserOpenCommand, resolveGatewayWsUrl } from "./onboard-helpers.js";
 
 const mocks = vi.hoisted(() => ({
   runCommandWithTimeout: vi.fn(async () => ({
@@ -62,44 +62,40 @@ describe("resolveBrowserOpenCommand", () => {
   });
 });
 
-describe("resolveControlUiLinks", () => {
+describe("resolveGatewayWsUrl", () => {
   it("uses customBindHost for custom bind", () => {
-    const links = resolveControlUiLinks({
+    const url = resolveGatewayWsUrl({
       port: 18789,
       bind: "custom",
       customBindHost: "192.168.1.100",
     });
-    expect(links.httpUrl).toBe("http://192.168.1.100:18789/");
-    expect(links.wsUrl).toBe("ws://192.168.1.100:18789");
+    expect(url).toBe("ws://192.168.1.100:18789");
   });
 
   it("falls back to loopback for invalid customBindHost", () => {
-    const links = resolveControlUiLinks({
+    const url = resolveGatewayWsUrl({
       port: 18789,
       bind: "custom",
       customBindHost: "192.168.001.100",
     });
-    expect(links.httpUrl).toBe("http://127.0.0.1:18789/");
-    expect(links.wsUrl).toBe("ws://127.0.0.1:18789");
+    expect(url).toBe("ws://127.0.0.1:18789");
   });
 
   it("uses tailnet IP for tailnet bind", () => {
     mocks.pickPrimaryTailnetIPv4.mockReturnValueOnce("100.64.0.9");
-    const links = resolveControlUiLinks({
+    const url = resolveGatewayWsUrl({
       port: 18789,
       bind: "tailnet",
     });
-    expect(links.httpUrl).toBe("http://100.64.0.9:18789/");
-    expect(links.wsUrl).toBe("ws://100.64.0.9:18789");
+    expect(url).toBe("ws://100.64.0.9:18789");
   });
 
   it("keeps loopback for auto even when tailnet is present", () => {
     mocks.pickPrimaryTailnetIPv4.mockReturnValueOnce("100.64.0.9");
-    const links = resolveControlUiLinks({
+    const url = resolveGatewayWsUrl({
       port: 18789,
       bind: "auto",
     });
-    expect(links.httpUrl).toBe("http://127.0.0.1:18789/");
-    expect(links.wsUrl).toBe("ws://127.0.0.1:18789");
+    expect(url).toBe("ws://127.0.0.1:18789");
   });
 });

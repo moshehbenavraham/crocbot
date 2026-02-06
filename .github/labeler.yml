@@ -25,7 +25,7 @@
   - changed-files:
       - any-glob-to-any-file:
           - "docs/**"
-          - "docs.acp.md"
+          - "docs/concepts/acp-bridge.md"
 
 "cli":
   - changed-files:

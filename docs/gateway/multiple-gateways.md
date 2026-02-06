@@ -13,7 +13,7 @@ Most setups should use one Gateway because a single Gateway can handle multiple 
 - `CROCBOT_STATE_DIR` — per-instance sessions, creds, caches
 - `agents.defaults.workspace` — per-instance workspace root
 - `gateway.port` (or `--port`) — unique per instance
-- Derived ports (browser/canvas) must not overlap
+- Derived ports (browser) must not overlap
 
 If these are shared, you will hit config races and port conflicts.
 
@@ -47,13 +47,13 @@ Run a second Gateway on the same host with its own:
 
 This keeps the rescue bot isolated from the main bot so it can debug or apply config changes if the primary bot is down.
 
-Port spacing: leave at least 20 ports between base ports so the derived browser/canvas/CDP ports never collide.
+Port spacing: leave at least 20 ports between base ports so the derived browser/CDP ports never collide.
 
 ### How to install (rescue bot)
 
 ```bash
 # Main bot (existing or fresh, without --profile param)
-# Runs on port 18789 + Chrome CDC/Canvas/... Ports 
+# Runs on port 18789 + Chrome CDC/... Ports
 crocbot onboard
 crocbot gateway install
 
@@ -74,7 +74,6 @@ crocbot --profile rescue gateway install
 Base port = `gateway.port` (or `CROCBOT_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
-- `canvasHost.port = base + 4`
 - Browser profile CDP ports auto-allocate from `browser.controlPort + 9 .. + 108`
 
 If you override any of these in config or env, you must keep them unique per instance.

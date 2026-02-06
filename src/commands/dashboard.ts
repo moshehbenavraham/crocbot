@@ -1,13 +1,7 @@
 import { readConfigFileSnapshot, resolveGatewayPort } from "../config/config.js";
-import { copyToClipboard } from "../infra/clipboard.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { defaultRuntime } from "../runtime.js";
-import {
-  detectBrowserOpenSupport,
-  formatControlUiSshHint,
-  openUrl,
-  resolveControlUiLinks,
-} from "./onboard-helpers.js";
+import { resolveGatewayWsUrl } from "./onboard-helpers.js";
 
 type DashboardOptions = {
   noOpen?: boolean;
@@ -15,50 +9,17 @@ type DashboardOptions = {
 
 export async function dashboardCommand(
   runtime: RuntimeEnv = defaultRuntime,
-  options: DashboardOptions = {},
+  _options: DashboardOptions = {},
 ) {
   const snapshot = await readConfigFileSnapshot();
   const cfg = snapshot.valid ? snapshot.config : {};
   const port = resolveGatewayPort(cfg);
   const bind = cfg.gateway?.bind ?? "loopback";
-  const basePath = cfg.gateway?.controlUi?.basePath;
   const customBindHost = cfg.gateway?.customBindHost;
-  const token = cfg.gateway?.auth?.token ?? process.env.CROCBOT_GATEWAY_TOKEN ?? "";
 
-  const links = resolveControlUiLinks({
-    port,
-    bind,
-    customBindHost,
-    basePath,
-  });
-  const authedUrl = token ? `${links.httpUrl}?token=${encodeURIComponent(token)}` : links.httpUrl;
-
-  runtime.log(`Dashboard URL: ${authedUrl}`);
-
-  const copied = await copyToClipboard(authedUrl).catch(() => false);
-  runtime.log(copied ? "Copied to clipboard." : "Copy to clipboard unavailable.");
-
-  let opened = false;
-  let hint: string | undefined;
-  if (!options.noOpen) {
-    const browserSupport = await detectBrowserOpenSupport();
-    if (browserSupport.ok) {
-      opened = await openUrl(authedUrl);
-    }
-    if (!opened) {
-      hint = formatControlUiSshHint({
-        port,
-        basePath,
-        token: token || undefined,
-      });
-    }
-  } else {
-    hint = "Browser launch disabled (--no-open). Use the URL above.";
-  }
-
-  if (opened) {
-    runtime.log("Opened in your browser. Keep that tab to control crocbot.");
-  } else if (hint) {
-    runtime.log(hint);
-  }
+  const wsUrl = resolveGatewayWsUrl({ port, bind, customBindHost });
+  runtime.log(`Gateway WS: ${wsUrl}`);
+  runtime.log(
+    "The browser-based Control UI has been removed. Use the TUI or Telegram to interact with crocbot.",
+  );
 }

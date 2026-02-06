@@ -27,7 +27,7 @@ export const TOOL_GROUPS: Record<string, string[]> = {
     "session_status",
   ],
   // UI helpers
-  "group:ui": ["browser", "canvas"],
+  "group:ui": ["browser"],
   // Automation + infra
   "group:automation": ["cron", "gateway"],
   // Messaging surface
@@ -37,7 +37,6 @@ export const TOOL_GROUPS: Record<string, string[]> = {
   // All crocbot native tools (excludes provider plugins).
   "group:crocbot": [
     "browser",
-    "canvas",
     "nodes",
     "cron",
     "message",

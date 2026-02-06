@@ -90,6 +90,6 @@ pnpm lint
 
 ## Next Steps
 
-- Read [Development Guide](development) for local development details
+- Read [Development Guide](reference/development) for local development details
 - Review [Architecture](ARCHITECTURE) for system overview
 - Check [Gateway docs](/gateway) for control plane configuration

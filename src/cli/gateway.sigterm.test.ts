@@ -92,7 +92,6 @@ describe("gateway SIGTERM", () => {
       CROCBOT_SKIP_GMAIL_WATCHER: "1",
       CROCBOT_SKIP_CRON: "1",
       CROCBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
-      CROCBOT_SKIP_CANVAS_HOST: "1",
     };
     const bootstrapPath = path.join(stateDir, "crocbot-entry-bootstrap.mjs");
     const runLoopPath = path.resolve("src/cli/gateway-cli/run-loop.ts");

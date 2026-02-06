@@ -97,7 +97,6 @@ biome.json
 
 # README files (not needed in runtime)
 README.md
-README-header.png
 CHANGELOG.md
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md

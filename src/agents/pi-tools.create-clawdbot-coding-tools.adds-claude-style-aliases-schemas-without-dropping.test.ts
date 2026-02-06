@@ -253,7 +253,6 @@ describe("createcrocbotCodingTools", () => {
     const tools = createcrocbotTools();
     const coreTools = new Set([
       "browser",
-      "canvas",
       "nodes",
       "cron",
       "message",

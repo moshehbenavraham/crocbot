@@ -45,7 +45,6 @@ let previousStateDir: string | undefined;
 let previousConfigPath: string | undefined;
 let previousSkipBrowserControl: string | undefined;
 let previousSkipGmailWatcher: string | undefined;
-let previousSkipCanvasHost: string | undefined;
 let tempHome: string | undefined;
 let tempConfigRoot: string | undefined;
 
@@ -84,7 +83,6 @@ async function setupGatewayTestHome() {
   previousConfigPath = process.env.CROCBOT_CONFIG_PATH;
   previousSkipBrowserControl = process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER;
   previousSkipGmailWatcher = process.env.CROCBOT_SKIP_GMAIL_WATCHER;
-  previousSkipCanvasHost = process.env.CROCBOT_SKIP_CANVAS_HOST;
   tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-gateway-home-"));
   process.env.HOME = tempHome;
   process.env.USERPROFILE = tempHome;
@@ -95,7 +93,6 @@ async function setupGatewayTestHome() {
 function applyGatewaySkipEnv() {
   process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
   process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
-  process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 }
 
 async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
@@ -116,7 +113,6 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
   testState.gatewayAuth = { mode: "token", token: "test-gateway-token-1234567890" };
   testState.gatewayControlUi = undefined;
   testState.hooksConfig = undefined;
-  testState.canvasHostPort = undefined;
   testState.legacyIssues = [];
   testState.legacyParsed = {};
   testState.migrationConfig = null;
@@ -178,11 +174,6 @@ async function cleanupGatewayTestHome(options: { restoreEnv: boolean }) {
       delete process.env.CROCBOT_SKIP_GMAIL_WATCHER;
     } else {
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = previousSkipGmailWatcher;
-    }
-    if (previousSkipCanvasHost === undefined) {
-      delete process.env.CROCBOT_SKIP_CANVAS_HOST;
-    } else {
-      process.env.CROCBOT_SKIP_CANVAS_HOST = previousSkipCanvasHost;
     }
   }
   if (options.restoreEnv && tempHome) {

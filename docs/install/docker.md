@@ -422,7 +422,7 @@ Example:
 ### Security notes
 
 - Hard wall only applies to **tools** (exec/read/write/edit/apply_patch).  
-- Host-only tools like browser/camera/canvas are blocked by default.  
+- Host-only tools like browser/camera are blocked by default.
 - Allowing `browser` in sandbox **breaks isolation** (browser runs on host).
 
 ## Troubleshooting

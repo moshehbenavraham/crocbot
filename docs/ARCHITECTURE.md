@@ -64,6 +64,32 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Tech**: Node.js streams, temp file lifecycle
 - **Location**: `src/media/`
 
+### Security Layer
+- **Purpose**: SSRF protection, path traversal validation, exec allowlisting
+- **Tech**: DNS pinning, IP range blocking, AbortSignal timeouts
+- **Location**: `src/infra/net/` (ssrf.ts, fetch-guard.ts), `src/infra/exec-approvals.ts`
+- **Key modules**: `ssrf.ts` (private IP/hostname blocking, redirect validation), `fetch-guard.ts` (guarded fetch wrapper), `exec-approvals.ts` (shell token blocking, allowlist enforcement)
+
+### Logging & Observability
+- **Purpose**: Structured logging, metrics, error alerting
+- **Tech**: tslog, OpenTelemetry-compatible metrics
+- **Location**: `src/logging/`, `src/metrics/`, `src/alerting/`
+
+### Plugin System
+- **Purpose**: Extensible plugin runtime with SDK
+- **Tech**: TypeScript plugin loader
+- **Location**: `src/plugins/`, `src/plugin-sdk/`
+
+### Cron Scheduler
+- **Purpose**: Scheduled jobs and wakeups
+- **Tech**: Node.js timers, JSONL persistence
+- **Location**: `src/cron/`
+
+### Memory
+- **Purpose**: Conversation memory and context management
+- **Tech**: File-based storage
+- **Location**: `src/memory/`
+
 ## Tech Stack Rationale
 
 | Technology | Purpose | Why Chosen |
@@ -94,18 +120,31 @@ See [Architecture Decision Records](adr/) for detailed history:
 
 ```
 src/
-  agents/        # Agent runtime and tools
-  channels/      # Channel registry
-  cli/           # CLI entry point
-  commands/      # CLI commands
-  config/        # Configuration loading
-  gateway/       # Gateway control plane
-  infra/         # Infrastructure utilities
-  media/         # Media pipeline
-  routing/       # Message routing
-  telegram/      # Telegram bot integration
-docs/            # Documentation (Mintlify)
-ui/              # Control UI
-test/            # Shared/e2e tests
-scripts/         # Development scripts
+  agents/           # Agent runtime, tools, session repair
+  alerting/         # Error reporting and alerting
+  auto-reply/       # Message dispatch and routing
+  browser/          # Browser control (CDP)
+  channels/         # Channel registry
+  cli/              # CLI entry point
+  commands/         # CLI commands
+  config/           # Configuration loading
+  cron/             # Scheduled jobs
+  daemon/           # Daemon process management
+  gateway/          # Gateway control plane
+  hooks/            # Hook system
+  infra/            # Infrastructure (exec, net/SSRF, utilities)
+  logging/          # Structured logging (tslog)
+  media/            # Media pipeline
+  media-understanding/  # Media analysis
+  memory/           # Memory management
+  metrics/          # Metrics and monitoring
+  plugins/          # Plugin runtime
+  plugin-sdk/       # Plugin SDK
+  providers/        # LLM provider integrations
+  routing/          # Message routing
+  telegram/         # Telegram bot (grammY)
+docs/               # Documentation (Mintlify)
+ui/                 # Control UI
+test/               # Shared/e2e tests
+scripts/            # Development scripts
 ```

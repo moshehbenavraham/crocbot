@@ -10,7 +10,6 @@ import type { crocbotConfig } from "../config/config.js";
 import { CONFIG_PATH } from "../config/config.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions.js";
 import { callGateway } from "../gateway/call.js";
-import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import { pickPrimaryTailnetIPv4 } from "../infra/tailnet.js";
 import { isWSL } from "../infra/wsl.js";
@@ -175,38 +174,6 @@ export async function detectBrowserOpenSupport(): Promise<BrowserOpenSupport> {
     return { ok: false, reason: resolved.reason };
   }
   return { ok: true, command: resolved.command };
-}
-
-export function formatControlUiSshHint(params: {
-  port: number;
-  basePath?: string;
-  token?: string;
-}): string {
-  const basePath = normalizeControlUiBasePath(params.basePath);
-  const uiPath = basePath ? `${basePath}/` : "/";
-  const localUrl = `http://localhost:${params.port}${uiPath}`;
-  const tokenParam = params.token ? `?token=${encodeURIComponent(params.token)}` : "";
-  const authedUrl = params.token ? `${localUrl}${tokenParam}` : undefined;
-  const sshTarget = resolveSshTargetHint();
-  return [
-    "No GUI detected. Open from your computer:",
-    `ssh -N -L ${params.port}:127.0.0.1:${params.port} ${sshTarget}`,
-    "Then open:",
-    localUrl,
-    authedUrl,
-    "Docs:",
-    "https://aiwithapex.mintlify.app/gateway/remote",
-    "https://aiwithapex.mintlify.app/web/control-ui",
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
-function resolveSshTargetHint(): string {
-  const user = process.env.USER || process.env.LOGNAME || "user";
-  const conn = process.env.SSH_CONNECTION?.trim().split(/\s+/);
-  const host = conn?.[2] ?? "<host>";
-  return `${user}@${host}`;
 }
 
 export async function openUrl(url: string): Promise<boolean> {
@@ -430,12 +397,11 @@ function summarizeError(err: unknown): string {
 
 export const DEFAULT_WORKSPACE = DEFAULT_AGENT_WORKSPACE_DIR;
 
-export function resolveControlUiLinks(params: {
+export function resolveGatewayWsUrl(params: {
   port: number;
   bind?: "auto" | "lan" | "loopback" | "custom" | "tailnet";
   customBindHost?: string;
-  basePath?: string;
-}): { httpUrl: string; wsUrl: string } {
+}): string {
   const port = params.port;
   const bind = params.bind ?? "loopback";
   const customBindHost = params.customBindHost?.trim();
@@ -449,13 +415,7 @@ export function resolveControlUiLinks(params: {
     }
     return "127.0.0.1";
   })();
-  const basePath = normalizeControlUiBasePath(params.basePath);
-  const uiPath = basePath ? `${basePath}/` : "/";
-  const wsPath = basePath ? basePath : "";
-  return {
-    httpUrl: `http://${host}:${port}${uiPath}`,
-    wsUrl: `ws://${host}:${port}${wsPath}`,
-  };
+  return `ws://${host}:${port}`;
 }
 
 function isValidIPv4(host: string): boolean {

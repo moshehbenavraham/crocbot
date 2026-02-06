@@ -29,7 +29,6 @@ echo "Starting gateway container..."
 	  -e "CROCBOT_SKIP_CHANNELS=1" \
 	  -e "CROCBOT_SKIP_GMAIL_WATCHER=1" \
 	  -e "CROCBOT_SKIP_CRON=1" \
-	  -e "CROCBOT_SKIP_CANVAS_HOST=1" \
 	  "$IMAGE_NAME" \
   bash -lc "node dist/index.js gateway --port $PORT --bind lan --allow-unconfigured > /tmp/gateway-net-e2e.log 2>&1"
 

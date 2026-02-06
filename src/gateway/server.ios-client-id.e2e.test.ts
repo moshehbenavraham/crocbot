@@ -41,7 +41,7 @@ function connectReq(
         },
         role: "node",
         scopes: [],
-        caps: ["canvas"],
+        caps: [],
         commands: ["system.notify"],
         permissions: {},
       },

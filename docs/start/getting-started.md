@@ -156,8 +156,6 @@ crocbot onboard --install-daemon
 ```
 
 If you don’t have a global install yet, run the onboarding step via `pnpm crocbot ...` from the repo.
-`pnpm build` also bundles A2UI assets; if you need to run just that step, use `pnpm canvas:a2ui:bundle`.
-
 Gateway (from this repo):
 
 ```bash

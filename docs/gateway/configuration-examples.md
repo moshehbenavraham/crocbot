@@ -247,7 +247,7 @@ Save to `~/.crocbot/crocbot.json` and you can DM the bot from that chat ID.
 
   tools: {
     allow: ["exec", "process", "read", "write", "edit", "apply_patch"],
-    deny: ["browser", "canvas"],
+    deny: ["browser"],
     exec: {
       backgroundMs: 10000,
       timeoutSec: 1800,
@@ -514,5 +514,5 @@ Save to `~/.crocbot/crocbot.json` and you can DM the bot from that chat ID.
 
 - If you set `dmPolicy: "open"`, the matching `allowFrom` list must include `"*"`.
 - Provider IDs differ (phone numbers, user IDs, channel IDs). Use the provider docs to confirm the format.
-- Optional sections to add later: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`.
+- Optional sections to add later: `web`, `browser`, `ui`, `discovery`, `talk`.
 - See [Telegram](/channels/telegram) and [Troubleshooting](/gateway/troubleshooting) for deeper setup notes.

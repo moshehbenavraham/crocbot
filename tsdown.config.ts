@@ -25,7 +25,7 @@ export default defineConfig([
     ...shared,
   },
   {
-    dts: true,
+    dts: false,
     entry: "src/plugin-sdk/index.ts",
     outDir: "dist/plugin-sdk",
     ...shared,

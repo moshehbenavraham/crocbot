@@ -7,7 +7,6 @@ import type { GatewayService } from "../daemon/service.js";
 import { resolveGatewayService } from "../daemon/service.js";
 import { resolveNodeService } from "../daemon/node-service.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
-import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { resolvecrocbotPackageRoot } from "../infra/crocbot-root.js";
@@ -25,7 +24,6 @@ import { getRemoteSkillEligibility } from "../infra/skills-remote.js";
 import { runExec } from "../process/exec.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { VERSION } from "../version.js";
-import { resolveControlUiLinks } from "./onboard-helpers.js";
 import { getAgentLocalStatuses } from "./status-all/agents.js";
 import { buildChannelsTable } from "./status-all/channels.js";
 import { formatDuration, formatGatewayAuthUsed } from "./status-all/format.js";
@@ -75,9 +73,7 @@ export async function statusAllCommand(
       }
     })();
     const tailscaleHttpsUrl =
-      tailscaleMode !== "off" && tailscale.dnsName
-        ? `https://${tailscale.dnsName}${normalizeControlUiBasePath(cfg.gateway?.controlUi?.basePath)}`
-        : null;
+      tailscaleMode !== "off" && tailscale.dnsName ? `https://${tailscale.dnsName}` : null;
     progress.tick();
 
     progress.setLabel("Checking for updates…");
@@ -265,16 +261,6 @@ export async function statusAllCommand(
           })()
         : null;
 
-    const controlUiEnabled = cfg.gateway?.controlUi?.enabled ?? true;
-    const dashboard = controlUiEnabled
-      ? resolveControlUiLinks({
-          port,
-          bind: cfg.gateway?.bind,
-          customBindHost: cfg.gateway?.customBindHost,
-          basePath: cfg.gateway?.controlUi?.basePath,
-        }).httpUrl
-      : null;
-
     const updateLine = (() => {
       if (update.installKind === "git" && update.git) {
         const parts: string[] = [];
@@ -384,9 +370,6 @@ export async function statusAllCommand(
         Item: "Config",
         Value: snap?.path?.trim() ? snap.path.trim() : "(unknown config path)",
       },
-      dashboard
-        ? { Item: "Dashboard", Value: dashboard }
-        : { Item: "Dashboard", Value: "disabled" },
       {
         Item: "Tailscale",
         Value:

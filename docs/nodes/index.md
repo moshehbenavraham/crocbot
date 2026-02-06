@@ -1,14 +1,14 @@
 ---
-summary: "Nodes: capabilities, permissions, and CLI helpers for canvas/camera/screen/system"
+summary: "Nodes: capabilities, permissions, and CLI helpers for camera/screen/system"
 read_when:
   - Connecting nodes to a gateway
-  - Using node canvas/camera for agent context
+  - Using node camera for agent context
   - Adding new node commands or CLI helpers
 ---
 
 # Nodes
 
-A **node** is a companion device (headless) that connects to the Gateway **WebSocket** (same port as operators) with `role: "node"` and exposes a command surface (e.g. `canvas.*`, `camera.*`, `system.*`) via `node.invoke`. Protocol details: [Gateway protocol](/gateway/protocol).
+A **node** is a companion device (headless) that connects to the Gateway **WebSocket** (same port as operators) with `role: "node"` and exposes a command surface (e.g. `camera.*`, `system.*`) via `node.invoke`. Protocol details: [Gateway protocol](/gateway/protocol).
 
 Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL; deprecated/removed for current nodes).
 
@@ -101,45 +101,10 @@ Related:
 Low-level (raw RPC):
 
 ```bash
-crocbot nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
+crocbot nodes invoke --node <idOrNameOrIp> --command system.run --params '{"command":["echo","hello"]}'
 ```
 
 Higher-level helpers exist for the common "give the agent a MEDIA attachment" workflows.
-
-## Screenshots (canvas snapshots)
-
-If the node is showing the Canvas (WebView), `canvas.snapshot` returns `{ format, base64 }`.
-
-CLI helper (writes to a temp file and prints `MEDIA:<path>`):
-
-```bash
-crocbot nodes canvas snapshot --node <idOrNameOrIp> --format png
-crocbot nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
-```
-
-### Canvas controls
-
-```bash
-crocbot nodes canvas present --node <idOrNameOrIp> --target https://example.com
-crocbot nodes canvas hide --node <idOrNameOrIp>
-crocbot nodes canvas navigate https://example.com --node <idOrNameOrIp>
-crocbot nodes canvas eval --node <idOrNameOrIp> --js "document.title"
-```
-
-Notes:
-- `canvas present` accepts URLs or local file paths (`--target`), plus optional `--x/--y/--width/--height` for positioning.
-- `canvas eval` accepts inline JS (`--js`) or a positional arg.
-
-### A2UI (Canvas)
-
-```bash
-crocbot nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
-crocbot nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
-crocbot nodes canvas a2ui reset --node <idOrNameOrIp>
-```
-
-Notes:
-- Only A2UI v0.8 JSONL is supported (v0.9/createSurface is rejected).
 
 ## Photos + videos (node camera)
 
@@ -159,7 +124,7 @@ crocbot nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 ```
 
 Notes:
-- The node must be **foregrounded** for `canvas.*` and `camera.*` (background calls return `NODE_BACKGROUND_UNAVAILABLE`).
+- The node must be **foregrounded** for `camera.*` (background calls return `NODE_BACKGROUND_UNAVAILABLE`).
 - Clip duration is clamped (currently `<= 60s`) to avoid oversized base64 payloads.
 
 ## Screen recordings (nodes)

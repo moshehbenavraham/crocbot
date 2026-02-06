@@ -3,7 +3,6 @@ import { initSubagentRegistry } from "../agents/subagent-registry.js";
 import { initializeReporter } from "../alerting/index.js";
 import { enableDefaultMetrics, markGatewayStarted } from "../metrics/index.js";
 import { registerSkillsChangeListener } from "../agents/skills/refresh.js";
-import type { CanvasHostServer } from "../canvas-host/server.js";
 import { type ChannelId, listChannelPlugins } from "../channels/plugins/index.js";
 import { createDefaultDeps } from "../cli/deps.js";
 import { formatCliCommand } from "../cli/command-format.js";
@@ -84,7 +83,6 @@ export { __resetModelCatalogCacheForTest } from "./server-model-catalog.js";
 ensurecrocbotCliOnPath();
 
 const log = createSubsystemLogger("gateway");
-const logCanvas = log.child("canvas");
 const logDiscovery = log.child("discovery");
 const logTailscale = log.child("tailscale");
 const logChannels = log.child("channels");
@@ -95,8 +93,6 @@ const logReload = log.child("reload");
 const logHooks = log.child("hooks");
 const logPlugins = log.child("plugins");
 const logWsControl = log.child("ws");
-const canvasRuntime = runtimeForLogger(logCanvas);
-
 export type GatewayServer = {
   close: (opts?: { reason?: string; restartExpectedMs?: number | null }) => Promise<void>;
 };
@@ -116,11 +112,6 @@ export type GatewayServerOptions = {
    */
   host?: string;
   /**
-   * If false, do not serve the browser Control UI.
-   * Default: config `gateway.controlUi.enabled` (or true when absent).
-   */
-  controlUiEnabled?: boolean;
-  /**
    * If false, do not serve `POST /v1/chat/completions`.
    * Default: config `gateway.http.endpoints.chatCompletions.enabled` (or false when absent).
    */
@@ -139,9 +130,6 @@ export type GatewayServerOptions = {
    */
   tailscale?: import("../config/config.js").GatewayTailscaleConfig;
   /**
-   * Test-only: allow canvas host startup even when NODE_ENV/VITEST would disable it.
-   */
-  allowCanvasHostInTests?: boolean;
   /**
    * Test-only: override the onboarding wizard runner.
    */
@@ -156,7 +144,7 @@ export async function startGatewayServer(
   port = 18789,
   opts: GatewayServerOptions = {},
 ): Promise<GatewayServer> {
-  // Ensure all default port derivations (browser/canvas) see the actual runtime port.
+  // Ensure all default port derivations (browser) see the actual runtime port.
   process.env.CROCBOT_GATEWAY_PORT = String(port);
   logAcceptedEnvOption({
     key: "CROCBOT_RAW_STREAM",
@@ -255,7 +243,6 @@ export async function startGatewayServer(
     port,
     bind: opts.bind,
     host: opts.host,
-    controlUiEnabled: opts.controlUiEnabled,
     openAiChatCompletionsEnabled: opts.openAiChatCompletionsEnabled,
     openResponsesEnabled: opts.openResponsesEnabled,
     auth: opts.auth,
@@ -263,29 +250,24 @@ export async function startGatewayServer(
   });
   const {
     bindHost,
-    controlUiEnabled,
     openAiChatCompletionsEnabled,
     openResponsesEnabled,
     openResponsesConfig,
-    controlUiBasePath,
     resolvedAuth,
     tailscaleConfig,
     tailscaleMode,
   } = runtimeConfig;
   let hooksConfig = runtimeConfig.hooksConfig;
-  const canvasHostEnabled = runtimeConfig.canvasHostEnabled;
 
   const wizardRunner = opts.wizardRunner ?? runOnboardingWizard;
   const { wizardSessions, findRunningWizard, purgeWizardSession } = createWizardSessionTracker();
 
   const deps = createDefaultDeps();
-  let canvasHostServer: CanvasHostServer | null = null;
   const gatewayTls = await loadGatewayTlsRuntime(cfgAtStart.gateway?.tls, log.child("tls"));
   if (cfgAtStart.gateway?.tls?.enabled && !gatewayTls.enabled) {
     throw new Error(gatewayTls.error ?? "gateway tls: failed to enable");
   }
   const {
-    canvasHost,
     httpServer,
     httpServers,
     httpBindHosts,
@@ -304,8 +286,6 @@ export async function startGatewayServer(
     cfg: cfgAtStart,
     bindHost,
     port,
-    controlUiEnabled,
-    controlUiBasePath,
     openAiChatCompletionsEnabled,
     openResponsesEnabled,
     openResponsesConfig,
@@ -314,10 +294,6 @@ export async function startGatewayServer(
     hooksConfig: () => hooksConfig,
     pluginRegistry,
     deps,
-    canvasRuntime,
-    canvasHostEnabled,
-    allowCanvasHostInTests: opts.allowCanvasHostInTests,
-    logCanvas,
     log,
     logHooks,
     logPlugins,
@@ -432,15 +408,9 @@ export async function startGatewayServer(
     forwarder: execApprovalForwarder,
   });
 
-  const canvasHostServerPort = (canvasHostServer as CanvasHostServer | null)?.port;
-
   attachGatewayWsHandlers({
     wss,
     clients,
-    port,
-    gatewayHost: bindHost ?? undefined,
-    canvasHostEnabled: Boolean(canvasHost),
-    canvasHostServerPort,
     resolvedAuth,
     gatewayMethods,
     events: GATEWAY_EVENTS,
@@ -527,7 +497,6 @@ export async function startGatewayServer(
     tailscaleMode,
     resetOnExit: tailscaleConfig.resetOnExit,
     port,
-    controlUiBasePath,
     logTailscale,
   });
 
@@ -585,8 +554,6 @@ export async function startGatewayServer(
 
   const close = createGatewayCloseHandler({
     tailscaleCleanup,
-    canvasHost,
-    canvasHostServer,
     stopChannel,
     pluginServices,
     cron,

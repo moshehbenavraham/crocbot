@@ -9,20 +9,15 @@ import {
 import { healthCommand } from "../commands/health.js";
 import { formatHealthCheckFailure } from "../commands/health-format.js";
 import {
-  detectBrowserOpenSupport,
-  formatControlUiSshHint,
-  openUrl,
-  openUrlInBackground,
   probeGatewayReachable,
   waitForGatewayReachable,
-  resolveControlUiLinks,
+  resolveGatewayWsUrl,
 } from "../commands/onboard-helpers.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import type { OnboardOptions } from "../commands/onboard-types.js";
 import type { crocbotConfig } from "../config/config.js";
 import { resolveGatewayService } from "../daemon/service.js";
 import { isSystemdUserServiceAvailable } from "../daemon/systemd.js";
-import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { runTui } from "../tui/tui.js";
 import { resolveUserPath } from "../utils.js";
@@ -45,7 +40,7 @@ type FinalizeOnboardingOptions = {
 };
 
 export async function finalizeOnboardingWizard(options: FinalizeOnboardingOptions) {
-  const { flow, opts, baseConfig, nextConfig, settings, prompter, runtime } = options;
+  const { flow, opts, nextConfig, settings, prompter, runtime } = options;
 
   const withWizardProgress = async <T>(
     label: string,
@@ -194,15 +189,14 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   }
 
   if (!opts.skipHealth) {
-    const probeLinks = resolveControlUiLinks({
+    const probeWsUrl = resolveGatewayWsUrl({
       bind: nextConfig.gateway?.bind ?? "loopback",
       port: settings.port,
       customBindHost: nextConfig.gateway?.customBindHost,
-      basePath: undefined,
     });
     // Daemon install/restart can briefly flap the WS; wait a bit so health check doesn't false-fail.
     await waitForGatewayReachable({
-      url: probeLinks.wsUrl,
+      url: probeWsUrl,
       token: settings.gatewayToken,
       deadlineMs: 15_000,
     });
@@ -221,40 +215,23 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     }
   }
 
-  const controlUiEnabled =
-    nextConfig.gateway?.controlUi?.enabled ?? baseConfig.gateway?.controlUi?.enabled ?? true;
-  if (!opts.skipUi && controlUiEnabled) {
-    const controlUiAssets = await ensureControlUiAssetsBuilt(runtime);
-    if (!controlUiAssets.ok && controlUiAssets.message) {
-      runtime.error(controlUiAssets.message);
-    }
-  }
-
   await prompter.note(
     [
       "Add nodes for extra features:",
       "- macOS app (system + notifications)",
-      "- iOS app (camera/canvas)",
-      "- Android app (camera/canvas)",
+      "- iOS app (camera)",
+      "- Android app (camera)",
     ].join("\n"),
     "Optional apps",
   );
 
-  const controlUiBasePath =
-    nextConfig.gateway?.controlUi?.basePath ?? baseConfig.gateway?.controlUi?.basePath;
-  const links = resolveControlUiLinks({
+  const wsUrl = resolveGatewayWsUrl({
     bind: settings.bind,
     port: settings.port,
     customBindHost: settings.customBindHost,
-    basePath: controlUiBasePath,
   });
-  const tokenParam =
-    settings.authMode === "token" && settings.gatewayToken
-      ? `?token=${encodeURIComponent(settings.gatewayToken)}`
-      : "";
-  const authedUrl = `${links.httpUrl}${tokenParam}`;
   const gatewayProbe = await probeGatewayReachable({
-    url: links.wsUrl,
+    url: wsUrl,
     token: settings.authMode === "token" ? settings.gatewayToken : undefined,
     password: settings.authMode === "password" ? nextConfig.gateway?.auth?.password : "",
   });
@@ -270,23 +247,9 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     .then(() => true)
     .catch(() => false);
 
-  await prompter.note(
-    [
-      `Web UI: ${links.httpUrl}`,
-      tokenParam ? `Web UI (with token): ${authedUrl}` : undefined,
-      `Gateway WS: ${links.wsUrl}`,
-      gatewayStatusLine,
-      "Docs: https://aiwithapex.mintlify.app/web/control-ui",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-    "Control UI",
-  );
+  await prompter.note([`Gateway WS: ${wsUrl}`, gatewayStatusLine].join("\n"), "Gateway");
 
-  let controlUiOpened = false;
-  let controlUiOpenHint: string | undefined;
-  let seededInBackground = false;
-  let hatchChoice: "tui" | "web" | "later" | null = null;
+  let hatchChoice: "tui" | "later" | null = null;
 
   if (!opts.skipUi && gatewayProbe.ok) {
     if (hasBootstrap) {
@@ -303,10 +266,8 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
     await prompter.note(
       [
-        "Gateway token: shared auth for the Gateway + Control UI.",
+        "Gateway token: shared auth for the Gateway.",
         "Stored in: ~/.crocbot/crocbot.json (gateway.auth.token) or CROCBOT_GATEWAY_TOKEN.",
-        "Web UI stores a copy in this browser's localStorage (crocbot.control.settings.v1).",
-        `Get the tokenized link anytime: ${formatCliCommand("crocbot dashboard --no-open")}`,
       ].join("\n"),
       "Token",
     );
@@ -315,7 +276,6 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       message: "How do you want to hatch your bot?",
       options: [
         { value: "tui", label: "Hatch in TUI (recommended)" },
-        { value: "web", label: "Open the Web UI" },
         { value: "later", label: "Do this later" },
       ],
       initialValue: "tui",
@@ -323,62 +283,18 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
     if (hatchChoice === "tui") {
       await runTui({
-        url: links.wsUrl,
+        url: wsUrl,
         token: settings.authMode === "token" ? settings.gatewayToken : undefined,
         password: settings.authMode === "password" ? nextConfig.gateway?.auth?.password : "",
         // Safety: onboarding TUI should not auto-deliver to lastProvider/lastTo.
         deliver: false,
         message: hasBootstrap ? "Wake up, my friend!" : undefined,
       });
-      if (settings.authMode === "token" && settings.gatewayToken) {
-        seededInBackground = await openUrlInBackground(authedUrl);
-      }
-      if (seededInBackground) {
-        await prompter.note(
-          `Web UI seeded in the background. Open later with: ${formatCliCommand(
-            "crocbot dashboard --no-open",
-          )}`,
-          "Web UI",
-        );
-      }
-    } else if (hatchChoice === "web") {
-      const browserSupport = await detectBrowserOpenSupport();
-      if (browserSupport.ok) {
-        controlUiOpened = await openUrl(authedUrl);
-        if (!controlUiOpened) {
-          controlUiOpenHint = formatControlUiSshHint({
-            port: settings.port,
-            basePath: controlUiBasePath,
-            token: settings.gatewayToken,
-          });
-        }
-      } else {
-        controlUiOpenHint = formatControlUiSshHint({
-          port: settings.port,
-          basePath: controlUiBasePath,
-          token: settings.gatewayToken,
-        });
-      }
-      await prompter.note(
-        [
-          `Dashboard link (with token): ${authedUrl}`,
-          controlUiOpened
-            ? "Opened in your browser. Keep that tab to control crocbot."
-            : "Copy/paste this URL in a browser on this machine to control crocbot.",
-          controlUiOpenHint,
-        ]
-          .filter(Boolean)
-          .join("\n"),
-        "Dashboard ready",
-      );
     } else {
-      await prompter.note(
-        `When you're ready: ${formatCliCommand("crocbot dashboard --no-open")}`,
-        "Later",
-      );
+      await prompter.note(`When you're ready: ${formatCliCommand("crocbot tui")}`, "Later");
     }
   } else if (opts.skipUi) {
-    await prompter.note("Skipping Control UI/TUI prompts.", "Control UI");
+    await prompter.note("Skipping TUI prompts.", "TUI");
   }
 
   await prompter.note(
@@ -394,44 +310,6 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     "Security",
   );
 
-  const shouldOpenControlUi =
-    !opts.skipUi &&
-    settings.authMode === "token" &&
-    Boolean(settings.gatewayToken) &&
-    hatchChoice === null;
-  if (shouldOpenControlUi) {
-    const browserSupport = await detectBrowserOpenSupport();
-    if (browserSupport.ok) {
-      controlUiOpened = await openUrl(authedUrl);
-      if (!controlUiOpened) {
-        controlUiOpenHint = formatControlUiSshHint({
-          port: settings.port,
-          basePath: controlUiBasePath,
-          token: settings.gatewayToken,
-        });
-      }
-    } else {
-      controlUiOpenHint = formatControlUiSshHint({
-        port: settings.port,
-        basePath: controlUiBasePath,
-        token: settings.gatewayToken,
-      });
-    }
-
-    await prompter.note(
-      [
-        `Dashboard link (with token): ${authedUrl}`,
-        controlUiOpened
-          ? "Opened in your browser. Keep that tab to control crocbot."
-          : "Copy/paste this URL in a browser on this machine to control crocbot.",
-        controlUiOpenHint,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      "Dashboard ready",
-    );
-  }
-
   const webSearchKey = (nextConfig.tools?.web?.search?.apiKey ?? "").trim();
   const webSearchEnv = (process.env.BRAVE_API_KEY ?? "").trim();
   const hasWebSearchKey = Boolean(webSearchKey || webSearchEnv);
@@ -446,9 +324,9 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           "Docs: https://aiwithapex.mintlify.app/tools/web",
         ].join("\n")
       : [
-          "If you want your agent to be able to search the web, you’ll need an API key.",
+          "If you want your agent to be able to search the web, you'll need an API key.",
           "",
-          "crocbot uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won’t work.",
+          "crocbot uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won't work.",
           "",
           "Set it up interactively:",
           `- Run: ${formatCliCommand("crocbot configure --section web")}`,
@@ -465,11 +343,5 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     "What now",
   );
 
-  await prompter.outro(
-    controlUiOpened
-      ? "Onboarding complete. Dashboard opened with your token; keep that tab to control crocbot."
-      : seededInBackground
-        ? "Onboarding complete. Web UI seeded in the background; open it anytime with the tokenized link above."
-        : "Onboarding complete. Use the tokenized dashboard link above to control crocbot.",
-  );
+  await prompter.outro("Onboarding complete.");
 }

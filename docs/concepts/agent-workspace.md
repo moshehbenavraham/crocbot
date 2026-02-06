@@ -109,9 +109,6 @@ See [Memory](/concepts/memory) for the workflow and automatic memory flush.
   - Workspace-specific skills.
   - Overrides managed/bundled skills when names collide.
 
-- `canvas/` (optional)
-  - Canvas UI files for node displays (for example `canvas/index.html`).
-
 If any bootstrap file is missing, crocbot injects a "missing file" marker into
 the session and continues. Large bootstrap files are truncated when injected;
 adjust the limit with `agents.defaults.bootstrapMaxChars` (default: 20000).

@@ -27,11 +27,10 @@ pnpm gateway:watch
   - Hot reload uses in-process restart via **SIGUSR1** when needed.
   - Disable with `gateway.reload.mode="off"`.
 - Binds WebSocket control plane to `127.0.0.1:<port>` (default 18789).
-- The same port also serves HTTP (control UI, hooks, A2UI). Single-port multiplex.
+- The same port also serves HTTP (control UI, hooks). Single-port multiplex.
   - OpenAI Chat Completions (HTTP): [`/v1/chat/completions`](/gateway/openai-http-api).
   - OpenResponses (HTTP): [`/v1/responses`](/gateway/openresponses-http-api).
   - Tools Invoke (HTTP): [`/tools/invoke`](/gateway/tools-invoke-http-api).
-- Starts a Canvas file server by default on `canvasHost.port` (default `18793`), serving `http://<gateway-host>:18793/__crocbot__/canvas/` from `~/croc/canvas`. Disable with `canvasHost.enabled=false` or `CROCBOT_SKIP_CANVAS_HOST=1`.
 - Logs to stdout; use launchd/systemd to keep it alive and rotate logs.
 - Pass `--verbose` to mirror debug logging (handshakes, req/res, events) from the log file into stdio when troubleshooting.
 - `--force` uses `lsof` to find listeners on the chosen port, sends SIGTERM, logs what it killed, then starts the gateway (fails fast if `lsof` is missing).
@@ -82,13 +81,11 @@ Defaults (can be overridden via env/flags/config):
 - `CROCBOT_CONFIG_PATH=~/.crocbot-dev/crocbot.json`
 - `CROCBOT_GATEWAY_PORT=19001` (Gateway WS + HTTP)
 - browser control service port = `19003` (derived: `gateway.port+2`, loopback only)
-- `canvasHost.port=19005` (derived: `gateway.port+4`)
 - `agents.defaults.workspace` default becomes `~/croc-dev` when you run `setup`/`onboard` under `--dev`.
 
 Derived ports (rules of thumb):
 - Base port = `gateway.port` (or `CROCBOT_GATEWAY_PORT` / `--port`)
 - browser control service port = base + 2 (loopback only)
-- `canvasHost.port = base + 4` (or `CROCBOT_CANVAS_HOST_PORT` / config override)
 - Browser profile CDP ports auto-allocate from `browser.controlPort + 9 .. + 108` (persisted per profile).
 
 Checklist per instance:
@@ -129,7 +126,7 @@ CROCBOT_CONFIG_PATH=~/.crocbot/b.json CROCBOT_STATE_DIR=~/.crocbot-b crocbot gat
 - `agent` — run an agent turn (streams events back on same connection).
 - `node.list` — list paired + currently-connected nodes (includes `caps`, `deviceFamily`, `modelIdentifier`, `paired`, `connected`, and advertised `commands`).
 - `node.describe` — describe a node (capabilities + supported `node.invoke` commands; works for paired nodes and for currently-connected unpaired nodes).
-- `node.invoke` — invoke a command on a node (e.g. `canvas.*`, `camera.*`).
+- `node.invoke` — invoke a command on a node (e.g. `camera.*`).
 
 See also: [Presence](/concepts/presence) for how presence is produced/deduped and why a stable `client.instanceId` matters.
 

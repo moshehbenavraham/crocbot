@@ -128,7 +128,6 @@ describe("provider timeouts (e2e)", () => {
         skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
         skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
         skipCron: process.env.CROCBOT_SKIP_CRON,
-        skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
       };
 
       const originalFetch = globalThis.fetch;
@@ -163,7 +162,6 @@ describe("provider timeouts (e2e)", () => {
       process.env.CROCBOT_SKIP_CHANNELS = "1";
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
       process.env.CROCBOT_SKIP_CRON = "1";
-      process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
 
       const token = `test-${randomUUID()}`;
       process.env.CROCBOT_GATEWAY_TOKEN = token;
@@ -230,7 +228,6 @@ describe("provider timeouts (e2e)", () => {
       const server = await startGatewayServer(port, {
         bind: "loopback",
         auth: { mode: "token", token },
-        controlUiEnabled: false,
       });
 
       const client = await connectClient({
@@ -299,11 +296,6 @@ describe("provider timeouts (e2e)", () => {
           delete process.env.CROCBOT_SKIP_CRON;
         } else {
           process.env.CROCBOT_SKIP_CRON = prev.skipCron;
-        }
-        if (prev.skipCanvas === undefined) {
-          delete process.env.CROCBOT_SKIP_CANVAS_HOST;
-        } else {
-          process.env.CROCBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
         }
       }
     },

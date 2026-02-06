@@ -99,7 +99,7 @@ Subsystem loggers keep output grouped and scannable.
 
 Behavior:
 
-- **Subsystem prefixes** on every line (e.g. `[gateway]`, `[canvas]`, `[tailscale]`)
+- **Subsystem prefixes** on every line (e.g. `[gateway]`, `[tailscale]`)
 - **Subsystem colors** (stable per subsystem) plus level coloring
 - **Color when output is a TTY or the environment looks like a rich terminal** (`TERM`/`COLORTERM`/`TERM_PROGRAM`), respects `NO_COLOR`
 - **Shortened subsystem prefixes**: drops leading `gateway/` + `channels/`, keeps last 2 segments (e.g. `telegram/outbound`)

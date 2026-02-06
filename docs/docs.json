@@ -889,6 +889,7 @@
       {
         "group": "Core Concepts",
         "pages": [
+          "concepts/acp-bridge",
           "concepts/architecture",
           "concepts/agent",
           "concepts/agent-loop",

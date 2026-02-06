@@ -180,7 +180,6 @@ export const testState = {
   gatewayAuth: undefined as Record<string, unknown> | undefined,
   gatewayControlUi: undefined as Record<string, unknown> | undefined,
   hooksConfig: undefined as HooksConfig | undefined,
-  canvasHostPort: undefined as number | undefined,
   legacyIssues: [] as Array<{ path: string; message: string }>,
   legacyParsed: {} as Record<string, unknown>,
   migrationConfig: null as Record<string, unknown> | null,
@@ -412,17 +411,6 @@ vi.mock("../config/config.js", async () => {
       }
       const gateway = Object.keys(fileGateway).length > 0 ? fileGateway : undefined;
 
-      const fileCanvasHost =
-        fileConfig.canvasHost &&
-        typeof fileConfig.canvasHost === "object" &&
-        !Array.isArray(fileConfig.canvasHost)
-          ? ({ ...(fileConfig.canvasHost as Record<string, unknown>) } as Record<string, unknown>)
-          : {};
-      if (typeof testState.canvasHostPort === "number") {
-        fileCanvasHost.port = testState.canvasHostPort;
-      }
-      const canvasHost = Object.keys(fileCanvasHost).length > 0 ? fileCanvasHost : undefined;
-
       const hooks = testState.hooksConfig ?? (fileConfig.hooks as HooksConfig | undefined);
 
       const fileCron =
@@ -444,7 +432,6 @@ vi.mock("../config/config.js", async () => {
         channels,
         session,
         gateway,
-        canvasHost,
         hooks,
         cron,
       };

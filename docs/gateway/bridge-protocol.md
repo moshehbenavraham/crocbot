@@ -40,7 +40,7 @@ When TLS is enabled, discovery TXT records include `bridgeTls=1` plus
 1) Client sends `hello` with node metadata + token.  
 2) If unauthorized, gateway replies `error` and closes the connection.  
 
-`hello-ok` returns `serverName` and may include `canvasHostUrl`.
+`hello-ok` returns `serverName`.
 
 ## Frames
 
@@ -49,7 +49,7 @@ Client → Gateway:
 - `event`: node signals (voice transcript, agent request, chat subscribe, exec lifecycle)
 
 Gateway → Client:
-- `invoke` / `invoke-res`: node commands (`canvas.*`, `camera.*`, `screen.record`,
+- `invoke` / `invoke-res`: node commands (`camera.*`, `screen.record`,
   `location.get`, `sms.send`)
 - `event`: chat updates for subscribed sessions
 - `ping` / `pong`: keepalive

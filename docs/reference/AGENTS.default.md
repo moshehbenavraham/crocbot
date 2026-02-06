@@ -103,7 +103,6 @@ git commit -m "Add Croc workspace"
 - Prefer the `crocbot` CLI for scripting; mac app handles permissions.
 - Run installs from the Skills tab; it hides the button if a binary is already present.
 - Keep heartbeats enabled so the assistant can schedule reminders, monitor inboxes, and trigger camera captures.
-- Canvas UI runs full-screen with native overlays. Avoid placing critical controls in the top-left/top-right/bottom edges; add explicit gutters in the layout and don’t rely on safe-area insets.
 - For browser-driven verification, use `crocbot browser` (tabs/status/screenshot) with the croc-managed Chrome profile.
 - For DOM inspection, use `crocbot browser eval|query|dom|snapshot` (and `--json`/`--out` when you need machine output).
 - For interactions, use `crocbot browser click|type|hover|drag|select|upload|press|wait|navigate|back|evaluate|run` (click/type require snapshot refs; use `evaluate` for CSS selectors).

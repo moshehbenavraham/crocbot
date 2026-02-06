@@ -11,13 +11,12 @@ const mocks = vi.hoisted(() => ({
   readConfigFileSnapshot: vi.fn(),
   writeConfigFile: vi.fn(),
   resolveGatewayPort: vi.fn(),
-  ensureControlUiAssetsBuilt: vi.fn(),
   createClackPrompter: vi.fn(),
   note: vi.fn(),
   printWizardHeader: vi.fn(),
   probeGatewayReachable: vi.fn(),
   waitForGatewayReachable: vi.fn(),
-  resolveControlUiLinks: vi.fn(),
+  resolveGatewayWsUrl: vi.fn(),
   summarizeExistingConfig: vi.fn(),
 }));
 
@@ -36,10 +35,6 @@ vi.mock("../config/config.js", () => ({
   resolveGatewayPort: mocks.resolveGatewayPort,
 }));
 
-vi.mock("../infra/control-ui-assets.js", () => ({
-  ensureControlUiAssetsBuilt: mocks.ensureControlUiAssetsBuilt,
-}));
-
 vi.mock("../wizard/clack-prompter.js", () => ({
   createClackPrompter: mocks.createClackPrompter,
 }));
@@ -55,7 +50,7 @@ vi.mock("./onboard-helpers.js", () => ({
   guardCancel: <T>(value: T) => value,
   printWizardHeader: mocks.printWizardHeader,
   probeGatewayReachable: mocks.probeGatewayReachable,
-  resolveControlUiLinks: mocks.resolveControlUiLinks,
+  resolveGatewayWsUrl: mocks.resolveGatewayWsUrl,
   summarizeExistingConfig: mocks.summarizeExistingConfig,
   waitForGatewayReachable: mocks.waitForGatewayReachable,
 }));
@@ -108,7 +103,7 @@ describe("runConfigureWizard", () => {
     });
     mocks.resolveGatewayPort.mockReturnValue(18789);
     mocks.probeGatewayReachable.mockResolvedValue({ ok: false });
-    mocks.resolveControlUiLinks.mockReturnValue({ wsUrl: "ws://127.0.0.1:18789" });
+    mocks.resolveGatewayWsUrl.mockReturnValue("ws://127.0.0.1:18789");
     mocks.summarizeExistingConfig.mockReturnValue("");
     mocks.createClackPrompter.mockReturnValue({});
 

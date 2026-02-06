@@ -5,11 +5,7 @@ import { dashboardCommand } from "./dashboard.js";
 const mocks = vi.hoisted(() => ({
   readConfigFileSnapshot: vi.fn(),
   resolveGatewayPort: vi.fn(),
-  resolveControlUiLinks: vi.fn(),
-  detectBrowserOpenSupport: vi.fn(),
-  openUrl: vi.fn(),
-  formatControlUiSshHint: vi.fn(),
-  copyToClipboard: vi.fn(),
+  resolveGatewayWsUrl: vi.fn(),
 }));
 
 vi.mock("../config/config.js", () => ({
@@ -18,14 +14,7 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("./onboard-helpers.js", () => ({
-  resolveControlUiLinks: mocks.resolveControlUiLinks,
-  detectBrowserOpenSupport: mocks.detectBrowserOpenSupport,
-  openUrl: mocks.openUrl,
-  formatControlUiSshHint: mocks.formatControlUiSshHint,
-}));
-
-vi.mock("../infra/clipboard.js", () => ({
-  copyToClipboard: mocks.copyToClipboard,
+  resolveGatewayWsUrl: mocks.resolveGatewayWsUrl,
 }));
 
 const runtime = {
@@ -52,10 +41,7 @@ function mockSnapshot(token = "abc") {
     legacyIssues: [],
   });
   mocks.resolveGatewayPort.mockReturnValue(18789);
-  mocks.resolveControlUiLinks.mockReturnValue({
-    httpUrl: "http://127.0.0.1:18789/",
-    wsUrl: "ws://127.0.0.1:18789",
-  });
+  mocks.resolveGatewayWsUrl.mockReturnValue("ws://127.0.0.1:18789");
 }
 
 describe("dashboardCommand", () => {
@@ -63,59 +49,64 @@ describe("dashboardCommand", () => {
     resetRuntime();
     mocks.readConfigFileSnapshot.mockReset();
     mocks.resolveGatewayPort.mockReset();
-    mocks.resolveControlUiLinks.mockReset();
-    mocks.detectBrowserOpenSupport.mockReset();
-    mocks.openUrl.mockReset();
-    mocks.formatControlUiSshHint.mockReset();
-    mocks.copyToClipboard.mockReset();
+    mocks.resolveGatewayWsUrl.mockReset();
   });
 
-  it("opens and copies the dashboard link by default", async () => {
+  it("prints the gateway WS URL and removal notice", async () => {
     mockSnapshot("abc123");
-    mocks.copyToClipboard.mockResolvedValue(true);
-    mocks.detectBrowserOpenSupport.mockResolvedValue({ ok: true });
-    mocks.openUrl.mockResolvedValue(true);
 
     await dashboardCommand(runtime);
 
-    expect(mocks.resolveControlUiLinks).toHaveBeenCalledWith({
+    expect(mocks.resolveGatewayWsUrl).toHaveBeenCalledWith({
       port: 18789,
       bind: "loopback",
       customBindHost: undefined,
-      basePath: undefined,
     });
-    expect(mocks.copyToClipboard).toHaveBeenCalledWith("http://127.0.0.1:18789/?token=abc123");
-    expect(mocks.openUrl).toHaveBeenCalledWith("http://127.0.0.1:18789/?token=abc123");
+    expect(runtime.log).toHaveBeenCalledWith("Gateway WS: ws://127.0.0.1:18789");
     expect(runtime.log).toHaveBeenCalledWith(
-      "Opened in your browser. Keep that tab to control crocbot.",
+      "The browser-based Control UI has been removed. Use the TUI or Telegram to interact with crocbot.",
     );
   });
 
-  it("prints SSH hint when browser cannot open", async () => {
-    mockSnapshot("shhhh");
-    mocks.copyToClipboard.mockResolvedValue(false);
-    mocks.detectBrowserOpenSupport.mockResolvedValue({
-      ok: false,
-      reason: "ssh",
+  it("uses bind mode from config", async () => {
+    mocks.readConfigFileSnapshot.mockResolvedValue({
+      path: "/tmp/crocbot.json",
+      exists: true,
+      raw: "{}",
+      parsed: {},
+      valid: true,
+      config: { gateway: { bind: "lan", auth: { token: "t" } } },
+      issues: [],
+      legacyIssues: [],
     });
-    mocks.formatControlUiSshHint.mockReturnValue("ssh hint");
+    mocks.resolveGatewayPort.mockReturnValue(18789);
+    mocks.resolveGatewayWsUrl.mockReturnValue("ws://0.0.0.0:18789");
 
     await dashboardCommand(runtime);
 
-    expect(mocks.openUrl).not.toHaveBeenCalled();
-    expect(runtime.log).toHaveBeenCalledWith("ssh hint");
+    expect(mocks.resolveGatewayWsUrl).toHaveBeenCalledWith({
+      port: 18789,
+      bind: "lan",
+      customBindHost: undefined,
+    });
   });
 
-  it("respects --no-open and skips browser attempts", async () => {
-    mockSnapshot();
-    mocks.copyToClipboard.mockResolvedValue(true);
+  it("handles invalid config gracefully", async () => {
+    mocks.readConfigFileSnapshot.mockResolvedValue({
+      path: "/tmp/crocbot.json",
+      exists: false,
+      raw: "",
+      parsed: {},
+      valid: false,
+      config: {},
+      issues: [],
+      legacyIssues: [],
+    });
+    mocks.resolveGatewayPort.mockReturnValue(18789);
+    mocks.resolveGatewayWsUrl.mockReturnValue("ws://127.0.0.1:18789");
 
-    await dashboardCommand(runtime, { noOpen: true });
+    await dashboardCommand(runtime);
 
-    expect(mocks.detectBrowserOpenSupport).not.toHaveBeenCalled();
-    expect(mocks.openUrl).not.toHaveBeenCalled();
-    expect(runtime.log).toHaveBeenCalledWith(
-      "Browser launch disabled (--no-open). Use the URL above.",
-    );
+    expect(runtime.log).toHaveBeenCalledWith(expect.stringContaining("Gateway WS:"));
   });
 });

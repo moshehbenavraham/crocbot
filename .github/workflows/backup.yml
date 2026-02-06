@@ -1,0 +1,70 @@
+name: Scheduled Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2:00 AM UTC
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Export config
+        id: export
+        run: |
+          HTTP_CODE=$(curl -sf -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CROCBOT_GATEWAY_TOKEN }}" \
+            -o config-export.json \
+            "${{ secrets.CROCBOT_GATEWAY_URL }}/setup/export" 2>/dev/null || echo "000")
+
+          if [ "$HTTP_CODE" = "200" ] && [ -s config-export.json ]; then
+            echo "Config exported successfully"
+            echo "exported=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Config export failed (HTTP $HTTP_CODE) — gateway may be unreachable"
+            echo "exported=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch health snapshot
+        if: steps.export.outputs.exported == 'true'
+        run: |
+          curl -sf -o health.json \
+            "${{ secrets.CROCBOT_GATEWAY_URL }}/health" 2>/dev/null || echo '{"status":"unreachable"}' > health.json
+
+      - name: Create manifest
+        if: steps.export.outputs.exported == 'true'
+        run: |
+          cat > manifest.json <<EOF
+          {
+            "version": "1.0",
+            "timestamp": "$(date -Iseconds)",
+            "source": "github-actions",
+            "run_id": "${{ github.run_id }}",
+            "run_number": "${{ github.run_number }}"
+          }
+          EOF
+
+      - name: Validate JSON
+        if: steps.export.outputs.exported == 'true'
+        run: |
+          for f in config-export.json health.json manifest.json; do
+            if [ -f "$f" ]; then
+              python3 -m json.tool "$f" > /dev/null 2>&1 || echo "::warning::$f is not valid JSON"
+            fi
+          done
+
+      - name: Upload backup artifact
+        if: steps.export.outputs.exported == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: crocbot-backup-${{ github.run_number }}
+          path: |
+            config-export.json
+            health.json
+            manifest.json
+          retention-days: 30

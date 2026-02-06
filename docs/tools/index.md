@@ -1,5 +1,5 @@
 ---
-summary: "Agent tool surface for crocbot (browser, canvas, nodes, message, cron) replacing legacy `crocbot-*` skills"
+summary: "Agent tool surface for crocbot (browser, nodes, message, cron) replacing legacy `crocbot-*` skills"
 read_when:
   - Adding or modifying agent tools
   - Retiring or changing `crocbot-*` skills
@@ -7,7 +7,7 @@ read_when:
 
 # Tools (crocbot)
 
-crocbot exposes **first-class agent tools** for browser, canvas, nodes, and cron.
+crocbot exposes **first-class agent tools** for browser, nodes, and cron.
 These replace the old `crocbot-*` skills: the tools are typed, no shelling,
 and the agent should rely on them directly.
 
@@ -136,7 +136,7 @@ Available groups:
 - `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `session_status`
 - `group:memory`: `memory_search`, `memory_get`
 - `group:web`: `web_search`, `web_fetch`
-- `group:ui`: `browser`, `canvas`
+- `group:ui`: `browser`
 - `group:automation`: `cron`, `gateway`
 - `group:messaging`: `message`
 - `group:nodes`: `nodes`
@@ -266,20 +266,6 @@ Notes:
 - `upload` can optionally pass a `ref` to auto-click after arming.
 - `upload` also supports `inputRef` (aria ref) or `element` (CSS selector) to set `<input type="file">` directly.
 
-### `canvas`
-Drive the node Canvas (present, eval, snapshot, A2UI).
-
-Core actions:
-- `present`, `hide`, `navigate`, `eval`
-- `snapshot` (returns image block + `MEDIA:<path>`)
-- `a2ui_push`, `a2ui_reset`
-
-Notes:
-- Uses gateway `node.invoke` under the hood.
-- If no `node` is provided, the tool picks a default (single connected node or local mac node).
-- A2UI is v0.8 only (no `createSurface`); the CLI rejects v0.9 JSONL with line errors.
-- Quick smoke: `crocbot nodes canvas a2ui push --node <id> --text "Hello from A2UI"`.
-
 ### `nodes`
 Discover and target connected nodes; send notifications; capture camera/screen.
 
@@ -402,7 +388,7 @@ Notes:
 
 ## Parameters (common)
 
-Gateway-backed tools (`canvas`, `nodes`, `cron`):
+Gateway-backed tools (`nodes`, `cron`):
 - `gatewayUrl` (default `ws://127.0.0.1:18789`)
 - `gatewayToken` (if auth enabled)
 - `timeoutMs`
@@ -419,11 +405,6 @@ Browser automation:
 2) `snapshot` (ai or aria)
 3) `act` (click/type/press)
 4) `screenshot` if you need visual confirmation
-
-Canvas render:
-1) `canvas` → `present`
-2) `a2ui_push` (optional)
-3) `snapshot`
 
 Node targeting:
 1) `nodes` → `status`

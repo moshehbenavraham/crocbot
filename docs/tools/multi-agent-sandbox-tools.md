@@ -220,7 +220,7 @@ Tool policies (global, agent, sandbox) support `group:*` entries that expand to 
 - `group:fs`: `read`, `write`, `edit`, `apply_patch`
 - `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `session_status`
 - `group:memory`: `memory_search`, `memory_get`
-- `group:ui`: `browser`, `canvas`
+- `group:ui`: `browser`
 - `group:automation`: `cron`, `gateway`
 - `group:messaging`: `message`
 - `group:nodes`: `nodes`

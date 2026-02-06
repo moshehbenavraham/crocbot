@@ -28,14 +28,7 @@ export const DEFAULT_TOOL_ALLOW = [
 ] as const;
 
 // Provider docking: keep sandbox policy aligned with provider tool names.
-export const DEFAULT_TOOL_DENY = [
-  "browser",
-  "canvas",
-  "nodes",
-  "cron",
-  "gateway",
-  ...CHANNEL_IDS,
-] as const;
+export const DEFAULT_TOOL_DENY = ["browser", "nodes", "cron", "gateway", ...CHANNEL_IDS] as const;
 
 export const DEFAULT_SANDBOX_BROWSER_IMAGE = "crocbot-sandbox-browser:bookworm-slim";
 export const DEFAULT_SANDBOX_COMMON_IMAGE = "crocbot-sandbox-common:bookworm-slim";

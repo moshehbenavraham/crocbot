@@ -133,7 +133,6 @@ const spawnGatewayInstance = async (name: string): Promise<GatewayInstance> => {
           CROCBOT_GATEWAY_PASSWORD: "",
           CROCBOT_SKIP_CHANNELS: "1",
           CROCBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
-          CROCBOT_SKIP_CANVAS_HOST: "1",
         },
         stdio: ["ignore", "pipe", "pipe"],
       },

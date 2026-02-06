@@ -13,7 +13,6 @@ describe("onboard (non-interactive): token auth", () => {
       skipChannels: process.env.CROCBOT_SKIP_CHANNELS,
       skipGmail: process.env.CROCBOT_SKIP_GMAIL_WATCHER,
       skipCron: process.env.CROCBOT_SKIP_CRON,
-      skipCanvas: process.env.CROCBOT_SKIP_CANVAS_HOST,
       token: process.env.CROCBOT_GATEWAY_TOKEN,
       password: process.env.CROCBOT_GATEWAY_PASSWORD,
     };
@@ -21,7 +20,6 @@ describe("onboard (non-interactive): token auth", () => {
     process.env.CROCBOT_SKIP_CHANNELS = "1";
     process.env.CROCBOT_SKIP_GMAIL_WATCHER = "1";
     process.env.CROCBOT_SKIP_CRON = "1";
-    process.env.CROCBOT_SKIP_CANVAS_HOST = "1";
     delete process.env.CROCBOT_GATEWAY_TOKEN;
     delete process.env.CROCBOT_GATEWAY_PASSWORD;
 
@@ -85,7 +83,6 @@ describe("onboard (non-interactive): token auth", () => {
       process.env.CROCBOT_SKIP_CHANNELS = prev.skipChannels;
       process.env.CROCBOT_SKIP_GMAIL_WATCHER = prev.skipGmail;
       process.env.CROCBOT_SKIP_CRON = prev.skipCron;
-      process.env.CROCBOT_SKIP_CANVAS_HOST = prev.skipCanvas;
       process.env.CROCBOT_GATEWAY_TOKEN = prev.token;
       process.env.CROCBOT_GATEWAY_PASSWORD = prev.password;
     }

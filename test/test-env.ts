@@ -78,7 +78,6 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
     { key: "CROCBOT_BRIDGE_ENABLED", value: process.env.CROCBOT_BRIDGE_ENABLED },
     { key: "CROCBOT_BRIDGE_HOST", value: process.env.CROCBOT_BRIDGE_HOST },
     { key: "CROCBOT_BRIDGE_PORT", value: process.env.CROCBOT_BRIDGE_PORT },
-    { key: "CROCBOT_CANVAS_HOST_PORT", value: process.env.CROCBOT_CANVAS_HOST_PORT },
     { key: "CROCBOT_TEST_HOME", value: process.env.CROCBOT_TEST_HOME },
     { key: "TELEGRAM_BOT_TOKEN", value: process.env.TELEGRAM_BOT_TOKEN },
     { key: "DISCORD_BOT_TOKEN", value: process.env.DISCORD_BOT_TOKEN },
@@ -107,7 +106,6 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
   delete process.env.CROCBOT_BRIDGE_ENABLED;
   delete process.env.CROCBOT_BRIDGE_HOST;
   delete process.env.CROCBOT_BRIDGE_PORT;
-  delete process.env.CROCBOT_CANVAS_HOST_PORT;
   // Avoid leaking real GitHub/Copilot tokens into non-live test runs.
   delete process.env.TELEGRAM_BOT_TOKEN;
   delete process.env.DISCORD_BOT_TOKEN;

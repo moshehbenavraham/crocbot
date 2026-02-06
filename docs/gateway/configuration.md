@@ -745,7 +745,7 @@ No filesystem access (messaging/session tools enabled):
         },
         tools: {
           allow: ["sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status", "telegram", "gateway"],
-          deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "canvas", "nodes", "cron", "gateway", "image"]
+          deny: ["read", "write", "edit", "apply_patch", "exec", "process", "browser", "nodes", "cron", "gateway", "image"]
         }
       }
     ]
@@ -1327,7 +1327,7 @@ Example (adaptive tuned):
         softTrim: { maxChars: 4000, headChars: 1500, tailChars: 1500 },
         hardClear: { enabled: true, placeholder: "[Old tool result content cleared]" },
         // Optional: restrict pruning to specific tools (deny wins; supports "*" wildcards)
-        tools: { deny: ["browser", "canvas"] },
+        tools: { deny: ["browser"] },
       }
     }
   }
@@ -1591,10 +1591,10 @@ Example (provider/model-specific allowlist):
 Matching is case-insensitive and supports `*` wildcards (`"*"` means all tools).
 This is applied even when the Docker sandbox is **off**.
 
-Example (disable browser/canvas everywhere):
+Example (disable browser everywhere):
 ```json5
 {
-  tools: { deny: ["browser", "canvas"] }
+  tools: { deny: ["browser"] }
 }
 ```
 
@@ -1604,7 +1604,7 @@ Tool groups (shorthands) work in **global** and **per-agent** tool policies:
 - `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `session_status`
 - `group:memory`: `memory_search`, `memory_get`
 - `group:web`: `web_search`, `web_fetch`
-- `group:ui`: `browser`, `canvas`
+- `group:ui`: `browser`
 - `group:automation`: `cron`, `gateway`
 - `group:messaging`: `message`
 - `group:nodes`: `nodes`
@@ -1748,7 +1748,7 @@ For package installs, ensure network egress, a writable root FS, and a root user
     sandbox: {
       tools: {
         allow: ["exec", "process", "read", "write", "edit", "apply_patch", "sessions_list", "sessions_history", "sessions_send", "sessions_spawn", "session_status"],
-        deny: ["browser", "canvas", "nodes", "cron", "gateway"]
+        deny: ["browser", "nodes", "cron", "gateway"]
       }
     }
   }
@@ -2364,7 +2364,7 @@ Trusted proxies:
 
 Notes:
 - `crocbot gateway` refuses to start unless `gateway.mode` is set to `local` (or you pass the override flag).
-- `gateway.port` controls the single multiplexed port used for WebSocket + HTTP (control UI, hooks, A2UI).
+- `gateway.port` controls the single multiplexed port used for WebSocket + HTTP (control UI, hooks).
 - OpenAI Chat Completions endpoint: **disabled by default**; enable with `gateway.http.endpoints.chatCompletions.enabled: true`.
 - Precedence: `--port` > `CROCBOT_GATEWAY_PORT` > `gateway.port` > default `18789`.
 - Gateway auth is required by default (token/password or Tailscale Serve identity). Non-loopback binds require a shared token/password.
@@ -2464,7 +2464,6 @@ Requires full Gateway restart:
 - `gateway` (port/bind/auth/control UI/tailscale)
 - `bridge` (legacy)
 - `discovery`
-- `canvasHost`
 - `plugins`
 - Any unknown/unsupported config path (defaults to restart for safety)
 
@@ -2480,7 +2479,7 @@ Convenience flags (CLI):
 - `crocbot --dev …` → uses `~/.crocbot-dev` + shifts ports from base `19001`
 - `crocbot --profile <name> …` → uses `~/.crocbot-<name>` (port via config/env/flags)
 
-See [Gateway runbook](/gateway) for the derived port mapping (gateway/browser/canvas).
+See [Gateway runbook](/gateway) for the derived port mapping (gateway/browser).
 See [Multiple gateways](/gateway/multiple-gateways) for browser/CDP port isolation details.
 
 Example:
@@ -2592,41 +2591,6 @@ Note: when `tailscale.mode` is on, crocbot defaults `serve.path` to `/` so
 Tailscale can proxy `/gmail-pubsub` correctly (it strips the set-path prefix).
 If you need the backend to receive the prefixed path, set
 `hooks.gmail.tailscale.target` to a full URL (and align `serve.path`).
-
-### `canvasHost` (LAN/tailnet Canvas file server + live reload)
-
-The Gateway serves a directory of HTML/CSS/JS over HTTP so nodes can simply `canvas.navigate` to it.
-
-Default root: `~/croc/canvas`  
-Default port: `18793` (chosen to avoid the croc browser CDP port `18792`)  
-The server listens on the **gateway bind host** (LAN or Tailnet) so nodes can reach it.
-
-The server:
-- serves files under `canvasHost.root`
-- injects a tiny live-reload client into served HTML
-- watches the directory and broadcasts reloads over a WebSocket endpoint at `/__crocbot/ws`
-- auto-creates a starter `index.html` when the directory is empty (so you see something immediately)
-- also serves A2UI at `/__crocbot__/a2ui/` and is advertised to nodes as `canvasHostUrl`
-  (always used by nodes for Canvas/A2UI)
-
-Disable live reload (and file watching) if the directory is large or you hit `EMFILE`:
-- config: `canvasHost: { liveReload: false }`
-
-```json5
-{
-  canvasHost: {
-    root: "~/croc/canvas",
-    port: 18793,
-    liveReload: true
-  }
-}
-```
-
-Changes to `canvasHost.*` require a gateway restart (config reload will restart).
-
-Disable with:
-- config: `canvasHost: { enabled: false }`
-- env: `CROCBOT_SKIP_CANVAS_HOST=1`
 
 ### `bridge` (legacy TCP bridge, removed)
 

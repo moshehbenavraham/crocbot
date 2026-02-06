@@ -70,7 +70,7 @@ What this does:
    - `CROCBOT_PROFILE=dev`
    - `CROCBOT_STATE_DIR=~/.crocbot-dev`
    - `CROCBOT_CONFIG_PATH=~/.crocbot-dev/crocbot.json`
-   - `CROCBOT_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
+   - `CROCBOT_GATEWAY_PORT=19001` (derived ports shift accordingly)
 
 2) **Dev bootstrap** (`gateway --dev`)
    - Writes a minimal config if missing (`gateway.mode=local`, bind loopback).
