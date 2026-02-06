@@ -4,6 +4,30 @@
 
 None.
 
+## GitHub Actions Billing Blocker
+
+As of 2026-02-06, all GitHub Actions workflows fail with:
+> "The job was not started because recent account payments have failed or your spending limit needs to be increased."
+
+**Resolution**: Fix billing in GitHub Settings → Billing & plans for the `moshehbenavraham` account.
+
+## CodeQL Requires "Code Scanning" Enabled
+
+The CodeQL Analysis job in `security.yml` fails with:
+> "Code scanning is not enabled for this repository."
+
+**Resolution**: Enable code scanning in repo Settings → Code security and analysis → Code scanning.
+CodeQL actions were upgraded from v3 to v4 (v3 deprecated Dec 2026).
+
+## npm Audit Vulnerabilities (informational)
+
+`pnpm audit` reports 7 vulnerabilities (3 high, 4 moderate) in transitive dependencies:
+- `node-tar` — Arbitrary File vulnerability
+- `fast-xml-parser` — RangeError DoS
+- `@isaacs/brace-expansion` — Uncontrolled Resource
+
+The npm Audit job uses `continue-on-error: true` so this does not block CI.
+
 ## E2E Test Failures (Pre-existing)
 
 18 E2E tests across 16 files are currently failing. These are pre-existing issues

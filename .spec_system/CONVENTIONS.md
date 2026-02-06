@@ -131,6 +131,8 @@ Additional workflows:
 - `.github/workflows/labeler.yml` - Auto-labels PRs
 - `.github/workflows/auto-response.yml` - Automated issue/PR responses
 
+Runners: `ubuntu-latest` (Linux), `windows-latest` (Windows), `macos-latest` (macOS PR-only), `ubuntu-24.04-arm` (Docker arm64 builds)
+
 ## Infrastructure
 
 | Component | Provider | Details |
