@@ -1,6 +1,6 @@
 {
   "name": "crocbot",
-  "version": "2026.1.73",
+  "version": "2026.1.74",
   "description": "Telegram gateway CLI with Pi RPC agent",
   "type": "module",
   "main": "dist/index.js",
@@ -76,7 +76,7 @@
     "docs:bin": "node scripts/build/build-docs-list.mjs",
     "docs:dev": "cd docs && mint dev",
     "docs:build": "cd docs && pnpm dlx --reporter append-only mint broken-links",
-    "build": "pnpm canvas:a2ui:bundle && tsdown && node --import tsx scripts/build/canvas-a2ui-copy.ts && node --import tsx scripts/copy-hook-metadata.ts && node --import tsx scripts/build/write-build-info.ts",
+    "build": "pnpm canvas:a2ui:bundle && tsdown && node --import tsx scripts/build/canvas-a2ui-copy.ts && node --import tsx scripts/copy-hook-metadata.ts && node --import tsx scripts/build/compile-pi-extensions.ts && node --import tsx scripts/build/write-build-info.ts",
     "check": "tsc --noEmit && pnpm lint && pnpm format",
     "release:check": "node --import tsx scripts/release-check.ts",
     "ui:install": "node scripts/ui.js install",

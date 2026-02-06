@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Security hardening (Phase 06)**: Ported three upstream security measures -- SSRF guards with DNS pinning on all outbound fetch sites (webhook alerts, skill downloads, media fetches), Telegram download timeouts with AbortSignal enforcement (30s metadata, 60s downloads), and path traversal validation via assertMediaPath on all media storage operations. Integration test suite validates private IP blocking (RFC 1918, link-local, loopback, IPv6-mapped), redirect chain SSRF prevention, protocol validation, null byte safety, and Unicode path edge cases. Security bypass audit completed with no critical findings.
+
 ### Changed
 
 - **Build tooling migration (Phase 05)**: Replaced tsc production builds with tsdown bundler powered by rolldown. Three entry points (index, CLI entry, plugin-sdk) now produce optimized flat output in dist/ with ~5s total build time. Unified tsconfig.json targets ES2023 with NodeNext module resolution and noEmit-only type checking. Stricter oxlint rules enabled (134 rules, type-aware) with oxfmt replacing Prettier for formatting. Zero `any` types remain in source. CI workflows, Docker multi-stage builds, and plugin-sdk .d.ts generation validated end-to-end.
