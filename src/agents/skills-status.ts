@@ -285,6 +285,7 @@ export function buildWorkspaceSkillStatus(
   opts?: {
     config?: crocbotConfig;
     managedSkillsDir?: string;
+    bundledSkillsDir?: string;
     entries?: SkillEntry[];
     eligibility?: SkillEligibilityContext;
   },

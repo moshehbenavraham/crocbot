@@ -1,4 +1,5 @@
 import type { crocbotConfig } from "../config/config.js";
+import { resolveSlackAccount } from "../slack/accounts.js";
 import { resolveTelegramAccount } from "../telegram/accounts.js";
 import { requireActivePluginRegistry } from "../plugins/runtime.js";
 import {
@@ -88,6 +89,38 @@ const DOCKS: Record<ChatChannelId, ChannelDock> = {
     },
     threading: {
       resolveReplyToMode: ({ cfg }) => cfg.channels?.telegram?.replyToMode ?? "first",
+      buildToolContext: ({ context, hasRepliedRef }) => {
+        const threadId = context.MessageThreadId ?? context.ReplyToId;
+        return {
+          currentChannelId: context.To?.trim() || undefined,
+          currentThreadTs: threadId != null ? String(threadId) : undefined,
+          hasRepliedRef,
+        };
+      },
+    },
+  },
+  slack: {
+    id: "slack",
+    capabilities: {
+      chatTypes: ["direct", "group", "channel", "thread"],
+      nativeCommands: false,
+      blockStreaming: false,
+    },
+    // No outbound — read-only channel
+    config: {
+      resolveAllowFrom: ({ cfg, accountId }) =>
+        (resolveSlackAccount({ cfg, accountId }).config.dm?.allowFrom ?? []).map(
+          (entry: string | number) => String(entry),
+        ),
+      formatAllowFrom: ({ allowFrom }) =>
+        allowFrom
+          .map((entry: string | number) => String(entry).trim())
+          .filter(Boolean)
+          .map((entry: string) => entry.replace(/^slack:/i, ""))
+          .map((entry: string) => entry.toLowerCase()),
+    },
+    threading: {
+      resolveReplyToMode: () => "off", // read-only: never reply
       buildToolContext: ({ context, hasRepliedRef }) => {
         const threadId = context.MessageThreadId ?? context.ReplyToId;
         return {

@@ -44,7 +44,6 @@ In process of checking still:
        🛵 ordercli
        🌊 songsee
        🎞️ video-frames
-       💬 slack (config: channels.slack)
        🧾 summarize (bins: summarize)
        📞 voice-call (config: plugins.entries.voice-call.enabled)
 
@@ -57,6 +56,9 @@ In process of checking still:
 | `google-gemini-cli-auth` | ✅ |
 | `lobster` | ✅ |
 | `memory-lancedb` | ✅ |
+
+Extensions we need to still install/check/etc:
+
 
 ---
 

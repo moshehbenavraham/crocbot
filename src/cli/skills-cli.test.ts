@@ -233,6 +233,7 @@ describe("skills-cli", () => {
 
       const report = buildWorkspaceSkillStatus("/tmp", {
         managedSkillsDir: "/nonexistent",
+        bundledSkillsDir: bundledDir,
       });
 
       // Should have loaded some skills

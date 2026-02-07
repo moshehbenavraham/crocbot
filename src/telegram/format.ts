@@ -40,6 +40,7 @@ function buildTelegramLink(link: MarkdownLinkSpan, _text: string) {
 function renderTelegramHtml(ir: MarkdownIR): string {
   return renderMarkdownWithMarkers(ir, {
     styleMarkers: {
+      blockquote: { open: "<blockquote>", close: "</blockquote>" },
       bold: { open: "<b>", close: "</b>" },
       italic: { open: "<i>", close: "</i>" },
       strikethrough: { open: "<s>", close: "</s>" },
@@ -57,7 +58,7 @@ export function markdownToTelegramHtml(
 ): string {
   const ir = markdownToIR(markdown ?? "", {
     linkify: true,
-    headingStyle: "none",
+    headingStyle: "bold",
     blockquotePrefix: "",
     tableMode: options.tableMode,
   });
@@ -82,7 +83,7 @@ export function markdownToTelegramChunks(
 ): TelegramFormattedChunk[] {
   const ir = markdownToIR(markdown ?? "", {
     linkify: true,
-    headingStyle: "none",
+    headingStyle: "bold",
     blockquotePrefix: "",
     tableMode: options.tableMode,
   });

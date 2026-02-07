@@ -40,6 +40,9 @@ function releaseAllLocksSync(): void {
       if (typeof held.handle.fd === "number") {
         fsSync.closeSync(held.handle.fd);
       }
+      // Mark the FileHandle as closed so its GC finalizer does not
+      // attempt to close the already-closed fd (causes flaky EBADF).
+      held.handle.close().catch(() => {});
     } catch {
       // Ignore errors during cleanup - best effort
     }

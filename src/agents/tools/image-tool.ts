@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { type Api, type Context, complete, type Model } from "@mariozechner/pi-ai";
-import { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
+import { discoverAuthStorage, discoverModels } from "../pi-model-discovery.js";
 import { Type } from "@sinclair/typebox";
 
 import type { crocbotConfig } from "../../config/config.js";

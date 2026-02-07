@@ -1,5 +1,5 @@
 import type { Api, Model } from "@mariozechner/pi-ai";
-import { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
+import { discoverAuthStorage, discoverModels } from "../../agents/pi-model-discovery.js";
 
 import { resolvecrocbotAgentDir } from "../../agents/agent-paths.js";
 import type { AuthProfileStore } from "../../agents/auth-profiles.js";
@@ -46,14 +46,53 @@ const hasAuthForProvider = (provider: string, cfg: crocbotConfig, authStore: Aut
   return false;
 };
 
+// Supplemental Anthropic models not yet in the SDK catalog.
+// Bypassed once the SDK includes the model natively (duplicate check).
+const SUPPLEMENTAL_MODELS: Model<Api>[] = [
+  {
+    id: "claude-opus-4-6",
+    name: "Claude Opus 4.6",
+    api: "anthropic-messages",
+    provider: "anthropic",
+    baseUrl: "https://api.anthropic.com",
+    reasoning: true,
+    input: ["text", "image"],
+    cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
+    contextWindow: 200_000,
+    maxTokens: 64_000,
+  } as Model<Api>,
+];
+
 export async function loadModelRegistry(cfg: crocbotConfig) {
   await ensurecrocbotModelsJson(cfg);
   const agentDir = resolvecrocbotAgentDir();
   const authStorage = discoverAuthStorage(agentDir);
   const registry = discoverModels(authStorage, agentDir);
   const models = registry.getAll();
+
+  // Inject supplemental models not yet in the SDK.
+  const existingKeys = new Set(models.map((m) => modelKey(m.provider, m.id)));
+  for (const supplemental of SUPPLEMENTAL_MODELS) {
+    if (!existingKeys.has(modelKey(supplemental.provider, supplemental.id))) {
+      models.push(supplemental);
+    }
+  }
+
   const availableModels = registry.getAvailable();
   const availableKeys = new Set(availableModels.map((model) => modelKey(model.provider, model.id)));
+
+  // Mark supplemental models as available if their provider has auth.
+  for (const supplemental of SUPPLEMENTAL_MODELS) {
+    const key = modelKey(supplemental.provider, supplemental.id);
+    if (!availableKeys.has(key)) {
+      // Check if any model from the same provider is available.
+      const providerAvailable = availableModels.some((m) => m.provider === supplemental.provider);
+      if (providerAvailable) {
+        availableKeys.add(key);
+      }
+    }
+  }
+
   return { registry, models, availableKeys };
 }
 

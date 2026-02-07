@@ -1,3 +1,4 @@
+import path from "node:path";
 import { type crocbotConfig, loadConfig } from "../config/config.js";
 import { resolvecrocbotAgentDir } from "./agent-paths.js";
 import { ensurecrocbotModelsJson } from "./models-config.js";
@@ -68,8 +69,18 @@ export async function loadModelCatalog(params?: {
       // will keep failing until restart).
       const piSdk = await importPiSdk();
       const agentDir = resolvecrocbotAgentDir();
-      const authStorage = piSdk.discoverAuthStorage(agentDir);
-      const registry = piSdk.discoverModels(authStorage, agentDir) as
+      // discoverAuthStorage/discoverModels were removed in pi-coding-agent 0.50+.
+      // Use the class constructors (AuthStorage/ModelRegistry) via the local
+      // compatibility layer, falling back to the SDK export if still present.
+      const authStorage =
+        typeof piSdk.discoverAuthStorage === "function"
+          ? piSdk.discoverAuthStorage(agentDir)
+          : new piSdk.AuthStorage(path.join(agentDir, "auth.json"));
+      const registry = (
+        typeof piSdk.discoverModels === "function"
+          ? piSdk.discoverModels(authStorage, agentDir)
+          : new piSdk.ModelRegistry(authStorage, path.join(agentDir, "models.json"))
+      ) as
         | {
             getAll: () => Array<DiscoveredModel>;
           }
@@ -92,6 +103,25 @@ export async function loadModelCatalog(params?: {
         const reasoning = typeof entry?.reasoning === "boolean" ? entry.reasoning : undefined;
         const input = Array.isArray(entry?.input) ? entry.input : undefined;
         models.push({ id, name, provider, contextWindow, reasoning, input });
+      }
+
+      // Inject supplemental Anthropic models not yet in the SDK catalog.
+      // Once the SDK includes them natively, the duplicate check prevents doubling.
+      const supplemental: ModelCatalogEntry[] = [
+        {
+          id: "claude-opus-4-6",
+          name: "Claude Opus 4.6",
+          provider: "anthropic",
+          contextWindow: 200_000,
+          reasoning: true,
+          input: ["text", "image"],
+        },
+      ];
+      for (const entry of supplemental) {
+        const exists = models.some((m) => m.provider === entry.provider && m.id === entry.id);
+        if (!exists) {
+          models.push(entry);
+        }
       }
 
       if (models.length === 0) {

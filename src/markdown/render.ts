@@ -21,6 +21,7 @@ export type RenderOptions = {
 };
 
 const STYLE_ORDER: MarkdownStyle[] = [
+  "blockquote",
   "code_block",
   "code",
   "bold",
@@ -45,14 +46,95 @@ function sortStyleSpans(spans: MarkdownStyleSpan[]): MarkdownStyleSpan[] {
   });
 }
 
+/**
+ * Split style spans and link spans at each other's boundaries so they nest
+ * cleanly.  Without this, a bold [5,20) overlapping a link [10,30) would
+ * produce `<b>...<a>...</b>...</a>` — invalid HTML.  After normalisation
+ * the bold becomes [5,10)+[10,20) and the link becomes [10,20)+[20,30),
+ * giving `<b>...</b><a><b>...</b>...</a>`.
+ */
+function normalizeSpans(ir: MarkdownIR, options: RenderOptions): MarkdownIR {
+  const linkSpans: MarkdownLinkSpan[] = [];
+  if (options.buildLink) {
+    for (const link of ir.links) {
+      const rendered = options.buildLink(link, ir.text);
+      if (rendered) {
+        linkSpans.push(link);
+      }
+    }
+  }
+
+  if (linkSpans.length === 0) {
+    return ir;
+  }
+
+  // Collect all boundary points from links
+  const linkBoundaries = new Set<number>();
+  for (const link of linkSpans) {
+    linkBoundaries.add(link.start);
+    linkBoundaries.add(link.end);
+  }
+
+  // Collect all boundary points from styles
+  const styleBoundaries = new Set<number>();
+  for (const style of ir.styles) {
+    styleBoundaries.add(style.start);
+    styleBoundaries.add(style.end);
+  }
+
+  // Split style spans at link boundaries
+  const newStyles: MarkdownStyleSpan[] = [];
+  for (const span of ir.styles) {
+    const cuts = [span.start, span.end];
+    for (const b of linkBoundaries) {
+      if (b > span.start && b < span.end) {
+        cuts.push(b);
+      }
+    }
+    cuts.sort((a, b) => a - b);
+    for (let i = 0; i < cuts.length - 1; i++) {
+      const s = cuts[i];
+      const e = cuts[i + 1];
+      if (e > s) {
+        newStyles.push({ start: s, end: e, style: span.style });
+      }
+    }
+  }
+
+  // Split link spans at style boundaries
+  const newLinks: MarkdownLinkSpan[] = [];
+  for (const link of ir.links) {
+    const cuts = [link.start, link.end];
+    for (const b of styleBoundaries) {
+      if (b > link.start && b < link.end) {
+        cuts.push(b);
+      }
+    }
+    cuts.sort((a, b) => a - b);
+    for (let i = 0; i < cuts.length - 1; i++) {
+      const s = cuts[i];
+      const e = cuts[i + 1];
+      if (e > s) {
+        newLinks.push({ start: s, end: e, href: link.href });
+      }
+    }
+  }
+
+  return { text: ir.text, styles: newStyles, links: newLinks };
+}
+
 export function renderMarkdownWithMarkers(ir: MarkdownIR, options: RenderOptions): string {
   const text = ir.text ?? "";
   if (!text) {
     return "";
   }
 
+  const normalized = normalizeSpans(ir, options);
+
   const styleMarkers = options.styleMarkers;
-  const styled = sortStyleSpans(ir.styles.filter((span) => Boolean(styleMarkers[span.style])));
+  const styled = sortStyleSpans(
+    normalized.styles.filter((span) => Boolean(styleMarkers[span.style])),
+  );
 
   const boundaries = new Set<number>();
   boundaries.add(0);
@@ -84,7 +166,7 @@ export function renderMarkdownWithMarkers(ir: MarkdownIR, options: RenderOptions
   const linkStarts = new Map<number, RenderLink[]>();
   const linkEnds = new Map<number, RenderLink[]>();
   if (options.buildLink) {
-    for (const link of ir.links) {
+    for (const link of normalized.links) {
       if (link.start === link.end) {
         continue;
       }

@@ -80,7 +80,7 @@ export type {
   MarkdownConfig,
   MarkdownTableMode,
 } from "../config/types.js";
-export { TelegramConfigSchema } from "../config/zod-schema.providers-core.js";
+export { SlackConfigSchema, TelegramConfigSchema } from "../config/zod-schema.providers-core.js";
 export {
   BlockStreamingCoalesceSchema,
   DmConfigSchema,
@@ -221,3 +221,26 @@ export {
   normalizeTelegramMessagingTarget,
 } from "../channels/plugins/normalize/telegram.js";
 export { collectTelegramStatusIssues } from "../channels/plugins/status-issues/telegram.js";
+
+// Channel: Slack (read-only)
+export {
+  listEnabledSlackAccounts,
+  listSlackAccountIds,
+  resolveDefaultSlackAccountId,
+  resolveSlackAccount,
+  resolveSlackReplyToMode,
+  type ResolvedSlackAccount,
+} from "../slack/accounts.js";
+export { buildSlackThreadingToolContext } from "../slack/threading-tool-context.js";
+export {
+  looksLikeSlackTargetId,
+  normalizeSlackMessagingTarget,
+} from "../channels/plugins/normalize/slack.js";
+export {
+  resolveSlackGroupRequireMention,
+  resolveSlackGroupToolPolicy,
+} from "../channels/plugins/group-mentions.js";
+export {
+  listSlackDirectoryGroupsFromConfig,
+  listSlackDirectoryPeersFromConfig,
+} from "../channels/plugins/directory-config.js";

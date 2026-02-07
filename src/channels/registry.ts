@@ -4,7 +4,7 @@ import { requireActivePluginRegistry } from "../plugins/runtime.js";
 
 // Channel docking: add new core channels here (order + meta + aliases), then
 // register the plugin in its extension entrypoint and keep protocol IDs in sync.
-export const CHAT_CHANNEL_ORDER = ["telegram"] as const;
+export const CHAT_CHANNEL_ORDER = ["telegram", "slack"] as const;
 
 export type ChatChannelId = (typeof CHAT_CHANNEL_ORDER)[number];
 
@@ -29,6 +29,19 @@ const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
     selectionDocsPrefix: "",
     selectionDocsOmitLabel: true,
     selectionExtras: [WEBSITE_URL],
+  },
+  slack: {
+    id: "slack",
+    label: "Slack",
+    selectionLabel: "Slack (Read-Only)",
+    detailLabel: "Slack Monitor",
+    docsPath: "/channels/slack",
+    docsLabel: "slack",
+    blurb: "read-only ingest — monitors Slack channels/DMs and feeds context to the agent.",
+    systemImage: "number.square",
+    selectionDocsPrefix: "",
+    selectionDocsOmitLabel: true,
+    selectionExtras: [],
   },
 };
 

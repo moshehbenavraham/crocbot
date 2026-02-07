@@ -75,6 +75,15 @@ import { monitorTelegramProvider } from "../../telegram/monitor.js";
 import { probeTelegram } from "../../telegram/probe.js";
 import { sendMessageTelegram } from "../../telegram/send.js";
 import { resolveTelegramToken } from "../../telegram/token.js";
+import { probeSlack } from "../../slack/probe.js";
+import { resolveSlackBotToken, resolveSlackAppToken } from "../../slack/token.js";
+import { monitorSlackProvider } from "../../slack/monitor/provider.js";
+import {
+  listSlackDirectoryPeersLive,
+  listSlackDirectoryGroupsLive,
+} from "../../slack/directory-live.js";
+import { resolveSlackChannelAllowlist } from "../../slack/resolve-channels.js";
+import { resolveSlackUserAllowlist } from "../../slack/resolve-users.js";
 import { registerMemoryCli } from "../../cli/memory-cli.js";
 import { formatNativeDependencyHint } from "./native-deps.js";
 
@@ -195,6 +204,16 @@ export function createPluginRuntime(): PluginRuntime {
         sendMessageTelegram,
         monitorTelegramProvider,
         messageActions: telegramMessageActions,
+      },
+      slack: {
+        probeSlack,
+        resolveSlackBotToken,
+        resolveSlackAppToken,
+        monitorSlackProvider,
+        listDirectoryPeersLive: listSlackDirectoryPeersLive,
+        listDirectoryGroupsLive: listSlackDirectoryGroupsLive,
+        resolveChannelAllowlist: resolveSlackChannelAllowlist,
+        resolveUserAllowlist: resolveSlackUserAllowlist,
       },
     },
     logging: {

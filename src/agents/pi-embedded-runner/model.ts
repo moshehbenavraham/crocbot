@@ -1,5 +1,5 @@
 import type { Api, Model } from "@mariozechner/pi-ai";
-import { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
+import { discoverAuthStorage, discoverModels } from "../pi-model-discovery.js";
 
 import type { crocbotConfig } from "../../config/config.js";
 import type { ModelDefinitionConfig } from "../../config/types.js";
@@ -70,6 +70,23 @@ export function resolveModel(
         authStorage,
         modelRegistry,
       };
+    }
+    // Supplemental Anthropic models not yet in the SDK catalog.
+    // This fallback is bypassed once the SDK includes the model natively.
+    if (provider === "anthropic" && modelId === "claude-opus-4-6") {
+      const supplemental: Model<Api> = normalizeModelCompat({
+        id: "claude-opus-4-6",
+        name: "Claude Opus 4.6",
+        api: "anthropic-messages",
+        provider: "anthropic",
+        baseUrl: "https://api.anthropic.com",
+        reasoning: true,
+        input: ["text", "image"],
+        cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
+        contextWindow: 200_000,
+        maxTokens: 64_000,
+      } as Model<Api>);
+      return { model: supplemental, authStorage, modelRegistry };
     }
     const providerCfg = providers[provider];
     if (providerCfg || modelId.startsWith("mock-")) {

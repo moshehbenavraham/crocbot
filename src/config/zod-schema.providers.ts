@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { TelegramConfigSchema } from "./zod-schema.providers-core.js";
+import { SlackConfigSchema, TelegramConfigSchema } from "./zod-schema.providers-core.js";
 import { WhatsAppConfigSchema } from "./zod-schema.providers-whatsapp.js";
 import { GroupPolicySchema } from "./zod-schema.core.js";
 import { ChannelHeartbeatVisibilitySchema } from "./zod-schema.channels.js";
@@ -20,6 +20,7 @@ export const ChannelsSchema = z
       .optional(),
     whatsapp: WhatsAppConfigSchema.optional(),
     telegram: TelegramConfigSchema.optional(),
+    slack: SlackConfigSchema.optional(),
   })
   .passthrough() // Allow extension channel configs (nostr, matrix, zalo, etc.)
   .optional();

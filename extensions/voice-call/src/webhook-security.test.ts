@@ -206,7 +206,7 @@ describe("verifyTwilioWebhook", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("rejects invalid signatures even with ngrok free tier enabled", () => {
+  it("rejects invalid signatures from non-loopback even with ngrok bypass enabled", () => {
     const authToken = "test-auth-token";
     const postBody = "CallSid=CS123&CallStatus=completed&From=%2B15550000000";
 
@@ -227,8 +227,9 @@ describe("verifyTwilioWebhook", () => {
       { allowNgrokFreeTierLoopbackBypass: true },
     );
 
+    // Non-loopback IP: forwarding headers are NOT trusted, so ngrok domain is not detected
     expect(result.ok).toBe(false);
-    expect(result.isNgrokFreeTier).toBe(true);
+    expect(result.isNgrokFreeTier).toBe(false);
     expect(result.reason).toMatch(/Invalid signature/);
   });
 

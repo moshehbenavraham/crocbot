@@ -1,3 +1,4 @@
+import type { SlackConfig } from "./types.slack.js";
 import type { TelegramConfig } from "./types.telegram.js";
 import type { GroupPolicy } from "./types.base.js";
 
@@ -18,6 +19,7 @@ export type ChannelDefaultsConfig = {
 
 export type ChannelsConfig = {
   defaults?: ChannelDefaultsConfig;
+  slack?: SlackConfig;
   telegram?: TelegramConfig;
   [key: string]: unknown;
 };

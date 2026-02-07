@@ -25,7 +25,14 @@ type MarkdownToken = {
   attrGet?: (name: string) => string | null;
 };
 
-export type MarkdownStyle = "bold" | "italic" | "strikethrough" | "code" | "code_block" | "spoiler";
+export type MarkdownStyle =
+  | "bold"
+  | "italic"
+  | "strikethrough"
+  | "code"
+  | "code_block"
+  | "spoiler"
+  | "blockquote";
 
 export type MarkdownStyleSpan = {
   start: number;
@@ -579,8 +586,10 @@ function renderTokens(tokens: MarkdownToken[], state: RenderState): void {
         if (state.blockquotePrefix) {
           state.text += state.blockquotePrefix;
         }
+        openStyle(state, "blockquote");
         break;
       case "blockquote_close":
+        closeStyle(state, "blockquote");
         state.text += "\n";
         break;
       case "bullet_list_open":

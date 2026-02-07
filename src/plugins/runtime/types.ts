@@ -89,6 +89,18 @@ type SendMessageTelegram = typeof import("../../telegram/send.js").sendMessageTe
 type MonitorTelegramProvider = typeof import("../../telegram/monitor.js").monitorTelegramProvider;
 type TelegramMessageActions =
   typeof import("../../channels/plugins/actions/telegram.js").telegramMessageActions;
+type ProbeSlack = typeof import("../../slack/probe.js").probeSlack;
+type ResolveSlackBotToken = typeof import("../../slack/token.js").resolveSlackBotToken;
+type ResolveSlackAppToken = typeof import("../../slack/token.js").resolveSlackAppToken;
+type MonitorSlackProvider = typeof import("../../slack/monitor/provider.js").monitorSlackProvider;
+type ListSlackDirectoryPeersLive =
+  typeof import("../../slack/directory-live.js").listSlackDirectoryPeersLive;
+type ListSlackDirectoryGroupsLive =
+  typeof import("../../slack/directory-live.js").listSlackDirectoryGroupsLive;
+type ResolveSlackChannelAllowlist =
+  typeof import("../../slack/resolve-channels.js").resolveSlackChannelAllowlist;
+type ResolveSlackUserAllowlist =
+  typeof import("../../slack/resolve-users.js").resolveSlackUserAllowlist;
 
 export type RuntimeLogger = {
   debug?: (message: string) => void;
@@ -194,6 +206,16 @@ export type PluginRuntime = {
       sendMessageTelegram: SendMessageTelegram;
       monitorTelegramProvider: MonitorTelegramProvider;
       messageActions: TelegramMessageActions;
+    };
+    slack: {
+      probeSlack: ProbeSlack;
+      resolveSlackBotToken: ResolveSlackBotToken;
+      resolveSlackAppToken: ResolveSlackAppToken;
+      monitorSlackProvider: MonitorSlackProvider;
+      listDirectoryPeersLive: ListSlackDirectoryPeersLive;
+      listDirectoryGroupsLive: ListSlackDirectoryGroupsLive;
+      resolveChannelAllowlist: ResolveSlackChannelAllowlist;
+      resolveUserAllowlist: ResolveSlackUserAllowlist;
     };
   };
   logging: {

@@ -1,6 +1,6 @@
 import type { AgentMessage } from "@mariozechner/pi-agent-core";
 import type { Api, AssistantMessage, ImageContent, Model } from "@mariozechner/pi-ai";
-import type { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
+import type { discoverAuthStorage, discoverModels } from "../../pi-model-discovery.js";
 
 import type { ReasoningLevel, ThinkLevel, VerboseLevel } from "../../../auto-reply/thinking.js";
 import type { crocbotConfig } from "../../../config/config.js";

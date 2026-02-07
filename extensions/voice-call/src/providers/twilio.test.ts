@@ -28,7 +28,7 @@ function createContext(
 describe("TwilioProvider", () => {
   it("returns streaming TwiML for outbound conversation calls before in-progress", () => {
     const provider = createProvider();
-    const ctx = createContext("CallStatus=initiated&Direction=outbound-api", {
+    const ctx = createContext("CallSid=CS123&CallStatus=initiated&Direction=outbound-api", {
       callId: "call-1",
     });
 
@@ -54,7 +54,7 @@ describe("TwilioProvider", () => {
 
   it("returns streaming TwiML for inbound calls", () => {
     const provider = createProvider();
-    const ctx = createContext("CallStatus=ringing&Direction=inbound");
+    const ctx = createContext("CallSid=CS456&CallStatus=ringing&Direction=inbound");
 
     const result = provider.parseWebhookEvent(ctx);
 

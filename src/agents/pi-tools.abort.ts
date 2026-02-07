@@ -22,13 +22,23 @@ function combineAbortSignals(a?: AbortSignal, b?: AbortSignal): AbortSignal | un
   if (b?.aborted) {
     return b;
   }
-  if (typeof AbortSignal.any === "function") {
-    return AbortSignal.any([a as AbortSignal, b as AbortSignal]);
+  if (
+    typeof AbortSignal.any === "function" &&
+    a instanceof AbortSignal &&
+    b instanceof AbortSignal
+  ) {
+    return AbortSignal.any([a, b]);
   }
   const controller = new AbortController();
   const onAbort = () => controller.abort();
-  a?.addEventListener("abort", onAbort, { once: true });
-  b?.addEventListener("abort", onAbort, { once: true });
+  // SDK v0.51.1 may pass signal-like objects without addEventListener.
+  // Only wire up signals that actually support it.
+  if (typeof a?.addEventListener === "function") {
+    a.addEventListener("abort", onAbort, { once: true });
+  }
+  if (typeof b?.addEventListener === "function") {
+    b.addEventListener("abort", onAbort, { once: true });
+  }
   return controller.signal;
 }
 

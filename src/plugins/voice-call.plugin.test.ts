@@ -133,7 +133,7 @@ describe("voice-call plugin", () => {
   it("CLI start prints JSON", async () => {
     const program = new Command();
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-    await plugin.register({
+    plugin.register({
       id: "voice-call",
       name: "Voice Call",
       description: "test",

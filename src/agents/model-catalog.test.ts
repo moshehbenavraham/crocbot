@@ -48,7 +48,17 @@ describe("loadModelCatalog", () => {
     expect(first).toEqual([]);
 
     const second = await loadModelCatalog({ config: cfg });
-    expect(second).toEqual([{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }]);
+    expect(second).toEqual([
+      {
+        id: "claude-opus-4-6",
+        name: "Claude Opus 4.6",
+        provider: "anthropic",
+        contextWindow: 200_000,
+        reasoning: true,
+        input: ["text", "image"],
+      },
+      { id: "gpt-4.1", name: "GPT-4.1", provider: "openai" },
+    ]);
     expect(call).toBe(2);
     expect(warnSpy).toHaveBeenCalledTimes(1);
   });
@@ -76,6 +86,8 @@ describe("loadModelCatalog", () => {
     );
 
     const result = await loadModelCatalog({ config: {} as crocbotConfig });
+    // Error path skips supplemental model injection — only the successfully
+    // parsed models are returned.
     expect(result).toEqual([{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }]);
     expect(warnSpy).toHaveBeenCalledTimes(1);
   });

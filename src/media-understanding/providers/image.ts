@@ -1,6 +1,6 @@
 import type { Api, Context, Model } from "@mariozechner/pi-ai";
 import { complete } from "@mariozechner/pi-ai";
-import { discoverAuthStorage, discoverModels } from "@mariozechner/pi-coding-agent";
+import { discoverAuthStorage, discoverModels } from "../../agents/pi-model-discovery.js";
 
 import { getApiKeyForModel, requireApiKey } from "../../agents/model-auth.js";
 import { ensurecrocbotModelsJson } from "../../agents/models-config.js";
