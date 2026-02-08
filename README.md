@@ -4,12 +4,6 @@
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
 </p>
 
-<p align="center">
-  <a href="https://github.com/moshehbenavraham/crocbot/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/moshehbenavraham/crocbot/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://github.com/moshehbenavraham/crocbot/releases"><img src="https://img.shields.io/github/v/release/moshehbenavraham/crocbot?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
-</p>
-
 **Crocbot** is a personal AI assistant you run on your own VPS. It answers you on **Telegram** via a full grammY bot integration, with an always-on **Gateway** control plane managing sessions, agents, tools, and automation.
 
 Fork of [OpenClaw](https://openclaw.ai/), stripped down to **CLI + Telegram** for lean, single-user deployment.
