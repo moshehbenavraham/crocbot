@@ -72,6 +72,9 @@ USER.md
 .serena/
 .001_ORIGINAL/
 __pycache__/
+# Internal deployment logs (contain PII, not for public)
+docs/ongoing-projects/
+
 # Local symlinks to state/workspace
 .crocbot-state
 .crocbot-workspace
