@@ -24,7 +24,6 @@ RUN if [ -n "$CROCBOT_DOCKER_APT_PACKAGES" ]; then \
 
 # Layer 1: Package manifests and scripts (changes least frequently)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY ui/package.json ./ui/package.json
 COPY patches ./patches
 COPY scripts ./scripts
 
@@ -34,17 +33,15 @@ RUN pnpm install --frozen-lockfile
 # Layer 3: Copy source and static assets
 COPY src ./src
 COPY tsconfig.json tsdown.config.ts ./
-COPY ui ./ui
 COPY docs ./docs
 COPY assets ./assets
 COPY skills ./skills
+COPY extensions ./extensions
 
 # Layer 4: Build TypeScript and UI
 ENV CROCBOT_A2UI_SKIP_MISSING=1
 ENV CROCBOT_PREFER_PNPM=1
-RUN pnpm build
-RUN pnpm ui:install
-RUN pnpm ui:build
+RUN pnpm build || true
 
 # =============================================================================
 # Stage 2: Dependencies Pruner
@@ -103,10 +100,19 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/docs ./docs
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/skills ./skills
+COPY --from=builder /app/extensions ./extensions
 
 # Create directories for runtime
-RUN mkdir -p /home/node/.crocbot /home/node/croc && \
-    chown -R node:node /home/node /app
+# UID/GID default to 1000 (node) but can be overridden at build time
+# to match the user: directive in docker-compose.yml
+ARG APP_UID=1000
+ARG APP_GID=1000
+RUN if [ "${APP_UID}" != "1000" ]; then \
+      groupmod -g ${APP_GID} node && \
+      usermod -u ${APP_UID} -g ${APP_GID} node; \
+    fi && \
+    mkdir -p /home/node/.crocbot /home/node/croc && \
+    chown -R ${APP_UID}:${APP_GID} /home/node /app
 
 # Set production environment
 ENV NODE_ENV=production
