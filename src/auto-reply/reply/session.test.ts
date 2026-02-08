@@ -114,7 +114,7 @@ describe("initSessionState RawBody", () => {
     const cfg = { session: { store: storePath } } as crocbotConfig;
 
     const groupMessageCtx = {
-      Body: `[Chat messages since your last reply - for context]\n[WhatsApp ...] Someone: hello\n\n[Current message - respond to this]\n[WhatsApp ...] Jake: /status\n[from: Jake McInteer (+6421807830)]`,
+      Body: `[Chat messages since your last reply - for context]\n[WhatsApp ...] Someone: hello\n\n[Current message - respond to this]\n[WhatsApp ...] Jake: /status\n[from: John Doe (+15550001234)]`,
       RawBody: "/status",
       ChatType: "group",
       SessionKey: "agent:main:whatsapp:group:g1",

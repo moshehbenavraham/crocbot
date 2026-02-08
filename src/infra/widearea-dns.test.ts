@@ -33,11 +33,11 @@ describe("wide-area DNS-SD zone rendering", () => {
       gatewayPort: 18789,
       displayName: "Mac Studio (crocbot)",
       tailnetIPv4: "100.123.224.76",
-      tailnetDns: "peters-mac-studio-1.sheep-coho.ts.net",
+      tailnetDns: "my-host.example-tailnet.ts.net",
       hostLabel: "studio-london",
       instanceLabel: "studio-london",
     });
 
-    expect(txt).toContain(`tailnetDns=peters-mac-studio-1.sheep-coho.ts.net`);
+    expect(txt).toContain(`tailnetDns=my-host.example-tailnet.ts.net`);
   });
 });

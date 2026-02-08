@@ -95,6 +95,11 @@ renovate.json
 .prettierrc*
 biome.json
 
+# Secrets
+.env
+.env.*
+!.env.example
+
 # README files (not needed in runtime)
 README.md
 CHANGELOG.md

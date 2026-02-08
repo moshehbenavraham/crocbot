@@ -10,7 +10,7 @@ If you believe you've found a security issue in crocbot, please report it privat
 
 ## Reporting
 
-- Email: `steipete@gmail.com`
+- Use [GitHub Security Advisories](https://github.com/moshehbenavraham/crocbot/security/advisories/new) to report privately.
 - What to include: reproduction steps, impact assessment, and (if possible) a minimal PoC.
 
 ## Operational Guidance

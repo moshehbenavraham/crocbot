@@ -3,7 +3,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 
 const QWEN_OAUTH_BASE_URL = "https://chat.qwen.ai";
 const QWEN_OAUTH_TOKEN_ENDPOINT = `${QWEN_OAUTH_BASE_URL}/api/v1/oauth2/token`;
-const QWEN_OAUTH_CLIENT_ID = "f0304373b74a44d2b584a3fb70ca9e56";
+const QWEN_OAUTH_CLIENT_ID = process.env.QWEN_OAUTH_CLIENT_ID ?? "f0304373b74a44d2b584a3fb70ca9e56";
 
 export async function refreshQwenPortalCredentials(
   credentials: OAuthCredentials,

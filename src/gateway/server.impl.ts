@@ -471,8 +471,7 @@ export async function startGatewayServer(
   });
 
   // Restart Awareness: Check for persisted restart state and send post-restart report
-  // Uses hardcoded user ID for notification (same as in server-close.ts)
-  const RESTART_NOTIFY_USER_ID = "1415494277";
+  const RESTART_NOTIFY_USER_ID = process.env.CROCBOT_ADMIN_USER_ID ?? "";
   void handlePostRestartReport({ defaultUserId: RESTART_NOTIFY_USER_ID }).catch((err) => {
     log.warn(`post-restart report failed: ${String(err)}`);
   });

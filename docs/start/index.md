@@ -207,7 +207,7 @@ Example:
 ## Core Contributors
 
 - **Maxim Vovshin** (@Hyaxia, 36747317+Hyaxia@users.noreply.github.com) — Blogwatcher skill
-- **Nacho Iacovino** (@nachoiacovino, nacho.iacovino@gmail.com) — Location parsing
+- **Nacho Iacovino** (@nachoiacovino) — Location parsing
 
 ## License
 

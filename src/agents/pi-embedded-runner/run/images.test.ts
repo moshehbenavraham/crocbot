@@ -106,16 +106,16 @@ describe("detectImageReferences", () => {
 
   it("detects [Image: source: ...] format from messaging systems", () => {
     const prompt = `What does this image show?
-[Image: source: /Users/tyleryust/Library/Messages/Attachments/IMG_0043.jpeg]`;
+[Image: source: /home/testuser/messages/attachments/IMG_0043.jpeg]`;
     const refs = detectImageReferences(prompt);
 
     expect(refs).toHaveLength(1);
-    expect(refs[0]?.raw).toBe("/Users/tyleryust/Library/Messages/Attachments/IMG_0043.jpeg");
+    expect(refs[0]?.raw).toBe("/home/testuser/messages/attachments/IMG_0043.jpeg");
     expect(refs[0]?.type).toBe("path");
   });
 
   it("handles complex message attachment paths", () => {
-    const prompt = `[Image: source: /Users/tyleryust/Library/Messages/Attachments/23/03/AA4726EA-DB27-4269-BA56-1436936CC134/5E3E286A-F585-4E5E-9043-5BC2AFAFD81BIMG_0043.jpeg]`;
+    const prompt = `[Image: source: /home/testuser/messages/attachments/23/03/AA4726EA-DB27-4269-BA56-1436936CC134/5E3E286A-F585-4E5E-9043-5BC2AFAFD81BIMG_0043.jpeg]`;
     const refs = detectImageReferences(prompt);
 
     expect(refs).toHaveLength(1);
@@ -125,8 +125,8 @@ describe("detectImageReferences", () => {
   it("detects multiple images in [media attached: ...] format", () => {
     // Multi-file format uses separate brackets on separate lines
     const prompt = `[media attached: 2 files]
-[media attached 1/2: /Users/tyleryust/.crocbot/media/IMG_6430.jpeg (image/jpeg)]
-[media attached 2/2: /Users/tyleryust/.crocbot/media/IMG_6431.jpeg (image/jpeg)]
+[media attached 1/2: /home/testuser/.crocbot/media/IMG_6430.jpeg (image/jpeg)]
+[media attached 2/2: /home/testuser/.crocbot/media/IMG_6431.jpeg (image/jpeg)]
 what about these images?`;
     const refs = detectImageReferences(prompt);
 

@@ -37,7 +37,7 @@ Edit `~/.ssh/config` and add:
 
 ```ssh
 Host remote-gateway
-    HostName <REMOTE_IP>          # e.g., 172.27.187.184
+    HostName <REMOTE_IP>          # e.g., 192.0.2.1
     User <REMOTE_USER>            # e.g., jefferson
     LocalForward 18789 127.0.0.1:18789
     IdentityFile ~/.ssh/id_rsa

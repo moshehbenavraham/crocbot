@@ -61,6 +61,22 @@ apps/ios/*.dSYM.zip
 apps/ios/*.mobileprovision
 .env
 
+# Secrets and credentials
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials/
+secrets/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+Thumbs.db
+
 # Local untracked files
 .local/
 .vscode/
@@ -72,6 +88,8 @@ USER.md
 .serena/
 .001_ORIGINAL/
 __pycache__/
+# Internal dev session state (not useful to external contributors)
+.spec_system/
 # Internal deployment logs (contain PII, not for public)
 docs/ongoing-projects/
 

@@ -10,7 +10,7 @@ export const NODE_WINDOWS_TASK_NAME = "crocbot Node";
 export const NODE_SERVICE_MARKER = "crocbot";
 export const NODE_SERVICE_KIND = "node";
 export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
-export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS = ["com.steipete.crocbot.gateway"];
+export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS = ["com.crocbot.gateway.legacy"];
 export const LEGACY_GATEWAY_SYSTEMD_SERVICE_NAMES: string[] = [];
 export const LEGACY_GATEWAY_WINDOWS_TASK_NAMES: string[] = [];
 

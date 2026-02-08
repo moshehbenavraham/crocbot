@@ -195,7 +195,7 @@ For team collaboration or production:
 
 ```bash
 # Example: Neon
-echo "OPENPROSE_POSTGRES_URL=postgresql://user:pass@ep-name.us-east-2.aws.neon.tech/neondb?sslmode=require" >> .prose/.env
+echo "OPENPROSE_POSTGRES_URL=postgresql://user:pass@ep-example-123.us-east-2.aws.neon.tech/neondb?sslmode=require" >> .prose/.env
 ```
 
 ---

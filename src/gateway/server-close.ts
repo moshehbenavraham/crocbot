@@ -9,8 +9,7 @@ import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("gateway/close");
 
-// Hardcoded notification user ID for restart awareness
-const RESTART_NOTIFY_USER_ID = "1415494277";
+const RESTART_NOTIFY_USER_ID = process.env.CROCBOT_ADMIN_USER_ID ?? "";
 
 export function createGatewayCloseHandler(params: {
   tailscaleCleanup: (() => Promise<void>) | null;

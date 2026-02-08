@@ -170,7 +170,7 @@ const defaultRegistry = createRegistry([
 describe("gateway server agent", () => {
   test("agent marks implicit delivery when lastTo is stale", async () => {
     setRegistry(defaultRegistry);
-    testState.allowFrom = ["+436769770569"];
+    testState.allowFrom = ["+15550005678"];
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-gw-"));
     testState.sessionStorePath = path.join(dir, "sessions.json");
     await writeSessionStore({

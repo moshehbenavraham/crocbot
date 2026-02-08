@@ -158,7 +158,7 @@ describe("trigger handling", () => {
           From: "discord:123",
           To: "user:123",
           Provider: "discord",
-          SenderName: "Peter Steinberger",
+          SenderName: "Test User",
           SenderUsername: "steipete",
           SenderTag: "steipete",
           CommandAuthorized: true,

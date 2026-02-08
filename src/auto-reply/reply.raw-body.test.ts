@@ -49,7 +49,7 @@ describe("RawBody directive parsing", () => {
       vi.mocked(runEmbeddedPiAgent).mockReset();
 
       const groupMessageCtx = {
-        Body: `[Chat messages since your last reply - for context]\\n[WhatsApp ...] Someone: hello\\n\\n[Current message - respond to this]\\n[WhatsApp ...] Jake: /think:high\\n[from: Jake McInteer (+6421807830)]`,
+        Body: `[Chat messages since your last reply - for context]\\n[WhatsApp ...] Someone: hello\\n\\n[Current message - respond to this]\\n[WhatsApp ...] Jake: /think:high\\n[from: John Doe (+15550001234)]`,
         RawBody: "/think:high",
         From: "+1222",
         To: "+1222",
@@ -154,7 +154,7 @@ describe("RawBody directive parsing", () => {
       vi.mocked(runEmbeddedPiAgent).mockReset();
 
       const groupMessageCtx = {
-        Body: `[Chat messages since your last reply - for context]\\n[WhatsApp ...] Someone: hello\\n\\n[Current message - respond to this]\\n[WhatsApp ...] Jake: /status\\n[from: Jake McInteer (+6421807830)]`,
+        Body: `[Chat messages since your last reply - for context]\\n[WhatsApp ...] Someone: hello\\n\\n[Current message - respond to this]\\n[WhatsApp ...] Jake: /status\\n[from: John Doe (+15550001234)]`,
         RawBody: "/status",
         ChatType: "group",
         From: "+1222",
@@ -205,7 +205,7 @@ describe("RawBody directive parsing", () => {
           "",
           "[Current message - respond to this]",
           "[WhatsApp ...] Jake: /think:high status please",
-          "[from: Jake McInteer (+6421807830)]",
+          "[from: John Doe (+15550001234)]",
         ].join("\n"),
         RawBody: "/think:high status please",
         From: "+1222",

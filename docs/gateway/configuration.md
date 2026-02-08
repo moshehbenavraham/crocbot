@@ -257,7 +257,7 @@ Included files can themselves contain `$include` directives (up to 10 levels dee
 ```json5
 // ~/.crocbot/clients/mueller/broadcast.json5
 {
-  "120363403215116621@g.us": ["mueller-transcribe", "mueller-docs"]
+  "123456789@g.us": ["mueller-transcribe", "mueller-docs"]
 }
 ```
 
@@ -2551,7 +2551,7 @@ Gmail helper config (used by `crocbot webhooks gmail setup` / `run`):
 {
   hooks: {
     gmail: {
-      account: "crocbot@gmail.com",
+      account: "you@gmail.com",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
       pushToken: "shared-push-token",

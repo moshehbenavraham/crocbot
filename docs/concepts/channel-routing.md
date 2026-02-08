@@ -57,7 +57,7 @@ Config:
 {
   broadcast: {
     strategy: "parallel",
-    "120363403215116621@g.us": ["alfred", "baerbel"],
+    "123456789@g.us": ["alfred", "baerbel"],
     "+15555550123": ["support", "logger"]
   }
 }

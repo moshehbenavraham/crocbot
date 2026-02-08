@@ -95,7 +95,7 @@ Use the crocbot helper to wire everything together:
 
 ```bash
 crocbot webhooks gmail setup \
-  --account crocbot@gmail.com
+  --account you@gmail.com
 ```
 
 Defaults:
@@ -163,7 +163,7 @@ gcloud pubsub topics add-iam-policy-binding gog-gmail-watch \
 
 ```bash
 gog gmail watch start \
-  --account crocbot@gmail.com \
+  --account you@gmail.com \
   --label INBOX \
   --topic projects/<project-id>/topics/gog-gmail-watch
 ```
@@ -176,7 +176,7 @@ Local example (shared token auth):
 
 ```bash
 gog gmail watch serve \
-  --account crocbot@gmail.com \
+  --account you@gmail.com \
   --bind 127.0.0.1 \
   --port 8788 \
   --path /gmail-pubsub \
@@ -223,8 +223,8 @@ Send a message to the watched inbox:
 
 ```bash
 gog gmail send \
-  --account crocbot@gmail.com \
-  --to crocbot@gmail.com \
+  --account you@gmail.com \
+  --to you@gmail.com \
   --subject "watch test" \
   --body "ping"
 ```
@@ -232,8 +232,8 @@ gog gmail send \
 Check watch state and history:
 
 ```bash
-gog gmail watch status --account crocbot@gmail.com
-gog gmail history --account crocbot@gmail.com --since <historyId>
+gog gmail watch status --account you@gmail.com
+gog gmail history --account you@gmail.com --since <historyId>
 ```
 
 ## Troubleshooting
@@ -245,7 +245,7 @@ gog gmail history --account crocbot@gmail.com --since <historyId>
 ## Cleanup
 
 ```bash
-gog gmail watch stop --account crocbot@gmail.com
+gog gmail watch stop --account you@gmail.com
 gcloud pubsub subscriptions delete gog-gmail-watch-push
 gcloud pubsub topics delete gog-gmail-watch
 ```

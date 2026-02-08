@@ -321,7 +321,7 @@ Save to `~/.crocbot/crocbot.json` and you can DM the bot from that chat ID.
       }
     ],
     gmail: {
-      account: "crocbot@gmail.com",
+      account: "you@gmail.com",
       label: "INBOX",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",

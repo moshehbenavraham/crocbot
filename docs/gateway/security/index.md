@@ -691,7 +691,7 @@ Mario asking for find ~
 
 Found a vulnerability in crocbot? Please report responsibly:
 
-1. Email: security@github.com/moshehbenavraham/crocbot
+1. Use [GitHub Security Advisories](https://github.com/moshehbenavraham/crocbot/security/advisories/new)
 2. Don't post publicly until fixed
 3. We'll credit you (unless you prefer anonymity)
 

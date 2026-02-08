@@ -7,7 +7,7 @@
 > - `CROCBOT_CONFIG_PATH` — main config file (auth, channels, skills, plugins)
 > - `CROCBOT_WORKSPACE` — agent working directory: `AGENTS.md`, `SOUL.md`, `USER.md`, `MEMORY.md`, `TOOLS.md`, `memory/`, `hooks/`
 >
-> **API Keys & Secrets**: Read `.env` in this repo — it contains credentials and paths to external config. Do NOT grep the codebase for credentials.
+> **API Keys & Secrets**: Copy `.env.example` to `.env` and fill in your own keys. Do NOT grep the codebase for credentials.
 
 ## Main Entry Point of App
  - run `crocbot -h`: you will see all the sysems of the assistant
