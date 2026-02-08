@@ -79,9 +79,31 @@ RUN pnpm prune --prod --ignore-scripts && \
 # =============================================================================
 FROM node:22-slim AS runtime
 
-# Install curl for health checks (minimal package)
+# Runtime tooling
+# Included: curl, ca-certificates, git, openssh-client, gh (GitHub CLI), gog (Google Workspace CLI)
+# NOT included (too large / optional):
+#   - claude-code (~npm global, install separately if needed)
+#   - chromium / playwright (~300 MB, mount or sidecar if needed)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      ca-certificates \
+      git \
+      openssh-client && \
+    # GitHub CLI (gh)
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
+    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      > /etc/apt/sources.list.d/github-cli.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends gh && \
+    # gog (Google Workspace CLI) — single Go binary
+    GOG_VER=$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/steipete/gogcli/releases/latest | grep -oP 'v[\d.]+') && \
+    curl -fsSL "https://github.com/steipete/gogcli/releases/download/${GOG_VER}/gogcli_${GOG_VER#v}_linux_amd64.tar.gz" \
+      | tar xz -C /usr/local/bin gog && \
+    chmod +x /usr/local/bin/gog && \
+    # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
