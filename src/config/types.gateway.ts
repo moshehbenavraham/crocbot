@@ -236,6 +236,12 @@ export type GatewayConfig = {
    * `x-real-ip`) to determine the client IP for local pairing and HTTP checks.
    */
   trustedProxies?: string[];
+  /**
+   * Allowed WebSocket Origin headers for non-loopback connections.
+   * If set, connections from non-loopback addresses with an Origin header
+   * not in this list will be rejected. Loopback connections are always allowed.
+   */
+  allowedWsOrigins?: string[];
   /** HTTP rate limiting per client IP (applied to non-health endpoints). */
   rateLimit?: GatewayRateLimitConfig;
   /** Alerting configuration for error notifications. */

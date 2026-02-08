@@ -228,6 +228,21 @@ export function attachGatewayWsMessageHandler(params: {
     );
   }
 
+  // Origin validation for non-loopback connections
+  const allowedWsOrigins = configSnapshot.gateway?.allowedWsOrigins;
+  if (allowedWsOrigins && allowedWsOrigins.length > 0 && !isLocalClient) {
+    const originLower = requestOrigin?.toLowerCase();
+    const allowed = originLower && allowedWsOrigins.some((o) => o.toLowerCase() === originLower);
+    if (!allowed) {
+      logWsControl.warn(
+        `WebSocket origin rejected: origin=${requestOrigin ?? "none"} remote=${remoteAddr ?? "?"} allowed=${allowedWsOrigins.join(",")}`,
+      );
+      setCloseCause("origin-rejected", { origin: requestOrigin });
+      close(1008, "origin not allowed");
+      return;
+    }
+  }
+
   const isWebchatConnect = (p: ConnectParams | null | undefined) => isWebchatClient(p?.client);
 
   socket.on("message", async (data) => {

@@ -76,19 +76,12 @@ export function createHooksRequestHandler(
       return false;
     }
 
-    const { token, fromQuery } = extractHookToken(req, url);
+    const { token } = extractHookToken(req, url);
     if (!token || token !== hooksConfig.token) {
       res.statusCode = 401;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end("Unauthorized");
       return true;
-    }
-    if (fromQuery) {
-      logHooks.warn(
-        "Hook token provided via query parameter is deprecated for security reasons. " +
-          "Tokens in URLs appear in logs, browser history, and referrer headers. " +
-          "Use Authorization: Bearer <token> or X-crocbot-Token header instead.",
-      );
     }
 
     if (req.method !== "POST") {
@@ -235,18 +228,7 @@ export function createGatewayHttpServer(opts: {
 
     // Lightweight HTTP health endpoint for platform probes (Fly.io, Docker, k8s)
     if (req.method === "GET" && req.url === "/health") {
-      const memUsage = process.memoryUsage();
-      const memoryMb = Math.round(memUsage.heapUsed / 1024 / 1024);
-      sendJson(res, 200, {
-        status: "healthy",
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: {
-          heapUsedMb: memoryMb,
-          heapTotalMb: Math.round(memUsage.heapTotal / 1024 / 1024),
-          rssMb: Math.round(memUsage.rss / 1024 / 1024),
-        },
-      });
+      sendJson(res, 200, { status: "healthy" });
       return;
     }
 

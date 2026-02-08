@@ -4,8 +4,9 @@
 # =============================================================================
 FROM node:22-bookworm AS builder
 
-# Install Bun (required for build scripts)
-RUN curl -fsSL https://bun.sh/install | bash
+# Install Bun (required for build scripts) — pinned version
+ARG BUN_VERSION=1.2.2
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
 ENV PATH="/root/.bun/bin:${PATH}"
 
 # Enable corepack for pnpm
@@ -41,7 +42,7 @@ COPY extensions ./extensions
 # Layer 4: Build TypeScript and UI
 ENV CROCBOT_A2UI_SKIP_MISSING=1
 ENV CROCBOT_PREFER_PNPM=1
-RUN pnpm build || true
+RUN pnpm build
 
 # =============================================================================
 # Stage 2: Dependencies Pruner
@@ -99,10 +100,12 @@ RUN apt-get update && \
       > /etc/apt/sources.list.d/github-cli.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends gh && \
-    # gog (Google Workspace CLI) — single Go binary
-    GOG_VER=$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/steipete/gogcli/releases/latest | grep -oP 'v[\d.]+') && \
+    # gog (Google Workspace CLI) — pinned version
+    GOG_VER=v1.5.0 && \
     curl -fsSL "https://github.com/steipete/gogcli/releases/download/${GOG_VER}/gogcli_${GOG_VER#v}_linux_amd64.tar.gz" \
-      | tar xz -C /usr/local/bin gog && \
+      -o /tmp/gog.tar.gz && \
+    tar xz -C /usr/local/bin gog -f /tmp/gog.tar.gz && \
+    rm /tmp/gog.tar.gz && \
     chmod +x /usr/local/bin/gog && \
     # Cleanup
     apt-get clean && \

@@ -346,7 +346,8 @@ export async function resolveMedia(
         },
       };
     } catch (err) {
-      logVerbose(`telegram: failed to process sticker: ${String(err)}`);
+      const msg = String(err).replace(/\/bot[^/]+\//g, "/bot<REDACTED>/");
+      logVerbose(`telegram: failed to process sticker: ${msg}`);
       return null;
     }
   }
@@ -365,11 +366,17 @@ export async function resolveMedia(
     throw new Error("fetch is not available; set channels.telegram.proxy in config");
   }
   const url = `https://api.telegram.org/file/bot${token}/${file.file_path}`;
-  const fetched = await fetchRemoteMedia({
-    url,
-    fetchImpl,
-    filePathHint: file.file_path,
-  });
+  let fetched: Awaited<ReturnType<typeof fetchRemoteMedia>>;
+  try {
+    fetched = await fetchRemoteMedia({
+      url,
+      fetchImpl,
+      filePathHint: file.file_path,
+    });
+  } catch (err) {
+    const msg = String(err).replace(/\/bot[^/]+\//g, "/bot<REDACTED>/");
+    throw new Error(`telegram media download failed: ${msg}`);
+  }
   const saved = await saveMediaBuffer(fetched.buffer, fetched.contentType, "inbound", maxBytes);
   let placeholder = "<media:document>";
   if (msg.photo) {
