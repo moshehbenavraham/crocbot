@@ -2,7 +2,7 @@
 
 ## Overview
 
-crocbot stores configuration and state in persistent storage. This guide covers backup procedures for Docker/Coolify deployments.
+crocbot stores configuration and state in persistent storage. This guide covers backup procedures for Docker deployments.
 
 ## What Gets Backed Up
 
@@ -37,9 +37,6 @@ Use the included backup script for automated backups:
 
 # Specify output directory
 ./scripts/backup.sh --output-dir ~/crocbot-backups
-
-# For Coolify deployments
-CROCBOT_GATEWAY_URL=https://your-domain.com ./scripts/backup.sh
 ```
 
 ### Method 3: Docker Volume Backup
@@ -48,7 +45,7 @@ For full state backup including all files:
 
 ```bash
 # Stop the container (recommended but optional)
-docker compose stop crocbot
+docker compose stop crocbot-gateway
 
 # Create tarball of the volume
 docker run --rm \
@@ -57,21 +54,7 @@ docker run --rm \
   alpine tar -czf /backup/crocbot-data-$(date +%Y%m%d).tar.gz -C /data .
 
 # Restart
-docker compose start crocbot
-```
-
-### Method 4: Coolify Volumes
-
-Coolify automatically manages volumes. To back up:
-
-1. Go to your service in Coolify dashboard
-2. Navigate to **Storages** tab
-3. Click the volume to view its path on the host
-4. Back up the host directory:
-
-```bash
-# SSH to your VPS
-sudo tar -czf /root/crocbot-backup.tar.gz /var/lib/docker/volumes/crocbot-data/_data
+docker compose start crocbot-gateway
 ```
 
 ## Restore Procedures
@@ -86,7 +69,7 @@ sudo tar -czf /root/crocbot-backup.tar.gz /var/lib/docker/volumes/crocbot-data/_
 
 ```bash
 # Stop the container
-docker compose stop crocbot
+docker compose stop crocbot-gateway
 
 # Restore the volume
 docker run --rm \
@@ -95,7 +78,7 @@ docker run --rm \
   alpine sh -c "rm -rf /data/* && tar -xzf /backup/crocbot-data-YYYYMMDD.tar.gz -C /data"
 
 # Start the container
-docker compose start crocbot
+docker compose start crocbot-gateway
 ```
 
 ## Scheduled Backups
@@ -162,7 +145,7 @@ tar -tzf crocbot-data-*.tar.gz > /dev/null && echo "Valid archive"
 
 ## Disaster Recovery
 
-1. **Provision new VPS/Coolify instance**
+1. **Provision new instance**
 2. **Deploy crocbot** following [Deployment guide](/platforms/deployment)
 3. **Restore config** via setup wizard or volume restore
 4. **Verify channels** are connected (Telegram, etc.)

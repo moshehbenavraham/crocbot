@@ -5,14 +5,14 @@
 | Environment | URL | Purpose |
 |-------------|-----|---------|
 | Development | localhost:18789 | Local development |
-| Production | (your VPS/Coolify) | Live system |
+| Production | Docker container | Live system |
 
 ## Configuration Differences
 
 | Config | Development | Production |
 |--------|-------------|------------|
 | Gateway port | 18789 | 18789 (behind proxy) |
-| TLS | None (HTTP) | Coolify/reverse proxy |
+| TLS | None (HTTP) | Reverse proxy |
 | Logging | Verbose | Structured JSON |
 | State dir | Local | Docker volume |
 
@@ -69,12 +69,3 @@ docker run -d \
 ```
 
 See [Docker installation](install/docker) and [Docker environment variables](install/docker-env-vars) for complete configuration.
-
-## Coolify Deployment
-
-Production deployments typically use Coolify for:
-- Automatic TLS termination via Let's Encrypt
-- Container management
-- Environment variable configuration
-
-Gateway runs HTTP internally (port 8080 or 18789), Coolify handles HTTPS termination.

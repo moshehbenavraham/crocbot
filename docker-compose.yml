@@ -1,9 +1,12 @@
 # crocbot Docker Compose - Local Testing
 #
+# Prerequisites:
+#   pnpm build          (produces dist/ and node_modules/)
+#   docker build -t crocbot:local .
+#
 # Usage:
-#   1. Quick start:  ./scripts/docker-setup.sh
-#   2. Manual:       docker compose up -d crocbot-gateway
-#   3. CLI access:   docker compose run --rm crocbot-cli <command>
+#   1. Quick start:  docker compose up -d crocbot-gateway
+#   2. CLI access:   docker compose run --rm crocbot-cli <command>
 #
 # Environment variables (set in .env or export):
 #   CROCBOT_CONFIG_DIR     - Host path for config (default: ~/.crocbot)
@@ -18,6 +21,9 @@
 services:
   crocbot-gateway:
     image: ${CROCBOT_IMAGE:-crocbot:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: crocbot-gateway
     environment:
       HOME: /home/node
@@ -27,10 +33,6 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
     volumes:
       - ${CROCBOT_CONFIG_DIR:-~/.crocbot}:/home/node/.crocbot
       - ${CROCBOT_WORKSPACE_DIR:-~/croc}:/home/node/croc
@@ -66,10 +68,6 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
     volumes:
       - ${CROCBOT_CONFIG_DIR:-~/.crocbot}:/home/node/.crocbot
       - ${CROCBOT_WORKSPACE_DIR:-~/croc}:/home/node/croc

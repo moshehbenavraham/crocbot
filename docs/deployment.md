@@ -1,5 +1,35 @@
 # Deployment
 
+## Deployment Paths
+
+crocbot supports two deployment paths:
+
+1. **Local** — native Node for dev/testing (`pnpm build` + `node dist/index.js gateway`)
+2. **Docker** — runtime-only image built from pre-compiled `dist/`
+
+## Local
+
+```bash
+pnpm install
+pnpm build
+node dist/index.js gateway --port 18789 --verbose
+```
+
+## Docker
+
+```bash
+# Build locally first
+pnpm build
+
+# Build the Docker image
+docker build -t crocbot:local .
+
+# Start the gateway
+docker compose up -d crocbot-gateway
+```
+
+See [Docker installation](/install/docker) for full documentation.
+
 ## CI/CD Pipeline
 
 ```
@@ -34,51 +64,16 @@ dist/           # Bundled JavaScript (code-split chunks)
 4. Push: `git push && git push --tags`
 5. CI builds and publishes
 
-## Docker Deployment
-
-### Build Image
+## Update Deployment
 
 ```bash
-# Multi-stage build
-docker build -t crocbot:latest .
-```
-
-### Run Container
-
-```bash
-docker run -d \
-  --name crocbot \
-  --restart unless-stopped \
-  -p 18789:18789 \
-  -e ANTHROPIC_API_KEY=... \
-  -e TELEGRAM_BOT_TOKEN=... \
-  -v crocbot-state:/app/state \
-  crocbot:latest
-```
-
-### Update Deployment
-
-```bash
-# Pull new image
-docker pull crocbot:latest
+# Rebuild image with latest code
+pnpm build
+docker build -t crocbot:local .
 
 # Recreate container
-docker stop crocbot
-docker rm crocbot
-docker run -d ... crocbot:latest
+docker compose up -d crocbot-gateway
 ```
-
-## Coolify Deployment
-
-1. Connect GitHub repository
-2. Configure environment variables
-3. Set build command: `pnpm build`
-4. Deploy
-
-Coolify handles:
-- Automatic TLS certificates
-- Container orchestration
-- Zero-downtime deployments
 
 ## Rollback
 
@@ -87,9 +82,9 @@ Coolify handles:
 docker images crocbot
 
 # Run previous version
-docker stop crocbot
-docker rm crocbot
-docker run -d --name crocbot ... crocbot:previous-tag
+docker stop crocbot-gateway
+docker rm crocbot-gateway
+docker run -d --name crocbot-gateway ... crocbot:previous-tag
 ```
 
 ## Health Monitoring
@@ -106,10 +101,7 @@ curl http://localhost:18789/health
 
 ```bash
 # Docker logs
-docker logs -f crocbot
-
-# systemd logs
-journalctl --user -u crocbot-gateway -f
+docker logs -f crocbot-gateway
 ```
 
 ## Runbooks

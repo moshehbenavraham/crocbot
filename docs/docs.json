@@ -1073,7 +1073,6 @@
           "platforms/index",
           "platforms/windows",
           "platforms/linux",
-          "platforms/raspberry-pi",
           "platforms/deployment",
           "platforms/vps"
         ]

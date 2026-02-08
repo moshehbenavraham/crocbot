@@ -72,9 +72,12 @@ pnpm gateway:watch
 
 ## Docker
 
-### Local testing
-
 ```bash
+# Build the image (requires dist/ from pnpm build)
+pnpm build
+docker build -t crocbot:local .
+
+# Start the gateway
 docker compose up -d crocbot-gateway
 
 # CLI access
@@ -83,19 +86,7 @@ docker compose run --rm crocbot-cli status
 
 Environment variables (`ANTHROPIC_API_KEY`, `TELEGRAM_BOT_TOKEN`, etc.) are read from `.env` or exported. Volumes mount `~/.crocbot` (config) and `~/croc` (workspace).
 
-### Coolify production deployment
-
-The repo includes a Coolify-optimized compose file:
-
-```bash
-# docker-compose.coolify.yml
-# - Multi-stage build from Dockerfile
-# - Persistent volume at /data
-# - Health checks, memory limits, auto-restart
-# - Set CROCBOT_GATEWAY_TOKEN + ANTHROPIC_API_KEY in Coolify UI
-```
-
-See [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml), and [`docker-compose.coolify.yml`](docker-compose.coolify.yml). Full docs: [Docker install](https://aiwithapex.mintlify.app/install/docker)
+See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). Full docs: [Docker install](https://aiwithapex.mintlify.app/install/docker)
 
 ---
 
@@ -303,8 +294,11 @@ scripts/committer "feat: add cron retry logic" src/cron/retry.ts
 ### Deploy
 
 ```bash
-pnpm build && systemctl --user restart crocbot-gateway
-systemctl --user status crocbot-gateway
+# Local
+pnpm build && node dist/index.js gateway
+
+# Docker
+pnpm build && docker build -t crocbot:local . && docker compose up -d
 ```
 
 Docs: [Development reference](https://aiwithapex.mintlify.app/reference/development)

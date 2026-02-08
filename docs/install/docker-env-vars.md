@@ -22,16 +22,6 @@ This document describes the environment variables used when running crocbot in D
 | `HOME` | `/home/node` | Home directory (set in compose) |
 | `TERM` | `xterm-256color` | Terminal type (set in compose) |
 
-## Claude Provider Variables
-
-These variables configure the Claude AI provider connection:
-
-| Variable | Description |
-|----------|-------------|
-| `CLAUDE_AI_SESSION_KEY` | Session key for Claude AI API |
-| `CLAUDE_WEB_SESSION_KEY` | Session key for Claude web interface |
-| `CLAUDE_WEB_COOKIE` | Cookie for Claude web authentication |
-
 ## Usage with docker-compose
 
 Create a `.env` file in the same directory as `docker-compose.yml`:
@@ -52,7 +42,7 @@ CROCBOT_GATEWAY_BIND=lan
 Then run:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Usage with docker run
@@ -66,20 +56,6 @@ docker run -d \
   -v /path/to/workspace:/home/node/croc \
   crocbot:local \
   node dist/index.js gateway --bind lan --port 18789
-```
-
-## Build-time Variables
-
-These ARG variables can be passed during `docker build`:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CROCBOT_DOCKER_APT_PACKAGES` | (empty) | Additional apt packages to install |
-
-Example:
-
-```bash
-docker build --build-arg CROCBOT_DOCKER_APT_PACKAGES="vim" -t crocbot:custom .
 ```
 
 ## First-Time Setup

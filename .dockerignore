@@ -21,9 +21,9 @@
 .vscode
 .idea
 
-# Build output (rebuilt in Docker)
-dist
-**/dist
+# Build output (included for runtime-only Dockerfile)
+# dist
+# **/dist
 
 # Coverage and test artifacts
 coverage
@@ -46,9 +46,9 @@ tmp
 *.wav
 *.mp3
 
-# Node modules (reinstalled in Docker)
-node_modules
-**/node_modules
+# Node modules (included for runtime-only Dockerfile)
+# node_modules
+# **/node_modules
 
 # Large app trees not needed for CLI build
 apps/

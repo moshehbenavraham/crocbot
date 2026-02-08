@@ -4,45 +4,66 @@
 
 crocbot supports two deployment paths:
 
-1. **Local** - Docker Compose for local development and testing
-2. **Coolify** - VPS production deployment with Coolify
+1. **Local** — native Node for development and testing
+2. **Docker** — runtime-only container for production or isolated environments
 
-## Local Deployment (Docker Compose)
+## Local Deployment (Node)
 
-Use Docker Compose for local development, testing, and evaluation.
+Run crocbot directly on your machine with Node.js.
 
 ### Prerequisites
 
-- Docker Desktop (or Docker Engine) + Docker Compose v2
-- Enough disk for images + logs
+- Node.js 22+
+- pnpm
 
 ### Quick Start
 
-From the repo root:
-
 ```bash
-./scripts/docker-setup.sh
+pnpm install
+pnpm build
+node dist/index.js gateway --port 18789 --verbose
 ```
 
-This script:
-- Builds the gateway image
-- Runs the onboarding wizard
-- Prints optional provider setup hints
-- Starts the gateway via Docker Compose
-- Generates a gateway token and writes it to `.env`
+### Environment Variables
 
-After it finishes:
-- Open `http://127.0.0.1:18789/` in your browser
-- Paste the token into the Control UI (Settings)
+Set these in `.env` or export them:
 
-### Manual Flow
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ANTHROPIC_API_KEY` | Anthropic API key | - |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token | - |
+| `CROCBOT_STATE_DIR` | Runtime state directory | `~/.crocbot` |
+| `CROCBOT_WORKSPACE` | Agent working directory | `~/croc` |
+
+### Commands
 
 ```bash
-# Build the image
-docker build -t crocbot:local -f Dockerfile .
+# Dev loop (auto-reload on TS changes)
+pnpm gateway:watch
 
-# Run onboarding
-docker compose run --rm crocbot-cli onboard
+# Health check
+curl http://localhost:18789/health
+```
+
+---
+
+## Docker Deployment
+
+Use Docker for production or isolated environments. The Dockerfile packages a pre-built `dist/` into a lean `node:22-slim` runtime image.
+
+### Prerequisites
+
+- Docker Engine + Docker Compose v2
+- Pre-built `dist/` directory (`pnpm build`)
+
+### Quick Start
+
+```bash
+# Build application
+pnpm build
+
+# Build Docker image
+docker build -t crocbot:local .
 
 # Start the gateway
 docker compose up -d crocbot-gateway
@@ -81,117 +102,13 @@ See [Docker Installation](/install/docker) for full documentation.
 
 ---
 
-## Coolify Deployment (VPS Production)
-
-Use Coolify for production VPS deployment with automatic SSL, persistent storage, and easy management.
-
-### Prerequisites
-
-- A VPS with [Coolify](https://coolify.io/) installed
-- An API key from your preferred model provider
-- Domain name (optional, for custom domain)
-
-### Setup Steps
-
-1. **Create a new service in Coolify**
-   - Go to your Coolify dashboard
-   - Create a new Project (or use existing)
-   - Add a new Resource > Docker Compose
-
-2. **Configure the repository**
-   - Repository: `https://github.com/moshehbenavraham/crocbot`
-   - Branch: `main`
-   - Docker Compose file: `docker-compose.coolify.yml`
-
-3. **Set environment variables**
-
-   Required:
-   - `CROCBOT_GATEWAY_TOKEN` - Generate with: `openssl rand -hex 32`
-   - `ANTHROPIC_API_KEY` - Your Anthropic API key
-
-   Optional:
-   - `SETUP_PASSWORD` - Password for `/setup` wizard
-   - `TELEGRAM_BOT_TOKEN` - Telegram bot token
-   - `OPENAI_API_KEY` - OpenAI API key (fallback)
-
-4. **Configure domain (optional)**
-   - Add your domain in Coolify's settings
-   - Coolify handles SSL automatically via Let's Encrypt
-
-5. **Deploy**
-   - Click Deploy
-   - Wait for the build to complete
-
-### After Deployment
-
-1. **Complete setup wizard**
-   - Visit `https://your-domain.com/setup`
-   - Enter your `SETUP_PASSWORD`
-   - Configure model provider and channels
-
-2. **Access Control UI**
-   - Visit `https://your-domain.com/crocbot`
-   - Use your gateway token to authenticate
-
-### Health Check
-
-The gateway exposes a health endpoint:
-
-```bash
-curl https://your-domain.com/health
-```
-
-Response:
-```json
-{
-  "status": "ok",
-  "timestamp": "2026-01-30T12:00:00.000Z",
-  "uptime": 3600,
-  "heapUsedMb": 150,
-  "heapTotalMb": 256,
-  "rssMb": 300
-}
-```
-
-### Monitoring
-
-View logs in Coolify dashboard:
-- Build logs (Docker image creation)
-- Runtime logs (application output)
-
-### Updates
-
-To update crocbot:
-1. Go to your service in Coolify
-2. Click "Redeploy" to pull latest changes
-3. Coolify rebuilds and restarts automatically
-
-### Backups
-
-Export configuration at any time:
-```
-https://your-domain.com/setup/export
-```
-
-This downloads a portable backup you can restore on any crocbot host.
-
-### Resource Requirements
-
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| Memory | 512MB | 2GB |
-| Storage | 1GB | 5GB+ |
-| CPU | 1 vCPU | 2 vCPU |
-
----
-
 ## CI/CD Pipeline
 
 The repository includes CI workflows:
 
-- `ci.yml` - Runs lint, build, and tests on push/PR
-- `docker-release.yml` - Builds and publishes Docker images on release
-- `security.yml` - CodeQL security scanning
+- `ci.yml` — runs lint, build, and tests on push/PR
+- `docker-release.yml` — builds and publishes Docker images on release
+- `security.yml` — CodeQL security scanning
 
 ## Release Process
 

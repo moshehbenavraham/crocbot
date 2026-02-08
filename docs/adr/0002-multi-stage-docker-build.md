@@ -1,7 +1,11 @@
 # 2. Multi-Stage Docker Build
 
-**Status:** Accepted
+**Status:** Superseded
 **Date:** 2026-01-30
+
+> **Superseded**: The multi-stage Dockerfile was replaced by a simple runtime-only
+> Dockerfile that copies pre-built `dist/` and `node_modules/` into `node:22-slim`.
+> Building happens locally via `pnpm build` before `docker build`.
 
 ## Context
 

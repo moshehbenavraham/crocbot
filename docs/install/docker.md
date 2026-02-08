@@ -7,12 +7,12 @@ read_when:
 
 # Docker (optional)
 
-Docker is **optional**. Use it only if you want a containerized gateway or to validate the Docker flow.
+Docker is **optional**. Use it only if you want a containerized gateway or to run crocbot on a host without local installs.
 
 ## Is Docker right for me?
 
 - **Yes**: you want an isolated, throwaway gateway environment or to run crocbot on a host without local installs.
-- **No**: you’re running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
+- **No**: you're running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
 - **Sandboxing note**: agent sandboxing uses Docker too, but it does **not** require the full gateway to run in Docker. See [Sandboxing](/gateway/sandboxing).
 
 This guide covers:
@@ -24,7 +24,12 @@ Sandboxing details: [Sandboxing](/gateway/sandboxing)
 ## Requirements
 
 - Docker Desktop (or Docker Engine) + Docker Compose v2
+- Node.js 22+ and pnpm (for building `dist/` before Docker build)
 - Enough disk for images + logs
+
+## How the Dockerfile works
+
+The Dockerfile is a simple runtime-only image. It copies the pre-built `dist/`, `node_modules/`, and static assets into a `node:22-slim` base. You must run `pnpm build` locally first — there is no build stage inside Docker.
 
 ## Containerized Gateway (Docker Compose)
 
@@ -33,35 +38,33 @@ Sandboxing details: [Sandboxing](/gateway/sandboxing)
 From repo root:
 
 ```bash
-./scripts/scripts/docker-setup.sh
+# 1. Build the application
+pnpm install
+pnpm build
+
+# 2. Build the Docker image
+docker build -t crocbot:local .
+
+# 3. Run onboarding
+docker compose run --rm crocbot-cli onboard
+
+# 4. Start the gateway
+docker compose up -d crocbot-gateway
 ```
-
-This script:
-- builds the gateway image
-- runs the onboarding wizard
-- prints optional provider setup hints
-- starts the gateway via Docker Compose
-- generates a gateway token and writes it to `.env`
-
-Optional env vars:
-- `CROCBOT_DOCKER_APT_PACKAGES` — install extra apt packages during build
-- `CROCBOT_EXTRA_MOUNTS` — add extra host bind mounts
-- `CROCBOT_HOME_VOLUME` — persist `/home/node` in a named volume
 
 After it finishes:
 - Open `http://127.0.0.1:18789/` in your browser.
-- Paste the token into the Control UI (Settings → token).
+- Paste the token into the Control UI (Settings).
 
 It writes config/workspace on the host:
 - `~/.crocbot/`
 - `~/croc`
 
-Running on a VPS? See [Hetzner (Docker VPS)](/platforms/hetzner).
-
 ### Manual flow (compose)
 
 ```bash
-docker build -t crocbot:local -f Dockerfile .
+pnpm build
+docker build -t crocbot:local .
 docker compose run --rm crocbot-cli onboard
 docker compose up -d crocbot-gateway
 ```
@@ -77,14 +80,14 @@ Example:
 
 ```bash
 export CROCBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
-./scripts/scripts/docker-setup.sh
+./scripts/docker-setup.sh
 ```
 
 Notes:
 - Paths must be shared with Docker Desktop on macOS/Windows.
 - If you edit `CROCBOT_EXTRA_MOUNTS`, rerun `scripts/docker-setup.sh` to regenerate the
   extra compose file.
-- `docker-compose.extra.yml` is generated. Don’t hand-edit it.
+- `docker-compose.extra.yml` is generated. Don't hand-edit it.
 
 ### Persist the entire container home (optional)
 
@@ -98,73 +101,13 @@ Example:
 
 ```bash
 export CROCBOT_HOME_VOLUME="crocbot_home"
-./scripts/scripts/docker-setup.sh
-```
-
-You can combine this with extra mounts:
-
-```bash
-export CROCBOT_HOME_VOLUME="crocbot_home"
-export CROCBOT_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
-./scripts/scripts/docker-setup.sh
+./scripts/docker-setup.sh
 ```
 
 Notes:
 - If you change `CROCBOT_HOME_VOLUME`, rerun `scripts/docker-setup.sh` to regenerate the
   extra compose file.
 - The named volume persists until removed with `docker volume rm <name>`.
-
-### Install extra apt packages (optional)
-
-If you need system packages inside the image (for example, build tools or media
-libraries), set `CROCBOT_DOCKER_APT_PACKAGES` before running `scripts/docker-setup.sh`.
-This installs the packages during the image build, so they persist even if the
-container is deleted.
-
-Example:
-
-```bash
-export CROCBOT_DOCKER_APT_PACKAGES="ffmpeg build-essential"
-./scripts/scripts/docker-setup.sh
-```
-
-Notes:
-- This accepts a space-separated list of apt package names.
-- If you change `CROCBOT_DOCKER_APT_PACKAGES`, rerun `scripts/docker-setup.sh` to rebuild
-  the image.
-
-### Faster rebuilds (recommended)
-
-To speed up rebuilds, order your Dockerfile so dependency layers are cached.
-This avoids re-running `pnpm install` unless lockfiles change:
-
-```dockerfile
-FROM node:22-bookworm
-
-# Install Bun (required for build scripts)
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:${PATH}"
-
-RUN corepack enable
-
-WORKDIR /app
-
-# Cache dependencies unless package metadata changes
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY ui/package.json ./ui/package.json
-COPY scripts ./scripts
-
-RUN pnpm install --frozen-lockfile
-
-COPY . .
-RUN pnpm build
-RUN pnpm ui:install
-RUN pnpm ui:build
-
-ENV NODE_ENV=production
-
-CMD ["node","dist/index.js"]
-```
 
 ### Channel setup (optional)
 
@@ -421,7 +364,7 @@ Example:
 
 ### Security notes
 
-- Hard wall only applies to **tools** (exec/read/write/edit/apply_patch).  
+- Hard wall only applies to **tools** (exec/read/write/edit/apply_patch).
 - Host-only tools like browser/camera are blocked by default.
 - Allowing `browser` in sandbox **breaks isolation** (browser runs on host).
 

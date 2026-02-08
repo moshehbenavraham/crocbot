@@ -13,7 +13,7 @@
  - run `crocbot -h`: you will see all the sysems of the assistant
 
 ## Project Snapshot
-- crocbot is a strip-down, sipmlification and customization of OpenClaw (details in "Source Project" below) specifically for only two interaction channels with crocobt (CLI & Telegram) and primary deployment is Coolify/Docker on a remote server
+- crocbot is a strip-down, sipmlification and customization of OpenClaw (details in "Source Project" below) specifically for only two interaction channels with crocobt (CLI & Telegram) and two deployment paths: local (Node) and Docker
 - crocbot is a Telegram-first personal AI assistant and gateway CLI (`crocbot` binary).
 - Chat channels: Telegram only (`src/channels/registry.ts`). Other channels and native apps were removed during the strip-down.
 - Plugin runtime remains (`src/plugins`, `src/plugin-sdk`); there are also bundled `extensions/`.
@@ -34,11 +34,10 @@
 - TypeScript is ESM; use `.js` extensions in imports and avoid `any`.
 - Use `scripts/committer "<msg>" <file...>` for commits (scoped staging).
 - **Audit**: `pnpm build` (type errors), `pnpm lint` (code quality), `pnpm test` (tests).
-- **Logs**: `journalctl --user -u crocbot-gateway --since "1 hour ago"`
 
 ## Deploy
-- Rebuild and restart: `pnpm build && systemctl --user restart crocbot-gateway`
-- Check status: `systemctl --user status crocbot-gateway`
+- **Local**: `pnpm build && node dist/index.js gateway`
+- **Docker**: `pnpm build && docker build -t crocbot:local . && docker compose up -d`
 
 ## Docs Rules
 - Internal links in `docs/**/*.md`: root-relative, no `.md`/`.mdx`.

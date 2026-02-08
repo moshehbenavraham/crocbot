@@ -1,36 +1,41 @@
 ---
-summary: "VPS hosting hub for crocbot (Oracle/Fly/Hetzner/GCP/exe.dev)"
+summary: "Running crocbot on a VPS with Docker"
 read_when:
   - You want to run the Gateway in the cloud
-  - You need a quick map of VPS/hosting guides
+  - You need guidance on VPS deployment
 ---
-# VPS hosting
+# VPS Hosting (Docker)
 
-This hub links to the supported VPS/hosting guides and explains how cloud
-deployments work at a high level.
+This guide covers running crocbot on a VPS using Docker.
 
-## Pick a provider
+## How it works
 
-- **Railway** (one‑click + browser setup): [Railway](/railway)
-- **Northflank** (one‑click + browser setup): [Northflank](/northflank)
-- **Oracle Cloud (Always Free)**: [Oracle](/platforms/oracle) — $0/month (Always Free, ARM; capacity/signup can be finicky)
-- **Fly.io**: [Fly.io](/platforms/fly)
-- **Hetzner (Docker)**: [Hetzner](/platforms/hetzner)
-- **GCP (Compute Engine)**: [GCP](/platforms/gcp)
-- **exe.dev** (VM + HTTPS proxy): [exe.dev](/platforms/exe-dev)
-- **AWS (EC2/Lightsail/free tier)**: works well too. Video guide:
-  https://x.com/techfrenAJ/status/2014934471095812547
-
-## How cloud setups work
-
-- The **Gateway runs on the VPS** and owns state + workspace.
+- The **Gateway runs on the VPS** inside a Docker container and owns state + workspace.
 - You connect from your laptop/phone via the **Control UI** or **Tailscale/SSH**.
 - Treat the VPS as the source of truth and **back up** the state + workspace.
 - Secure default: keep the Gateway on loopback and access it via SSH tunnel or Tailscale Serve.
   If you bind to `lan`/`tailnet`, require `gateway.auth.token` or `gateway.auth.password`.
 
-Remote access: [Gateway remote](/gateway/remote)  
-Platforms hub: [Platforms](/platforms)
+## Setup
+
+1. **Provision a VPS** with any cloud provider (Hetzner, DigitalOcean, AWS, GCP, etc.)
+2. **Install Docker** on the VPS
+3. **Clone the repo** and build:
+
+```bash
+git clone https://github.com/moshehbenavraham/crocbot.git
+cd crocbot
+pnpm install
+pnpm build
+docker build -t crocbot:local .
+```
+
+4. **Configure environment** — create a `.env` file with your API keys and tokens
+5. **Start the gateway**:
+
+```bash
+docker compose up -d crocbot-gateway
+```
 
 ## Remote access
 
@@ -38,83 +43,18 @@ The Gateway runs on the VPS and handles all Telegram traffic. Access the Gateway
 remotely via Tailscale Serve/Funnel or SSH tunnel.
 
 Docs: [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale)
----
-summary: "VPS hosting hub for crocbot (Oracle/Fly/Hetzner/GCP/exe.dev)"
-read_when:
-  - You want to run the Gateway in the cloud
-  - You need a quick map of VPS/hosting guides
----
-# VPS hosting
 
-This hub links to the supported VPS/hosting guides and explains how cloud
-deployments work at a high level.
+## Resource requirements
 
-## Pick a provider
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| Memory | 512MB | 2GB |
+| Storage | 1GB | 5GB+ |
+| CPU | 1 vCPU | 2 vCPU |
 
-- **Railway** (one‑click + browser setup): [Railway](/railway)
-- **Northflank** (one‑click + browser setup): [Northflank](/northflank)
-- **Oracle Cloud (Always Free)**: [Oracle](/platforms/oracle) — $0/month (Always Free, ARM; capacity/signup can be finicky)
-- **Fly.io**: [Fly.io](/platforms/fly)
-- **Hetzner (Docker)**: [Hetzner](/platforms/hetzner)
-- **GCP (Compute Engine)**: [GCP](/platforms/gcp)
-- **exe.dev** (VM + HTTPS proxy): [exe.dev](/platforms/exe-dev)
-- **AWS (EC2/Lightsail/free tier)**: works well too. Video guide:
-  https://x.com/techfrenAJ/status/2014934471095812547
+## Backups
 
-## How cloud setups work
+See [Backup & Restore](/runbooks/backup-restore) for backup procedures.
 
-- The **Gateway runs on the VPS** and owns state + workspace.
-- You connect from your laptop/phone via the **Control UI** or **Tailscale/SSH**.
-- Treat the VPS as the source of truth and **back up** the state + workspace.
-- Secure default: keep the Gateway on loopback and access it via SSH tunnel or Tailscale Serve.
-  If you bind to `lan`/`tailnet`, require `gateway.auth.token` or `gateway.auth.password`.
-
-Remote access: [Gateway remote](/gateway/remote)  
+Remote access: [Gateway remote](/gateway/remote)
 Platforms hub: [Platforms](/platforms)
-
-## Remote access
-
-The Gateway runs on the VPS and handles all Telegram traffic. Access the Gateway
-remotely via Tailscale Serve/Funnel or SSH tunnel.
-
-Docs: [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale)
----
-summary: "VPS hosting hub for crocbot (Oracle/Fly/Hetzner/GCP/exe.dev)"
-read_when:
-  - You want to run the Gateway in the cloud
-  - You need a quick map of VPS/hosting guides
----
-# VPS hosting
-
-This hub links to the supported VPS/hosting guides and explains how cloud
-deployments work at a high level.
-
-## Pick a provider
-
-- **Railway** (one‑click + browser setup): [Railway](/railway)
-- **Northflank** (one‑click + browser setup): [Northflank](/northflank)
-- **Oracle Cloud (Always Free)**: [Oracle](/platforms/oracle) — $0/month (Always Free, ARM; capacity/signup can be finicky)
-- **Fly.io**: [Fly.io](/platforms/fly)
-- **Hetzner (Docker)**: [Hetzner](/platforms/hetzner)
-- **GCP (Compute Engine)**: [GCP](/platforms/gcp)
-- **exe.dev** (VM + HTTPS proxy): [exe.dev](/platforms/exe-dev)
-- **AWS (EC2/Lightsail/free tier)**: works well too. Video guide:
-  https://x.com/techfrenAJ/status/2014934471095812547
-
-## How cloud setups work
-
-- The **Gateway runs on the VPS** and owns state + workspace.
-- You connect from your laptop/phone via the **Control UI** or **Tailscale/SSH**.
-- Treat the VPS as the source of truth and **back up** the state + workspace.
-- Secure default: keep the Gateway on loopback and access it via SSH tunnel or Tailscale Serve.
-  If you bind to `lan`/`tailnet`, require `gateway.auth.token` or `gateway.auth.password`.
-
-Remote access: [Gateway remote](/gateway/remote)  
-Platforms hub: [Platforms](/platforms)
-
-## Remote access
-
-The Gateway runs on the VPS and handles all Telegram traffic. Access the Gateway
-remotely via Tailscale Serve/Funnel or SSH tunnel.
-
-Docs: [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale)

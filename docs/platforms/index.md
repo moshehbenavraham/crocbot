@@ -13,8 +13,8 @@ Bun is not recommended for the Gateway.
 
 crocbot supports two deployment paths:
 
-1. **Local (Docker Compose)** - For development and testing
-2. **Coolify (VPS)** - For production deployment
+1. **Local (Node)** — native Node for development and testing
+2. **Docker** — runtime-only container for production or isolated environments
 
 See [Deployment](/platforms/deployment) for full setup instructions.
 
@@ -22,7 +22,6 @@ See [Deployment](/platforms/deployment) for full setup instructions.
 
 - Windows: [Windows (WSL2)](/platforms/windows)
 - Linux: [Linux](/platforms/linux)
-- Raspberry Pi: [Raspberry Pi](/platforms/raspberry-pi)
 
 ## Common Links
 
@@ -30,15 +29,3 @@ See [Deployment](/platforms/deployment) for full setup instructions.
 - Gateway runbook: [Gateway](/gateway)
 - Gateway configuration: [Configuration](/gateway/configuration)
 - Service status: `crocbot gateway status`
-
-## Gateway Service Install (CLI)
-
-Use one of these (all supported):
-
-- Wizard (recommended): `crocbot onboard --install-daemon`
-- Direct: `crocbot gateway install`
-- Configure flow: `crocbot configure` -> select **Gateway service**
-- Repair/migrate: `crocbot doctor` (offers to install or fix the service)
-
-The service target depends on OS:
-- Linux/WSL2: systemd user service (`crocbot-gateway[-<profile>].service`)
