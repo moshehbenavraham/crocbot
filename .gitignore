@@ -87,6 +87,7 @@ USER.md
 # local tooling
 .serena/
 .001_ORIGINAL/
+.002_AGENT_ZERO/
 __pycache__/
 # Internal dev session state (not useful to external contributors)
 .spec_system/
