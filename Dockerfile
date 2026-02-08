@@ -80,7 +80,7 @@ RUN pnpm prune --prod --ignore-scripts && \
 FROM node:22-slim AS runtime
 
 # Runtime tooling
-# Included: curl, ca-certificates, git, openssh-client, gh (GitHub CLI), gog (Google Workspace CLI)
+# Included: curl, ca-certificates, git, jq, openssh-client, gh (GitHub CLI), gog (Google Workspace CLI)
 # NOT included (too large / optional):
 #   - claude-code (~npm global, install separately if needed)
 #   - chromium / playwright (~300 MB, mount or sidecar if needed)
@@ -89,6 +89,7 @@ RUN apt-get update && \
       curl \
       ca-certificates \
       git \
+      jq \
       openssh-client && \
     # GitHub CLI (gh)
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
