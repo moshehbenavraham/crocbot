@@ -114,6 +114,14 @@ pnpm vitest run src/mcp/mcp-server.e2e.test.ts
 pnpm vitest run src/mcp/mcp-ssrf.e2e.test.ts
 ```
 
+## Secrets Masking
+
+MCP tool results are automatically masked by the secrets pipeline before persistence. The integration point is `maskToolResultMessage()` from `src/infra/secrets/tool-result-masking.ts`, applied via the session tool-result guard wrapper (`src/agents/session-tool-result-guard-wrapper.ts`).
+
+This ensures that any secrets returned by MCP tool calls (API keys, tokens, credentials) are replaced with `{{SECRET:hash8}}` placeholders before they reach the session transcript, logs, or Telegram output. At tool execution time, placeholders are restored to real values via `unmaskForExecution()`.
+
+MCP server authentication tokens configured in `mcp.server.token` are auto-discovered by the SecretsRegistry at startup and masked in all output boundaries.
+
 ## Dependencies
 
 - `@modelcontextprotocol/sdk` -- official MCP TypeScript SDK
