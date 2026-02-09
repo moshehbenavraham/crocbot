@@ -433,6 +433,34 @@ export const crocbotSchema = z
           })
           .strict()
           .optional(),
+        alerting: z
+          .object({
+            enabled: z.boolean().optional(),
+            dedupeWindowMs: z.number().int().min(0).optional(),
+            rateLimitCritical: z.number().int().min(0).optional(),
+            rateLimitWarning: z.number().int().min(0).optional(),
+            rateLimitWindowMs: z.number().int().min(0).optional(),
+            webhook: z
+              .object({
+                url: z.string(),
+                headers: z.record(z.string(), z.string()).optional(),
+                timeoutMs: z.number().int().positive().optional(),
+              })
+              .strict()
+              .optional(),
+            telegram: z
+              .object({
+                chatId: z.string(),
+                accountId: z.string().optional(),
+                minSeverity: z
+                  .union([z.literal("critical"), z.literal("warning"), z.literal("info")])
+                  .optional(),
+              })
+              .strict()
+              .optional(),
+          })
+          .strict()
+          .optional(),
       })
       .strict()
       .optional(),

@@ -3,6 +3,7 @@ import { Type } from "@sinclair/typebox";
 import type { AgentToolResult } from "@mariozechner/pi-agent-core";
 
 import type { AnyAgentTool } from "../agents/tools/common.js";
+import { SecretsRegistry } from "../infra/secrets/registry.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { McpClientManager } from "./client.js";
 import { McpToolError } from "./errors.js";
@@ -36,6 +37,9 @@ export function wrapMcpTool(
       _toolCallId: string,
       params: Record<string, unknown>,
     ): Promise<AgentToolResult<unknown>> {
+      const registry = SecretsRegistry.getInstance();
+      const maskText = registry.size > 0 ? (t: string) => registry.mask(t) : (t: string) => t;
+
       try {
         const result = await manager.callTool(serverName, tool.name, params);
         const content: AgentToolResult<unknown>["content"] = [];
@@ -43,7 +47,7 @@ export function wrapMcpTool(
         if (result.content && Array.isArray(result.content)) {
           for (const entry of result.content) {
             if (entry.type === "text" && typeof entry.text === "string") {
-              content.push({ type: "text", text: entry.text });
+              content.push({ type: "text", text: maskText(entry.text) });
             } else if (
               entry.type === "image" &&
               typeof entry.data === "string" &&
@@ -74,7 +78,7 @@ export function wrapMcpTool(
         log.error(message);
 
         return {
-          content: [{ type: "text", text: message }],
+          content: [{ type: "text", text: maskText(message) }],
           details: {
             serverName,
             toolName: tool.name,

@@ -1,6 +1,7 @@
 import type { AgentMessage } from "@mariozechner/pi-agent-core";
 import type { SessionManager } from "@mariozechner/pi-coding-agent";
 
+import { maskToolResultMessage } from "../infra/secrets/tool-result-masking.js";
 import { getGlobalHookRunner } from "../plugins/hook-runner-global.js";
 import { installSessionToolResultGuard } from "./session-tool-result-guard.js";
 
@@ -49,8 +50,17 @@ export function guardSessionManager(
       }
     : undefined;
 
+  // Compose: plugin hooks first, then secrets masking (always last).
+  const composedTransform = (
+    message: AgentMessage,
+    meta: { toolCallId?: string; toolName?: string; isSynthetic?: boolean },
+  ): AgentMessage => {
+    const afterHooks = transform ? transform(message, meta) : message;
+    return maskToolResultMessage(afterHooks);
+  };
+
   const guard = installSessionToolResultGuard(sessionManager, {
-    transformToolResultForPersistence: transform,
+    transformToolResultForPersistence: composedTransform,
     allowSyntheticToolResults: opts?.allowSyntheticToolResults,
   });
   (sessionManager as GuardedSessionManager).flushPendingToolResults = guard.flushPendingToolResults;

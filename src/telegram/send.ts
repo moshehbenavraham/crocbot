@@ -8,6 +8,7 @@ import { type ApiClientOptions, Bot, HttpError, InputFile } from "grammy";
 import { loadConfig } from "../config/config.js";
 import { logVerbose } from "../globals.js";
 import { recordChannelActivity } from "../infra/channel-activity.js";
+import { SecretsRegistry } from "../infra/secrets/registry.js";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
 import { formatErrorMessage, formatUncaughtError } from "../infra/errors.js";
 import { isDiagnosticFlagEnabled } from "../infra/diagnostic-flags.js";
@@ -265,12 +266,16 @@ export async function sendMessageTelegram(
   const linkPreviewEnabled = account.config.linkPreview ?? true;
   const linkPreviewOptions = linkPreviewEnabled ? undefined : { is_disabled: true };
 
+  const secretsRegistry = SecretsRegistry.getInstance();
+  const maskSecrets =
+    secretsRegistry.size > 0 ? (t: string) => secretsRegistry.mask(t) : (t: string) => t;
+
   const sendTelegramText = async (
     rawText: string,
     params?: Record<string, unknown>,
     fallbackText?: string,
   ) => {
-    const htmlText = renderHtmlText(rawText);
+    const htmlText = renderHtmlText(maskSecrets(rawText));
     const baseParams = params ? { ...params } : {};
     if (linkPreviewOptions) {
       baseParams.link_preview_options = linkPreviewOptions;
@@ -292,7 +297,7 @@ export async function sendMessageTelegram(
         if (opts.verbose) {
           console.warn(`telegram HTML parse failed, retrying as plain text: ${errText}`);
         }
-        const fallback = fallbackText ?? rawText;
+        const fallback = maskSecrets(fallbackText ?? rawText);
         const plainParams = hasBaseParams ? baseParams : undefined;
         return await requestWithDiag(
           () =>
@@ -319,7 +324,7 @@ export async function sendMessageTelegram(
     const fileName = media.fileName ?? (isGif ? "animation.gif" : inferFilename(kind)) ?? "file";
     const file = new InputFile(media.buffer, fileName);
     const { caption, followUpText } = splitTelegramCaption(text);
-    const htmlCaption = caption ? renderHtmlText(caption) : undefined;
+    const htmlCaption = caption ? renderHtmlText(maskSecrets(caption)) : undefined;
     // If text exceeds Telegram's caption limit, send media without caption
     // then send text as a separate follow-up message.
     const needsSeparateText = Boolean(followUpText);
@@ -579,13 +584,18 @@ export async function editMessageTelegram(
       throw err;
     });
 
+  const editRegistry = SecretsRegistry.getInstance();
+  const maskEditSecrets =
+    editRegistry.size > 0 ? (t: string) => editRegistry.mask(t) : (t: string) => t;
+
   const textMode = opts.textMode ?? "markdown";
   const tableMode = resolveMarkdownTableMode({
     cfg,
     channel: "telegram",
     accountId: account.accountId,
   });
-  const htmlText = renderTelegramHtmlText(text, { textMode, tableMode });
+  const maskedText = maskEditSecrets(text);
+  const htmlText = renderTelegramHtmlText(maskedText, { textMode, tableMode });
 
   // Reply markup semantics:
   // - buttons === undefined → don't send reply_markup (keep existing)
@@ -619,8 +629,8 @@ export async function editMessageTelegram(
       return await requestWithDiag(
         () =>
           Object.keys(plainParams).length > 0
-            ? api.editMessageText(chatId, messageId, text, plainParams)
-            : api.editMessageText(chatId, messageId, text),
+            ? api.editMessageText(chatId, messageId, maskedText, plainParams)
+            : api.editMessageText(chatId, messageId, maskedText),
         "editMessage-plain",
       );
     }

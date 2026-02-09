@@ -1,5 +1,7 @@
 import type { Bot } from "grammy";
 
+import { SecretsRegistry } from "../infra/secrets/registry.js";
+
 const TELEGRAM_DRAFT_MAX_CHARS = 4096;
 const DEFAULT_THROTTLE_MS = 300;
 
@@ -36,6 +38,8 @@ export function createTelegramDraftStream(params: {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let stopped = false;
 
+  const draftRegistry = SecretsRegistry.getInstance();
+
   const sendDraft = async (text: string) => {
     if (stopped) {
       return;
@@ -51,13 +55,14 @@ export function createTelegramDraftStream(params: {
       params.warn?.(`telegram draft stream stopped (draft length ${trimmed.length} > ${maxChars})`);
       return;
     }
-    if (trimmed === lastSentText) {
+    const masked = draftRegistry.size > 0 ? draftRegistry.mask(trimmed) : trimmed;
+    if (masked === lastSentText) {
       return;
     }
-    lastSentText = trimmed;
+    lastSentText = masked;
     lastSentAt = Date.now();
     try {
-      await params.api.sendMessageDraft(chatId, draftId, trimmed, threadParams);
+      await params.api.sendMessageDraft(chatId, draftId, masked, threadParams);
     } catch (err) {
       stopped = true;
       params.warn?.(

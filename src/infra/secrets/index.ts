@@ -15,3 +15,5 @@ export { createMaskingTransport, maskStringsDeep } from "./logging-transport.js"
 export { wrapStreamFnWithMasking } from "./llm-masking.js";
 export { StreamMasker } from "./stream-masker.js";
 export { unmaskForExecution } from "./unmask-exec.js";
+export { maskToolResultMessage } from "./tool-result-masking.js";
+export { maskErrorOutput } from "./error-masking.js";
