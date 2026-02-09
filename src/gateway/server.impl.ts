@@ -71,6 +71,8 @@ import { resolveGatewayRuntimeConfig } from "./server-runtime-config.js";
 import { createGatewayRuntimeState } from "./server-runtime-state.js";
 import { hasConnectedMobileNode } from "./server-mobile-nodes.js";
 import { resolveSessionKeyForRun } from "./server-session-key.js";
+import { McpClientManager } from "../mcp/client.js";
+import { loadMcpConfig } from "../mcp/config.js";
 import { startGatewaySidecars } from "./server-startup.js";
 import { logGatewayStartup } from "./server-startup-log.js";
 import { startGatewayTailscaleExposure } from "./server-tailscale.js";
@@ -92,6 +94,7 @@ const logCron = log.child("cron");
 const logReload = log.child("reload");
 const logHooks = log.child("hooks");
 const logPlugins = log.child("plugins");
+const logMcp = log.child("mcp");
 const logWsControl = log.child("ws");
 export type GatewayServer = {
   close: (opts?: { reason?: string; restartExpectedMs?: number | null }) => Promise<void>;
@@ -229,6 +232,33 @@ export async function startGatewayServer(
     coreGatewayHandlers,
     baseMethods,
   });
+  // Initialize MCP client manager (fail-open: errors are logged, gateway continues).
+  let mcpManager: McpClientManager | null = null;
+  if (cfgAtStart.mcp) {
+    try {
+      const mcpConfig = loadMcpConfig(cfgAtStart.mcp);
+      if (Object.keys(mcpConfig.servers).length > 0) {
+        mcpManager = new McpClientManager(mcpConfig);
+        const serverNames = Object.keys(mcpConfig.servers);
+        const results = await Promise.allSettled(
+          serverNames.map((name) => mcpManager!.connect(name)),
+        );
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i];
+          if (result && result.status === "rejected") {
+            logMcp.warn(
+              `MCP server "${serverNames[i]}" failed to connect: ${result.reason instanceof Error ? result.reason.message : String(result.reason)}`,
+            );
+          }
+        }
+      }
+    } catch (err) {
+      logMcp.error(
+        `MCP initialization failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
   const channelLogs = Object.fromEntries(
     listChannelPlugins().map((plugin) => [plugin.id, logChannels.child(plugin.id)]),
   ) as Record<ChannelId, ReturnType<typeof createSubsystemLogger>>;
@@ -553,6 +583,7 @@ export async function startGatewayServer(
 
   const close = createGatewayCloseHandler({
     tailscaleCleanup,
+    mcpManager,
     stopChannel,
     pluginServices,
     cron,

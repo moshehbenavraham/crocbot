@@ -110,8 +110,8 @@ export class AcpGatewayAgent implements Agent {
           embeddedContext: true,
         },
         mcpCapabilities: {
-          http: false,
-          sse: false,
+          http: Boolean(this.opts.mcpEnabled),
+          sse: Boolean(this.opts.mcpEnabled),
         },
         sessionCapabilities: {
           list: {},

@@ -7,6 +7,7 @@ import type { ChannelsConfig } from "./types.channels.js";
 import type { CronConfig } from "./types.cron.js";
 import type { DiscoveryConfig, GatewayConfig, TalkConfig } from "./types.gateway.js";
 import type { HooksConfig } from "./types.hooks.js";
+import type { McpGlobalConfig } from "../mcp/types.js";
 import type {
   AudioConfig,
   BroadcastConfig,
@@ -89,6 +90,8 @@ export type crocbotConfig = {
   discovery?: DiscoveryConfig;
   talk?: TalkConfig;
   gateway?: GatewayConfig;
+  /** MCP server connections for tool discovery and invocation. */
+  mcp?: McpGlobalConfig;
 };
 
 export type ConfigValidationIssue = {

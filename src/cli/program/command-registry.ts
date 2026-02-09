@@ -2,6 +2,7 @@ import type { Command } from "commander";
 
 import { agentsListCommand } from "../../commands/agents.js";
 import { healthCommand } from "../../commands/health.js";
+import { mcpStatusCommand } from "../../commands/mcp-status.command.js";
 import { sessionsCommand } from "../../commands/sessions.js";
 import { statusCommand } from "../../commands/status.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -113,6 +114,15 @@ const routeMemoryStatus: RouteSpec = {
   },
 };
 
+const routeMcpStatus: RouteSpec = {
+  match: (path) => path[0] === "mcp" && path[1] === "status",
+  run: async (argv) => {
+    const json = hasFlag(argv, "--json");
+    await mcpStatusCommand({ json }, defaultRuntime);
+    return true;
+  },
+};
+
 export const commandRegistry: CommandRegistration[] = [
   {
     id: "setup",
@@ -156,7 +166,7 @@ export const commandRegistry: CommandRegistration[] = [
   {
     id: "status-health-sessions",
     register: ({ program }) => registerStatusHealthSessionsCommands(program),
-    routes: [routeHealth, routeStatus, routeSessions],
+    routes: [routeHealth, routeStatus, routeSessions, routeMcpStatus],
   },
   {
     id: "browser",

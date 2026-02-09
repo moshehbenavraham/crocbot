@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { healthCommand } from "../../commands/health.js";
+import { mcpStatusCommand } from "../../commands/mcp-status.command.js";
 import { sessionsCommand } from "../../commands/sessions.js";
 import { statusCommand } from "../../commands/status.js";
 import { setVerbose } from "../../globals.js";
@@ -142,5 +143,25 @@ export function registerStatusHealthSessionsCommands(program: Command) {
         },
         defaultRuntime,
       );
+    });
+
+  const mcpCmd = program.command("mcp").description("MCP server management");
+
+  mcpCmd
+    .command("status")
+    .description("Show MCP server connection status and tool counts")
+    .option("--json", "Output JSON instead of text", false)
+    .addHelpText(
+      "after",
+      () =>
+        `\n${theme.heading("Examples:")}\n${formatHelpExamples([
+          ["crocbot mcp status", "Show MCP server states and tool counts."],
+          ["crocbot mcp status --json", "Machine-readable output."],
+        ])}`,
+    )
+    .action(async (opts) => {
+      await runCommandWithRuntime(defaultRuntime, async () => {
+        await mcpStatusCommand({ json: Boolean(opts.json) }, defaultRuntime);
+      });
     });
 }

@@ -21,6 +21,8 @@ export type AcpServerOptions = {
   resetSession?: boolean;
   prefixCwd?: boolean;
   verbose?: boolean;
+  /** Whether MCP servers are configured (enables MCP capabilities in ACP). */
+  mcpEnabled?: boolean;
 };
 
 export const ACP_AGENT_INFO = {

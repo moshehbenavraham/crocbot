@@ -51,6 +51,8 @@ export function createcrocbotTools(options?: {
   modelHasVision?: boolean;
   /** Explicit agent ID override for cron/hook sessions. */
   requesterAgentIdOverride?: string;
+  /** Pre-resolved MCP tools from connected MCP servers. */
+  mcpTools?: AnyAgentTool[];
 }): AnyAgentTool[] {
   const imageTool = options?.agentDir?.trim()
     ? createImageTool({
@@ -150,5 +152,5 @@ export function createcrocbotTools(options?: {
     toolAllowlist: options?.pluginToolAllowlist,
   });
 
-  return [...tools, ...pluginTools];
+  return [...tools, ...pluginTools, ...(options?.mcpTools ?? [])];
 }

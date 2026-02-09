@@ -3,6 +3,7 @@ import type { WebSocketServer } from "ws";
 import { type ChannelId, listChannelPlugins } from "../channels/plugins/index.js";
 import { stopGmailWatcher } from "../hooks/gmail-watcher.js";
 import type { HeartbeatRunner } from "../infra/heartbeat-runner.js";
+import type { McpClientManager } from "../mcp/client.js";
 import type { PluginServicesHandle } from "../plugins/services.js";
 import { sendPreRestartNotification, persistRestartState } from "../infra/restart-awareness.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -13,6 +14,7 @@ const RESTART_NOTIFY_USER_ID = process.env.CROCBOT_ADMIN_USER_ID ?? "";
 
 export function createGatewayCloseHandler(params: {
   tailscaleCleanup: (() => Promise<void>) | null;
+  mcpManager: McpClientManager | null;
   stopChannel: (name: ChannelId, accountId?: string) => Promise<void>;
   pluginServices: PluginServicesHandle | null;
   cron: { stop: () => void };
@@ -68,6 +70,14 @@ export function createGatewayCloseHandler(params: {
       }
     }
 
+    // Shutdown MCP connections early to terminate child processes and network connections.
+    if (params.mcpManager) {
+      try {
+        await params.mcpManager.shutdown();
+      } catch (err) {
+        log.warn(`MCP shutdown error: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
     if (params.tailscaleCleanup) {
       await params.tailscaleCleanup();
     }
