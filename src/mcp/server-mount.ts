@@ -25,13 +25,18 @@ const sseSessions = new Map<string, SSEServerTransport>();
  * Returns a function with signature `(req, res) => Promise<boolean>` that
  * matches the gateway handler chain pattern. Returns `true` when the request
  * was handled (even if rejected), `false` when the path does not match.
+ *
+ * The `serverFactory` option creates a fresh MCP Server per stateless HTTP
+ * request. The SDK Server class only allows one active transport, so each
+ * HTTP POST needs its own Server instance. SSE reuses the shared `server`.
  */
 export function createMcpServerHandler(opts: {
   server: Server;
   config: McpServerModeConfig;
   log: LogFn;
+  serverFactory?: () => Server;
 }): (req: IncomingMessage, res: ServerResponse) => Promise<boolean> {
-  const { server, config, log } = opts;
+  const { server, config, log, serverFactory } = opts;
   const basePath = config.basePath;
 
   return async (req: IncomingMessage, res: ServerResponse): Promise<boolean> => {
@@ -65,7 +70,10 @@ export function createMcpServerHandler(opts: {
 
     // Streamable HTTP transport: POST /mcp/http
     if (subPath === "http" && req.method === "POST") {
-      return handleStreamableHttp(server, req, res, log);
+      // Each stateless HTTP request needs its own Server instance because
+      // the SDK Server class only allows one active transport connection.
+      const httpServer = serverFactory ? serverFactory() : server;
+      return handleStreamableHttp(httpServer, req, res, log);
     }
 
     // Unknown sub-path under basePath.
