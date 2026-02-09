@@ -359,7 +359,32 @@ The packaging script will:
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
 
-### Step 6: Iterate
+### Step 6: Enable and Document the Skill
+
+After creating or installing a skill, it must be explicitly enabled in the gateway configuration to be loaded.
+
+1. **Enable in Gateway:**
+   - Open your gateway configuration file (`crocbot.json`).
+   - Add the skill name to the `skills.allowBundled` array.
+
+   Example:
+   ```json
+   {
+     "skills": {
+       "allowBundled": [
+         "your-new-skill",
+         "existing-skill-1",
+         "existing-skill-2"
+       ]
+     }
+   }
+   ```
+   - Restart the gateway or use `/restart` to load the changes.
+
+2. **Update Workspace Documentation:**
+   - If appropriate, add notes to `TOOLS.md` in the workspace root. This is the place to track specific configuration details, and/or usage preferences for the skill in this specific environment.
+
+### Step 7: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
 

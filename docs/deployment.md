@@ -94,7 +94,7 @@ docker run -d --name crocbot-gateway ... crocbot:previous-tag
 curl http://localhost:18789/health
 
 # Expected response
-{"status":"ok","timestamp":"...","uptime":...}
+{"status":"healthy"}
 ```
 
 ## Logs

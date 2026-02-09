@@ -38,6 +38,7 @@ pnpm build
 | `pnpm lint` | Lint with oxlint (134 type-aware rules) |
 | `pnpm format` | Format check with oxfmt |
 | `pnpm test` | Run tests with Vitest |
+| `pnpm test:e2e` | End-to-end tests (240 tests, 52 files) |
 | `pnpm test:coverage` | Tests with coverage report |
 | `pnpm ui:dev` | Control UI dev server |
 | `pnpm ui:build` | Build Control UI |
@@ -56,6 +57,9 @@ pnpm build
 # Run all tests
 pnpm test
 
+# Run E2E tests
+pnpm test:e2e
+
 # Run specific test file
 pnpm vitest run src/telegram/network-errors.test.ts
 
@@ -67,6 +71,9 @@ pnpm test:watch
 
 # Live tests (requires real API keys)
 CROCBOT_LIVE_TEST=1 pnpm test:live
+
+# Local CI check (lint, format, build, test, e2e, audit)
+bash scripts/ci-local.sh
 ```
 
 ### Test Coverage

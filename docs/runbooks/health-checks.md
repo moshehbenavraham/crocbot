@@ -21,62 +21,40 @@ Guide to understanding and troubleshooting health check responses from the crocb
 curl http://localhost:18789/health
 ```
 
-### Response Fields
+### Response
+
+The `/health` endpoint is a lightweight liveness probe that returns a minimal response:
 
 ```json
-{
-  "status": "ok",
-  "timestamp": "2026-02-04T12:00:00.000Z",
-  "uptime": 3600.123,
-  "heapUsedMb": 45.2,
-  "rssMb": 98.7
-}
+{"status": "healthy"}
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `status` | string | `"ok"` if healthy, `"degraded"` or `"error"` otherwise |
-| `timestamp` | string | ISO 8601 timestamp of the response |
-| `uptime` | number | Gateway uptime in seconds |
-| `heapUsedMb` | number | V8 heap memory used (MB) |
-| `rssMb` | number | Resident set size - total process memory (MB) |
+| `status` | string | `"healthy"` if the gateway is running |
+
+A 200 response with `"healthy"` status confirms the gateway process is alive and accepting HTTP connections. If the endpoint does not respond, the gateway is down.
+
+For detailed diagnostics (memory, uptime, component health), use the CLI:
+
+```bash
+crocbot health --json
+crocbot status --all
+```
 
 ---
 
 ## Interpreting Health Status
 
-### Status: OK
+### Status: Healthy (200 response)
 
 ```json
-{"status": "ok", "uptime": 3600, "heapUsedMb": 45, "rssMb": 98}
+{"status": "healthy"}
 ```
 
-**Meaning**: Gateway is running normally.
+**Meaning**: Gateway is running and accepting connections.
 
-**Checks**:
-- Process is alive
-- Basic internal systems operational
-- Memory within expected bounds
-
-### Status: Degraded
-
-```json
-{"status": "degraded", "uptime": 3600, "heapUsedMb": 400, "rssMb": 512}
-```
-
-**Meaning**: Gateway running but with issues.
-
-**Possible causes**:
-- High memory usage
-- Slow response times
-- Non-critical component failures
-
-**Actions**:
-1. Check memory usage trends
-2. Review recent logs for warnings
-3. Consider restart if memory continues rising
-
-### Status: Error / No Response
+### No Response / Connection Refused
 
 **Meaning**: Gateway is down or unresponsive.
 
@@ -88,49 +66,21 @@ curl http://localhost:18789/health
 
 ---
 
-## Memory Thresholds
+## Memory Monitoring
 
-| Metric | Normal | Warning | Critical |
-|--------|--------|---------|----------|
-| `heapUsedMb` | < 200 | 200-400 | > 400 |
-| `rssMb` | < 300 | 300-512 | > 512 |
-
-### Memory Trending
+The `/health` endpoint does not return memory metrics. Use the CLI or `/metrics` endpoint for memory monitoring:
 
 ```bash
-# Monitor memory over time
-watch -n 5 'curl -s http://localhost:18789/health | jq ".heapUsedMb, .rssMb"'
+# CLI health with diagnostics
+crocbot health --json
+
+# Prometheus metrics
+curl -s http://localhost:18789/metrics | grep -E 'heap|rss'
 ```
-
-### Memory Leak Detection
-
-```bash
-# Log memory every minute
-while true; do
-  echo "$(date): $(curl -s http://localhost:18789/health | jq -c '{heap: .heapUsedMb, rss: .rssMb}')"
-  sleep 60
-done >> memory.log
-```
-
-If `heapUsedMb` grows continuously without returning to baseline, a memory leak may be present.
-
----
-
-## Uptime Interpretation
-
-| Uptime | Interpretation |
-|--------|----------------|
-| < 60s | Recently started or restarted |
-| < 300s | May still be warming up |
-| > 86400s (1 day) | Stable |
-| Decreasing frequently | Crash-restart loop |
 
 ### Check for Restart Loop
 
 ```bash
-# Compare uptime to when you expect it started
-curl -s http://localhost:18789/health | jq '.uptime'
-
 # Docker restart count
 docker inspect crocbot | jq '.[0].RestartCount'
 ```
@@ -275,13 +225,16 @@ strace -p $(pgrep -f crocbot) -c
 systemctl --user restart crocbot-gateway
 ```
 
-### High Memory Response
+### High Memory Suspected
 
 ```bash
-# Check what's consuming memory
-curl -s http://localhost:18789/health | jq
+# Check process memory via CLI diagnostics
+crocbot health --json
 
-# If heapUsedMb > 400, consider restart
+# Or check via system tools
+ps -o rss,vsz -p $(pgrep -f crocbot)
+
+# Restart if needed
 docker restart crocbot
 ```
 
@@ -335,19 +288,11 @@ if [ $? -ne 0 ]; then
 fi
 
 STATUS=$(echo "$RESPONSE" | jq -r '.status')
-HEAP=$(echo "$RESPONSE" | jq -r '.heapUsedMb')
-RSS=$(echo "$RESPONSE" | jq -r '.rssMb')
-UPTIME=$(echo "$RESPONSE" | jq -r '.uptime')
 
-echo "Status: $STATUS | Heap: ${HEAP}MB | RSS: ${RSS}MB | Uptime: ${UPTIME}s"
+echo "Status: $STATUS"
 
-if [ "$STATUS" != "ok" ]; then
+if [ "$STATUS" != "healthy" ]; then
   echo "WARNING: Gateway status is $STATUS"
-  exit 1
-fi
-
-if [ "$(echo "$RSS > 512" | bc)" -eq 1 ]; then
-  echo "WARNING: High memory usage (RSS: ${RSS}MB)"
   exit 1
 fi
 

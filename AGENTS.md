@@ -29,6 +29,7 @@
 - Tests: colocated `*.test.ts` plus shared/e2e in `test/`.
 
 ## Dev Workflow
+- NEVER add attributions or co-authors to commits or pushes
 - Runtime: Node 22+. Install: `pnpm install`.
 - Build: `pnpm build`, UI: `pnpm ui:build`; Lint/format: `pnpm lint`, `pnpm format`; Tests: `pnpm test`.
 - TypeScript is ESM; use `.js` extensions in imports and avoid `any`.
