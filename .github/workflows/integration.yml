@@ -22,7 +22,7 @@ jobs:
             if git -c protocol.version=2 submodule update --init --force --depth=1 --recursive; then
               exit 0
             fi
-            echo "Submodule update failed (attempt $attempt/5). Retrying…"
+            echo "Submodule update failed (attempt $attempt/5). Retrying..."
             sleep $((attempt * 10))
           done
           exit 1
@@ -70,7 +70,4 @@ jobs:
         run: pnpm build
 
       - name: Run E2E tests
-        # Known pre-existing failures documented in .spec_system/audit/known-issues.md
-        # Remove continue-on-error once all E2E tests are fixed
-        continue-on-error: true
         run: pnpm test:e2e

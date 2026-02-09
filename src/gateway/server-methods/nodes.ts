@@ -207,7 +207,7 @@ export const nodesHandlers: GatewayRequestHandlers = {
 
   "node.invoke.result": async ({ params, respond, context, client }) => {
     // Normalize payloadJSON: if null is sent as a value, convert to undefined
-    const raw = params as Record<string, unknown>;
+    const raw: Record<string, unknown> = params;
     if ("payloadJSON" in raw && raw.payloadJSON === null) {
       delete raw.payloadJSON;
     }

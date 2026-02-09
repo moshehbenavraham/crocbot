@@ -11,15 +11,15 @@ telegram/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `bot-handlers.ts` | Message and callback handlers |
-| `model-buttons.ts` | Inline keyboard for model selection |
+| File                | Purpose                                   |
+| ------------------- | ----------------------------------------- |
+| `bot-handlers.ts`   | Message and callback handlers             |
+| `model-buttons.ts`  | Inline keyboard for model selection       |
 | `network-errors.ts` | grammY timeout and network error recovery |
-| `monitor.ts` | Scoped rejection handler |
-| `context.ts` | Telegram context management |
-| `updates.ts` | Update processing pipeline |
-| `audit.ts` | Telegram-specific auditing |
+| `monitor.ts`        | Scoped rejection handler                  |
+| `context.ts`        | Telegram context management               |
+| `updates.ts`        | Update processing pipeline                |
+| `audit.ts`          | Telegram-specific auditing                |
 
 ## Tech Stack
 

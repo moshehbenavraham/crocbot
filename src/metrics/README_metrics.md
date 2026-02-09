@@ -4,11 +4,11 @@ Observability metrics collection using Prometheus-compatible counters and gauges
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `gateway.ts` | Gateway-level metrics (connections, requests, uptime) |
-| `telegram.ts` | Telegram channel metrics (messages sent/received) |
-| `registry.ts` | Metric registration and export |
+| File          | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `gateway.ts`  | Gateway-level metrics (connections, requests, uptime) |
+| `telegram.ts` | Telegram channel metrics (messages sent/received)     |
+| `registry.ts` | Metric registration and export                        |
 
 ## Stack
 

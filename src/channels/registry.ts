@@ -70,9 +70,7 @@ export function normalizeChatChannelId(raw?: string | null): ChatChannelId | nul
     return null;
   }
   const resolved = CHAT_CHANNEL_ALIASES[normalized] ?? normalized;
-  return CHAT_CHANNEL_ORDER.includes(resolved as ChatChannelId)
-    ? (resolved as ChatChannelId)
-    : null;
+  return CHAT_CHANNEL_ORDER.includes(resolved) ? resolved : null;
 }
 
 // Channel docking: prefer this helper in shared code. Importing from

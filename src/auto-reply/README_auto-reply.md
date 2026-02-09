@@ -12,14 +12,14 @@ auto-reply/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `dispatch.ts` | Main message routing and dispatch |
+| File                   | Purpose                                                      |
+| ---------------------- | ------------------------------------------------------------ |
+| `dispatch.ts`          | Main message routing and dispatch                            |
 | `commands-registry.ts` | Chat command definitions (`/status`, `/new`, `/think`, etc.) |
-| `commands-args.ts` | Command argument parsing |
-| `command-detection.ts` | Identifies commands in messages |
-| `envelope.ts` | Message envelope wrapping |
-| `chunk.ts` | Response chunking for channel limits |
+| `commands-args.ts`     | Command argument parsing                                     |
+| `command-detection.ts` | Identifies commands in messages                              |
+| `envelope.ts`          | Message envelope wrapping                                    |
+| `chunk.ts`             | Response chunking for channel limits                         |
 
 ## How It Works
 

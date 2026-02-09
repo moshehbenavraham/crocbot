@@ -4,13 +4,13 @@ Markdown parsing and rendering utilities.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `ir.ts` | Internal representation for parsed markdown |
-| `render.ts` | Renders IR back to text (plain, Telegram, etc.) |
-| `tables.ts` | Table parsing and formatting |
-| `fences.ts` | Code fence parsing |
-| `frontmatter.ts` | YAML frontmatter extraction |
+| File             | Purpose                                         |
+| ---------------- | ----------------------------------------------- |
+| `ir.ts`          | Internal representation for parsed markdown     |
+| `render.ts`      | Renders IR back to text (plain, Telegram, etc.) |
+| `tables.ts`      | Table parsing and formatting                    |
+| `fences.ts`      | Code fence parsing                              |
+| `frontmatter.ts` | YAML frontmatter extraction                     |
 
 ## Purpose
 

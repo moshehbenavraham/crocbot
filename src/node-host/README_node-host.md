@@ -4,9 +4,9 @@ Node.js subprocess bridge — spawns isolated Node.js child processes for specif
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `config.ts` | Subprocess configuration |
+| File        | Purpose                           |
+| ----------- | --------------------------------- |
+| `config.ts` | Subprocess configuration          |
 | `runner.ts` | Subprocess spawning and lifecycle |
 
 ## Purpose

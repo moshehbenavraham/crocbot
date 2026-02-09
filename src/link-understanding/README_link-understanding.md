@@ -4,13 +4,13 @@ URL detection and content extraction from messages.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `detect.ts` | Extracts URLs from message text |
-| `apply.ts` | Processes detected links (fetch, summarize) |
-| `runner.ts` | Execution pipeline for link processing |
-| `format.ts` | Formats extracted content for the agent |
-| `defaults.ts` | Default behavior configuration |
+| File          | Purpose                                     |
+| ------------- | ------------------------------------------- |
+| `detect.ts`   | Extracts URLs from message text             |
+| `apply.ts`    | Processes detected links (fetch, summarize) |
+| `runner.ts`   | Execution pipeline for link processing      |
+| `format.ts`   | Formats extracted content for the agent     |
+| `defaults.ts` | Default behavior configuration              |
 
 ## How It Works
 

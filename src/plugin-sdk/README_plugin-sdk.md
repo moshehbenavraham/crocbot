@@ -5,6 +5,7 @@ Public SDK for developing crocbot plugins. This is the external-facing API that 
 ## Exports
 
 The SDK is published as `crocbot/plugin-sdk` and provides:
+
 - Type definitions for plugin manifests
 - Hook registration interfaces
 - Tool definition helpers
@@ -13,7 +14,7 @@ The SDK is published as `crocbot/plugin-sdk` and provides:
 ## Usage
 
 ```typescript
-import { definePlugin } from 'crocbot/plugin-sdk';
+import { definePlugin } from "crocbot/plugin-sdk";
 ```
 
 ## Related

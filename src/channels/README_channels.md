@@ -17,13 +17,13 @@ channels/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `registry.ts` | Channel registration and docking |
-| `channel-config.ts` | Channel configuration schema |
-| `ack-reactions.ts` | Acknowledgment reactions (read receipts, etc.) |
-| `command-gating.ts` | Permission checks for channel commands |
-| `mention-gating.ts` | @mention filtering for group messages |
+| File                | Purpose                                        |
+| ------------------- | ---------------------------------------------- |
+| `registry.ts`       | Channel registration and docking               |
+| `channel-config.ts` | Channel configuration schema                   |
+| `ack-reactions.ts`  | Acknowledgment reactions (read receipts, etc.) |
+| `command-gating.ts` | Permission checks for channel commands         |
+| `mention-gating.ts` | @mention filtering for group messages          |
 
 ## Active Channels
 

@@ -4,12 +4,12 @@ Child process management — command queuing, exec bridging, and spawn utilities
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `command-queue.ts` | Queues and serializes child process commands |
-| `exec-bridge.ts` | Bridge between agent tool calls and OS exec |
-| `spawn.ts` | Safe child process spawning |
-| `lanes.ts` | Process execution lanes (parallelism control) |
+| File               | Purpose                                       |
+| ------------------ | --------------------------------------------- |
+| `command-queue.ts` | Queues and serializes child process commands  |
+| `exec-bridge.ts`   | Bridge between agent tool calls and OS exec   |
+| `spawn.ts`         | Safe child process spawning                   |
+| `lanes.ts`         | Process execution lanes (parallelism control) |
 
 ## Purpose
 

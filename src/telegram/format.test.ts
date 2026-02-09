@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { markdownToTelegramHtml } from "./format.js";
-import { markdownToIR } from "../markdown/ir.js";
 import { renderMarkdownWithMarkers } from "../markdown/render.js";
 
 describe("markdownToTelegramHtml", () => {

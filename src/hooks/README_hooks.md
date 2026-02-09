@@ -16,6 +16,7 @@ hooks/
 ## How Hooks Work
 
 Hooks are functions that run at specific lifecycle points:
+
 - **Pre-message** — before the agent processes a message
 - **Post-message** — after the agent responds
 - **Boot** — when a session starts
@@ -23,12 +24,12 @@ Hooks are functions that run at specific lifecycle points:
 
 ## Bundled Hooks
 
-| Hook | Purpose |
-|------|---------|
-| `boot-md` | Injects workspace markdown files (AGENTS.md, SOUL.md, etc.) |
-| `command-logger` | Logs all executed commands for auditing |
-| `session-memory` | Saves and restores session memory |
-| `soul-evil` | Personality injection (configurable tone/style) |
+| Hook             | Purpose                                                     |
+| ---------------- | ----------------------------------------------------------- |
+| `boot-md`        | Injects workspace markdown files (AGENTS.md, SOUL.md, etc.) |
+| `command-logger` | Logs all executed commands for auditing                     |
+| `session-memory` | Saves and restores session memory                           |
+| `soul-evil`      | Personality injection (configurable tone/style)             |
 
 ## Related
 

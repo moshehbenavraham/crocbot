@@ -18,13 +18,13 @@ cli/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `argv.ts` | CLI argument parsing and validation |
-| `banner.ts` | ASCII banner and CLI output formatting |
-| `channel-auth.ts` | Channel authentication flow |
-| `acp-cli.ts` | ACP protocol CLI interactions |
-| `browser-cli.ts` | Browser debugging CLI |
+| File              | Purpose                                |
+| ----------------- | -------------------------------------- |
+| `argv.ts`         | CLI argument parsing and validation    |
+| `banner.ts`       | ASCII banner and CLI output formatting |
+| `channel-auth.ts` | Channel authentication flow            |
+| `acp-cli.ts`      | ACP protocol CLI interactions          |
+| `browser-cli.ts`  | Browser debugging CLI                  |
 
 ## Usage
 

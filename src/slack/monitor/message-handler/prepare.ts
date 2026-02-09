@@ -313,7 +313,7 @@ export async function prepareSlackMessage(params: {
   const ackReaction = resolveAckReaction(cfg, route.agentId);
   const ackReactionValue = ackReaction ?? "";
 
-  const shouldAckReaction = () =>
+  const _shouldAckReaction = () =>
     Boolean(
       ackReaction &&
       shouldAckReactionGate({

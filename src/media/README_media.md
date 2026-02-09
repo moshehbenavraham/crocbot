@@ -4,15 +4,15 @@ Media pipeline — handles audio, image, and video files throughout the system.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `audio.ts` | Audio file processing |
-| `image.ts` | Image processing and resizing (via sharp) |
-| `video.ts` | Video file handling |
-| `mime.ts` | MIME type detection |
-| `fetch.ts` | Media file downloading |
-| `storage.ts` | Temp file lifecycle management |
-| `server.ts` | HTTP media serving |
+| File         | Purpose                                   |
+| ------------ | ----------------------------------------- |
+| `audio.ts`   | Audio file processing                     |
+| `image.ts`   | Image processing and resizing (via sharp) |
+| `video.ts`   | Video file handling                       |
+| `mime.ts`    | MIME type detection                       |
+| `fetch.ts`   | Media file downloading                    |
+| `storage.ts` | Temp file lifecycle management            |
+| `server.ts`  | HTTP media serving                        |
 
 ## How It Works
 

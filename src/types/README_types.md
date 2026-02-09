@@ -5,6 +5,7 @@ Ambient TypeScript type definitions (`.d.ts` files) for untyped dependencies and
 ## Contents
 
 Type declarations for:
+
 - CLI libraries
 - PTY (pseudo-terminal) bindings
 - Canvas rendering

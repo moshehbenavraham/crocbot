@@ -8,14 +8,14 @@ ACP enables communication between the gateway and external agent clients over a 
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `client.ts` | ACP client interface |
-| `server.ts` | ACP server handler |
-| `session.ts` | Session lifecycle management |
-| `translator.ts` | Protocol translation (internal <-> ACP) |
-| `event-mapper.ts` | Maps internal events to ACP events |
-| `commands.ts` | ACP command handling |
+| File              | Purpose                                 |
+| ----------------- | --------------------------------------- |
+| `client.ts`       | ACP client interface                    |
+| `server.ts`       | ACP server handler                      |
+| `session.ts`      | Session lifecycle management            |
+| `translator.ts`   | Protocol translation (internal <-> ACP) |
+| `event-mapper.ts` | Maps internal events to ACP events      |
+| `commands.ts`     | ACP command handling                    |
 
 ## Related
 

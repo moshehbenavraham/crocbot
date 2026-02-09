@@ -4,11 +4,11 @@ External authentication providers for LLM services and third-party integrations.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `copilot.ts` | GitHub Copilot token exchange |
-| `qwen.ts` | Qwen (Alibaba Cloud) auth |
-| `google.ts` | Google OAuth for Gemini/Cloud APIs |
+| File         | Purpose                            |
+| ------------ | ---------------------------------- |
+| `copilot.ts` | GitHub Copilot token exchange      |
+| `qwen.ts`    | Qwen (Alibaba Cloud) auth          |
+| `google.ts`  | Google OAuth for Gemini/Cloud APIs |
 
 ## Purpose
 

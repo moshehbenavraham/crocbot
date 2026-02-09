@@ -4,12 +4,12 @@ System service integration — installs and manages crocbot as a background daem
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `constants.ts` | Service labels and identifiers |
-| `launchd.ts` | macOS launchd service management |
-| `schtasks.ts` | Windows Task Scheduler integration |
-| `paths.ts` | System path resolution for service files |
+| File               | Purpose                                    |
+| ------------------ | ------------------------------------------ |
+| `constants.ts`     | Service labels and identifiers             |
+| `launchd.ts`       | macOS launchd service management           |
+| `schtasks.ts`      | Windows Task Scheduler integration         |
+| `paths.ts`         | System path resolution for service files   |
 | `service-audit.ts` | Validates service health and configuration |
 
 ## Supported Platforms

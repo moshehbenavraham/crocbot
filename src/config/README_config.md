@@ -11,14 +11,14 @@ config/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `config.ts` | Main configuration loader |
-| `config-paths.ts` | Safe path resolution for config files |
-| `agent-limits.ts` | Agent concurrency and rate limits |
-| `commands.ts` | Command configuration definitions |
-| `channel-capabilities.ts` | Feature availability per channel |
-| `defaults.ts` | Default configuration values |
+| File                      | Purpose                               |
+| ------------------------- | ------------------------------------- |
+| `config.ts`               | Main configuration loader             |
+| `config-paths.ts`         | Safe path resolution for config files |
+| `agent-limits.ts`         | Agent concurrency and rate limits     |
+| `commands.ts`             | Command configuration definitions     |
+| `channel-capabilities.ts` | Feature availability per channel      |
+| `defaults.ts`             | Default configuration values          |
 
 ## Configuration Files
 

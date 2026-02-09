@@ -11,15 +11,15 @@ browser/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `client.ts` | High-level browser client API |
-| `cdp.ts` | Chrome DevTools Protocol connection |
-| `chrome.ts` | Chrome/Chromium process management |
-| `client-actions.ts` | Browser actions (click, type, scroll, etc.) |
-| `client-fetch.ts` | Fetch within browser context |
-| `client-navigate.ts` | Navigation and page loading |
-| `client-snapshot.ts` | Page snapshot capture |
+| File                 | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| `client.ts`          | High-level browser client API               |
+| `cdp.ts`             | Chrome DevTools Protocol connection         |
+| `chrome.ts`          | Chrome/Chromium process management          |
+| `client-actions.ts`  | Browser actions (click, type, scroll, etc.) |
+| `client-fetch.ts`    | Fetch within browser context                |
+| `client-navigate.ts` | Navigation and page loading                 |
+| `client-snapshot.ts` | Page snapshot capture                       |
 
 ## How It Works
 

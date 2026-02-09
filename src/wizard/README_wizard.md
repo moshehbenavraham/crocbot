@@ -4,13 +4,13 @@ Interactive onboarding wizard — guides new users through initial setup.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `onboarding.ts` | Main wizard flow |
-| `onboarding.finalize.ts` | Finalization and config writing |
-| `prompts.ts` | Interactive prompt definitions |
-| `sessions.ts` | Session setup within the wizard |
-| `gateway.ts` | Gateway configuration wizard step |
+| File                     | Purpose                           |
+| ------------------------ | --------------------------------- |
+| `onboarding.ts`          | Main wizard flow                  |
+| `onboarding.finalize.ts` | Finalization and config writing   |
+| `prompts.ts`             | Interactive prompt definitions    |
+| `sessions.ts`            | Session setup within the wizard   |
+| `gateway.ts`             | Gateway configuration wizard step |
 
 ## Wizard Flow
 

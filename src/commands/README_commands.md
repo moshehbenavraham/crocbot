@@ -19,16 +19,16 @@ commands/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `agent.ts` | Single agent invocation |
-| `agents.ts` | Multi-agent management |
+| File                  | Purpose                          |
+| --------------------- | -------------------------------- |
+| `agent.ts`            | Single agent invocation          |
+| `agents.ts`           | Multi-agent management           |
 | `configure.wizard.ts` | Interactive configuration wizard |
-| `dashboard.ts` | Status dashboard display |
-| `doctor.ts` | Health check and diagnostics |
-| `status.command.ts` | Status command entry point |
-| `status.scan.ts` | System status scanning |
-| `onboard-helpers.ts` | Onboarding utility functions |
+| `dashboard.ts`        | Status dashboard display         |
+| `doctor.ts`           | Health check and diagnostics     |
+| `status.command.ts`   | Status command entry point       |
+| `status.scan.ts`      | System status scanning           |
+| `onboard-helpers.ts`  | Onboarding utility functions     |
 
 ## Related
 

@@ -4,14 +4,14 @@ CLI UI helpers — ANSI formatting, progress indicators, tables, and prompts.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `colors.ts` | ANSI color utilities |
+| File          | Purpose                    |
+| ------------- | -------------------------- |
+| `colors.ts`   | ANSI color utilities       |
 | `progress.ts` | Progress bars and spinners |
-| `tables.ts` | Terminal table rendering |
-| `prompts.ts` | Interactive prompts |
-| `theme.ts` | Terminal color theme |
-| `stream.ts` | Stream writing utilities |
+| `tables.ts`   | Terminal table rendering   |
+| `prompts.ts`  | Interactive prompts        |
+| `theme.ts`    | Terminal color theme       |
+| `stream.ts`   | Stream writing utilities   |
 
 ## Purpose
 

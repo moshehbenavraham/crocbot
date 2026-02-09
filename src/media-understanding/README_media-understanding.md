@@ -18,6 +18,7 @@ media-understanding/
 ## How It Works
 
 When media is attached to a message, this module:
+
 1. Detects the media type (image, audio, video)
 2. Routes to the appropriate provider
 3. Runs analysis (vision description, transcription, etc.)

@@ -11,14 +11,14 @@ plugins/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `discovery.ts` | Finds plugins in configured directories |
-| `loader.ts` | Loads and initializes plugins |
-| `config.ts` | Plugin configuration management |
-| `hooks.ts` | Plugin hook registration and dispatch |
-| `http-registry.ts` | Plugin HTTP endpoint registration |
-| `manifest.ts` | Plugin manifest parsing and validation |
+| File               | Purpose                                 |
+| ------------------ | --------------------------------------- |
+| `discovery.ts`     | Finds plugins in configured directories |
+| `loader.ts`        | Loads and initializes plugins           |
+| `config.ts`        | Plugin configuration management         |
+| `hooks.ts`         | Plugin hook registration and dispatch   |
+| `http-registry.ts` | Plugin HTTP endpoint registration       |
+| `manifest.ts`      | Plugin manifest parsing and validation  |
 
 ## Plugin Lifecycle
 

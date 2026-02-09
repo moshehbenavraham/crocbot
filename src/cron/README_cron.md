@@ -12,12 +12,12 @@ cron/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `service.ts` | Cron job scheduler and service loop |
-| `schedule.ts` | Next-run calculation |
-| `parse.ts` | Cron expression parsing |
-| `run-log.ts` | Execution history logging |
+| File          | Purpose                             |
+| ------------- | ----------------------------------- |
+| `service.ts`  | Cron job scheduler and service loop |
+| `schedule.ts` | Next-run calculation                |
+| `parse.ts`    | Cron expression parsing             |
+| `run-log.ts`  | Execution history logging           |
 
 ## How It Works
 

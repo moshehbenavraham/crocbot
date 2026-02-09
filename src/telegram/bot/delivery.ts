@@ -375,7 +375,7 @@ export async function resolveMedia(
     });
   } catch (err) {
     const msg = String(err).replace(/\/bot[^/]+\//g, "/bot<REDACTED>/");
-    throw new Error(`telegram media download failed: ${msg}`);
+    throw new Error(`telegram media download failed: ${msg}`, { cause: err });
   }
   const saved = await saveMediaBuffer(fetched.buffer, fetched.contentType, "inbound", maxBytes);
   let placeholder = "<media:document>";

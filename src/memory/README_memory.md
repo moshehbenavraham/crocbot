@@ -4,13 +4,13 @@ Vector embeddings, semantic search, and conversation memory management.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `index.ts` | Memory indexing and storage |
-| `search.ts` | Semantic search over stored memories |
-| `embeddings.ts` | Vector embedding generation |
-| `cache.ts` | Embedding cache layer |
-| `hybrid.ts` | Hybrid search (keyword + semantic) |
+| File            | Purpose                              |
+| --------------- | ------------------------------------ |
+| `index.ts`      | Memory indexing and storage          |
+| `search.ts`     | Semantic search over stored memories |
+| `embeddings.ts` | Vector embedding generation          |
+| `cache.ts`      | Embedding cache layer                |
+| `hybrid.ts`     | Hybrid search (keyword + semantic)   |
 
 ## How It Works
 

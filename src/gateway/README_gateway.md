@@ -16,14 +16,14 @@ gateway/
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `server.impl.ts` | Main gateway server implementation |
-| `server-http.ts` | HTTP endpoint handlers |
-| `server-tailscale.ts` | Tailscale Serve/Funnel integration |
-| `server-runtime-config.ts` | Runtime configuration management |
-| `server-runtime-state.ts` | Runtime state tracking |
-| `server-methods/agent.ts` | Agent RPC method handlers |
+| File                       | Purpose                            |
+| -------------------------- | ---------------------------------- |
+| `server.impl.ts`           | Main gateway server implementation |
+| `server-http.ts`           | HTTP endpoint handlers             |
+| `server-tailscale.ts`      | Tailscale Serve/Funnel integration |
+| `server-runtime-config.ts` | Runtime configuration management   |
+| `server-runtime-state.ts`  | Runtime state tracking             |
+| `server-methods/agent.ts`  | Agent RPC method handlers          |
 
 ## Architecture
 

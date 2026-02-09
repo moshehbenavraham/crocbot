@@ -4,12 +4,12 @@ Session management — model overrides, send policies, transcript events, and la
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `model-overrides.ts` | Per-session model selection overrides |
-| `send-policy.ts` | Controls when/how responses are delivered |
-| `transcript-events.ts` | Session transcript event handling |
-| `labels.ts` | Session labeling and metadata |
+| File                   | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| `model-overrides.ts`   | Per-session model selection overrides     |
+| `send-policy.ts`       | Controls when/how responses are delivered |
+| `transcript-events.ts` | Session transcript event handling         |
+| `labels.ts`            | Session labeling and metadata             |
 
 ## Session Model
 
