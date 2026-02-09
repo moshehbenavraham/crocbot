@@ -81,7 +81,7 @@ function makeCfg(home: string) {
       },
     },
     channels: {
-      whatsapp: {
+      telegram: {
         allowFrom: ["*"],
       },
     },
@@ -100,10 +100,10 @@ describe("trigger handling", () => {
       const res = await getReplyFromConfig(
         {
           Body: "/activation mention",
-          From: "123@g.us",
+          From: "telegram:group:-1001234567890",
           To: "+2000",
           ChatType: "group",
-          Provider: "whatsapp",
+          Provider: "telegram",
           SenderE164: "+999",
           CommandAuthorized: true,
         },
@@ -128,10 +128,10 @@ describe("trigger handling", () => {
       const res = await getReplyFromConfig(
         {
           Body: "hello group",
-          From: "123@g.us",
+          From: "telegram:group:-1001234567890",
           To: "+2000",
           ChatType: "group",
-          Provider: "whatsapp",
+          Provider: "telegram",
           SenderE164: "+2000",
           GroupSubject: "Test Group",
           GroupMembers: "Alice (+1), Bob (+2)",
@@ -145,7 +145,7 @@ describe("trigger handling", () => {
             },
           },
           channels: {
-            whatsapp: {
+            telegram: {
               allowFrom: ["*"],
               groups: { "*": { requireMention: false } },
             },
@@ -191,7 +191,7 @@ describe("trigger handling", () => {
             },
           },
           channels: {
-            whatsapp: {
+            telegram: {
               allowFrom: ["*"],
             },
           },

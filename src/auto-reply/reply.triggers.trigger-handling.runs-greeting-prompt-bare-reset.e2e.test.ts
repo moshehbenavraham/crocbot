@@ -81,7 +81,7 @@ function _makeCfg(home: string) {
       },
     },
     channels: {
-      whatsapp: {
+      telegram: {
         allowFrom: ["*"],
       },
     },
@@ -120,7 +120,7 @@ describe("trigger handling", () => {
             },
           },
           channels: {
-            whatsapp: {
+            telegram: {
               allowFrom: ["*"],
             },
           },
@@ -154,7 +154,7 @@ describe("trigger handling", () => {
             },
           },
           channels: {
-            whatsapp: {
+            telegram: {
               allowFrom: ["+1999"],
             },
           },
@@ -167,8 +167,16 @@ describe("trigger handling", () => {
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });
   });
-  it("blocks /reset for non-owner senders", async () => {
+  it("allows /reset for non-owner senders on telegram (no enforceOwnerForCommands)", async () => {
     await withTempHome(async (home) => {
+      vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
+        payloads: [{ text: "hello" }],
+        meta: {
+          durationMs: 1,
+          agentMeta: { sessionId: "s", provider: "p", model: "m" },
+        },
+      });
+
       const res = await getReplyFromConfig(
         {
           Body: "/reset",
@@ -185,7 +193,7 @@ describe("trigger handling", () => {
             },
           },
           channels: {
-            whatsapp: {
+            telegram: {
               allowFrom: ["+1999"],
             },
           },
@@ -194,8 +202,9 @@ describe("trigger handling", () => {
           },
         },
       );
-      expect(res).toBeUndefined();
-      expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
+      const text = Array.isArray(res) ? res[0]?.text : res?.text;
+      expect(text).toBe("hello");
+      expect(runEmbeddedPiAgent).toHaveBeenCalledOnce();
     });
   });
 });

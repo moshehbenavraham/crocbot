@@ -81,7 +81,7 @@ function makeCfg(home: string) {
       },
     },
     channels: {
-      whatsapp: {
+      telegram: {
         allowFrom: ["*"],
       },
     },
@@ -191,7 +191,7 @@ describe("trigger handling", () => {
       );
       const text = Array.isArray(res) ? res[0]?.text : res?.text;
       expect(text).toContain("Help");
-      expect(text).toContain("Shortcuts");
+      expect(text).toContain("Session");
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });
   });

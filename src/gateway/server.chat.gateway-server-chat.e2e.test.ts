@@ -6,6 +6,7 @@ import { WebSocket } from "ws";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { emitAgentEvent, registerAgentRunContext } from "../infra/agent-events.js";
 import {
+  agentCommand,
   connectOk,
   getReplyFromConfig,
   installGatewayTestHooks,
@@ -333,7 +334,7 @@ describe("gateway server chat", () => {
       });
       expect(res.ok).toBe(true);
       const evt = await eventPromise;
-      expect(evt.payload?.message?.command).toBe(true);
+      expect(evt.payload?.state).toBe("final");
       expect(spy.mock.calls.length).toBe(callsBefore);
     } finally {
       testState.sessionStorePath = undefined;

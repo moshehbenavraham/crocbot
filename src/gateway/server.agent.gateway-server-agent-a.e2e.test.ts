@@ -148,7 +148,16 @@ const defaultRegistry = createRegistry([
   {
     pluginId: "telegram",
     source: "test",
-    plugin: createStubChannelPlugin({ id: "telegram", label: "Telegram" }),
+    plugin: createStubChannelPlugin({
+      id: "telegram",
+      label: "Telegram",
+      resolveAllowFrom: (cfg) => {
+        const channels = cfg.channels as Record<string, unknown> | undefined;
+        const entry = channels?.telegram as Record<string, unknown> | undefined;
+        const allow = entry?.allowFrom;
+        return Array.isArray(allow) ? allow.map((value) => String(value)) : [];
+      },
+    }),
   },
   {
     pluginId: "discord",
@@ -460,9 +469,9 @@ describe("gateway server agent", () => {
     expect(images[0]?.data).toBe(BASE_IMAGE_PNG);
   });
 
-  test("agent falls back to whatsapp when delivery requested and no last channel exists", async () => {
+  test("agent falls back to telegram when delivery requested and no last channel exists", async () => {
     setRegistry(defaultRegistry);
-    testState.allowFrom = ["+1555"];
+    testState.channelsConfig = { telegram: { allowFrom: ["+1555"] } };
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-gw-"));
     testState.sessionStorePath = path.join(dir, "sessions.json");
     await writeSessionStore({
@@ -483,11 +492,11 @@ describe("gateway server agent", () => {
 
     const spy = vi.mocked(agentCommand);
     const call = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    expectChannels(call, "whatsapp");
+    expectChannels(call, "telegram");
     expect(call.to).toBe("+1555");
     expect(call.deliver).toBe(true);
     expect(call.sessionId).toBe("sess-main-missing-provider");
-    testState.allowFrom = undefined;
+    testState.channelsConfig = undefined;
   });
 
   test("agent routes main last-channel whatsapp", async () => {

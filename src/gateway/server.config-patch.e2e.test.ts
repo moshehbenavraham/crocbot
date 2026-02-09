@@ -117,7 +117,7 @@ describe("gateway config.patch", () => {
     }>(ws, (o) => o.type === "res" && o.id === get2Id);
     expect(get2Res.ok).toBe(true);
     expect(get2Res.payload?.config?.gateway?.mode).toBe("local");
-    expect(get2Res.payload?.config?.channels?.telegram?.botToken).toBe("token-1");
+    expect(get2Res.payload?.config?.channels?.telegram?.botToken).toBe("[REDACTED]");
   });
 
   it("writes config, stores sentinel, and schedules restart", async () => {
