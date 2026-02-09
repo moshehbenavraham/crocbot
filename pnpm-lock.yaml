@@ -46,6 +46,9 @@ importers:
       '@mariozechner/pi-tui':
         specifier: 0.51.1
         version: 0.51.1
+      '@modelcontextprotocol/sdk':
+        specifier: 1.26.0
+        version: 1.26.0(zod@4.3.6)
       '@mozilla/readability':
         specifier: ^0.6.0
         version: 0.6.0
@@ -164,9 +167,6 @@ importers:
       '@grammyjs/types':
         specifier: ^3.23.0
         version: 3.23.0
-      '@modelcontextprotocol/sdk':
-        specifier: 1.26.0
-        version: 1.26.0(zod@4.3.6)
       '@types/body-parser':
         specifier: ^1.19.6
         version: 1.19.6
