@@ -94,6 +94,9 @@ __pycache__/
 # Internal deployment logs (contain PII, not for public)
 docs/ongoing-projects/
 
+# Skills (local development)
+skills/infinite/
+
 # Local symlinks to state/workspace
 .crocbot-state
 .crocbot-workspace
