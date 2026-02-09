@@ -29,6 +29,7 @@ import {
 import { assertSupportedRuntime } from "./infra/runtime-guard.js";
 import { formatUncaughtError } from "./infra/errors.js";
 import { installUnhandledRejectionHandler } from "./infra/unhandled-rejections.js";
+import { initSecretsRegistry } from "./infra/secrets/init.js";
 import { enableConsoleCapture } from "./logging.js";
 import { runCommandWithTimeout, runExec } from "./process/exec.js";
 import { normalizeE164 } from "./utils.js";
@@ -36,6 +37,9 @@ import { normalizeE164 } from "./utils.js";
 loadDotEnv({ quiet: true });
 normalizeEnv();
 ensurecrocbotCliOnPath();
+
+// Initialize secrets registry from env vars before any logging occurs.
+initSecretsRegistry();
 
 // Capture all console output into structured logs while keeping stdout/stderr behavior.
 enableConsoleCapture();

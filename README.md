@@ -89,26 +89,28 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
 ```
               Telegram
              (grammY bot)
-                  │
-                  ▼
-     ┌────────────────────────┐
-     │        Gateway         │
-     │   (WebSocket + HTTP)   │
-     │  ws://127.0.0.1:18789  │
-     └────────────┬───────────┘
-                  │
-     ┌────────────┼────────────┐
-     │            │            │
-     ▼            ▼            ▼
-  Agents      Sessions       Cron
-  (Pi RT)     (Storage)     (Jobs)
-     │
-     ▼
-    LLM Providers
-  (Claude, GPT, Gemini, …)
+                  |
+                  v
+     +------------------------+
+     |        Gateway         |
+     |   (WebSocket + HTTP)   |
+     |  ws://127.0.0.1:18789  |
+     +------------+-----------+
+                  |
+     +------+-----+------+---------+
+     |      |            |         |
+     v      v            v         v
+  Agents  Sessions     Cron    MCP Server
+  (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
+     |                              ^
+     +---> LLM Providers            |
+     |   (Claude, GPT, Gemini)  External AI
+     |                           Systems
+     +---> MCP Client
+          (stdio, SSE, HTTP)
 ```
 
-The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket.
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
 
 Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
 
@@ -125,6 +127,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Plugin system](https://aiwithapex.mintlify.app/tools/plugins)** — extensible runtime with SDK (`crocbot/plugin-sdk`)
 - **[Multi-model support](https://aiwithapex.mintlify.app/concepts/models)** — Anthropic, OpenAI, Google Gemini, Bedrock, Ollama, OpenRouter, and more
 - **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
+- **[MCP integration](https://aiwithapex.mintlify.app/concepts/mcp)** — native MCP client (stdio/SSE/HTTP) and server mode with SSRF-guarded transports
 - **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, DM pairing
 
@@ -255,6 +258,7 @@ Docs: [Skills](https://aiwithapex.mintlify.app/tools/skills) · [Skills config](
 | tsdown (rolldown) | Bundler (~5s builds) |
 | pnpm | Package manager |
 | grammY | Telegram SDK |
+| @modelcontextprotocol/sdk | MCP client and server |
 | Vitest | Testing |
 | oxlint + oxfmt | Lint + format (Rust-based, fast) |
 

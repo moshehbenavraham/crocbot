@@ -1116,7 +1116,8 @@
               "runbooks/docker-operations",
               "runbooks/backup-restore",
               "runbooks/log-analysis",
-              "runbooks/health-checks"
+              "runbooks/health-checks",
+              "runbooks/coolify-deploy"
             ]
           }
         ]

@@ -10,3 +10,5 @@ export { SecretsRegistry } from "./registry.js";
 export type { SecretEntry, RegistryOptions } from "./registry.js";
 export { createMasker, computeHash8, makePlaceholder } from "./masker.js";
 export type { SecretsMasker, EncodingVariant } from "./masker.js";
+export { initSecretsRegistry } from "./init.js";
+export { createMaskingTransport, maskStringsDeep } from "./logging-transport.js";

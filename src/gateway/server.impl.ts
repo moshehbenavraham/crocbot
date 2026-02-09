@@ -1,6 +1,7 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { initSubagentRegistry } from "../agents/subagent-registry.js";
 import { initializeReporter } from "../alerting/index.js";
+import { initSecretsRegistry } from "../infra/secrets/init.js";
 import { enableDefaultMetrics, markGatewayStarted } from "../metrics/index.js";
 import { registerSkillsChangeListener } from "../agents/skills/refresh.js";
 import { type ChannelId, listChannelPlugins } from "../channels/plugins/index.js";
@@ -150,6 +151,9 @@ export async function startGatewayServer(
   port = 18789,
   opts: GatewayServerOptions = {},
 ): Promise<GatewayServer> {
+  // Initialize secrets registry from env vars before any logging occurs.
+  initSecretsRegistry();
+
   // Ensure all default port derivations (browser) see the actual runtime port.
   process.env.CROCBOT_GATEWAY_PORT = String(port);
   logAcceptedEnvOption({
@@ -212,6 +216,8 @@ export async function startGatewayServer(
   }
 
   const cfgAtStart = loadConfig();
+  // Add config-based secrets to registry (env already loaded above).
+  initSecretsRegistry(cfgAtStart as unknown as Record<string, unknown>, { skipEnv: true });
   const diagnosticsEnabled = isDiagnosticsEnabled(cfgAtStart);
   if (diagnosticsEnabled) {
     startDiagnosticHeartbeat();

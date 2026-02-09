@@ -141,3 +141,20 @@ jobs:
             ${{ needs.build-arm64.outputs.image-digest }}
         env:
           DOCKER_METADATA_OUTPUT_JSON: ${{ steps.meta.outputs.json }}
+
+  # Trigger Coolify auto-deploy via webhook
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [create-manifest]
+    if: github.ref == 'refs/heads/main' && vars.COOLIFY_WEBHOOK_URL != ''
+    steps:
+      - name: Trigger Coolify deployment
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "${{ vars.COOLIFY_WEBHOOK_URL }}")
+          if [ "$response" -ge 200 ] && [ "$response" -lt 300 ]
+          then
+            echo "Coolify deploy triggered successfully (HTTP $response)"
+          else
+            echo "::warning::Coolify deploy webhook returned HTTP $response"
+          fi

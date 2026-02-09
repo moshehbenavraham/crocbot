@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions/paths.js";
+import { SecretsRegistry } from "../infra/secrets/registry.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { hashText } from "./internal.js";
 
@@ -108,7 +109,9 @@ export async function buildSessionEntry(absPath: string): Promise<SessionFileEnt
       const label = message.role === "user" ? "User" : "Assistant";
       collected.push(`${label}: ${text}`);
     }
-    const content = collected.join("\n");
+    // Apply secrets masking to prevent leaking registered secrets in read-back.
+    const rawContent = collected.join("\n");
+    const content = SecretsRegistry.getInstance().mask(rawContent);
     return {
       path: sessionPathForFile(absPath),
       absPath,

@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
+import { SecretsRegistry } from "../../infra/secrets/registry.js";
+
 import { CURRENT_SESSION_VERSION } from "@mariozechner/pi-coding-agent";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { resolveEffectiveMessagesConfig, resolveIdentityName } from "../../agents/identity.js";
@@ -81,7 +83,8 @@ function ensureTranscriptFile(params: { transcriptPath: string; sessionId: strin
       timestamp: new Date().toISOString(),
       cwd: process.cwd(),
     };
-    fs.writeFileSync(params.transcriptPath, `${JSON.stringify(header)}\n`, "utf-8");
+    const line = SecretsRegistry.getInstance().mask(JSON.stringify(header));
+    fs.writeFileSync(params.transcriptPath, `${line}\n`, "utf-8");
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
@@ -136,7 +139,8 @@ function appendAssistantTranscriptMessage(params: {
   };
 
   try {
-    fs.appendFileSync(transcriptPath, `${JSON.stringify(transcriptEntry)}\n`, "utf-8");
+    const line = SecretsRegistry.getInstance().mask(JSON.stringify(transcriptEntry));
+    fs.appendFileSync(transcriptPath, `${line}\n`, "utf-8");
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
@@ -662,9 +666,10 @@ export const chatHandlers: GatewayRequestHandlers = {
       message: messageBody,
     };
 
-    // Append to transcript file
+    // Append to transcript file (with secrets masking)
     try {
-      fs.appendFileSync(transcriptPath, `${JSON.stringify(transcriptEntry)}\n`, "utf-8");
+      const line = SecretsRegistry.getInstance().mask(JSON.stringify(transcriptEntry));
+      fs.appendFileSync(transcriptPath, `${line}\n`, "utf-8");
     } catch (err) {
       const errMessage = err instanceof Error ? err.message : String(err);
       respond(

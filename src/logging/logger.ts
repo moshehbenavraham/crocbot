@@ -7,6 +7,7 @@ import { Logger as TsLogger } from "tslog";
 import type { crocbotConfig } from "../config/types.js";
 import type { ConsoleStyle } from "./console.js";
 import { getCorrelationContext } from "./correlation.js";
+import { createMaskingTransport } from "../infra/secrets/logging-transport.js";
 import { type LogLevel, levelToMinLevel, normalizeLogLevel } from "./levels.js";
 import { readLoggingConfig } from "./config.js";
 import { loggingState } from "./state.js";
@@ -102,6 +103,10 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
     type: "hidden", // no ansi formatting
   });
 
+  // Create masking transport for secrets redaction.
+  // Composes value-based masking (registry) + pattern-based redaction.
+  const maskingTransport = createMaskingTransport();
+
   logger.attachTransport((logObj: LogObj) => {
     try {
       const time = logObj.date?.toISOString?.() ?? new Date().toISOString();
@@ -120,6 +125,8 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
           entry.message_id = correlationCtx.messageId;
         }
       }
+      // Apply secrets masking before serialization to disk.
+      maskingTransport(entry);
       const line = JSON.stringify(entry);
       fs.appendFileSync(settings.file, `${line}\n`, { encoding: "utf8" });
     } catch {

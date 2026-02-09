@@ -3,6 +3,8 @@
  * Masks sensitive values (API keys, tokens, passwords, secrets) while preserving structure.
  */
 
+import { SecretsRegistry } from "../infra/secrets/registry.js";
+
 const REDACTED_MARKER = "[REDACTED]";
 
 /**
@@ -157,9 +159,34 @@ export function redactConfigObject<T extends Record<string, unknown>>(obj: T): T
 }
 
 /**
+ * Recursively apply registry.mask() to all string leaf values in a value.
+ * Preserves object structure; only masks string values, not keys.
+ */
+function registryMaskDeep(value: unknown, registry: SecretsRegistry): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+  if (typeof value === "string") {
+    return registry.mask(value);
+  }
+  if (typeof value !== "object") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => registryMaskDeep(item, registry));
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    result[key] = registryMaskDeep(val, registry);
+  }
+  return result;
+}
+
+/**
  * Redacts a ConfigFileSnapshot's sensitive fields.
  * The `raw` field is completely redacted as it contains the raw config text.
  * The `parsed` and `config` objects are deeply redacted.
+ * After key-based redaction, applies value-based masking via SecretsRegistry.
  */
 export function redactConfigSnapshot<
   T extends {
@@ -183,6 +210,21 @@ export function redactConfigSnapshot<
   // Redact validated config object
   if (result.config && typeof result.config === "object") {
     result.config = redactConfigObject(result.config);
+  }
+
+  // Apply value-based masking via SecretsRegistry for any remaining secrets
+  // that were not caught by key-based redaction above.
+  const registry = SecretsRegistry.getInstance();
+  if (registry.size > 0) {
+    if (typeof result.raw === "string" && result.raw !== REDACTED_MARKER) {
+      result.raw = registry.mask(result.raw) as T["raw"] & string;
+    }
+    if (result.parsed && typeof result.parsed === "object") {
+      result.parsed = registryMaskDeep(result.parsed, registry);
+    }
+    if (result.config && typeof result.config === "object") {
+      result.config = registryMaskDeep(result.config, registry) as Record<string, unknown>;
+    }
   }
 
   return result;

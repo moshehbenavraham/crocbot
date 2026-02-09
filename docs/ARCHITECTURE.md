@@ -18,21 +18,17 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
           | (WebSocket + HTTP)|
           +--------+---------+
                    |
-      +------------+------------+
-      |            |            |
-      v            v            v
-+-----+----+ +-----+----+ +-----+----+
-|  Agents  | |  Sessions | |   Cron   |
-| (Pi RT)  | | (Storage) | |  (Jobs)  |
-+----------+ +----------+ +----------+
-      |
-      v
-+-----+----+
-|   LLM    |
-| Providers|
-| (Claude, |
-| OpenAI)  |
-+----------+
+      +------+-----+------+---------+
+      |      |            |         |
+      v      v            v         v
+  Agents  Sessions     Cron    MCP Server
+  (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
+      |                              ^
+      +---> LLM Providers            |
+      |   (Claude, OpenAI, ...)  External AI
+      |                           Systems
+      +---> MCP Client
+           (stdio, SSE, HTTP)
 ```
 
 ## Components
@@ -90,6 +86,18 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Tech**: File-based storage
 - **Location**: `src/memory/`
 
+### MCP Client
+- **Purpose**: In-process client connecting to external MCP tool servers
+- **Tech**: @modelcontextprotocol/sdk, stdio/SSE/HTTP transports
+- **Location**: `src/mcp/` (client.ts, client-transport.ts, transport-*.ts)
+- **Key modules**: `client.ts` (lifecycle manager with reconnect), `tool-bridge.ts` (MCP-to-agent tool conversion), `transport-ssrf.ts` (SSRF-guarded fetch for remote transports)
+
+### MCP Server
+- **Purpose**: Exposes crocbot as MCP infrastructure for external AI systems
+- **Tech**: @modelcontextprotocol/sdk, SSE + streamable HTTP transports
+- **Location**: `src/mcp/` (server.ts, server-auth.ts, server-tools.ts, server-mount.ts)
+- **Key modules**: `server-auth.ts` (Bearer token with timing-safe comparison), `server-tools.ts` (send_message, finish_chat, query_memory, list_capabilities), `server-mount.ts` (HTTP route mounting)
+
 ## Tech Stack Rationale
 
 | Technology | Purpose | Why Chosen |
@@ -100,15 +108,16 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 | pnpm | Package manager | Fast, disk-efficient |
 | grammY | Telegram SDK | Modern, well-maintained, middleware support |
 | Vitest | Testing | Fast, ESM-native, good DX |
+| @modelcontextprotocol/sdk | MCP Client + Server | Official TypeScript SDK for Model Context Protocol |
 | oxlint + oxfmt | Lint + Format | Fast Rust-based toolchain, 134 type-aware rules |
 
 ## Data Flow
 
-1. User sends message via Telegram
+1. User sends message via Telegram (or external AI calls MCP server endpoint)
 2. grammY bot receives message, routes to Gateway
 3. Gateway creates/resumes session, invokes agent
-4. Agent processes message with LLM provider
-5. Response streamed back through Gateway to Telegram
+4. Agent processes message with LLM provider, invoking MCP client tools as needed
+5. Response streamed back through Gateway to Telegram (or MCP server response)
 
 ## Key Architectural Decisions
 
@@ -136,6 +145,7 @@ src/
   logging/          # Structured logging (tslog)
   media/            # Media pipeline
   media-understanding/  # Media analysis
+  mcp/              # MCP client, server, transports, tool bridge
   memory/           # Memory management
   metrics/          # Metrics and monitoring
   plugins/          # Plugin runtime

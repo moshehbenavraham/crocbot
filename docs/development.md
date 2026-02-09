@@ -155,6 +155,7 @@ src/
   hooks/            # Hook system
   infra/            # Infrastructure utilities (exec, net, SSRF guards)
   logging/          # Structured logging (tslog)
+  mcp/              # MCP client, server, transports, tool bridge
   media/            # Media processing
   memory/           # Memory management
   metrics/          # Metrics and monitoring
