@@ -41,6 +41,8 @@ export function loadMcpConfig(raw: unknown): McpGlobalConfig {
 
     validateRequiredFields(name, type as McpTransportType, entry);
 
+    const headers = parseHeaders(name, entry.headers);
+
     servers[name] = {
       type: type as McpTransportType,
       timeout: typeof entry.timeout === "number" ? entry.timeout : DEFAULT_TOOL_TIMEOUT_MS,
@@ -48,6 +50,7 @@ export function loadMcpConfig(raw: unknown): McpGlobalConfig {
       args: Array.isArray(entry.args) ? (entry.args as string[]) : undefined,
       env: isStringRecord(entry.env) ? entry.env : undefined,
       url: typeof entry.url === "string" ? entry.url : undefined,
+      headers,
     };
   }
 
@@ -70,6 +73,22 @@ function validateRequiredFields(
       throw new Error(`MCP server "${name}": ${type} transport requires a "url" field`);
     }
   }
+}
+
+function parseHeaders(name: string, value: unknown): Record<string, string> | undefined {
+  if (value == null) {
+    return undefined;
+  }
+  if (typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`MCP server "${name}": "headers" must be an object with string values`);
+  }
+  const record = value as Record<string, unknown>;
+  for (const [key, val] of Object.entries(record)) {
+    if (typeof val !== "string") {
+      throw new Error(`MCP server "${name}": header "${key}" must be a string value`);
+    }
+  }
+  return record as Record<string, string>;
 }
 
 function isStringRecord(value: unknown): value is Record<string, string> {

@@ -74,7 +74,7 @@ export class McpClientManager {
     server.lastError = null;
 
     try {
-      const transport = createTransport(server.config);
+      const transport = await createTransport(server.config);
       const client = new Client(CLIENT_INFO);
 
       await client.connect(transport);

@@ -24,6 +24,7 @@ describe("loadMcpConfig", () => {
       env: { API_KEY: "test" },
       timeout: 30_000,
       url: undefined,
+      headers: undefined,
     });
   });
 
@@ -44,6 +45,7 @@ describe("loadMcpConfig", () => {
       env: undefined,
       url: "https://example.com/mcp",
       timeout: DEFAULT_TOOL_TIMEOUT_MS,
+      headers: undefined,
     });
   });
 
@@ -160,5 +162,109 @@ describe("loadMcpConfig", () => {
     expect(result.servers.first.command).toBe("cmd1");
     expect(result.servers.second.command).toBe("cmd2");
     expect(result.servers.second.args).toEqual(["-v"]);
+  });
+
+  describe("headers", () => {
+    it("parses valid headers from SSE config", () => {
+      const result = loadMcpConfig({
+        servers: {
+          remote: {
+            type: "sse",
+            url: "https://example.com/events",
+            headers: { Authorization: "Bearer tok123", "X-Api-Key": "abc" },
+          },
+        },
+      });
+
+      expect(result.servers.remote.headers).toEqual({
+        Authorization: "Bearer tok123",
+        "X-Api-Key": "abc",
+      });
+    });
+
+    it("parses valid headers from HTTP config", () => {
+      const result = loadMcpConfig({
+        servers: {
+          remote: {
+            type: "http",
+            url: "https://example.com/mcp",
+            headers: { Authorization: "Bearer tok456" },
+          },
+        },
+      });
+
+      expect(result.servers.remote.headers).toEqual({
+        Authorization: "Bearer tok456",
+      });
+    });
+
+    it("accepts empty headers object", () => {
+      const result = loadMcpConfig({
+        servers: {
+          remote: {
+            type: "http",
+            url: "https://example.com/mcp",
+            headers: {},
+          },
+        },
+      });
+
+      expect(result.servers.remote.headers).toEqual({});
+    });
+
+    it("omits headers when not specified", () => {
+      const result = loadMcpConfig({
+        servers: {
+          remote: {
+            type: "http",
+            url: "https://example.com/mcp",
+          },
+        },
+      });
+
+      expect(result.servers.remote.headers).toBeUndefined();
+    });
+
+    it("rejects non-string header values", () => {
+      expect(() =>
+        loadMcpConfig({
+          servers: {
+            bad: {
+              type: "http",
+              url: "https://example.com/mcp",
+              headers: { "X-Count": 42 },
+            },
+          },
+        }),
+      ).toThrow('header "X-Count" must be a string value');
+    });
+
+    it("rejects array as headers value", () => {
+      expect(() =>
+        loadMcpConfig({
+          servers: {
+            bad: {
+              type: "http",
+              url: "https://example.com/mcp",
+              headers: ["not", "valid"],
+            },
+          },
+        }),
+      ).toThrow('"headers" must be an object with string values');
+    });
+
+    it("rejects non-object headers value", () => {
+      expect(() =>
+        loadMcpConfig({
+          servers: {
+            bad: {
+              type: "http",
+              url: "https://example.com/mcp",
+              headers: "not-an-object",
+            },
+          },
+        }),
+      ).toThrow('"headers" must be an object with string values');
+    });
   });
 });

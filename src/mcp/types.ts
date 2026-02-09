@@ -30,9 +30,11 @@ export interface McpServerConfig {
   /** Environment variables for the stdio process. */
   env?: Record<string, string>;
 
-  // HTTP/SSE-specific fields (used in Session 03)
+  // HTTP/SSE-specific fields
   /** URL for HTTP or SSE transport. */
   url?: string;
+  /** Custom HTTP headers for remote transports (Bearer tokens, API keys). */
+  headers?: Record<string, string>;
 }
 
 /** Top-level MCP configuration from crocbot.json "mcp" section. */

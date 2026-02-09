@@ -1,10 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createTransport } from "./client-transport.js";
 import type { McpServerConfig } from "./types.js";
 
+vi.mock("./transport-sse.js", () => ({
+  createSseTransport: vi.fn().mockResolvedValue({ _mockType: "sse-transport" }),
+}));
+
+vi.mock("./transport-http.js", () => ({
+  createHttpTransport: vi.fn().mockResolvedValue({ _mockType: "http-transport" }),
+}));
+
 describe("createTransport", () => {
-  it("creates a StdioClientTransport for stdio config", () => {
+  it("creates a StdioClientTransport for stdio config", async () => {
     const config: McpServerConfig = {
       type: "stdio",
       command: "echo",
@@ -12,13 +20,13 @@ describe("createTransport", () => {
       env: { FOO: "bar" },
     };
 
-    const transport = createTransport(config);
+    const transport = await createTransport(config);
     expect(transport).toBeDefined();
     expect(typeof transport.start).toBe("function");
     expect(typeof transport.close).toBe("function");
   });
 
-  it("maps command, args, and env correctly", () => {
+  it("maps command, args, and env correctly", async () => {
     const config: McpServerConfig = {
       type: "stdio",
       command: "node",
@@ -26,44 +34,51 @@ describe("createTransport", () => {
       env: { NODE_ENV: "test", API_KEY: "secret" },
     };
 
-    // Verifies no throw and transport is created
-    const transport = createTransport(config);
+    const transport = await createTransport(config);
     expect(transport).toBeDefined();
   });
 
-  it("creates transport with no args or env", () => {
+  it("creates transport with no args or env", async () => {
     const config: McpServerConfig = {
       type: "stdio",
       command: "my-server",
     };
 
-    const transport = createTransport(config);
+    const transport = await createTransport(config);
     expect(transport).toBeDefined();
   });
 
-  it("throws for SSE transport type (not yet implemented)", () => {
+  it("delegates to createSseTransport for SSE config", async () => {
+    const { createSseTransport } = await import("./transport-sse.js");
     const config: McpServerConfig = {
       type: "sse",
       url: "https://example.com/events",
     };
 
-    expect(() => createTransport(config)).toThrow("not yet implemented");
+    const transport = await createTransport(config);
+
+    expect(createSseTransport).toHaveBeenCalledWith(config);
+    expect(transport).toEqual({ _mockType: "sse-transport" });
   });
 
-  it("throws for HTTP transport type (not yet implemented)", () => {
+  it("delegates to createHttpTransport for HTTP config", async () => {
+    const { createHttpTransport } = await import("./transport-http.js");
     const config: McpServerConfig = {
       type: "http",
       url: "https://example.com/mcp",
     };
 
-    expect(() => createTransport(config)).toThrow("not yet implemented");
+    const transport = await createTransport(config);
+
+    expect(createHttpTransport).toHaveBeenCalledWith(config);
+    expect(transport).toEqual({ _mockType: "http-transport" });
   });
 
-  it("throws for missing command in stdio config", () => {
+  it("throws for missing command in stdio config", async () => {
     const config: McpServerConfig = {
       type: "stdio",
     };
 
-    expect(() => createTransport(config)).toThrow("requires a command");
+    await expect(createTransport(config)).rejects.toThrow("requires a command");
   });
 });
