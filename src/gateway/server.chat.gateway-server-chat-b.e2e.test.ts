@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, test, vi } from "vitest";
-import { emitAgentEvent } from "../infra/agent-events.js";
+import { emitAgentEvent, registerAgentRunContext } from "../infra/agent-events.js";
 import {
   connectOk,
   getReplyFromConfig,
@@ -277,6 +277,7 @@ describe("gateway server chat", () => {
         const stopEvt = await abortedStopEventP;
         expect(stopEvt.payload?.sessionKey).toBe("main");
         expect(spy.mock.calls.length).toBe(callsBeforeStop + 1);
+
         resetSpy();
         let resolveRun: (() => void) | undefined;
         const runDone = new Promise<void>((resolve) => {
@@ -315,6 +316,7 @@ describe("gateway server chat", () => {
           await new Promise((r) => setTimeout(r, 10));
         }
         expect(completed).toBe(true);
+
         resetSpy();
         spy.mockImplementationOnce(async (_ctx, opts) => {
           opts?.onAgentRunStart?.(opts.runId ?? "idem-abort-all-1");
@@ -462,6 +464,15 @@ describe("gateway server chat", () => {
         expect(abortCompleteRes.payload?.aborted).toBe(false);
 
         await writeStore({ main: { sessionId: "sess-main", updatedAt: Date.now() } });
+        resetSpy();
+        // Use a mock that calls onAgentRunStart so the dispatch .then() handler
+        // does NOT call broadcastChatFinal prematurely. The test controls the
+        // final event via emitAgentEvent below.
+        spy.mockImplementation(async (_ctx, opts) => {
+          opts?.onAgentRunStart?.(opts.runId ?? "unknown");
+        });
+        registerAgentRunContext("idem-1", { sessionKey: "main" });
+        registerAgentRunContext("idem-2", { sessionKey: "main" });
         const res1 = await rpcReq(ws, "chat.send", {
           sessionKey: "main",
           message: "first",

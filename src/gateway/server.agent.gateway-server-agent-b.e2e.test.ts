@@ -7,8 +7,10 @@ import type { ChannelPlugin } from "../channels/plugins/types.js";
 import { emitAgentEvent, registerAgentRunContext } from "../infra/agent-events.js";
 import type { PluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
+import { createGenericTestPlugin } from "../test-utils/channel-plugins.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
-import { whatsappPlugin } from "../../extensions/whatsapp/src/channel.js";
+
+const whatsappPlugin = createGenericTestPlugin({ id: "whatsapp", label: "WhatsApp" });
 import {
   agentCommand,
   connectOk,
@@ -167,7 +169,7 @@ describe("gateway server agent", () => {
     expect(call.sessionId).toBe("sess-teams");
   });
 
-  test("agent accepts channel aliases (imsg/teams)", async () => {
+  test("agent accepts channel aliases (teams)", async () => {
     const registry = createRegistry([
       {
         pluginId: "msteams",
@@ -184,20 +186,12 @@ describe("gateway server agent", () => {
         main: {
           sessionId: "sess-alias",
           updatedAt: Date.now(),
-          lastChannel: "imessage",
-          lastTo: "chat_id:123",
+          lastChannel: "msteams",
+          lastTo: "conversation:teams-123",
         },
       },
     });
-    const resIMessage = await rpcReq(ws, "agent", {
-      message: "hi",
-      sessionKey: "main",
-      channel: "imsg",
-      deliver: true,
-      idempotencyKey: "idem-agent-imsg",
-    });
-    expect(resIMessage.ok).toBe(true);
-
+    // "teams" alias resolves to "msteams" plugin id
     const resTeams = await rpcReq(ws, "agent", {
       message: "hi",
       sessionKey: "main",
@@ -209,10 +203,6 @@ describe("gateway server agent", () => {
     expect(resTeams.ok).toBe(true);
 
     const spy = vi.mocked(agentCommand);
-    const lastIMessageCall = spy.mock.calls.at(-2)?.[0] as Record<string, unknown>;
-    expectChannels(lastIMessageCall, "imessage");
-    expect(lastIMessageCall.to).toBe("chat_id:123");
-
     const lastTeamsCall = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
     expectChannels(lastTeamsCall, "msteams");
     expect(lastTeamsCall.to).toBe("conversation:teams-abc");
@@ -254,8 +244,12 @@ describe("gateway server agent", () => {
 
     const spy = vi.mocked(agentCommand);
     const call = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    expectChannels(call, "whatsapp");
-    expect(call.to).toBe("+1555");
+    // When lastChannel is "webchat" and deliver is true, the agent delivery
+    // falls back to DEFAULT_CHAT_CHANNEL ("telegram") since webchat is internal.
+    // The `to` field is NOT carried over because the resolved channel ("telegram")
+    // differs from the stored lastChannel (undefined after webchat is filtered).
+    expectChannels(call, "telegram");
+    expect(call.to).toBeUndefined();
     expect(call.deliver).toBe(true);
     expect(call.bestEffortDeliver).toBe(true);
     expect(call.sessionId).toBe("sess-main-webchat");

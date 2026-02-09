@@ -197,12 +197,15 @@ vi.mock("@mariozechner/pi-coding-agent", async () => {
 
   return {
     ...actual,
-    discoverModels: (...args: unknown[]) => {
+    discoverAuthStorage: undefined,
+    get discoverModels() {
       if (!piSdkMock.enabled) {
-        return (actual.discoverModels as (...args: unknown[]) => unknown)(...args);
+        return undefined;
       }
-      piSdkMock.discoverCalls += 1;
-      return piSdkMock.models;
+      return (..._args: unknown[]) => {
+        piSdkMock.discoverCalls += 1;
+        return piSdkMock.models;
+      };
     },
   };
 });

@@ -209,7 +209,10 @@ describe("gateway server auth/connect", () => {
 
     test("rejects invalid password", async () => {
       const ws = await openWs(port);
-      const res = await connectReq(ws, { password: "wrong" });
+      // Send a device identity (auto-built by connectReq) but with an invalid
+      // password. The gateway checks device identity first, so we must provide
+      // one to reach the credential validation layer.
+      const res = await connectReq(ws, { password: "wrong", skipDefaultAuth: true });
       expect(res.ok).toBe(false);
       expect(res.error?.message ?? "").toContain("unauthorized");
       ws.close();
@@ -239,7 +242,7 @@ describe("gateway server auth/connect", () => {
 
     test("rejects invalid token", async () => {
       const ws = await openWs(port);
-      const res = await connectReq(ws, { token: "wrong" });
+      const res = await connectReq(ws, { token: "wrong", skipDefaultAuth: true, device: null });
       expect(res.ok).toBe(false);
       expect(res.error?.message ?? "").toContain("unauthorized");
       ws.close();
@@ -415,7 +418,11 @@ describe("gateway server auth/connect", () => {
     }
   });
 
-  test("accepts device token auth for paired device", async () => {
+  // TODO: Device pairing was removed during Phase 00 strip-down. The stub in
+  // src/infra/device-pairing.ts returns null for getPairedDevice/ensureDeviceToken
+  // and null for approveDevicePairing. These tests require real pairing infrastructure.
+  // Re-enable when device pairing is restored.
+  test.skip("accepts device token auth for paired device", async () => {
     const { loadOrCreateDeviceIdentity } = await import("../infra/device-identity.js");
     const { approveDevicePairing, getPairedDevice, listDevicePairing } =
       await import("../infra/device-pairing.js");
@@ -451,7 +458,8 @@ describe("gateway server auth/connect", () => {
     }
   });
 
-  test("requires pairing for scope upgrades", async () => {
+  // TODO: Device pairing stub returns null -- cannot test scope upgrades without real pairing.
+  test.skip("requires pairing for scope upgrades", async () => {
     const { mkdtemp } = await import("node:fs/promises");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
@@ -530,7 +538,8 @@ describe("gateway server auth/connect", () => {
     }
   });
 
-  test("rejects revoked device token", async () => {
+  // TODO: Device pairing stub returns null -- cannot test token revocation without real pairing.
+  test.skip("rejects revoked device token", async () => {
     const { loadOrCreateDeviceIdentity } = await import("../infra/device-identity.js");
     const { approveDevicePairing, getPairedDevice, listDevicePairing, revokeDeviceToken } =
       await import("../infra/device-pairing.js");

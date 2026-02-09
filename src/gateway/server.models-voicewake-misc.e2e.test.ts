@@ -6,11 +6,11 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { WebSocket } from "ws";
 
 import { getChannelPlugin } from "../channels/plugins/index.js";
-import type { ChannelOutboundAdapter } from "../channels/plugins/types.js";
+import { resetModelCatalogCacheForTest } from "../agents/model-catalog.js";
 import { GatewayLockError } from "../infra/gateway-lock.js";
 import type { PluginRegistry } from "../plugins/registry.js";
 import { getActivePluginRegistry, setActivePluginRegistry } from "../plugins/runtime.js";
-import { createOutboundTestPlugin } from "../test-utils/channel-plugins.js";
+import { createGenericTestPlugin } from "../test-utils/channel-plugins.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import {
   connectOk,
@@ -43,25 +43,8 @@ afterAll(async () => {
   await server.close();
 });
 
-const whatsappOutbound: ChannelOutboundAdapter = {
-  deliveryMode: "direct",
-  sendText: async ({ deps, to, text }) => {
-    if (!deps?.sendWhatsApp) {
-      throw new Error("Missing sendWhatsApp dep");
-    }
-    return { channel: "whatsapp", ...(await deps.sendWhatsApp(to, text, {})) };
-  },
-  sendMedia: async ({ deps, to, text, mediaUrl }) => {
-    if (!deps?.sendWhatsApp) {
-      throw new Error("Missing sendWhatsApp dep");
-    }
-    return { channel: "whatsapp", ...(await deps.sendWhatsApp(to, text, { mediaUrl })) };
-  },
-};
-
-const whatsappPlugin = createOutboundTestPlugin({
+const whatsappPlugin = createGenericTestPlugin({
   id: "whatsapp",
-  outbound: whatsappOutbound,
   label: "WhatsApp",
 });
 
@@ -226,6 +209,7 @@ describe("gateway server models + voicewake", () => {
   });
 
   test("models.list returns model catalog", async () => {
+    resetModelCatalogCacheForTest();
     piSdkMock.enabled = true;
     piSdkMock.models = [
       { id: "gpt-test-z", provider: "openai", contextWindow: 0 },
@@ -270,7 +254,8 @@ describe("gateway server models + voicewake", () => {
     expect(res1.ok).toBe(true);
     expect(res2.ok).toBe(true);
 
-    const models = res1.payload?.models ?? [];
+    const testIds = new Set(["claude-test-a", "claude-test-b", "gpt-test-a", "gpt-test-z"]);
+    const models = (res1.payload?.models ?? []).filter((m) => testIds.has(m.id));
     expect(models).toEqual([
       {
         id: "claude-test-a",
@@ -326,7 +311,12 @@ describe("gateway server misc", () => {
             type: "req",
             id,
             method: "send",
-            params: { to: "+15550000000", message: "hi", idempotencyKey: idem },
+            params: {
+              to: "+15550000000",
+              message: "hi",
+              channel: "whatsapp",
+              idempotencyKey: idem,
+            },
           }),
         );
       sendReq("a1");

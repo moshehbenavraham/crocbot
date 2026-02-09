@@ -39,7 +39,7 @@ describe("gateway hooks helpers", () => {
     expect(() => resolveHooksConfig(cfg)).toThrow("hooks.path may not be '/'");
   });
 
-  test("extractHookToken prefers bearer > header, ignores query", () => {
+  test("extractHookToken prefers bearer > header > query", () => {
     const req = {
       headers: {
         authorization: "Bearer top",
@@ -60,8 +60,14 @@ describe("gateway hooks helpers", () => {
 
     const req3 = { headers: {} } as unknown as IncomingMessage;
     const result3 = extractHookToken(req3, url);
-    expect(result3.token).toBeUndefined();
-    expect(result3.fromQuery).toBe(false);
+    expect(result3.token).toBe("query");
+    expect(result3.fromQuery).toBe(true);
+
+    const req4 = { headers: {} } as unknown as IncomingMessage;
+    const url4 = new URL("http://localhost/hooks/wake");
+    const result4 = extractHookToken(req4, url4);
+    expect(result4.token).toBeUndefined();
+    expect(result4.fromQuery).toBe(false);
   });
 
   test("normalizeWakePayload trims + validates", () => {

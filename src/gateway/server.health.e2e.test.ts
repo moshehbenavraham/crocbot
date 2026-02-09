@@ -19,6 +19,7 @@ import {
   onceMessage,
   startGatewayServer,
   startServerWithClient,
+  testState,
 } from "./test-helpers.js";
 import { buildDeviceAuthPayload } from "./device-auth.js";
 
@@ -26,22 +27,14 @@ installGatewayTestHooks({ scope: "suite" });
 
 let server: Awaited<ReturnType<typeof startGatewayServer>>;
 let port = 0;
-let previousToken: string | undefined;
 
 beforeAll(async () => {
-  previousToken = process.env.CROCBOT_GATEWAY_TOKEN;
-  delete process.env.CROCBOT_GATEWAY_TOKEN;
   port = await getFreePort();
   server = await startGatewayServer(port);
 });
 
 afterAll(async () => {
-  await server.close();
-  if (previousToken === undefined) {
-    delete process.env.CROCBOT_GATEWAY_TOKEN;
-  } else {
-    process.env.CROCBOT_GATEWAY_TOKEN = previousToken;
-  }
+  await server?.close();
 });
 
 const openClient = async (opts?: Parameters<typeof connectOk>[1]) => {
@@ -55,7 +48,7 @@ describe("gateway server health/presence", () => {
   test("HTTP /health endpoint returns healthy status", async () => {
     const response = await new Promise<{
       statusCode: number;
-      body: { status: string; timestamp: string; uptime: number };
+      body: { status: string };
     }>((resolve, reject) => {
       const req = http.get(`http://127.0.0.1:${port}/health`, (res) => {
         let data = "";
@@ -73,9 +66,9 @@ describe("gateway server health/presence", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("healthy");
-    expect(typeof response.body.timestamp).toBe("string");
-    expect(typeof response.body.uptime).toBe("number");
-    expect(response.body.uptime).toBeGreaterThan(0);
+    // TODO: The /health endpoint currently returns only { status: "healthy" }.
+    // timestamp and uptime were removed during Phase 01 hardening; re-add when
+    // the endpoint is enriched (see server-http.ts:230).
   });
 
   test("connect + health + presence + status succeed", { timeout: 60_000 }, async () => {
@@ -251,6 +244,10 @@ describe("gateway server health/presence", () => {
     const role = "operator";
     const scopes: string[] = [];
     const signedAtMs = Date.now();
+    const authToken =
+      typeof (testState.gatewayAuth as { token?: unknown } | undefined)?.token === "string"
+        ? ((testState.gatewayAuth as { token?: string }).token ?? null)
+        : null;
     const payload = buildDeviceAuthPayload({
       deviceId: identity.deviceId,
       clientId: GATEWAY_CLIENT_NAMES.FINGERPRINT,
@@ -258,7 +255,7 @@ describe("gateway server health/presence", () => {
       role,
       scopes,
       signedAtMs,
-      token: null,
+      token: authToken,
     });
     const ws = await openClient({
       role,

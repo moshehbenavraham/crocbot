@@ -2,7 +2,15 @@ import { afterAll, beforeAll, test } from "vitest";
 import WebSocket from "ws";
 
 import { PROTOCOL_VERSION } from "./protocol/index.js";
-import { getFreePort, onceMessage, startGatewayServer } from "./test-helpers.server.js";
+import {
+  getFreePort,
+  installGatewayTestHooks,
+  onceMessage,
+  startGatewayServer,
+  testState,
+} from "./test-helpers.js";
+
+installGatewayTestHooks({ scope: "suite" });
 
 let server: Awaited<ReturnType<typeof startGatewayServer>>;
 let port = 0;
@@ -13,7 +21,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await server.close();
+  await server?.close();
 });
 
 function connectReq(
@@ -21,6 +29,11 @@ function connectReq(
   params: { clientId: string; platform: string; token?: string; password?: string },
 ): Promise<{ ok: boolean; error?: { message?: string } }> {
   const id = `c-${Math.random().toString(16).slice(2)}`;
+  const authToken =
+    params.token ??
+    (typeof (testState.gatewayAuth as { token?: unknown } | undefined)?.token === "string"
+      ? (testState.gatewayAuth as { token?: string }).token
+      : undefined);
   ws.send(
     JSON.stringify({
       type: "req",
@@ -36,7 +49,7 @@ function connectReq(
           mode: "node",
         },
         auth: {
-          token: params.token,
+          token: authToken,
           password: params.password,
         },
         role: "node",
