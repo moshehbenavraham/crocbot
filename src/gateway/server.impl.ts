@@ -72,7 +72,10 @@ import { createGatewayRuntimeState } from "./server-runtime-state.js";
 import { hasConnectedMobileNode } from "./server-mobile-nodes.js";
 import { resolveSessionKeyForRun } from "./server-session-key.js";
 import { McpClientManager } from "../mcp/client.js";
-import { loadMcpConfig } from "../mcp/config.js";
+import { loadMcpConfig, loadMcpServerConfig } from "../mcp/config.js";
+import { createMcpServer } from "../mcp/server.js";
+import { createMcpServerHandler } from "../mcp/server-mount.js";
+import type { ServerDeps } from "../mcp/server-tools.js";
 import { startGatewaySidecars } from "./server-startup.js";
 import { logGatewayStartup } from "./server-startup-log.js";
 import { startGatewayTailscaleExposure } from "./server-tailscale.js";
@@ -259,6 +262,78 @@ export async function startGatewayServer(
     }
   }
 
+  // Initialize MCP server mode (fail-open: errors are logged, gateway continues).
+  let handleMcpServerRequest:
+    | ((
+        req: import("node:http").IncomingMessage,
+        res: import("node:http").ServerResponse,
+      ) => Promise<boolean>)
+    | undefined;
+  if (cfgAtStart.mcp) {
+    try {
+      const mcpServerConfig = loadMcpServerConfig(cfgAtStart.mcp);
+      if (mcpServerConfig) {
+        const { agentCommand } = await import("../commands/agent.js");
+        const { defaultRuntime } = await import("../runtime.js");
+        const { getMemorySearchManager } = await import("../memory/search-manager.js");
+        const { resolveDefaultAgentId: resolveAgent } = await import("../agents/agent-scope.js");
+
+        const serverDeps: ServerDeps = {
+          dispatchChat: async (params) => {
+            const result = await agentCommand(
+              {
+                message: params.message,
+                sessionKey: params.sessionKey,
+                runId: params.runId,
+                deliver: false,
+                messageChannel: "webchat",
+                bestEffortDeliver: false,
+                agentId: resolveAgent(loadConfig()),
+              },
+              defaultRuntime,
+              deps,
+            );
+            const payloads = (result as { payloads?: Array<{ text?: string }> } | null)?.payloads;
+            if (Array.isArray(payloads) && payloads.length > 0) {
+              return payloads
+                .map((p) => (typeof p.text === "string" ? p.text : ""))
+                .filter(Boolean)
+                .join("\n\n");
+            }
+            return "No response from crocbot.";
+          },
+          searchMemory: async (params) => {
+            const cfg = loadConfig();
+            const agentId = resolveAgent(cfg);
+            const { manager, error } = await getMemorySearchManager({ cfg, agentId });
+            if (!manager) {
+              throw new Error(error ?? "Memory search is not configured");
+            }
+            const results = await manager.search(params.query, {
+              maxResults: params.limit,
+            });
+            return results.map((r) => ({
+              path: r.path,
+              snippet: r.snippet,
+              score: r.score,
+            }));
+          },
+          getConfig: loadConfig,
+        };
+
+        const mcpServer = createMcpServer(mcpServerConfig, serverDeps);
+        handleMcpServerRequest = createMcpServerHandler({
+          server: mcpServer,
+          config: mcpServerConfig,
+          log: logMcp,
+        });
+        logMcp.info(`MCP server mode enabled at ${mcpServerConfig.basePath} (SSE + HTTP)`);
+      }
+    } catch (err) {
+      logMcp.error(`MCP server init failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
   const channelLogs = Object.fromEntries(
     listChannelPlugins().map((plugin) => [plugin.id, logChannels.child(plugin.id)]),
   ) as Record<ChannelId, ReturnType<typeof createSubsystemLogger>>;
@@ -322,6 +397,7 @@ export async function startGatewayServer(
     resolvedAuth,
     gatewayTls,
     hooksConfig: () => hooksConfig,
+    handleMcpServerRequest,
     pluginRegistry,
     deps,
     log,

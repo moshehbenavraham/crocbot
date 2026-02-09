@@ -199,6 +199,7 @@ export function createGatewayHttpServer(opts: {
   openResponsesConfig?: import("../config/types.gateway.js").GatewayHttpResponsesConfig;
   handleHooksRequest: HooksRequestHandler;
   handlePluginRequest?: HooksRequestHandler;
+  handleMcpServerRequest?: HooksRequestHandler;
   resolvedAuth: import("./auth.js").ResolvedGatewayAuth;
   tlsOptions?: TlsOptions;
   rateLimiter?: RateLimiter;
@@ -209,6 +210,7 @@ export function createGatewayHttpServer(opts: {
     openResponsesConfig,
     handleHooksRequest,
     handlePluginRequest,
+    handleMcpServerRequest,
     resolvedAuth,
     rateLimiter,
   } = opts;
@@ -287,6 +289,9 @@ export function createGatewayHttpServer(opts: {
       const configSnapshot = loadConfig();
       const trustedProxies = configSnapshot.gateway?.trustedProxies ?? [];
       if (await handleHooksRequest(req, res)) {
+        return;
+      }
+      if (handleMcpServerRequest && (await handleMcpServerRequest(req, res))) {
         return;
       }
       if (

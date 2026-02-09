@@ -1,5 +1,10 @@
-import { DEFAULT_TOOL_TIMEOUT_MS } from "./types.js";
-import type { McpGlobalConfig, McpServerConfig, McpTransportType } from "./types.js";
+import { DEFAULT_MCP_SERVER_BASE_PATH, DEFAULT_TOOL_TIMEOUT_MS } from "./types.js";
+import type {
+  McpGlobalConfig,
+  McpServerConfig,
+  McpServerModeConfig,
+  McpTransportType,
+} from "./types.js";
 
 const VALID_TRANSPORT_TYPES = new Set<McpTransportType>(["stdio", "sse", "http"]);
 
@@ -96,4 +101,43 @@ function isStringRecord(value: unknown): value is Record<string, string> {
     return false;
   }
   return Object.values(value as Record<string, unknown>).every((v) => typeof v === "string");
+}
+
+/**
+ * Validate and normalize the `mcp.server` configuration section.
+ *
+ * Returns `null` when the server section is absent or `enabled` is `false`.
+ * Throws when `enabled` is `true` but `token` is missing.
+ */
+export function loadMcpServerConfig(raw: unknown): McpServerModeConfig | null {
+  if (raw == null || typeof raw !== "object") {
+    return null;
+  }
+
+  const obj = raw as Record<string, unknown>;
+  const serverRaw = obj.server;
+  if (serverRaw == null || typeof serverRaw !== "object") {
+    return null;
+  }
+
+  const section = serverRaw as Record<string, unknown>;
+  const enabled = section.enabled === true;
+  if (!enabled) {
+    return null;
+  }
+
+  const token = typeof section.token === "string" ? section.token.trim() : "";
+  if (!token) {
+    throw new Error("MCP server mode requires a token: set mcp.server.token in your config");
+  }
+
+  const rawBasePath = typeof section.basePath === "string" ? section.basePath.trim() : "";
+  let basePath = rawBasePath || DEFAULT_MCP_SERVER_BASE_PATH;
+  // Ensure basePath starts with "/" and has no trailing slash.
+  if (!basePath.startsWith("/")) {
+    basePath = `/${basePath}`;
+  }
+  basePath = basePath.replace(/\/+$/, "") || "/";
+
+  return { enabled: true, token, basePath };
 }

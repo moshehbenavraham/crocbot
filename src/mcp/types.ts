@@ -82,5 +82,18 @@ export interface McpServerStatus {
 /** Default tool call timeout in milliseconds. */
 export const DEFAULT_TOOL_TIMEOUT_MS = 60_000;
 
+/** Default MCP server base path. */
+export const DEFAULT_MCP_SERVER_BASE_PATH = "/mcp";
+
+/** Configuration for crocbot's MCP server mode. */
+export interface McpServerModeConfig {
+  /** Whether the MCP server is enabled (default: false). */
+  enabled: boolean;
+  /** Bearer token for authenticating inbound MCP requests. Required when enabled. */
+  token: string;
+  /** Base path for MCP server HTTP endpoints (default: "/mcp"). */
+  basePath: string;
+}
+
 // Re-export SDK types used by consumers
 export type { Tool as McpSdkTool, CallToolResult as McpCallToolResult };
