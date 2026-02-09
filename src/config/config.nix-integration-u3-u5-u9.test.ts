@@ -55,15 +55,19 @@ describe("Nix integration (U3, U5, U9)", () => {
       );
     });
 
-    it("STATE_DIR prefers crocbot_STATE_DIR over legacy override", async () => {
-      await withEnvOverride(
-        { crocbot_STATE_DIR: "/custom/new", CROCBOT_STATE_DIR: "/custom/legacy" },
-        async () => {
-          const { STATE_DIR } = await import("./config.js");
-          expect(STATE_DIR).toBe(path.resolve("/custom/new"));
-        },
-      );
-    });
+    // Windows env vars are case-insensitive; both keys map to the same variable
+    it.skipIf(process.platform === "win32")(
+      "STATE_DIR prefers crocbot_STATE_DIR over legacy override",
+      async () => {
+        await withEnvOverride(
+          { crocbot_STATE_DIR: "/custom/new", CROCBOT_STATE_DIR: "/custom/legacy" },
+          async () => {
+            const { STATE_DIR } = await import("./config.js");
+            expect(STATE_DIR).toBe(path.resolve("/custom/new"));
+          },
+        );
+      },
+    );
 
     it("CONFIG_PATH defaults to ~/.crocbot/crocbot.json when env not set", async () => {
       await withEnvOverride(
@@ -90,18 +94,22 @@ describe("Nix integration (U3, U5, U9)", () => {
       );
     });
 
-    it("CONFIG_PATH prefers crocbot_CONFIG_PATH over legacy override", async () => {
-      await withEnvOverride(
-        {
-          crocbot_CONFIG_PATH: "/nix/store/new/crocbot.json",
-          CROCBOT_CONFIG_PATH: "/nix/store/legacy/crocbot.json",
-        },
-        async () => {
-          const { CONFIG_PATH } = await import("./config.js");
-          expect(CONFIG_PATH).toBe(path.resolve("/nix/store/new/crocbot.json"));
-        },
-      );
-    });
+    // Windows env vars are case-insensitive; both keys map to the same variable
+    it.skipIf(process.platform === "win32")(
+      "CONFIG_PATH prefers crocbot_CONFIG_PATH over legacy override",
+      async () => {
+        await withEnvOverride(
+          {
+            crocbot_CONFIG_PATH: "/nix/store/new/crocbot.json",
+            CROCBOT_CONFIG_PATH: "/nix/store/legacy/crocbot.json",
+          },
+          async () => {
+            const { CONFIG_PATH } = await import("./config.js");
+            expect(CONFIG_PATH).toBe(path.resolve("/nix/store/new/crocbot.json"));
+          },
+        );
+      },
+    );
 
     it("CONFIG_PATH expands ~ in CROCBOT_CONFIG_PATH override", async () => {
       await withTempHome(async (home) => {

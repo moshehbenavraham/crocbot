@@ -100,9 +100,10 @@ RUN apt-get update && \
       > /etc/apt/sources.list.d/github-cli.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends gh && \
-    # gog (Google Workspace CLI) — pinned version
-    GOG_VER=v1.5.0 && \
-    curl -fsSL "https://github.com/steipete/gogcli/releases/download/${GOG_VER}/gogcli_${GOG_VER#v}_linux_amd64.tar.gz" \
+    # gog (Google Workspace CLI) — pinned version, arch-aware download
+    GOG_VER=v0.9.0 && \
+    GOG_ARCH=$(dpkg --print-architecture) && \
+    curl -fsSL "https://github.com/steipete/gogcli/releases/download/${GOG_VER}/gogcli_${GOG_VER#v}_linux_${GOG_ARCH}.tar.gz" \
       -o /tmp/gog.tar.gz && \
     tar xz -C /usr/local/bin gog -f /tmp/gog.tar.gz && \
     rm /tmp/gog.tar.gz && \
