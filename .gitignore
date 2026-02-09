@@ -68,7 +68,8 @@ apps/ios/*.mobileprovision
 *.key
 *.p12
 credentials/
-secrets/
+/secrets/
+!src/infra/secrets/
 
 # Logs
 *.log
