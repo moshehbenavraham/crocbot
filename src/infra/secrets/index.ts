@@ -12,3 +12,6 @@ export { createMasker, computeHash8, makePlaceholder } from "./masker.js";
 export type { SecretsMasker, EncodingVariant } from "./masker.js";
 export { initSecretsRegistry } from "./init.js";
 export { createMaskingTransport, maskStringsDeep } from "./logging-transport.js";
+export { wrapStreamFnWithMasking } from "./llm-masking.js";
+export { StreamMasker } from "./stream-masker.js";
+export { unmaskForExecution } from "./unmask-exec.js";

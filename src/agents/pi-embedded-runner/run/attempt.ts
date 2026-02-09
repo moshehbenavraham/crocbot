@@ -21,6 +21,7 @@ import { isSubagentSessionKey } from "../../../routing/session-key.js";
 import { resolveUserPath } from "../../../utils.js";
 import { createCacheTrace } from "../../cache-trace.js";
 import { createAnthropicPayloadLogger } from "../../anthropic-payload-log.js";
+import { wrapStreamFnWithMasking } from "../../../infra/secrets/llm-masking.js";
 import { resolvecrocbotAgentDir } from "../../agent-paths.js";
 import { resolveSessionAgentIds } from "../../agent-scope.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "../../bootstrap-files.js";
@@ -511,6 +512,7 @@ export async function runEmbeddedAttempt(
           activeSession.agent.streamFn,
         );
       }
+      activeSession.agent.streamFn = wrapStreamFnWithMasking(activeSession.agent.streamFn);
 
       try {
         const prior = await sanitizeSessionHistory({

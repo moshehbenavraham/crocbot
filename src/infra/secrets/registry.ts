@@ -285,6 +285,17 @@ export class SecretsRegistry {
     return this.masker!.patternCount;
   }
 
+  /** Length of the longest registered secret value (0 when empty). */
+  get maxSecretLength(): number {
+    let max = 0;
+    for (const value of this.secrets.values()) {
+      if (value.length > max) {
+        max = value.length;
+      }
+    }
+    return max;
+  }
+
   /** Check whether a specific secret name is registered. */
   has(name: string): boolean {
     return this.secrets.has(name);

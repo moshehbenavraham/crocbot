@@ -1,6 +1,8 @@
 import { parseReplyDirectives } from "../auto-reply/reply/reply-directives.js";
 import { createStreamingDirectiveAccumulator } from "../auto-reply/reply/streaming-directives.js";
 import { formatToolAggregate } from "../auto-reply/tool-meta.js";
+import { SecretsRegistry } from "../infra/secrets/registry.js";
+import { StreamMasker } from "../infra/secrets/stream-masker.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { InlineCodeState } from "../markdown/code-spans.js";
 import { buildCodeSpanIndex, createInlineCodeState } from "../markdown/code-spans.js";
@@ -494,12 +496,17 @@ export function subscribeEmbeddedPiSession(params: SubscribeEmbeddedPiSessionPar
     resetAssistantMessageState(0);
   };
 
+  // Create a stream masker for response chunk masking (only when secrets are registered).
+  const secretsRegistry = SecretsRegistry.getInstance();
+  const streamMasker = secretsRegistry.size > 0 ? new StreamMasker(secretsRegistry) : undefined;
+
   const ctx: EmbeddedPiSubscribeContext = {
     params,
     state,
     log,
     blockChunking,
     blockChunker,
+    streamMasker,
     shouldEmitToolResult,
     shouldEmitToolOutput,
     emitToolSummary,

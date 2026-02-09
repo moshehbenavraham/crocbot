@@ -33,6 +33,8 @@ export function handleMessageStart(
   // may deliver late text_end updates after message_end, which would otherwise
   // re-trigger block replies.
   ctx.resetAssistantMessageState(ctx.state.assistantTexts.length);
+  // Reset the stream masker for the new message to clear any stale tail buffer.
+  ctx.streamMasker?.reset();
   // Use assistant message_start as the earliest "writing" signal for typing.
   void ctx.params.onAssistantMessageStart?.();
 }
@@ -87,6 +89,12 @@ export function handleMessageUpdate(
         chunk = content;
       }
     }
+  }
+
+  // Push streaming chunk through the secrets masker (if active) before it
+  // reaches any buffers, event emitters, or logs.
+  if (chunk && ctx.streamMasker) {
+    chunk = ctx.streamMasker.push(chunk);
   }
 
   if (chunk) {
@@ -147,6 +155,19 @@ export function handleMessageUpdate(
     ctx.blockChunker?.drain({ force: false, emit: ctx.emitBlockChunk });
   }
 
+  // Flush remaining tail buffer from the stream masker at text end.
+  if (evtType === "text_end" && ctx.streamMasker) {
+    const flushed = ctx.streamMasker.flush();
+    if (flushed) {
+      ctx.state.deltaBuffer += flushed;
+      if (ctx.blockChunker) {
+        ctx.blockChunker.append(flushed);
+      } else {
+        ctx.state.blockBuffer += flushed;
+      }
+    }
+  }
+
   if (evtType === "text_end" && ctx.state.blockReplyBreak === "text_end") {
     if (ctx.blockChunker?.hasBuffered()) {
       ctx.blockChunker.drain({ force: true, emit: ctx.emitBlockChunk });
@@ -165,6 +186,14 @@ export function handleMessageEnd(
   const msg = evt.message;
   if (msg?.role !== "assistant") {
     return;
+  }
+
+  // Flush any remaining masker tail buffer (safety net if text_end was missed).
+  if (ctx.streamMasker) {
+    const flushed = ctx.streamMasker.flush();
+    if (flushed) {
+      ctx.state.deltaBuffer += flushed;
+    }
   }
 
   const assistantMessage = msg;

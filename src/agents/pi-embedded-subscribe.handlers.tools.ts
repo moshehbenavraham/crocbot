@@ -1,6 +1,8 @@
 import type { AgentEvent } from "@mariozechner/pi-agent-core";
 
 import { emitAgentEvent } from "../infra/agent-events.js";
+import { SecretsRegistry } from "../infra/secrets/registry.js";
+import { unmaskForExecution } from "../infra/secrets/unmask-exec.js";
 import { normalizeTextForComparison } from "./pi-embedded-helpers.js";
 import { isMessagingTool, isMessagingToolSendAction } from "./pi-embedded-messaging.js";
 import type { EmbeddedPiSubscribeContext } from "./pi-embedded-subscribe.handlers.types.js";
@@ -50,6 +52,15 @@ export async function handleToolExecutionStart(
   const rawToolName = String(evt.toolName);
   const toolName = normalizeToolName(rawToolName);
   const toolCallId = String(evt.toolCallId);
+
+  // Unmask {{SECRET:hash8}} placeholders in tool arguments at the execution
+  // boundary so that tool calls work with real credentials.  Mutates the
+  // shared args object in place so the agent loop receives unmasked values.
+  const registry = SecretsRegistry.getInstance();
+  if (registry.size > 0 && evt.args && typeof evt.args === "object" && !Array.isArray(evt.args)) {
+    const unmasked = unmaskForExecution(evt.args, registry) as Record<string, unknown>;
+    Object.assign(evt.args, unmasked);
+  }
   const args = evt.args;
 
   if (toolName === "read") {
