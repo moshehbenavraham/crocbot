@@ -5,6 +5,7 @@ import type {
   TypingMode,
 } from "./types.base.js";
 import type { ChannelId } from "../channels/plugins/types.js";
+import type { ModelRolesConfig } from "./types.model-roles.js";
 import type {
   SandboxBrowserSettings,
   SandboxDockerSettings,
@@ -98,6 +99,8 @@ export type AgentDefaultsConfig = {
   imageModel?: AgentModelListConfig;
   /** Model catalog with optional aliases (full provider/model keys). */
   models?: Record<string, AgentModelEntryConfig>;
+  /** Model role assignments for cost-optimized routing (reasoning + utility). */
+  roles?: ModelRolesConfig;
   /** Agent working directory (preferred). Used as the default cwd for agent runs. */
   workspace?: string;
   /** Optional repository root for system prompt runtime line (overrides auto-detect). */

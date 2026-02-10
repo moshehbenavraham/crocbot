@@ -13,6 +13,7 @@ export * from "./types.cron.js";
 export * from "./types.gateway.js";
 export * from "./types.hooks.js";
 export * from "./types.messages.js";
+export * from "./types.model-roles.js";
 export * from "./types.models.js";
 export * from "./types.node-host.js";
 export * from "./types.plugins.js";
