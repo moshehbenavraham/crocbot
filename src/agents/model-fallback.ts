@@ -1,4 +1,6 @@
 import type { crocbotConfig } from "../config/config.js";
+import type { ProviderRateLimiter } from "../infra/provider-rate-limiter-config.js";
+import { logThrottle } from "../infra/rate-limit-middleware.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
 import {
   coerceToFailoverError,
@@ -227,7 +229,11 @@ export async function runWithModelFallback<T>(params: {
   agentDir?: string;
   /** Optional explicit fallbacks list; when provided (even empty), replaces agents.defaults.model.fallbacks. */
   fallbacksOverride?: string[];
+  /** Optional per-provider rate limiter. When absent, zero behavior change. */
+  rateLimiter?: ProviderRateLimiter;
   run: (provider: string, model: string) => Promise<T>;
+  /** Called after a successful run to extract token usage for rate limiter recording. */
+  onSuccess?: (result: T, provider: string, model: string) => { totalTokens?: number } | void;
   onError?: (attempt: {
     provider: string;
     model: string;
@@ -274,8 +280,38 @@ export async function runWithModelFallback<T>(params: {
         continue;
       }
     }
+
+    // Rate limiter pre-flight check
+    if (params.rateLimiter) {
+      const check = params.rateLimiter.tryAcquire(candidate.provider);
+      if (!check.allowed) {
+        logThrottle({
+          provider: candidate.provider,
+          rejectedBy: check.rejectedBy ?? "unknown",
+          retryAfterMs: check.retryAfterMs,
+          context: "model-fallback",
+        });
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          error: `Provider ${candidate.provider} at rate limit capacity (${check.rejectedBy ?? "unknown"})`,
+          reason: "rate_limit",
+        });
+        continue;
+      }
+    }
+
     try {
       const result = await params.run(candidate.provider, candidate.model);
+
+      // Post-flight: record actual token usage
+      if (params.rateLimiter && params.onSuccess) {
+        const usage = params.onSuccess(result, candidate.provider, candidate.model);
+        if (usage?.totalTokens && usage.totalTokens > 0) {
+          params.rateLimiter.recordUsage(candidate.provider, usage.totalTokens);
+        }
+      }
+
       return {
         result,
         provider: candidate.provider,

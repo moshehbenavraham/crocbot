@@ -1,4 +1,5 @@
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
+import { initGlobalRateLimiter } from "../infra/rate-limiter-instance.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import {
   getModelRefStatus,
@@ -38,6 +39,9 @@ export async function startGatewaySidecars(params: {
   logChannels: { info: (msg: string) => void; error: (msg: string) => void };
   logBrowser: { error: (msg: string) => void };
 }) {
+  // Initialize per-provider rate limiter (no-op when rateLimits config is absent).
+  initGlobalRateLimiter(params.cfg.rateLimits);
+
   // Start croc browser control server (unless disabled via config).
   let browserControl: Awaited<ReturnType<typeof startBrowserControlServerIfEnabled>> = null;
   try {

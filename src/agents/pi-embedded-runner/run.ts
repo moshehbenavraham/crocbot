@@ -41,6 +41,8 @@ import {
   type FailoverReason,
 } from "../pi-embedded-helpers.js";
 import { normalizeUsage, type UsageLike } from "../usage.js";
+import { getGlobalRateLimiter } from "../../infra/rate-limiter-instance.js";
+import { logRetry } from "../../infra/rate-limit-middleware.js";
 
 import { compactEmbeddedPiSessionDirect } from "./compact.js";
 import { resolveGlobalLane, resolveSessionLane } from "./lanes.js";
@@ -536,6 +538,19 @@ export async function runEmbeddedPiAgent(
           const shouldRotate = (!aborted && failoverFailure) || timedOut;
 
           if (shouldRotate) {
+            // Record rate limit hit in the sliding window rate limiter
+            if (rateLimitFailure) {
+              const rateLimiter = getGlobalRateLimiter();
+              if (rateLimiter) {
+                rateLimiter.recordRateLimitHit(provider);
+                logRetry({
+                  provider,
+                  retryAfterMs: 60_000,
+                  context: "embedded-runner-429",
+                });
+              }
+            }
+
             if (lastProfileId) {
               const reason =
                 timedOut || assistantFailoverReason === "timeout"

@@ -1,5 +1,7 @@
 import { requireApiKey, resolveApiKeyForProvider } from "../agents/model-auth.js";
 import { isTruthyEnvValue } from "../infra/env.js";
+import { getGlobalRateLimiter } from "../infra/rate-limiter-instance.js";
+import { estimateTokens } from "../infra/rate-limit-middleware.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { EmbeddingProvider, EmbeddingProviderOptions } from "./embeddings.js";
 
@@ -74,6 +76,16 @@ export async function createGeminiEmbeddingProvider(
     if (!text.trim()) {
       return [];
     }
+    const estimated = estimateTokens(text);
+    const rateLimiter = getGlobalRateLimiter();
+    if (rateLimiter) {
+      const check = rateLimiter.tryAcquire("gemini", estimated);
+      if (!check.allowed) {
+        throw new Error(
+          `Rate limit exceeded for gemini embeddings (${check.rejectedBy ?? "unknown"}). Retry after ${check.retryAfterMs}ms.`,
+        );
+      }
+    }
     const res = await fetch(embedUrl, {
       method: "POST",
       headers: client.headers,
@@ -87,12 +99,26 @@ export async function createGeminiEmbeddingProvider(
       throw new Error(`gemini embeddings failed: ${res.status} ${payload}`);
     }
     const payload = (await res.json()) as { embedding?: { values?: number[] } };
+    if (rateLimiter && estimated > 0) {
+      rateLimiter.recordUsage("gemini", estimated);
+    }
     return payload.embedding?.values ?? [];
   };
 
   const embedBatch = async (texts: string[]): Promise<number[][]> => {
     if (texts.length === 0) {
       return [];
+    }
+    const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+    const estimated = Math.ceil(totalChars / 4);
+    const rateLimiter = getGlobalRateLimiter();
+    if (rateLimiter) {
+      const check = rateLimiter.tryAcquire("gemini", estimated);
+      if (!check.allowed) {
+        throw new Error(
+          `Rate limit exceeded for gemini embeddings (${check.rejectedBy ?? "unknown"}). Retry after ${check.retryAfterMs}ms.`,
+        );
+      }
     }
     const requests = texts.map((text) => ({
       model: client.modelPath,
@@ -109,6 +135,9 @@ export async function createGeminiEmbeddingProvider(
       throw new Error(`gemini embeddings failed: ${res.status} ${payload}`);
     }
     const payload = (await res.json()) as { embeddings?: Array<{ values?: number[] }> };
+    if (rateLimiter && estimated > 0) {
+      rateLimiter.recordUsage("gemini", estimated);
+    }
     const embeddings = Array.isArray(payload.embeddings) ? payload.embeddings : [];
     return texts.map((_, index) => embeddings[index]?.values ?? []);
   };

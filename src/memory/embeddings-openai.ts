@@ -1,4 +1,6 @@
 import { requireApiKey, resolveApiKeyForProvider } from "../agents/model-auth.js";
+import { getGlobalRateLimiter } from "../infra/rate-limiter-instance.js";
+import { estimateTokens } from "../infra/rate-limit-middleware.js";
 import type { EmbeddingProvider, EmbeddingProviderOptions } from "./embeddings.js";
 
 export type OpenAiEmbeddingClient = {
@@ -31,6 +33,17 @@ export async function createOpenAiEmbeddingProvider(
     if (input.length === 0) {
       return [];
     }
+    const totalChars = input.reduce((sum, t) => sum + t.length, 0);
+    const estimated = estimateTokens(undefined) > 0 ? undefined : Math.ceil(totalChars / 4);
+    const rateLimiter = getGlobalRateLimiter();
+    if (rateLimiter) {
+      const check = rateLimiter.tryAcquire("openai", estimated);
+      if (!check.allowed) {
+        throw new Error(
+          `Rate limit exceeded for openai embeddings (${check.rejectedBy ?? "unknown"}). Retry after ${check.retryAfterMs}ms.`,
+        );
+      }
+    }
     const res = await fetch(url, {
       method: "POST",
       headers: client.headers,
@@ -42,7 +55,14 @@ export async function createOpenAiEmbeddingProvider(
     }
     const payload = (await res.json()) as {
       data?: Array<{ embedding?: number[] }>;
+      usage?: { total_tokens?: number };
     };
+    if (rateLimiter) {
+      const tokens = payload.usage?.total_tokens ?? estimated ?? 0;
+      if (tokens > 0) {
+        rateLimiter.recordUsage("openai", tokens);
+      }
+    }
     const data = payload.data ?? [];
     return data.map((entry) => entry.embedding ?? []);
   };

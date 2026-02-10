@@ -5,6 +5,10 @@ import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 import type { crocbotConfig } from "../config/config.js";
+import type {
+  ProviderRateLimiter,
+  RateLimitCheckResult,
+} from "../infra/provider-rate-limiter-config.js";
 import type { AuthProfileStore } from "./auth-profiles.js";
 import { saveAuthProfileStore } from "./auth-profiles.js";
 import { AUTH_STORE_VERSION } from "./auth-profiles/constants.js";
@@ -541,5 +545,191 @@ describe("runWithModelFallback", () => {
     expect(run).toHaveBeenCalledTimes(2);
     expect(result.provider).toBe("openai");
     expect(result.model).toBe("gpt-4.1-mini");
+  });
+
+  // -------------------------------------------------------------------------
+  // Rate limiter integration
+  // -------------------------------------------------------------------------
+
+  function createMockRateLimiter(overrides?: {
+    tryAcquire?: ReturnType<typeof vi.fn>;
+    recordUsage?: ReturnType<typeof vi.fn>;
+  }) {
+    const tryAcquire =
+      overrides?.tryAcquire ?? vi.fn().mockReturnValue({ allowed: true, retryAfterMs: 0 });
+    const recordUsage = overrides?.recordUsage ?? vi.fn();
+    const limiter: ProviderRateLimiter = {
+      tryAcquire,
+      recordUsage,
+      recordRateLimitHit: vi.fn(),
+      getUsage: vi.fn().mockReturnValue(null),
+      reset: vi.fn(),
+    };
+    return { limiter, tryAcquire, recordUsage };
+  }
+
+  it("passes through when no rate limiter is provided", async () => {
+    const cfg = makeCfg();
+    const run = vi.fn().mockResolvedValue("ok");
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      run,
+    });
+
+    expect(result.result).toBe("ok");
+    expect(run).toHaveBeenCalledOnce();
+  });
+
+  it("skips at-capacity provider and falls back to next candidate", async () => {
+    const cfg = makeCfg();
+    const { limiter } = createMockRateLimiter({
+      tryAcquire: vi.fn().mockImplementation((providerId: string) => {
+        if (providerId === "openai") {
+          return {
+            allowed: false,
+            retryAfterMs: 5000,
+            rejectedBy: "rpm",
+          } satisfies RateLimitCheckResult;
+        }
+        return { allowed: true, retryAfterMs: 0 } satisfies RateLimitCheckResult;
+      }),
+    });
+    const run = vi.fn().mockResolvedValue("ok");
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      rateLimiter: limiter,
+      run,
+    });
+
+    expect(result.result).toBe("ok");
+    expect(result.provider).toBe("anthropic");
+    expect(result.model).toBe("claude-haiku-3-5");
+    // run should only be called once (for the fallback, not the primary)
+    expect(run).toHaveBeenCalledOnce();
+    expect(run.mock.calls[0]).toEqual(["anthropic", "claude-haiku-3-5"]);
+    // First attempt should show rate_limit skip
+    expect(result.attempts[0]?.reason).toBe("rate_limit");
+    expect(result.attempts[0]?.provider).toBe("openai");
+  });
+
+  it("allows request when rate limiter says allowed", async () => {
+    const cfg = makeCfg();
+    const { limiter, tryAcquire } = createMockRateLimiter();
+    const run = vi.fn().mockResolvedValue("ok");
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      rateLimiter: limiter,
+      run,
+    });
+
+    expect(result.result).toBe("ok");
+    expect(tryAcquire).toHaveBeenCalledWith("openai");
+    expect(run).toHaveBeenCalledOnce();
+  });
+
+  it("records usage via onSuccess after successful run", async () => {
+    const cfg = makeCfg();
+    const { limiter, recordUsage } = createMockRateLimiter();
+    const run = vi.fn().mockResolvedValue("ok");
+    const onSuccess = vi.fn().mockReturnValue({ totalTokens: 150 });
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      rateLimiter: limiter,
+      run,
+      onSuccess,
+    });
+
+    expect(result.result).toBe("ok");
+    expect(onSuccess).toHaveBeenCalledWith("ok", "openai", "gpt-4.1-mini");
+    expect(recordUsage).toHaveBeenCalledWith("openai", 150);
+  });
+
+  it("does not record usage when onSuccess returns no tokens", async () => {
+    const cfg = makeCfg();
+    const { limiter, recordUsage } = createMockRateLimiter();
+    const run = vi.fn().mockResolvedValue("ok");
+    const onSuccess = vi.fn().mockReturnValue(undefined);
+
+    await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      rateLimiter: limiter,
+      run,
+      onSuccess,
+    });
+
+    expect(recordUsage).not.toHaveBeenCalled();
+  });
+
+  it("does not record usage when onSuccess returns zero tokens", async () => {
+    const cfg = makeCfg();
+    const { limiter, recordUsage } = createMockRateLimiter();
+    const run = vi.fn().mockResolvedValue("ok");
+    const onSuccess = vi.fn().mockReturnValue({ totalTokens: 0 });
+
+    await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      rateLimiter: limiter,
+      run,
+      onSuccess,
+    });
+
+    expect(recordUsage).not.toHaveBeenCalled();
+  });
+
+  it("does not call onSuccess when rateLimiter is absent", async () => {
+    const cfg = makeCfg();
+    const run = vi.fn().mockResolvedValue("ok");
+    const onSuccess = vi.fn().mockReturnValue({ totalTokens: 100 });
+
+    await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "gpt-4.1-mini",
+      run,
+      onSuccess,
+    });
+
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it("fails when all candidates are rate limited", async () => {
+    const cfg = makeCfg();
+    const { limiter } = createMockRateLimiter({
+      tryAcquire: vi.fn().mockReturnValue({
+        allowed: false,
+        retryAfterMs: 10000,
+        rejectedBy: "tpm",
+      } satisfies RateLimitCheckResult),
+    });
+    const run = vi.fn();
+
+    await expect(
+      runWithModelFallback({
+        cfg,
+        provider: "openai",
+        model: "gpt-4.1-mini",
+        rateLimiter: limiter,
+        run,
+      }),
+    ).rejects.toThrow("All models failed");
+
+    // run should never be called since all candidates were rejected pre-flight
+    expect(run).not.toHaveBeenCalled();
   });
 });

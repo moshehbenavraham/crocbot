@@ -546,6 +546,31 @@ export const crocbotSchema = z
       })
       .strict()
       .optional(),
+    rateLimits: z
+      .object({
+        defaults: z
+          .object({
+            rpm: z.number().int().nonnegative().optional(),
+            tpm: z.number().int().nonnegative().optional(),
+          })
+          .strict()
+          .optional(),
+        providers: z
+          .record(
+            z.string(),
+            z
+              .object({
+                rpm: z.number().int().nonnegative().optional(),
+                tpm: z.number().int().nonnegative().optional(),
+              })
+              .strict(),
+          )
+          .optional(),
+        windowMs: z.number().int().positive().optional(),
+        tokenEstimationDivisor: z.number().positive().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .superRefine((cfg, ctx) => {

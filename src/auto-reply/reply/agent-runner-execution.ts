@@ -21,6 +21,7 @@ import {
 } from "../../config/sessions.js";
 import { logVerbose } from "../../globals.js";
 import { emitAgentEvent, registerAgentRunContext } from "../../infra/agent-events.js";
+import { getGlobalRateLimiter } from "../../infra/rate-limiter-instance.js";
 import { defaultRuntime } from "../../runtime.js";
 import {
   isMarkdownCapableMessageChannel,
@@ -151,6 +152,15 @@ export async function runAgentTurnWithFallback(params: {
           params.followupRun.run.config,
           resolveAgentIdFromSessionKey(params.followupRun.run.sessionKey),
         ),
+        rateLimiter: getGlobalRateLimiter(),
+        onSuccess: (result) => {
+          const usage = result.meta?.agentMeta?.usage;
+          if (!usage) {
+            return;
+          }
+          const total = usage.total ?? (usage.input ?? 0) + (usage.output ?? 0);
+          return total > 0 ? { totalTokens: total } : undefined;
+        },
         run: (provider, model) => {
           // Notify that model selection is complete (including after fallback).
           // This allows responsePrefix template interpolation with the actual model.
