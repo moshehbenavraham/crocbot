@@ -196,7 +196,7 @@ describe("backward compatibility", () => {
   // =========================================================================
 
   describe("redactConfigSnapshot with registry", () => {
-    it("applies key-based redaction then value-based masking", () => {
+    it("applies key-based and heuristic redaction without registry masking", () => {
       registerCompatSecrets(registry);
 
       const snapshot = {
@@ -216,22 +216,24 @@ describe("backward compatibility", () => {
       // raw is completely replaced with [REDACTED]
       expect(redacted.raw).toBe("[REDACTED]");
 
-      // parsed.apiKey: key-based -> [REDACTED], then value-based is no-op on [REDACTED]
+      // parsed.apiKey: key-based -> [REDACTED]
       expect((redacted.parsed as Record<string, unknown>).apiKey).toBe("[REDACTED]");
 
-      // parsed.webhookUrl: not a sensitive key, but value-based masks the token inside
+      // parsed.webhookUrl: not a sensitive key and the full URL value doesn't
+      // match looksLikeSecret heuristics, so it is preserved as-is
+      // (no registry masking in config snapshots).
       const webhookUrl = (redacted.parsed as Record<string, unknown>).webhookUrl as string;
-      expect(webhookUrl).not.toContain(COMPAT_SECRETS.TELEGRAM_TOKEN);
+      expect(webhookUrl).toBe(`https://api.example.com?token=${COMPAT_SECRETS.TELEGRAM_TOKEN}`);
 
       // config.botToken: key-based -> [REDACTED]
       const redactedConfig = redacted.config as Record<string, unknown>;
       expect(redactedConfig.botToken).toBe("[REDACTED]");
 
-      // config.customField: not a sensitive key, so key-based passes through
-      // value-based then masks the embedded GROQ key
+      // config.customField: not a sensitive key and the prefixed value doesn't
+      // match looksLikeSecret heuristics, so it is preserved as-is
+      // (no registry masking in config snapshots).
       const customField = redactedConfig.customField as string;
-      expect(customField).not.toContain(COMPAT_SECRETS.GROQ_KEY);
-      expect(customField).toContain(PLACEHOLDERS.GROQ_KEY);
+      expect(customField).toBe(`prefix-${COMPAT_SECRETS.GROQ_KEY}-suffix`);
     });
   });
 

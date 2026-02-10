@@ -40,9 +40,10 @@ export function logThrottle(params: {
   rejectedBy: string;
   retryAfterMs: number;
   context?: string;
+  role?: string;
 }): void {
   log.info(
-    `rate-limit throttle: provider=${params.provider} rejectedBy=${params.rejectedBy} retryAfterMs=${params.retryAfterMs}${params.context ? ` context=${params.context}` : ""}`,
+    `rate-limit throttle: provider=${params.provider} rejectedBy=${params.rejectedBy} retryAfterMs=${params.retryAfterMs}${params.role ? ` role=${params.role}` : ""}${params.context ? ` context=${params.context}` : ""}`,
   );
 }
 
@@ -51,9 +52,10 @@ export function logReject(params: {
   rejectedBy: string;
   retryAfterMs: number;
   context?: string;
+  role?: string;
 }): void {
   log.warn(
-    `rate-limit reject: provider=${params.provider} rejectedBy=${params.rejectedBy} retryAfterMs=${params.retryAfterMs}${params.context ? ` context=${params.context}` : ""}`,
+    `rate-limit reject: provider=${params.provider} rejectedBy=${params.rejectedBy} retryAfterMs=${params.retryAfterMs}${params.role ? ` role=${params.role}` : ""}${params.context ? ` context=${params.context}` : ""}`,
   );
 }
 
@@ -61,9 +63,10 @@ export function logRetry(params: {
   provider: string;
   retryAfterMs: number;
   context?: string;
+  role?: string;
 }): void {
   log.info(
-    `rate-limit retry-after recorded: provider=${params.provider} retryAfterMs=${params.retryAfterMs}${params.context ? ` context=${params.context}` : ""}`,
+    `rate-limit retry-after recorded: provider=${params.provider} retryAfterMs=${params.retryAfterMs}${params.role ? ` role=${params.role}` : ""}${params.context ? ` context=${params.context}` : ""}`,
   );
 }
 
@@ -71,9 +74,10 @@ export function logUsageRecorded(params: {
   provider: string;
   tokens: number;
   context?: string;
+  role?: string;
 }): void {
   log.debug(
-    `rate-limit usage recorded: provider=${params.provider} tokens=${params.tokens}${params.context ? ` context=${params.context}` : ""}`,
+    `rate-limit usage recorded: provider=${params.provider} tokens=${params.tokens}${params.role ? ` role=${params.role}` : ""}${params.context ? ` context=${params.context}` : ""}`,
   );
 }
 
@@ -102,6 +106,7 @@ export async function withRateLimitCheck<T>(params: {
   estimatedTokens?: number;
   actualTokens?: (result: T) => number | undefined;
   context?: string;
+  role?: string;
   fn: () => Promise<T>;
 }): Promise<T> {
   if (!params.rateLimiter) {
@@ -116,6 +121,7 @@ export async function withRateLimitCheck<T>(params: {
       rejectedBy: check.rejectedBy ?? "unknown",
       retryAfterMs: check.retryAfterMs,
       context: params.context,
+      role: params.role,
     });
     throw new Error(
       `Rate limit exceeded for provider ${params.provider} (${check.rejectedBy ?? "unknown"}). Retry after ${check.retryAfterMs}ms.`,
@@ -131,6 +137,7 @@ export async function withRateLimitCheck<T>(params: {
       provider: params.provider,
       tokens,
       context: params.context,
+      role: params.role,
     });
   }
 

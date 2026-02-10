@@ -217,9 +217,31 @@ describe("log helpers", () => {
     ).not.toThrow();
   });
 
+  it("logThrottle with role does not throw", () => {
+    expect(() =>
+      logThrottle({
+        provider: "openai",
+        rejectedBy: "rpm",
+        retryAfterMs: 5000,
+        role: "utility",
+      }),
+    ).not.toThrow();
+  });
+
   it("logReject does not throw", () => {
     expect(() =>
       logReject({ provider: "anthropic", rejectedBy: "rpm", retryAfterMs: 1000 }),
+    ).not.toThrow();
+  });
+
+  it("logReject with role does not throw", () => {
+    expect(() =>
+      logReject({
+        provider: "anthropic",
+        rejectedBy: "rpm",
+        retryAfterMs: 1000,
+        role: "reasoning",
+      }),
     ).not.toThrow();
   });
 
@@ -227,8 +249,106 @@ describe("log helpers", () => {
     expect(() => logRetry({ provider: "openai", retryAfterMs: 60000 })).not.toThrow();
   });
 
+  it("logRetry with role does not throw", () => {
+    expect(() =>
+      logRetry({ provider: "openai", retryAfterMs: 60000, role: "utility" }),
+    ).not.toThrow();
+  });
+
   it("logUsageRecorded does not throw", () => {
     expect(() => logUsageRecorded({ provider: "openai", tokens: 500 })).not.toThrow();
+  });
+
+  it("logUsageRecorded with role does not throw", () => {
+    expect(() =>
+      logUsageRecorded({ provider: "openai", tokens: 500, role: "utility" }),
+    ).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// withRateLimitCheck role pass-through
+// ---------------------------------------------------------------------------
+
+describe("withRateLimitCheck role pass-through", () => {
+  it("accepts role parameter without affecting fn execution", async () => {
+    const { limiter } = createMockRateLimiter();
+    const fn = vi.fn().mockResolvedValue("result");
+
+    const result = await withRateLimitCheck({
+      rateLimiter: limiter,
+      provider: "openai",
+      role: "utility",
+      fn,
+    });
+
+    expect(result).toBe("result");
+    expect(fn).toHaveBeenCalledOnce();
+  });
+
+  it("works identically to current behavior when role is omitted", async () => {
+    const { limiter, tryAcquire } = createMockRateLimiter();
+    const fn = vi.fn().mockResolvedValue("ok");
+
+    await withRateLimitCheck({
+      rateLimiter: limiter,
+      provider: "openai",
+      estimatedTokens: 50,
+      fn,
+    });
+
+    expect(tryAcquire).toHaveBeenCalledWith("openai", 50);
+    expect(fn).toHaveBeenCalledOnce();
+  });
+
+  it("passes role through when rate limiter rejects", async () => {
+    const { limiter } = createMockRateLimiter({
+      tryAcquire: vi.fn().mockReturnValue({
+        allowed: false,
+        retryAfterMs: 5000,
+        rejectedBy: "rpm",
+      } satisfies RateLimitCheckResult),
+    });
+    const fn = vi.fn();
+
+    await expect(
+      withRateLimitCheck({
+        rateLimiter: limiter,
+        provider: "openai",
+        role: "utility",
+        fn,
+      }),
+    ).rejects.toThrow("Rate limit exceeded");
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("passes role through to usage recording", async () => {
+    const { limiter, recordUsage } = createMockRateLimiter();
+    const fn = vi.fn().mockResolvedValue({ tokens: 42 });
+
+    await withRateLimitCheck({
+      rateLimiter: limiter,
+      provider: "anthropic",
+      role: "reasoning",
+      fn,
+      actualTokens: (result: { tokens: number }) => result.tokens,
+    });
+
+    expect(recordUsage).toHaveBeenCalledWith("anthropic", 42);
+  });
+
+  it("passes through when no rate limiter is provided regardless of role", async () => {
+    const fn = vi.fn().mockResolvedValue("result");
+
+    const result = await withRateLimitCheck({
+      provider: "openai",
+      role: "utility",
+      fn,
+    });
+
+    expect(result).toBe("result");
+    expect(fn).toHaveBeenCalledOnce();
   });
 });
 
