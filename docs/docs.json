@@ -1104,7 +1104,11 @@
             "group": "ADRs",
             "pages": [
               "adr/0001-telegram-only-architecture",
-              "adr/0002-multi-stage-docker-build"
+              "adr/0002-multi-stage-docker-build",
+              "adr/0003-native-mcp-integration",
+              "adr/0004-secrets-masking-pipeline",
+              "adr/0005-per-provider-rate-limiting",
+              "adr/0006-4-model-role-architecture"
             ]
           },
           {

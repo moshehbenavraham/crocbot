@@ -103,9 +103,10 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
   Agents  Sessions     Cron    MCP Server
   (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
      |                              ^
-     +---> LLM Providers            |
-     |   (Claude, GPT, Gemini)  External AI
-     |                           Systems
+     +---> Rate Limiter + KeyPool    |
+     |         |                  External AI
+     |    LLM Providers           Systems
+     |   (Claude, GPT, Gemini)
      +---> MCP Client
           (stdio, SSE, HTTP)
 ```
@@ -129,6 +130,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
 - **[MCP integration](https://aiwithapex.mintlify.app/concepts/mcp)** — native MCP client (stdio/SSE/HTTP) and server mode with SSRF-guarded transports
 - **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
+- **[Rate limiting](docs/ARCHITECTURE)** — per-provider RPM/TPM throttling, API key round-robin rotation, transient error retry with backoff
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
 
 ---

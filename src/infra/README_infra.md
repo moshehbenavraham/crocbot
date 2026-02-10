@@ -1,6 +1,6 @@
 # src/infra/
 
-Infrastructure utilities — networking, security, exec management, and system integration.
+Infrastructure utilities — networking, security, exec management, rate limiting, and system integration.
 
 ## Structure
 
@@ -14,13 +14,21 @@ infra/
 
 ## Key Files
 
-| File                 | Purpose                                                            |
-| -------------------- | ------------------------------------------------------------------ |
-| `net/ssrf.ts`        | SSRF protection: private IP/hostname blocking, redirect validation |
-| `net/fetch-guard.ts` | Guarded fetch wrapper with timeouts and DNS pinning                |
-| `exec-approvals.ts`  | Shell command allowlisting and token blocking                      |
-| `update-check.ts`    | Version update checking                                            |
-| `update-runner.ts`   | Runs the update process                                            |
+| File                            | Purpose                                                            |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `net/ssrf.ts`                   | SSRF protection: private IP/hostname blocking, redirect validation |
+| `net/fetch-guard.ts`            | Guarded fetch wrapper with timeouts and DNS pinning                |
+| `exec-approvals.ts`             | Shell command allowlisting and token blocking                      |
+| `provider-rate-limiter.ts`      | Sliding window RPM/TPM enforcement per provider                    |
+| `provider-rate-limiter-config.ts` | Rate limiter config types and resolution                         |
+| `rate-limiter-instance.ts`      | Singleton rate limiter instance                                    |
+| `key-pool.ts`                   | Health-aware round-robin API key selection                         |
+| `llm-retry.ts`                  | LLM transient error classification and retry policy                |
+| `retry.ts`                      | Generic retry with exponential backoff and jitter                  |
+| `retry-policy.ts`               | Retry policy types                                                 |
+| `rate-limit-middleware.ts`      | Pre-flight/post-flight wrapper for LLM call sites                  |
+| `update-check.ts`               | Version update checking                                            |
+| `update-runner.ts`              | Runs the update process                                            |
 
 ## Secrets Masking (`secrets/`)
 
@@ -37,6 +45,28 @@ Prevents credential leakage across all output boundaries. The SecretsRegistry au
 | `secrets/unmask-exec.ts`         | Tool argument unmasking at execution boundary               |
 | `secrets/tool-result-masking.ts` | AgentMessage content masking                                |
 | `secrets/error-masking.ts`       | Error output masking                                        |
+
+## Rate Limiting
+
+Per-provider rate limiting with API key rotation and transient error retry. Four-layer pipeline:
+
+1. **ProviderRateLimiter** -- Sliding window log algorithm enforcing RPM and TPM per provider. Zero overhead in pass-through mode (no limits configured).
+2. **KeyPool** -- Health-aware round-robin across multiple API keys per provider. Integrates cooldown state from the auth profile system with rate limiter capacity checks.
+3. **retryAsync + createLlmRetryOptions** -- Transient error retry with exponential backoff and jitter. Classifies 408/429/5xx as retryable, parses Retry-After headers.
+4. **withRateLimitCheck** -- Call-site middleware wrapping LLM fetch calls with pre-flight capacity check and post-flight usage recording.
+
+Configuration via `rateLimits` in crocbot config:
+```json5
+{
+  rateLimits: {
+    defaults: { rpm: 60, tpm: 100000 },
+    providers: {
+      anthropic: { rpm: 50, tpm: 80000 },
+      openai: { rpm: 60 }
+    }
+  }
+}
+```
 
 ## Security
 
@@ -62,3 +92,4 @@ The secrets masking pipeline (`secrets/`) provides seven-boundary defense:
 - Security validation: `src/security/`
 - Exec tool: `src/agents/tools/`
 - MCP integration: `src/mcp/` (tool results masked via secrets pipeline)
+- LLM providers: `src/providers/` (rate limiter wraps provider calls)

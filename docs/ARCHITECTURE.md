@@ -24,9 +24,10 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
   Agents  Sessions     Cron    MCP Server
   (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
       |                              ^
-      +---> LLM Providers            |
-      |   (Claude, OpenAI, ...)  External AI
-      |                           Systems
+      +---> Rate Limiter + KeyPool    |
+      |         |                  External AI
+      |    LLM Providers           Systems
+      |   (Claude, OpenAI, ...)
       +---> MCP Client
            (stdio, SSE, HTTP)
 ```
@@ -92,6 +93,12 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Tech**: File-based storage
 - **Location**: `src/memory/`
 
+### Rate Limiting (`src/infra/`)
+- **Purpose**: Per-provider rate limiting, API key rotation, and transient error retry
+- **Tech**: Sliding window log algorithm (RPM/TPM), health-aware round-robin key pool, exponential backoff with jitter
+- **Key modules**: `provider-rate-limiter.ts` (sliding window RPM/TPM enforcement), `key-pool.ts` (health-aware round-robin with rate limiter integration), `llm-retry.ts` (transient error classification and Retry-After parsing), `rate-limit-middleware.ts` (pre-flight/post-flight wrapper for LLM call sites)
+- **Composition**: Four-layer pipeline -- ProviderRateLimiter (sliding window) -> KeyPool (key selection) -> retryAsync + createLlmRetryOptions (transient retry) -> withRateLimitCheck (call-site middleware). Zero overhead when no limits configured (pass-through mode).
+
 ### MCP Client
 - **Purpose**: In-process client connecting to external MCP tool servers
 - **Tech**: @modelcontextprotocol/sdk, stdio/SSE/HTTP transports
@@ -124,10 +131,11 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 3. Gateway creates/resumes session, invokes agent
 4. Agent builds context: system prompt + memory recall + conversation history
 5. SecretsRegistry masks any credentials in LLM context before provider call
-6. Agent processes message with LLM provider, invoking MCP client tools as needed
-7. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
-8. Tool results masked before persistence and display
-9. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
+6. Rate limiter checks RPM/TPM capacity; KeyPool selects best API key via round-robin
+7. Agent processes message with LLM provider (transient errors retried with backoff), invoking MCP client tools as needed
+8. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
+9. Tool results masked before persistence and display
+10. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
 
 ## Key Architectural Decisions
 
@@ -136,6 +144,7 @@ See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0002: Multi-stage Docker Build](adr/0002-multi-stage-docker-build)
 - [ADR-0003: Native MCP Integration](adr/0003-native-mcp-integration)
 - [ADR-0004: Secrets Masking Pipeline](adr/0004-secrets-masking-pipeline)
+- [ADR-0005: Per-Provider Rate Limiting](adr/0005-per-provider-rate-limiting)
 
 ## Directory Structure
 
@@ -153,7 +162,7 @@ src/
   daemon/           # Daemon process management
   gateway/          # Gateway control plane
   hooks/            # Hook system
-  infra/            # Infrastructure (exec, net/SSRF, secrets masking, utilities)
+  infra/            # Infrastructure (exec, net/SSRF, secrets masking, rate limiting)
   logging/          # Structured logging (tslog)
   media/            # Media pipeline
   media-understanding/  # Media analysis
