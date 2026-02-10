@@ -3,6 +3,7 @@ import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { loadSessionStore, resolveStorePath } from "../../config/sessions.js";
 import { logVerbose } from "../../globals.js";
 import { isDiagnosticsEnabled } from "../../infra/diagnostic-events.js";
+import { createSubsystemLogger } from "../../logging/subsystem.js";
 import {
   logMessageProcessed,
   logMessageQueued,
@@ -327,6 +328,12 @@ export async function dispatchReplyFromConfig(params: {
     );
 
     const replies = replyResult ? (Array.isArray(replyResult) ? replyResult : [replyResult]) : [];
+    {
+      const diagLog = createSubsystemLogger("dispatch/diag");
+      diagLog.info(
+        `blockCount=${blockCount} finalReplies=${replies.length} textLens=${JSON.stringify(replies.map((r) => (r.text ?? "").length))} texts=${JSON.stringify(replies.map((r) => (r.text ?? "").slice(0, 200)))}`,
+      );
+    }
 
     let queuedFinal = false;
     let routedFinalCount = 0;

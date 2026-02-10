@@ -71,6 +71,8 @@ export type TelegramAccountConfig = {
   replyToMode?: ReplyToMode;
   groups?: Record<string, TelegramGroupConfig>;
   allowFrom?: Array<string | number>;
+  /** Default delivery target (chat ID) for autonomous/cron messages when no explicit target is set. */
+  defaultDeliveryTo?: string | number;
   /** Optional allowlist for Telegram group senders (user ids or usernames). */
   groupAllowFrom?: Array<string | number>;
   /**

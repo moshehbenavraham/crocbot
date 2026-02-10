@@ -69,7 +69,14 @@ export async function resolveDeliveryTarget(
   const toCandidate = resolved.to;
 
   if (!toCandidate) {
-    return { channel, to: undefined, accountId: resolved.accountId, mode };
+    // Try config-level default delivery target for autonomous messages
+    const defaultTo = resolveDefaultDeliveryTo(cfg, channel);
+    return {
+      channel,
+      to: defaultTo,
+      accountId: resolved.accountId,
+      mode: defaultTo ? "implicit" : mode,
+    };
   }
 
   const docked = resolveOutboundTarget({
@@ -86,4 +93,19 @@ export async function resolveDeliveryTarget(
     mode,
     error: docked.ok ? undefined : docked.error,
   };
+}
+
+/** Look up `defaultDeliveryTo` from the channel's config as a string fallback. */
+function resolveDefaultDeliveryTo(
+  cfg: crocbotConfig,
+  channel: Exclude<OutboundChannel, "none">,
+): string | undefined {
+  if (channel !== "telegram") {
+    return undefined;
+  }
+  const raw = cfg.channels?.telegram?.defaultDeliveryTo;
+  if (raw == null) {
+    return undefined;
+  }
+  return String(raw);
 }

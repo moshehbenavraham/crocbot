@@ -11,6 +11,7 @@ import {
   isRawApiErrorPayload,
   normalizeTextForComparison,
 } from "../../pi-embedded-helpers.js";
+import { createSubsystemLogger } from "../../../logging/subsystem.js";
 import {
   extractAssistantText,
   extractAssistantThinking,
@@ -167,6 +168,12 @@ export function buildEmbeddedRunPayloads(params: {
         ? [fallbackAnswerText]
         : []
   ).filter((text) => !shouldSuppressRawErrorText(text));
+  {
+    const diagLog = createSubsystemLogger("agent/payloads/diag");
+    diagLog.info(
+      `assistantTexts=${params.assistantTexts.length} answerTexts=${answerTexts.length} texts=${JSON.stringify(answerTexts.map((t) => t.slice(0, 200)))}`,
+    );
+  }
 
   for (const text of answerTexts) {
     const {

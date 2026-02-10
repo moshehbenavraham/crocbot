@@ -8,6 +8,7 @@ import {
 } from "./pi-embedded-helpers.js";
 import type { EmbeddedPiSubscribeContext } from "./pi-embedded-subscribe.handlers.types.js";
 import { appendRawStream } from "./pi-embedded-subscribe.raw-stream.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
   extractAssistantText,
   extractAssistantThinking,
@@ -81,7 +82,14 @@ export function handleMessageUpdate(
     } else if (content) {
       // KNOWN: Some providers resend full content on `text_end`.
       // We only append a suffix (or nothing) to keep output monotonic.
-      if (content.startsWith(ctx.state.deltaBuffer)) {
+      // Use rawDeltaLength (pre-masking length) for dedup so the stream masker's
+      // tail buffer doesn't cause deltaBuffer to under-represent accumulated text.
+      const dedupLen = ctx.state.rawDeltaLength;
+      if (dedupLen > 0 && content.length <= dedupLen) {
+        chunk = "";
+      } else if (dedupLen > 0) {
+        chunk = content.slice(dedupLen);
+      } else if (content.startsWith(ctx.state.deltaBuffer)) {
         chunk = content.slice(ctx.state.deltaBuffer.length);
       } else if (ctx.state.deltaBuffer.startsWith(content)) {
         chunk = "";
@@ -89,6 +97,11 @@ export function handleMessageUpdate(
         chunk = content;
       }
     }
+  }
+
+  // Track raw (pre-masking) delta length for text_start/text_end dedup.
+  if (chunk) {
+    ctx.state.rawDeltaLength += chunk.length;
   }
 
   // Push streaming chunk through the secrets masker (if active) before it
@@ -169,6 +182,10 @@ export function handleMessageUpdate(
   }
 
   if (evtType === "text_end" && ctx.state.blockReplyBreak === "text_end") {
+    const streamDiag2 = createSubsystemLogger("stream/diag");
+    streamDiag2.info(
+      `text_end emit: deltaLen=${ctx.state.deltaBuffer.length} blockLen=${ctx.state.blockBuffer.length} blockText=${JSON.stringify(ctx.state.blockBuffer.slice(0, 200))}`,
+    );
     if (ctx.blockChunker?.hasBuffered()) {
       ctx.blockChunker.drain({ force: true, emit: ctx.emitBlockChunk });
       ctx.blockChunker.reset();
@@ -322,6 +339,7 @@ export function handleMessageEnd(
   }
 
   ctx.state.deltaBuffer = "";
+  ctx.state.rawDeltaLength = 0;
   ctx.state.blockBuffer = "";
   ctx.blockChunker?.reset();
   ctx.state.blockState.thinking = false;

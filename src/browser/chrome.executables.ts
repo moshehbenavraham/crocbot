@@ -508,6 +508,12 @@ export function findChromeExecutableMac(): BrowserExecutable | null {
 }
 
 export function findChromeExecutableLinux(): BrowserExecutable | null {
+  // Honor CHROME_PATH env var (set by Dockerfile and other container setups)
+  const envPath = process.env.CHROME_PATH?.trim();
+  if (envPath && exists(envPath)) {
+    return { kind: inferKindFromExecutableName(path.basename(envPath)), path: envPath };
+  }
+
   const candidates: Array<BrowserExecutable> = [
     { kind: "chrome", path: "/usr/bin/google-chrome" },
     { kind: "chrome", path: "/usr/bin/google-chrome-stable" },

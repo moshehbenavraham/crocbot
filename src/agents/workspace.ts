@@ -12,6 +12,10 @@ export function resolveDefaultAgentWorkspaceDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
+  const envOverride = env.CROCBOT_WORKSPACE_DIR?.trim();
+  if (envOverride) {
+    return resolveUserPath(envOverride);
+  }
   const profile = env.CROCBOT_PROFILE?.trim();
   if (profile && profile.toLowerCase() !== "default") {
     return path.join(homedir(), `croc-${profile}`);

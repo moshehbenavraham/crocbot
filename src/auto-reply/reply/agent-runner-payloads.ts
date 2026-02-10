@@ -1,5 +1,6 @@
 import type { ReplyToMode } from "../../config/types.js";
 import { logVerbose } from "../../globals.js";
+import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { stripHeartbeatToken } from "../heartbeat.js";
 import type { OriginatingChannelType } from "../templating.js";
 import { SILENT_REPLY_TOKEN } from "../tokens.js";
@@ -113,6 +114,12 @@ export function buildReplyPayloads(params: {
           )
         : dedupedPayloads;
   const replyPayloads = suppressMessagingToolReplies ? [] : filteredPayloads;
+  {
+    const diagLog = createSubsystemLogger("agent/reply-payloads/diag");
+    diagLog.info(
+      `blockStreaming=${params.blockStreamingEnabled} dropFinal=${shouldDropFinalPayloads} sanitized=${sanitizedPayloads.length} tagged=${replyTaggedPayloads.length} deduped=${dedupedPayloads.length} filtered=${filteredPayloads.length} final=${replyPayloads.length} textLens=${JSON.stringify(replyPayloads.map((p) => (p.text ?? "").length))} texts=${JSON.stringify(replyPayloads.map((p) => (p.text ?? "").slice(0, 200)))}`,
+    );
+  }
 
   return {
     replyPayloads,

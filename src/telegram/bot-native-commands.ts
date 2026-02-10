@@ -16,6 +16,7 @@ import { resolveTelegramCustomCommands } from "../config/telegram-custom-command
 import { dispatchReplyWithBufferedBlockDispatcher } from "../auto-reply/reply/provider-dispatcher.js";
 import { finalizeInboundContext } from "../auto-reply/reply/inbound-context.js";
 import { danger, logVerbose } from "../globals.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveMarkdownTableMode } from "../config/markdown-tables.js";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
 import {
@@ -216,6 +217,10 @@ async function resolveTelegramCommandAuth(params: {
     modeWhenAccessGroupsOff: "configured",
   });
   if (requireAuth && !commandAuthorized) {
+    const cmdAuthLogger = createSubsystemLogger("gateway/channels/telegram/auth");
+    cmdAuthLogger.info(
+      `command rejected: chatId=${chatId} senderId=${senderId} hasEntries=${dmAllow.hasEntries} senderAllowed=${senderAllowed} commandAuthorized=${commandAuthorized}`,
+    );
     await withTelegramApiErrorLogging({
       operation: "sendMessage",
       fn: () => bot.api.sendMessage(chatId, "You are not authorized to use this command."),

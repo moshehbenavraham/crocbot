@@ -24,6 +24,7 @@ import { readSessionUpdatedAt, resolveStorePath } from "../config/sessions.js";
 import type { crocbotConfig } from "../config/config.js";
 import type { DmPolicy, TelegramGroupConfig, TelegramTopicConfig } from "../config/types.js";
 import { logVerbose, shouldLogVerbose } from "../globals.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { recordChannelActivity } from "../infra/channel-activity.js";
 import { resolveAgentRoute } from "../routing/resolve-route.js";
 import { resolveThreadSessionKeys } from "../routing/session-key.js";
@@ -223,6 +224,9 @@ export const buildTelegramMessageContext = async ({
   // DM access control (secure defaults): "pairing" (default) / "allowlist" / "open" / "disabled"
   if (!isGroup) {
     if (dmPolicy === "disabled") {
+      createSubsystemLogger("gateway/channels/telegram/auth").info(
+        `DM rejected: chatId=${chatId} dmPolicy=disabled`,
+      );
       return null;
     }
 
@@ -234,9 +238,6 @@ export const buildTelegramMessageContext = async ({
         senderId: candidate,
         senderUsername,
       });
-      const allowMatchMeta = `matchKey=${allowMatch.matchKey ?? "none"} matchSource=${
-        allowMatch.matchSource ?? "none"
-      }`;
       const allowed =
         effectiveDmAllow.hasWildcard || (effectiveDmAllow.hasEntries && allowMatch.allowed);
       if (!allowed) {
@@ -291,8 +292,8 @@ export const buildTelegramMessageContext = async ({
             logVerbose(`telegram pairing reply failed for chat ${chatId}: ${String(err)}`);
           }
         } else {
-          logVerbose(
-            `Blocked unauthorized telegram sender ${candidate} (dmPolicy=${dmPolicy}, ${allowMatchMeta})`,
+          createSubsystemLogger("gateway/channels/telegram/auth").info(
+            `DM rejected: chatId=${candidate} dmPolicy=${dmPolicy} matchKey=${allowMatch.matchKey ?? "none"} matchSource=${allowMatch.matchSource ?? "none"} hasEntries=${effectiveDmAllow.hasEntries} entriesLength=${effectiveDmAllow.entries.length}`,
           );
         }
         return null;

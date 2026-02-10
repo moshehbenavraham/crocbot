@@ -16,6 +16,7 @@ import { logAckFailure, logTypingFailure } from "../channels/logging.js";
 import { createReplyPrefixContext } from "../channels/reply-prefix.js";
 import { createTypingCallbacks } from "../channels/typing.js";
 import { danger, logVerbose } from "../globals.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveMarkdownTableMode } from "../config/markdown-tables.js";
 import { deliverReplies } from "./bot/delivery.js";
 import { resolveTelegramDraftStreamingChunking } from "./draft-chunking.js";
@@ -222,6 +223,10 @@ export const dispatchTelegramMessage = async ({
       responsePrefix: prefixContext.responsePrefix,
       responsePrefixContextProvider: prefixContext.responsePrefixContextProvider,
       deliver: async (payload, info) => {
+        const diagLog = createSubsystemLogger("telegram/deliver/diag");
+        diagLog.info(
+          `kind=${info.kind} textLen=${(payload.text ?? "").length} text=${JSON.stringify((payload.text ?? "").slice(0, 200))}`,
+        );
         if (info.kind === "final") {
           await flushDraft();
           draftStream?.stop();

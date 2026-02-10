@@ -36,6 +36,8 @@ export type EmbeddedPiSubscribeState = {
   streamReasoning: boolean;
 
   deltaBuffer: string;
+  /** Pre-masking delta length — used for text_start/text_end content dedup. */
+  rawDeltaLength: number;
   blockBuffer: string;
   blockState: { thinking: boolean; final: boolean; inlineCode: InlineCodeState };
   lastStreamedAssistant?: string;

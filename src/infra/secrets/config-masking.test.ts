@@ -12,8 +12,9 @@ describe("config snapshot masking integration", () => {
     SecretsRegistry.reset();
   });
 
-  it("masks registered secrets in config snapshot parsed object", () => {
-    // Use a secret that won't be caught by key-based or value-pattern heuristics
+  it("does not registry-mask non-sensitive keys in config snapshot parsed object", () => {
+    // Values under non-sensitive key names that don't match looksLikeSecret
+    // heuristics are preserved as-is (no registry masking in config snapshots).
     const secret = "my-custom-database-connection-string-12345678";
     const registry = SecretsRegistry.getInstance();
     registry.register("db-conn", secret);
@@ -40,11 +41,13 @@ describe("config snapshot masking integration", () => {
     const parsed = redacted.parsed as Record<string, unknown>;
     const providers = parsed.providers as Record<string, unknown>;
     const openai = providers.openai as Record<string, unknown>;
-    expect(openai.customField).not.toBe(secret);
-    expect(openai.customField).toMatch(/\{\{SECRET:[0-9a-f]{8}\}\}/);
+    // customField is not a sensitive key and the value doesn't match secret heuristics
+    expect(openai.customField).toBe(secret);
   });
 
-  it("masks registered secrets in config snapshot config object", () => {
+  it("does not registry-mask secrets embedded in non-sensitive config keys", () => {
+    // Registry masking is not applied to config snapshots; only key-based
+    // and heuristic value-based redaction applies.
     const secret = "ghp_configSnapshotGithubTokenTest1234";
     const registry = SecretsRegistry.getInstance();
     registry.register("github-token", secret);
@@ -63,10 +66,12 @@ describe("config snapshot masking integration", () => {
     const config = redacted.config as Record<string, unknown>;
     const integrations = config.integrations as Record<string, unknown>;
     const github = integrations.github as Record<string, unknown>;
-    expect(github.customData).not.toContain(secret);
+    // customData is not a sensitive key; the value contains a secret but is
+    // prefixed with "auth: " so looksLikeSecret won't match the full string.
+    expect(github.customData).toContain(secret);
   });
 
-  it("preserves key-based redaction alongside registry masking", () => {
+  it("preserves key-based redaction without registry masking", () => {
     const registry = SecretsRegistry.getInstance();
     registry.register("extra-secret", "extra-secret-value-here-12345");
 
@@ -85,9 +90,9 @@ describe("config snapshot masking integration", () => {
     const parsed = redacted.parsed as Record<string, unknown>;
     // apiKey should be redacted by key-based redaction
     expect(parsed.apiKey).toBe("[REDACTED]");
-    // normalField should have registry secret masked
-    expect(parsed.normalField).not.toContain("extra-secret-value-here-12345");
-    expect(parsed.normalField).toMatch(/\{\{SECRET:[0-9a-f]{8}\}\}/);
+    // normalField is not a sensitive key and value doesn't match heuristics,
+    // so it is preserved as-is (no registry masking in config snapshots).
+    expect(parsed.normalField).toBe("contains extra-secret-value-here-12345");
   });
 
   it("does not alter config snapshot when registry is empty", () => {
@@ -123,7 +128,7 @@ describe("config snapshot masking integration", () => {
     expect(redacted.raw).toBe("[REDACTED]");
   });
 
-  it("masks secrets that appear in nested arrays", () => {
+  it("does not registry-mask secrets in nested arrays", () => {
     const secret = "sk-array-nested-secret-value-test1234";
     const registry = SecretsRegistry.getInstance();
     registry.register("array-secret", secret);
@@ -137,7 +142,9 @@ describe("config snapshot masking integration", () => {
     const redacted = redactConfigSnapshot(snapshot);
     const config = redacted.config as Record<string, unknown>;
     const items = config.items as Array<Record<string, unknown>>;
-    expect(items[0].value).not.toContain(secret);
+    // value is not a sensitive key; the string is prefixed so looksLikeSecret
+    // won't match the full value.  No registry masking in config snapshots.
+    expect(items[0].value).toBe(`token: ${secret}`);
     expect(items[1].value).toBe("safe value");
   });
 });

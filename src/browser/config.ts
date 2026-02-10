@@ -1,3 +1,5 @@
+import fsSync from "node:fs";
+
 import type { BrowserConfig, BrowserProfileConfig, crocbotConfig } from "../config/config.js";
 import {
   deriveDefaultBrowserCdpPortRange,
@@ -41,6 +43,18 @@ export type ResolvedBrowserProfile = {
   color: string;
   driver: "croc" | "extension";
 };
+
+/** Detect whether we are running inside a Docker container. */
+function isDockerContainer(): boolean {
+  if (fsSync.existsSync("/.dockerenv")) {
+    return true;
+  }
+  try {
+    return fsSync.readFileSync("/proc/1/cgroup", "utf8").includes("/docker/");
+  } catch {
+    return false;
+  }
+}
 
 function isLoopbackHost(host: string) {
   const h = host.trim().toLowerCase();
@@ -189,8 +203,9 @@ export function resolveBrowserConfig(
     };
   }
 
-  const headless = cfg?.headless === true;
-  const noSandbox = cfg?.noSandbox === true;
+  const containerDefaults = isDockerContainer();
+  const headless = cfg?.headless ?? containerDefaults;
+  const noSandbox = cfg?.noSandbox ?? containerDefaults;
   const attachOnly = cfg?.attachOnly === true;
   const executablePath = cfg?.executablePath?.trim() || undefined;
 

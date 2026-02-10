@@ -39,6 +39,17 @@ export function stop(state: CronServiceState) {
 }
 
 export async function status(state: CronServiceState) {
+  const store = state.store;
+  if (store) {
+    // Store already loaded — read without lock (read-only snapshot)
+    return {
+      enabled: state.deps.cronEnabled,
+      storePath: state.deps.storePath,
+      jobs: store.jobs.length,
+      nextWakeAtMs: state.deps.cronEnabled ? (nextWakeAtMs(state) ?? null) : null,
+    };
+  }
+  // Fallback: store not yet loaded, wait for lock
   return await locked(state, async () => {
     await ensureLoaded(state);
     return {
@@ -51,6 +62,14 @@ export async function status(state: CronServiceState) {
 }
 
 export async function list(state: CronServiceState, opts?: { includeDisabled?: boolean }) {
+  const store = state.store;
+  if (store) {
+    // Store already loaded — read without lock (returns new array via toSorted)
+    const includeDisabled = opts?.includeDisabled === true;
+    const jobs = store.jobs.filter((j) => includeDisabled || j.enabled);
+    return jobs.toSorted((a, b) => (a.state.nextRunAtMs ?? 0) - (b.state.nextRunAtMs ?? 0));
+  }
+  // Fallback: store not yet loaded, wait for lock
   return await locked(state, async () => {
     await ensureLoaded(state);
     const includeDisabled = opts?.includeDisabled === true;
