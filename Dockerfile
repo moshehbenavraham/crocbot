@@ -90,6 +90,7 @@ RUN apt-get update && \
       curl \
       ca-certificates \
       git \
+      gosu \
       jq \
       openssh-client && \
     # GitHub CLI (gh)
@@ -130,22 +131,18 @@ COPY --from=builder /app/skills ./skills
 COPY --from=builder /app/extensions ./extensions
 
 # Create directories for runtime
-# UID/GID default to 1000 (node) but can be overridden at build time
-# to match the user: directive in docker-compose.yml
-ARG APP_UID=1000
-ARG APP_GID=1000
-RUN if [ "${APP_UID}" != "1000" ]; then \
-      groupmod -g ${APP_GID} node && \
-      usermod -u ${APP_UID} -g ${APP_GID} node; \
-    fi && \
-    mkdir -p /home/node/.crocbot /home/node/croc && \
-    chown -R ${APP_UID}:${APP_GID} /home/node /app
+RUN mkdir -p /home/node/.crocbot /home/node/croc && \
+    chown -R node:node /home/node /app
+
+# Entrypoint: adjusts node user UID/GID at runtime via PUID/PGID env vars,
+# then drops privileges with gosu. No special build args needed.
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set production environment
 ENV NODE_ENV=production
 
-# Security hardening: Run as non-root user
-USER node
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Health check endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
