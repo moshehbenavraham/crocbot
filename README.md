@@ -129,7 +129,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
 - **[MCP integration](https://aiwithapex.mintlify.app/concepts/mcp)** — native MCP client (stdio/SSE/HTTP) and server mode with SSRF-guarded transports
 - **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
-- **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, DM pairing
+- **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
 
 ---
 
@@ -231,6 +231,7 @@ Crocbot connects to real messaging surfaces — treat inbound DMs as **untrusted
 - **DM pairing** (`dmPolicy="pairing"`) — unknown senders must pair before the bot responds
 - **Exec allowlisting** — shell commands are gated by an allowlist
 - **SSRF protection** — private IP/hostname blocking on all outbound fetches
+- **Secrets masking** — credentials never appear in logs, LLM context, or Telegram output
 - **Sandbox mode** — run non-main sessions (groups) in per-session Docker sandboxes
 - **`crocbot doctor`** — audit tool that surfaces risky or misconfigured policies
 

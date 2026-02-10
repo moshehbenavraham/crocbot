@@ -38,9 +38,14 @@
 - `NODE_ENV=development`: Enable development features
 - `DEBUG=*`: Enable debug logging
 
+### MCP (optional)
+
+- `MCP_SERVER_TOKEN`: Authentication token for MCP server mode (if `mcp.server.enabled`)
+
 ### Production-Only
 
 - `NODE_ENV=production`: Production mode
+- `COOLIFY_WEBHOOK_URL`: Deployment trigger (GitHub Actions repo variable)
 - Alerting webhook URLs (optional)
 
 ## Local Development

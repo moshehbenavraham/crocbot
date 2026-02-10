@@ -32,6 +32,10 @@
 # Gateway and infrastructure
 /src/gateway/ @moshehbenavraham
 /src/infra/ @moshehbenavraham
+/src/infra/secrets/ @moshehbenavraham
+
+# MCP client and server
+/src/mcp/ @moshehbenavraham
 
 # Media pipeline
 /src/media/ @moshehbenavraham

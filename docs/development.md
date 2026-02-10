@@ -153,7 +153,7 @@ src/
   cron/             # Scheduled jobs
   gateway/          # Gateway server
   hooks/            # Hook system
-  infra/            # Infrastructure utilities (exec, net, SSRF guards)
+  infra/            # Infrastructure (exec, net/SSRF, secrets masking)
   logging/          # Structured logging (tslog)
   mcp/              # MCP client, server, transports, tool bridge
   media/            # Media processing

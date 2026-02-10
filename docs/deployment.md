@@ -33,15 +33,18 @@ See [Docker installation](/install/docker) for full documentation.
 ## CI/CD Pipeline
 
 ```
-Push --> Build --> Test --> Deploy
+Push to main --> CI (lint, build, test) --> Docker build --> Push to registry --> Coolify webhook deploy
 ```
 
-GitHub Actions workflow runs on push to `main`:
-1. Install dependencies
-2. Run build (`pnpm build`)
-3. Run lint (`pnpm lint`)
-4. Run tests (`pnpm test`)
-5. Build Docker image (on success)
+### Pipeline Bundles
+
+| Bundle | Workflow | Triggers |
+|--------|----------|----------|
+| Code Quality | `ci.yml` | Push, PR (lint, format, typecheck) |
+| Build & Test | `ci.yml` | Push, PR (build, test with coverage) |
+| Security | `ci.yml` + `security.yml` | Push, schedule (detect-secrets, CodeQL, npm-audit) |
+| Integration | `integration.yml` | PR to main (E2E tests) |
+| Docker Release | `docker-release.yml` | Push to main (build + push + Coolify webhook) |
 
 ## Build Process
 
@@ -94,14 +97,25 @@ docker run -d --name crocbot-gateway ... crocbot:previous-tag
 curl http://localhost:18789/health
 
 # Expected response
-{"status":"healthy"}
+# {"status":"ok","timestamp":"...","uptime":...,"heapUsedMb":...}
 ```
+
+Docker healthcheck: 30s interval, 3 retries, 10s timeout.
+
+## Backup
+
+- **Config backup**: `scripts/backup.sh` (7-day retention default)
+- **Scheduled backup**: `.github/workflows/backup.yml` (daily 02:00 UTC, 30-day artifact retention)
+- **Config export**: `GET /setup/export` (Bearer token auth, returns redacted config snapshot)
 
 ## Logs
 
 ```bash
 # Docker logs
 docker logs -f crocbot-gateway
+
+# Systemd logs (if using daemon)
+journalctl --user -u crocbot-gateway --since "1 hour ago"
 ```
 
 ## Runbooks
@@ -110,3 +124,7 @@ docker logs -f crocbot-gateway
 - [Incident Response](runbooks/incident-response)
 - [Docker Operations](runbooks/docker-operations)
 - [Health Checks](runbooks/health-checks)
+- [Backup/Restore](runbooks/backup-restore)
+- [Coolify Deploy](runbooks/coolify-deploy)
+- [Log Analysis](runbooks/log-analysis)
+- [Telegram Troubleshooting](runbooks/telegram-troubleshooting)

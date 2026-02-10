@@ -66,9 +66,15 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Location**: `src/infra/net/` (ssrf.ts, fetch-guard.ts), `src/infra/exec-approvals.ts`
 - **Key modules**: `ssrf.ts` (private IP/hostname blocking, redirect validation), `fetch-guard.ts` (guarded fetch wrapper), `exec-approvals.ts` (shell token blocking, allowlist enforcement)
 
+### Secrets Masking (`src/infra/secrets/`)
+- **Purpose**: Prevent credential leakage across all output boundaries
+- **Tech**: Custom Aho-Corasick masker, SecretsRegistry singleton, value-based + pattern-based defense-in-depth
+- **Key modules**: `registry.ts` (singleton, auto-discovery from env/config), `masker.ts` (Aho-Corasick for 10+ patterns, sequential fallback), `stream-masker.ts` (cross-chunk boundary detection), `logging-transport.ts` (tslog masking transport), `llm-masking.ts` (context wrapper), `tool-result-masking.ts` (agent tool output), `error-masking.ts` (error messages)
+- **Boundaries**: (1) Logging, (2) Config snapshots, (3) LLM context, (4) Streaming output, (5) Tool results, (6) Telegram send, (7) Error formatting
+
 ### Logging & Observability
 - **Purpose**: Structured logging, metrics, error alerting
-- **Tech**: tslog, OpenTelemetry-compatible metrics
+- **Tech**: tslog (with secrets masking transport), OpenTelemetry-compatible metrics
 - **Location**: `src/logging/`, `src/metrics/`, `src/alerting/`
 
 ### Plugin System
@@ -116,14 +122,20 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 1. User sends message via Telegram (or external AI calls MCP server endpoint)
 2. grammY bot receives message, routes to Gateway
 3. Gateway creates/resumes session, invokes agent
-4. Agent processes message with LLM provider, invoking MCP client tools as needed
-5. Response streamed back through Gateway to Telegram (or MCP server response)
+4. Agent builds context: system prompt + memory recall + conversation history
+5. SecretsRegistry masks any credentials in LLM context before provider call
+6. Agent processes message with LLM provider, invoking MCP client tools as needed
+7. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
+8. Tool results masked before persistence and display
+9. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
 
 ## Key Architectural Decisions
 
 See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0001: Telegram-only Architecture](adr/0001-telegram-only-architecture)
 - [ADR-0002: Multi-stage Docker Build](adr/0002-multi-stage-docker-build)
+- [ADR-0003: Native MCP Integration](adr/0003-native-mcp-integration)
+- [ADR-0004: Secrets Masking Pipeline](adr/0004-secrets-masking-pipeline)
 
 ## Directory Structure
 
@@ -141,7 +153,7 @@ src/
   daemon/           # Daemon process management
   gateway/          # Gateway control plane
   hooks/            # Hook system
-  infra/            # Infrastructure (exec, net/SSRF, utilities)
+  infra/            # Infrastructure (exec, net/SSRF, secrets masking, utilities)
   logging/          # Structured logging (tslog)
   media/            # Media pipeline
   media-understanding/  # Media analysis
