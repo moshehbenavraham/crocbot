@@ -214,6 +214,11 @@ export function stripPluginOnlyAllowlist(
   const unknownAllowlist: string[] = [];
   let hasCoreEntry = false;
   for (const entry of normalized) {
+    // Wildcards/globs (e.g. "*") match all tools including core — skip validation.
+    if (entry.includes("*")) {
+      hasCoreEntry = true;
+      continue;
+    }
     const isPluginEntry =
       entry === "group:plugins" || pluginIds.has(entry) || pluginTools.has(entry);
     const expanded = expandToolGroups([entry]);
