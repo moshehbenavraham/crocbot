@@ -28,6 +28,13 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY patches ./patches
 COPY scripts ./scripts
 
+# Layer 1b: Copy extension package manifests so pnpm workspace resolves them
+COPY extensions/ /tmp/extensions/
+RUN find /tmp/extensions -maxdepth 2 -name 'package.json' | while read f; do \
+      dir="extensions/$(basename $(dirname $f))"; \
+      mkdir -p "$dir" && cp "$f" "$dir/"; \
+    done && rm -rf /tmp/extensions
+
 # Layer 2: Install all dependencies (cached unless package files change)
 RUN pnpm install --frozen-lockfile
 
@@ -38,6 +45,14 @@ COPY docs ./docs
 COPY assets ./assets
 COPY skills ./skills
 COPY extensions ./extensions
+
+# Layer 3b: Dereference pnpm symlinks in extension node_modules so they
+# survive the pruner stage (which strips the main .pnpm store).
+RUN for ext in extensions/*/node_modules; do \
+      [ -d "$ext" ] || continue; \
+      rm -f "$ext/crocbot"; \
+      cp -rL "$ext" "$ext.real" && rm -rf "$ext" && mv "$ext.real" "$ext"; \
+    done 2>/dev/null; true
 
 # Layer 4: Build TypeScript and UI
 ENV CROCBOT_A2UI_SKIP_MISSING=1
@@ -85,14 +100,15 @@ FROM node:22-slim AS runtime
 # NOT included (too large / optional):
 #   - claude-code (~npm global, install separately if needed)
 #   - chromium / playwright (~300 MB, mount or sidecar if needed)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       curl \
       ca-certificates \
       git \
       gosu \
       jq \
-      openssh-client && \
+      openssh-client \
+      ripgrep && \
     # GitHub CLI (gh)
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
       -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
@@ -100,7 +116,7 @@ RUN apt-get update && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
       > /etc/apt/sources.list.d/github-cli.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends gh && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends gh && \
     # gog (Google Workspace CLI) — pinned version, arch-aware download
     GOG_VER=v0.9.0 && \
     GOG_ARCH=$(dpkg --print-architecture) && \
@@ -116,23 +132,23 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy package.json for runtime
-COPY --from=builder /app/package.json ./
+COPY --from=builder --chown=node:node /app/package.json ./
 
 # Copy pruned node_modules from pruner stage
-COPY --from=pruner /app/node_modules ./node_modules
+COPY --from=pruner --chown=node:node /app/node_modules ./node_modules
 
 # Copy built artifacts from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder --chown=node:node /app/dist ./dist
 
 # Copy additional required files
-COPY --from=builder /app/docs ./docs
-COPY --from=builder /app/assets ./assets
-COPY --from=builder /app/skills ./skills
-COPY --from=builder /app/extensions ./extensions
+COPY --from=builder --chown=node:node /app/docs ./docs
+COPY --from=builder --chown=node:node /app/assets ./assets
+COPY --from=builder --chown=node:node /app/skills ./skills
+COPY --from=builder --chown=node:node /app/extensions ./extensions
 
-# Create directories for runtime
+# Create directories for runtime (no recursive chown needed — COPY --chown handles /app)
 RUN mkdir -p /home/node/.crocbot /home/node/croc && \
-    chown -R node:node /home/node /app
+    chown -R node:node /home/node
 
 # Entrypoint: adjusts node user UID/GID at runtime via PUID/PGID env vars,
 # then drops privileges with gosu. No special build args needed.
