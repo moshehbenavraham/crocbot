@@ -182,7 +182,7 @@ RUN mkdir -p /home/node/.crocbot /home/node/croc && \
 
 # Entrypoint: adjusts node user UID/GID at runtime via PUID/PGID env vars,
 # then drops privileges with gosu. No special build args needed.
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set production environment
