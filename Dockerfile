@@ -46,12 +46,42 @@ COPY assets ./assets
 COPY skills ./skills
 COPY extensions ./extensions
 
-# Layer 3b: Dereference pnpm symlinks in extension node_modules so they
-# survive the pruner stage (which strips the main .pnpm store).
+# Layer 3b: Flatten extension node_modules so they are fully self-contained
+# and survive the pruner stage (which strips the pnpm store).
+# For each symlinked dep, resolve its pnpm virtual-store node_modules dir
+# (the parent containing all transitive deps as siblings) and copy them in.
+# Uses sed to extract the virtual-store node_modules path, which handles
+# both scoped (@scope/pkg) and non-scoped packages correctly.
 RUN for ext in extensions/*/node_modules; do \
       [ -d "$ext" ] || continue; \
       rm -f "$ext/crocbot"; \
+      for pkg in "$ext"/*/ "$ext"/@*/*/; do \
+        [ -L "${pkg%/}" ] || continue; \
+        target=$(readlink -f "${pkg%/}"); \
+        store_nm=$(echo "$target" | sed 's|\(.*node_modules\)/.*|\1|'); \
+        [ -d "$store_nm" ] || continue; \
+        for sibling in "$store_nm"/*/; do \
+          [ -d "$sibling" ] || continue; \
+          name=$(basename "$sibling"); \
+          [ "$name" = ".bin" ] && continue; \
+          [ -e "$ext/$name" ] && continue; \
+          cp -rL "$sibling" "$ext/$name" 2>/dev/null || true; \
+        done; \
+        for scope in "$store_nm"/@*/; do \
+          [ -d "$scope" ] || continue; \
+          scopename=$(basename "$scope"); \
+          for scopepkg in "$scope"/*/; do \
+            [ -d "$scopepkg" ] || continue; \
+            pkgname=$(basename "$scopepkg"); \
+            [ -e "$ext/$scopename/$pkgname" ] && continue; \
+            mkdir -p "$ext/$scopename"; \
+            cp -rL "$scopepkg" "$ext/$scopename/$pkgname" 2>/dev/null || true; \
+          done; \
+        done; \
+      done; \
       cp -rL "$ext" "$ext.real" && rm -rf "$ext" && mv "$ext.real" "$ext"; \
+      find "$ext" -mindepth 2 -name node_modules -type d -exec sh -c \
+        'ls -A1 "$1" | grep -qvx ".bin" && exit 1; rm -rf "$1"' _ {} \; ; \
     done 2>/dev/null; true
 
 # Layer 4: Build TypeScript and UI

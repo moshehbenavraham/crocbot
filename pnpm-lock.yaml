@@ -293,6 +293,9 @@ importers:
       '@sinclair/typebox':
         specifier: 0.34.47
         version: 0.34.47
+      apache-arrow:
+        specifier: ^18.1.0
+        version: 18.1.0
       openai:
         specifier: ^6.16.0
         version: 6.17.0(ws@8.19.0)(zod@4.3.6)
@@ -303,7 +306,7 @@ importers:
     devDependencies:
       crocbot:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/crocbot
 
   extensions/telegram: {}
 
@@ -323,7 +326,7 @@ importers:
     dependencies:
       crocbot:
         specifier: workspace:*
-        version: link:../..
+        version: 'link:'
 
 packages:
 
