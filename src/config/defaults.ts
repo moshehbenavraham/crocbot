@@ -215,7 +215,8 @@ export function applyModelDefaults(cfg: crocbotConfig): crocbotConfig {
         }
 
         const defaultMaxTokens = Math.min(DEFAULT_MODEL_MAX_TOKENS, contextWindow);
-        const maxTokens = isPositiveNumber(raw.maxTokens) ? raw.maxTokens : defaultMaxTokens;
+        const rawMaxTokens = isPositiveNumber(raw.maxTokens) ? raw.maxTokens : defaultMaxTokens;
+        const maxTokens = Math.min(rawMaxTokens, contextWindow);
         if (raw.maxTokens !== maxTokens) {
           modelMutated = true;
         }

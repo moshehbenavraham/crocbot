@@ -26,7 +26,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import { VERSION } from "../version.js";
 import { getAgentLocalStatuses } from "./status-all/agents.js";
 import { buildChannelsTable } from "./status-all/channels.js";
-import { formatDuration, formatGatewayAuthUsed } from "./status-all/format.js";
+import { formatDurationPrecise, formatGatewayAuthUsed } from "./status-all/format.js";
 import { pickGatewaySelfPresence } from "./status-all/gateway.js";
 import { buildStatusAllReportLines } from "./status-all/report-lines.js";
 
@@ -340,7 +340,7 @@ export async function statusAllCommand(
 
     const gatewayTarget = remoteUrlMissing ? `fallback ${connection.url}` : connection.url;
     const gatewayStatus = gatewayReachable
-      ? `reachable ${formatDuration(gatewayProbe?.connectLatencyMs)}`
+      ? `reachable ${formatDurationPrecise(gatewayProbe?.connectLatencyMs ?? 0)}`
       : gatewayProbe?.error
         ? `unreachable (${gatewayProbe.error})`
         : "unreachable";

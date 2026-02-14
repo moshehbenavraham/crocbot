@@ -20,6 +20,8 @@ export type ProcessStatus = "running" | "completed" | "failed" | "killed";
 export type SessionStdin = {
   write: (data: string, cb?: (err?: Error | null) => void) => void;
   end: () => void;
+  // When backed by a real Node stream (child.stdin), this exists; for PTY wrappers it may not.
+  destroy?: () => void;
   destroyed?: boolean;
 };
 
@@ -157,6 +159,36 @@ export function markBackgrounded(session: ProcessSession) {
 
 function moveToFinished(session: ProcessSession, status: ProcessStatus) {
   runningSessions.delete(session.id);
+
+  // Clean up child process stdio streams to prevent FD leaks
+  if (session.child) {
+    // Destroy stdio streams to release file descriptors
+    session.child.stdin?.destroy?.();
+    session.child.stdout?.destroy?.();
+    session.child.stderr?.destroy?.();
+
+    // Remove all event listeners to prevent memory leaks
+    session.child.removeAllListeners?.();
+
+    // Clear the reference
+    delete session.child;
+  }
+
+  // Clean up stdin wrapper - call destroy if available, otherwise just remove reference
+  if (session.stdin) {
+    if (typeof session.stdin.destroy === "function") {
+      session.stdin.destroy();
+    } else if (typeof session.stdin.end === "function") {
+      session.stdin.end();
+    }
+    try {
+      (session.stdin as { destroyed?: boolean }).destroyed = true;
+    } catch {
+      // Ignore if read-only
+    }
+    delete session.stdin;
+  }
+
   if (!session.backgrounded) {
     return;
   }

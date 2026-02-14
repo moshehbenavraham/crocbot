@@ -10,12 +10,9 @@ import {
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { note } from "../terminal/note.js";
+import { isRecord } from "../utils.js";
 import { normalizeLegacyConfigValues } from "./doctor-legacy-config.js";
 import type { DoctorOptions } from "./doctor-prompter.js";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
-}
 
 type UnrecognizedKeysIssue = ZodIssue & {
   code: "unrecognized_keys";

@@ -12,6 +12,7 @@ export type EmbeddedPiAgentMeta = {
     cacheWrite?: number;
     total?: number;
   };
+  compactionCount?: number;
 };
 
 export type EmbeddedPiRunMeta = {

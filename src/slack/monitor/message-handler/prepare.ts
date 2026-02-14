@@ -157,7 +157,7 @@ export async function prepareSlackMessage(params: {
     accountId: account.accountId,
     teamId: ctx.teamId || undefined,
     peer: {
-      kind: isDirectMessage ? "dm" : isRoom ? "channel" : "group",
+      kind: isDirectMessage ? "direct" : isRoom ? "channel" : "group",
       id: isDirectMessage ? (message.user ?? "unknown") : message.channel,
     },
   });

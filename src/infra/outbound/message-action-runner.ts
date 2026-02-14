@@ -22,6 +22,7 @@ import {
   type GatewayClientMode,
   type GatewayClientName,
 } from "../../utils/message-channel.js";
+import { throwIfAborted } from "./abort.js";
 import {
   listConfiguredMessageChannels,
   resolveMessageChannelSelection,
@@ -42,6 +43,7 @@ import { actionHasTarget, actionRequiresTarget } from "./message-action-spec.js"
 import { resolveChannelTarget, type ResolvedMessagingTarget } from "./target-resolver.js";
 import { loadWebMedia } from "../../media/load.js";
 import { extensionForMime } from "../../media/mime.js";
+import { parseTelegramTarget } from "../../telegram/targets.js";
 
 export type MessageActionRunnerGateway = {
   url?: string;
@@ -275,6 +277,27 @@ function normalizeBase64Payload(params: { base64?: string; contentType?: string 
     base64: payload,
     contentType: params.contentType ?? mime,
   };
+}
+
+/**
+ * Auto-inject Telegram forum topic thread ID when the message tool targets
+ * the same chat the session originated from.  Ensures media, buttons, and
+ * other tool-sent messages land in the correct topic instead of General Topic.
+ */
+function resolveTelegramAutoThreadId(params: {
+  to: string;
+  toolContext?: ChannelThreadingToolContext;
+}): string | undefined {
+  const context = params.toolContext;
+  if (!context?.currentThreadTs || !context.currentChannelId) {
+    return undefined;
+  }
+  const parsedTo = parseTelegramTarget(params.to);
+  const parsedChannel = parseTelegramTarget(context.currentChannelId);
+  if (parsedTo.chatId.toLowerCase() !== parsedChannel.chatId.toLowerCase()) {
+    return undefined;
+  }
+  return context.currentThreadTs;
 }
 
 async function hydrateSetGroupIconParams(params: {
@@ -595,14 +618,6 @@ async function handleBroadcastAction(
   };
 }
 
-function throwIfAborted(abortSignal?: AbortSignal): void {
-  if (abortSignal?.aborted) {
-    const err = new Error("Message send aborted");
-    err.name = "AbortError";
-    throw err;
-  }
-}
-
 async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActionRunResult> {
   const {
     cfg,
@@ -630,6 +645,9 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
       required: !mediaHint && !hasCard,
       allowEmpty: true,
     }) ?? "";
+  if (message.includes("\\n")) {
+    message = message.replaceAll("\\n", "\n");
+  }
 
   const parsed = parseReplyDirectives(message);
   const mergedMediaUrls: string[] = [];
@@ -678,6 +696,16 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
 
   const replyToId = readStringParam(params, "replyTo");
   const threadId = readStringParam(params, "threadId");
+  // Telegram forum topic auto-threading: inject threadId so media/buttons land in the correct topic.
+  const telegramAutoThreadId =
+    channel === "telegram" && !threadId
+      ? resolveTelegramAutoThreadId({ to, toolContext: input.toolContext })
+      : undefined;
+  const resolvedThreadId = threadId ?? telegramAutoThreadId;
+  // Inject the resolved thread ID back into params so downstream dispatch (plugin/gateway) sees it.
+  if (resolvedThreadId && !params.threadId) {
+    params.threadId = resolvedThreadId;
+  }
   const outboundRoute =
     agentId && !dryRun
       ? await resolveOutboundSessionRoute({
@@ -688,7 +716,7 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
           target: to,
           resolvedTarget,
           replyToId,
-          threadId,
+          threadId: resolvedThreadId,
         })
       : null;
   if (outboundRoute && agentId && !dryRun) {

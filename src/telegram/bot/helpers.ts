@@ -24,6 +24,25 @@ export function resolveTelegramForumThreadId(params: {
 }
 
 /**
+ * Build a parent peer for Telegram routing binding inheritance.
+ * When a message comes from a forum topic, the peer ID includes a topic suffix
+ * (e.g., `-1001234567890:topic:99`), but bindings are configured with the base
+ * group ID. To allow bindings configured for the base group ID to match, we
+ * provide the parent group as `parentPeer` so the routing layer can fall back
+ * to it when the exact peer doesn't match.
+ */
+export function buildTelegramParentPeer(params: {
+  isGroup: boolean;
+  resolvedThreadId?: number;
+  chatId: number | string;
+}): { kind: "group"; id: string } | undefined {
+  if (!params.isGroup || params.resolvedThreadId == null) {
+    return undefined;
+  }
+  return { kind: "group", id: String(params.chatId) };
+}
+
+/**
  * Build thread params for Telegram API calls (messages, media).
  * General forum topic (id=1) must be treated like a regular supergroup send:
  * Telegram rejects sendMessage/sendMedia with message_thread_id=1 ("thread not found").
@@ -174,36 +193,57 @@ export function resolveTelegramReplyId(raw?: string): number | undefined {
 
 export function describeReplyTarget(msg: TelegramMessage) {
   const reply = msg.reply_to_message;
-  if (!reply) {
-    return null;
+  const externalReply = msg.external_reply;
+  const quoteText =
+    msg.quote?.text ??
+    (externalReply as (typeof externalReply & { quote?: { text?: string } }) | undefined)?.quote
+      ?.text;
+  let body = "";
+  let kind: "reply" | "quote" = "reply";
+
+  if (typeof quoteText === "string") {
+    body = quoteText.trim();
+    if (body) {
+      kind = "quote";
+    }
   }
-  const replyBody = (reply.text ?? reply.caption ?? "").trim();
-  let body = replyBody;
-  if (!body) {
-    if (reply.photo) {
-      body = "<media:image>";
-    } else if (reply.video) {
-      body = "<media:video>";
-    } else if (reply.audio || reply.voice) {
-      body = "<media:audio>";
-    } else if (reply.document) {
-      body = "<media:document>";
-    } else {
-      const locationData = extractTelegramLocation(reply);
-      if (locationData) {
-        body = formatLocationText(locationData);
+
+  const replyLike = reply ?? externalReply;
+  if (!body && replyLike) {
+    const replyBody = (
+      (replyLike as { text?: string }).text ??
+      (replyLike as { caption?: string }).caption ??
+      ""
+    ).trim();
+    body = replyBody;
+    if (!body) {
+      if (replyLike.photo) {
+        body = "<media:image>";
+      } else if (replyLike.video) {
+        body = "<media:video>";
+      } else if (replyLike.audio || replyLike.voice) {
+        body = "<media:audio>";
+      } else if (replyLike.document) {
+        body = "<media:document>";
+      } else {
+        const locationData = extractTelegramLocation(replyLike as TelegramMessage);
+        if (locationData) {
+          body = formatLocationText(locationData);
+        }
       }
     }
   }
   if (!body) {
     return null;
   }
-  const sender = buildSenderName(reply);
-  const senderLabel = sender ? sender : "unknown sender";
+  const sender = replyLike ? buildSenderName(replyLike as TelegramMessage) : undefined;
+  const senderLabel = sender ?? "unknown sender";
+
   return {
-    id: reply.message_id ? String(reply.message_id) : undefined,
+    id: replyLike?.message_id ? String(replyLike.message_id) : undefined,
     sender: senderLabel,
     body,
+    kind,
   };
 }
 

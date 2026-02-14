@@ -12,9 +12,7 @@ type Modifiers = {
   shift: boolean;
 };
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { escapeRegExp } from "../utils.js";
 
 const namedKeyMap = new Map<string, string>([
   ["enter", CR],

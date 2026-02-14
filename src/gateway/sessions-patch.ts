@@ -133,11 +133,7 @@ export async function applySessionsPatchToStore(params: {
           `invalid thinkingLevel (use ${formatThinkingLevels(hintProvider, hintModel, "|")})`,
         );
       }
-      if (normalized === "off") {
-        delete next.thinkingLevel;
-      } else {
-        next.thinkingLevel = normalized;
-      }
+      next.thinkingLevel = normalized;
     }
   }
 

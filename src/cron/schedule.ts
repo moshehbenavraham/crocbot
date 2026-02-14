@@ -25,6 +25,15 @@ export function computeNextRunAtMs(schedule: CronSchedule, nowMs: number): numbe
     timezone: schedule.tz?.trim() || undefined,
     catch: false,
   });
-  const next = cron.nextRun(new Date(nowMs));
-  return next ? next.getTime() : undefined;
+  // Cron operates at second granularity, so floor nowMs to the start of the
+  // current second.  We ask croner for the next occurrence strictly *after*
+  // nowSecondMs so that a job whose schedule matches the current second is
+  // never re-scheduled into the same (already-elapsed) second.
+  const nowSecondMs = Math.floor(nowMs / 1000) * 1000;
+  const next = cron.nextRun(new Date(nowSecondMs));
+  if (!next) {
+    return undefined;
+  }
+  const nextMs = next.getTime();
+  return Number.isFinite(nextMs) && nextMs > nowSecondMs ? nextMs : undefined;
 }

@@ -6,7 +6,7 @@ import { resolveAgentMaxConcurrent } from "../config/agent-limits.js";
 import { computeBackoff, sleepWithAbort } from "../infra/backoff.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { registerUnhandledRejectionHandler } from "../infra/unhandled-rejections.js";
-import { formatDurationMs } from "../infra/format-duration.js";
+import { formatDurationPrecise } from "../infra/format-time/format-duration.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { resolveTelegramAccount } from "./accounts.js";
 import { resolveTelegramAllowedUpdates } from "./allowed-updates.js";
@@ -201,7 +201,7 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
         const connectionDuration = Date.now() - attemptStart;
         if (connectionDuration > 60_000 && restartAttempts > 0) {
           log(
-            `telegram: connection was stable for ${formatDurationMs(connectionDuration)}; resetting retry counter`,
+            `telegram: connection was stable for ${formatDurationPrecise(connectionDuration)}; resetting retry counter`,
           );
           restartAttempts = 0;
         }
@@ -212,7 +212,7 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
         const reasonLabel = isConflict ? "getUpdates conflict" : "network error";
         const errMsg = formatErrorMessage(err);
         logError(
-          `telegram: ${reasonLabel} (attempt ${restartAttempts}): ${errMsg}; retrying in ${formatDurationMs(delayMs)}`,
+          `telegram: ${reasonLabel} (attempt ${restartAttempts}): ${errMsg}; retrying in ${formatDurationPrecise(delayMs)}`,
         );
         try {
           await sleepWithAbort(delayMs, opts.abortSignal);

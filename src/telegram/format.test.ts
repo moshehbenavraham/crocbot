@@ -39,9 +39,14 @@ describe("markdownToTelegramHtml", () => {
     expect(res).toBe("2. two\n3. three");
   });
 
-  it("renders headings as bold and blockquotes as blockquote tags", () => {
-    const res = markdownToTelegramHtml("# Title\n\n> Quote");
-    expect(res).toBe("<b>Title</b>\n\n<blockquote>Quote</blockquote>");
+  it("renders headings as plain text", () => {
+    const res = markdownToTelegramHtml("# Title\n\nBody");
+    expect(res).toBe("Title\n\nBody");
+  });
+
+  it("renders blockquotes as native blockquote tags", () => {
+    const res = markdownToTelegramHtml("> Quote");
+    expect(res).toBe("<blockquote>Quote</blockquote>");
   });
 
   it("renders fenced code blocks", () => {

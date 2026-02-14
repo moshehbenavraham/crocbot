@@ -82,7 +82,8 @@ describe("finalizeInboundContext", () => {
     const out = finalizeInboundContext(ctx);
     expect(out.Body).toBe("a\nb\nc");
     expect(out.RawBody).toBe("raw\nline");
-    expect(out.BodyForAgent).toBe("a\nb\nc");
+    // BodyForAgent prefers clean text (RawBody) over envelope-shaped Body when BodyForAgent is not set.
+    expect(out.BodyForAgent).toBe("raw\nline");
     expect(out.BodyForCommands).toBe("raw\nline");
     expect(out.CommandAuthorized).toBe(false);
     expect(out.ChatType).toBe("channel");
@@ -258,15 +259,16 @@ describe("createInboundDebouncer", () => {
   });
 });
 
-describe("initSessionState sender meta", () => {
-  it("injects sender meta into BodyStripped for group chats", async () => {
+describe("initSessionState BodyStripped", () => {
+  it("prefers BodyForAgent over Body for group chats", async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-sender-meta-"));
     const storePath = path.join(root, "sessions.json");
     const cfg = { session: { store: storePath } } as crocbotConfig;
 
     const result = await initSessionState({
       ctx: {
-        Body: "[Telegram -1001234567890] ping",
+        Body: "[Telegram -1001234567890] Bob: ping",
+        BodyForAgent: "ping",
         ChatType: "group",
         SenderName: "Bob",
         SenderE164: "+222",
@@ -277,12 +279,10 @@ describe("initSessionState sender meta", () => {
       commandAuthorized: true,
     });
 
-    expect(result.sessionCtx.BodyStripped).toBe(
-      "[Telegram -1001234567890] ping\n[from: Bob (+222)]",
-    );
+    expect(result.sessionCtx.BodyStripped).toBe("ping");
   });
 
-  it("does not inject sender meta for direct chats", async () => {
+  it("prefers BodyForAgent over Body for direct chats", async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-sender-meta-direct-"));
     const storePath = path.join(root, "sessions.json");
     const cfg = { session: { store: storePath } } as crocbotConfig;
@@ -290,6 +290,7 @@ describe("initSessionState sender meta", () => {
     const result = await initSessionState({
       ctx: {
         Body: "[Telegram +1] ping",
+        BodyForAgent: "ping",
         ChatType: "direct",
         SenderName: "Bob",
         SenderE164: "+222",
@@ -299,7 +300,7 @@ describe("initSessionState sender meta", () => {
       commandAuthorized: true,
     });
 
-    expect(result.sessionCtx.BodyStripped).toBe("[Telegram +1] ping");
+    expect(result.sessionCtx.BodyStripped).toBe("ping");
   });
 });
 

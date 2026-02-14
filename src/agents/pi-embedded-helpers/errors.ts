@@ -22,7 +22,7 @@ export function isContextOverflowError(errorMessage?: string): boolean {
     lower.includes("prompt is too long") ||
     lower.includes("exceeds model context window") ||
     (hasRequestSizeExceeds && hasContextWindow) ||
-    lower.includes("context overflow") ||
+    lower.includes("context overflow:") ||
     (lower.includes("413") && lower.includes("too large"))
   );
 }
@@ -38,6 +38,12 @@ export function isLikelyContextOverflowError(errorMessage?: string): boolean {
   if (CONTEXT_WINDOW_TOO_SMALL_RE.test(errorMessage)) {
     return false;
   }
+  // Rate limit errors can match the broad CONTEXT_OVERFLOW_HINT_RE pattern
+  // (e.g., "request reached organization TPD rate limit" matches request.*limit).
+  // Exclude them before checking context overflow heuristics.
+  if (isRateLimitErrorMessage(errorMessage)) {
+    return false;
+  }
   if (isContextOverflowError(errorMessage)) {
     return true;
   }
@@ -48,7 +54,10 @@ export function isCompactionFailureError(errorMessage?: string): boolean {
   if (!errorMessage) {
     return false;
   }
-  if (!isContextOverflowError(errorMessage)) {
+  // Use the heuristic check (isLikelyContextOverflowError) instead of the strict
+  // check (isContextOverflowError) because compaction errors come from internal
+  // code paths that may include "context overflow" without the colon-prefix format.
+  if (!isLikelyContextOverflowError(errorMessage)) {
     return false;
   }
   const lower = errorMessage.toLowerCase();
@@ -66,6 +75,10 @@ const FINAL_TAG_RE = /<\s*\/?\s*final\s*>/gi;
 const ERROR_PREFIX_RE =
   /^(?:error|api\s*error|openai\s*error|anthropic\s*error|gateway\s*error|request failed|failed|exception)[:\s-]+/i;
 const HTTP_STATUS_PREFIX_RE = /^(?:http\s*)?(\d{3})\s+(.+)$/i;
+const HTTP_STATUS_CODE_PREFIX_RE = /^(?:http\s*)?(\d{3})(?:\s+([\s\S]+))?$/i;
+const HTML_ERROR_PREFIX_RE = /^\s*(?:<!doctype\s+html\b|<html\b)/i;
+const CLOUDFLARE_HTML_ERROR_CODES = new Set([521, 522, 523, 524, 525, 526, 530]);
+const TRANSIENT_HTTP_ERROR_CODES = new Set([500, 502, 503, 521, 522, 523, 524, 529]);
 const HTTP_ERROR_HINTS = [
   "error",
   "bad request",
@@ -83,6 +96,50 @@ const HTTP_ERROR_HINTS = [
   "too many requests",
   "permission",
 ];
+
+function extractLeadingHttpStatus(raw: string): { code: number; rest: string } | null {
+  const match = raw.match(HTTP_STATUS_CODE_PREFIX_RE);
+  if (!match) {
+    return null;
+  }
+  const code = Number(match[1]);
+  if (!Number.isFinite(code)) {
+    return null;
+  }
+  return { code, rest: (match[2] ?? "").trim() };
+}
+
+export function isCloudflareOrHtmlErrorPage(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return false;
+  }
+
+  const status = extractLeadingHttpStatus(trimmed);
+  if (!status || status.code < 500) {
+    return false;
+  }
+
+  if (CLOUDFLARE_HTML_ERROR_CODES.has(status.code)) {
+    return true;
+  }
+
+  return (
+    status.code < 600 && HTML_ERROR_PREFIX_RE.test(status.rest) && /<\/html>/i.test(status.rest)
+  );
+}
+
+export function isTransientHttpError(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return false;
+  }
+  const status = extractLeadingHttpStatus(trimmed);
+  if (!status) {
+    return false;
+  }
+  return TRANSIENT_HTTP_ERROR_CODES.has(status.code);
+}
 
 function stripFinalTagsFromText(text: string): string {
   if (!text) {
@@ -121,6 +178,9 @@ function collapseConsecutiveDuplicateBlocks(text: string): string {
 }
 
 function isLikelyHttpErrorText(raw: string): boolean {
+  if (isCloudflareOrHtmlErrorPage(raw)) {
+    return true;
+  }
   const match = raw.match(HTTP_STATUS_PREFIX_RE);
   if (!match) {
     return false;
@@ -287,6 +347,11 @@ export function formatRawAssistantErrorForUi(raw?: string): string {
     return "LLM request failed with an unknown error.";
   }
 
+  const leadingStatus = extractLeadingHttpStatus(trimmed);
+  if (leadingStatus && isCloudflareOrHtmlErrorPage(trimmed)) {
+    return `The AI service is temporarily unavailable (HTTP ${leadingStatus.code}). Please try again in a moment.`;
+  }
+
   const httpMatch = trimmed.match(HTTP_STATUS_PREFIX_RE);
   if (httpMatch) {
     const rest = httpMatch[2].trim();
@@ -336,7 +401,7 @@ export function formatAssistantErrorText(
   if (isContextOverflowError(raw)) {
     return (
       "Context overflow: prompt too large for the model. " +
-      "Try again with less input or a larger-context model."
+      "Try /reset (or /new) to start a fresh session, or use a larger-context model."
     );
   }
 
@@ -392,7 +457,7 @@ export function sanitizeUserFacingText(text: string): string {
   if (isContextOverflowError(trimmed)) {
     return (
       "Context overflow: prompt too large for the model. " +
-      "Try again with less input or a larger-context model."
+      "Try /reset (or /new) to start a fresh session, or use a larger-context model."
     );
   }
 
@@ -434,11 +499,12 @@ const ERROR_PATTERNS = {
   overloaded: [/overloaded_error|"type"\s*:\s*"overloaded_error"/i, "overloaded"],
   timeout: ["timeout", "timed out", "deadline exceeded", "context deadline exceeded"],
   billing: [
-    /\b402\b/,
+    /["']?(?:status|code)["']?\s*[:=]\s*402\b|\bhttp\s*402\b|\berror(?:\s+code)?\s*[:=]?\s*402\b|\b(?:got|returned|received)\s+(?:a\s+)?402\b|^\s*402\s+payment/i,
     "payment required",
     "insufficient credits",
     "credit balance",
     "plans & billing",
+    "insufficient balance",
   ],
   auth: [
     /invalid[_ ]?api[_ ]?key/,
@@ -493,16 +559,8 @@ export function isBillingErrorMessage(raw: string): boolean {
   if (!value) {
     return false;
   }
-  if (matchesErrorPatterns(value, ERROR_PATTERNS.billing)) {
-    return true;
-  }
-  return (
-    value.includes("billing") &&
-    (value.includes("upgrade") ||
-      value.includes("credits") ||
-      value.includes("payment") ||
-      value.includes("plan"))
-  );
+
+  return matchesErrorPatterns(value, ERROR_PATTERNS.billing);
 }
 
 export function isBillingAssistantError(msg: AssistantMessage | undefined): boolean {
@@ -561,6 +619,10 @@ export function isAuthAssistantError(msg: AssistantMessage | undefined): boolean
 export function classifyFailoverReason(raw: string): FailoverReason | null {
   if (isImageDimensionErrorMessage(raw)) {
     return null;
+  }
+  if (isTransientHttpError(raw)) {
+    // Treat transient 5xx provider failures as retryable transport issues.
+    return "timeout";
   }
   if (isRateLimitErrorMessage(raw)) {
     return "rate_limit";

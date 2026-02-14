@@ -21,6 +21,10 @@ vi.mock("../config/config.js", async (importOriginal) => {
   };
 });
 
+vi.mock("./tools/agent-step.js", () => ({
+  readLatestAssistantReply: vi.fn(async () => "subagent output"),
+}));
+
 import "./test-helpers/fast-core-tools.js";
 import { createcrocbotTools } from "./crocbot-tools.js";
 import { resetSubagentRegistryForTests } from "./subagent-registry.js";

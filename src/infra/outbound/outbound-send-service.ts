@@ -4,6 +4,7 @@ import type { ChannelId, ChannelThreadingToolContext } from "../../channels/plug
 import type { crocbotConfig } from "../../config/config.js";
 import { appendAssistantMessageToSessionTranscript } from "../../config/sessions.js";
 import type { GatewayClientMode, GatewayClientName } from "../../utils/message-channel.js";
+import { throwIfAborted } from "./abort.js";
 import type { OutboundSendDeps } from "./deliver.js";
 import type { MessagePollResult, MessageSendResult } from "./message.js";
 import { sendMessage, sendPoll } from "./message.js";
@@ -57,14 +58,6 @@ function extractToolPayload(result: AgentToolResult<unknown>): unknown {
     }
   }
   return result.content ?? result;
-}
-
-function throwIfAborted(abortSignal?: AbortSignal): void {
-  if (abortSignal?.aborted) {
-    const err = new Error("Message send aborted");
-    err.name = "AbortError";
-    throw err;
-  }
 }
 
 export async function executeSendAction(params: {

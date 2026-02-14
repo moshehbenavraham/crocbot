@@ -133,6 +133,43 @@ function ensureDir(filePath: string) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+/**
+ * Coerce bare string allowlist entries into proper objects.
+ * When a string like "ls" is spread via `{ ...entry }`, it produces `{"0":"l","1":"s"}`.
+ * This function normalises those entries to `{ pattern: "ls" }` and drops malformed ones.
+ */
+function coerceAllowlistEntries(allowlist: unknown): ExecAllowlistEntry[] | undefined {
+  if (!Array.isArray(allowlist) || allowlist.length === 0) {
+    return undefined;
+  }
+  let changed = false;
+  const result: ExecAllowlistEntry[] = [];
+  for (const item of allowlist) {
+    if (typeof item === "string") {
+      const trimmed = item.trim();
+      if (trimmed) {
+        result.push({ pattern: trimmed });
+        changed = true;
+      } else {
+        changed = true; // dropped empty string
+      }
+    } else if (item != null && typeof item === "object" && !Array.isArray(item)) {
+      const pattern = (item as Record<string, unknown>).pattern;
+      if (typeof pattern === "string" && pattern.trim()) {
+        result.push(item as ExecAllowlistEntry);
+      } else {
+        changed = true; // dropped object with missing/invalid pattern
+      }
+    } else {
+      changed = true; // dropped non-string, non-object entry
+    }
+  }
+  if (result.length === 0) {
+    return undefined;
+  }
+  return changed ? result : (allowlist as ExecAllowlistEntry[]);
+}
+
 function ensureAllowlistIds(
   allowlist: ExecAllowlistEntry[] | undefined,
 ): ExecAllowlistEntry[] | undefined {
@@ -161,7 +198,8 @@ export function normalizeExecApprovals(file: ExecApprovalsFile): ExecApprovalsFi
     delete agents.default;
   }
   for (const [key, agent] of Object.entries(agents)) {
-    const allowlist = ensureAllowlistIds(agent.allowlist);
+    const coerced = coerceAllowlistEntries(agent.allowlist);
+    const allowlist = ensureAllowlistIds(coerced);
     if (allowlist !== agent.allowlist) {
       agents[key] = { ...agent, allowlist };
     }

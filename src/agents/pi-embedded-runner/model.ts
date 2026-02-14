@@ -8,6 +8,89 @@ import { DEFAULT_CONTEXT_TOKENS } from "../defaults.js";
 import { normalizeModelCompat } from "../model-compat.js";
 import { normalizeProviderId } from "../model-selection.js";
 
+// pi-ai's built-in Anthropic catalog can lag behind crocbot's defaults/docs.
+// Add forward-compat fallbacks for known-new IDs by cloning an older template model.
+const ANTHROPIC_OPUS_46_MODEL_ID = "claude-opus-4-6";
+const ANTHROPIC_OPUS_46_DOT_MODEL_ID = "claude-opus-4.6";
+const ANTHROPIC_OPUS_TEMPLATE_MODEL_IDS = ["claude-opus-4-5", "claude-opus-4.5"] as const;
+
+function resolveAnthropicOpus46ForwardCompatModel(
+  provider: string,
+  modelId: string,
+  modelRegistry: ReturnType<typeof discoverModels>,
+): Model<Api> | undefined {
+  const normalizedProvider = normalizeProviderId(provider);
+  if (normalizedProvider !== "anthropic") {
+    return undefined;
+  }
+
+  const trimmedModelId = modelId.trim();
+  const lower = trimmedModelId.toLowerCase();
+  const isOpus46 =
+    lower === ANTHROPIC_OPUS_46_MODEL_ID ||
+    lower === ANTHROPIC_OPUS_46_DOT_MODEL_ID ||
+    lower.startsWith(`${ANTHROPIC_OPUS_46_MODEL_ID}-`) ||
+    lower.startsWith(`${ANTHROPIC_OPUS_46_DOT_MODEL_ID}-`);
+  if (!isOpus46) {
+    return undefined;
+  }
+
+  const templateIds: string[] = [];
+  if (lower.startsWith(ANTHROPIC_OPUS_46_MODEL_ID)) {
+    templateIds.push(lower.replace(ANTHROPIC_OPUS_46_MODEL_ID, "claude-opus-4-5"));
+  }
+  if (lower.startsWith(ANTHROPIC_OPUS_46_DOT_MODEL_ID)) {
+    templateIds.push(lower.replace(ANTHROPIC_OPUS_46_DOT_MODEL_ID, "claude-opus-4.5"));
+  }
+  templateIds.push(...ANTHROPIC_OPUS_TEMPLATE_MODEL_IDS);
+
+  for (const templateId of [...new Set(templateIds)].filter(Boolean)) {
+    const template = modelRegistry.find(normalizedProvider, templateId) as Model<Api> | null;
+    if (!template) {
+      continue;
+    }
+    return normalizeModelCompat({
+      ...template,
+      id: trimmedModelId,
+      name: trimmedModelId,
+    } as Model<Api>);
+  }
+
+  return undefined;
+}
+
+// Google Antigravity forward-compat: resolve Opus 4.6 model IDs by cloning from 4.5 template.
+const ANTIGRAVITY_OPUS_46_STEMS = ["claude-opus-4-6", "claude-opus-4.6"] as const;
+const ANTIGRAVITY_OPUS_45_TEMPLATES = ["claude-opus-4-5-thinking", "claude-opus-4-5"] as const;
+
+function resolveAntigravityOpus46ForwardCompatModel(
+  provider: string,
+  modelId: string,
+  modelRegistry: ReturnType<typeof discoverModels>,
+): Model<Api> | undefined {
+  if (normalizeProviderId(provider) !== "google-antigravity") {
+    return undefined;
+  }
+  const lower = modelId.trim().toLowerCase();
+  const isOpus46 = ANTIGRAVITY_OPUS_46_STEMS.some(
+    (stem) => lower === stem || lower.startsWith(`${stem}-`),
+  );
+  if (!isOpus46) {
+    return undefined;
+  }
+  for (const templateId of ANTIGRAVITY_OPUS_45_TEMPLATES) {
+    const template = modelRegistry.find("google-antigravity", templateId) as Model<Api> | null;
+    if (template) {
+      return normalizeModelCompat({
+        ...template,
+        id: modelId.trim(),
+        name: modelId.trim(),
+      } as Model<Api>);
+    }
+  }
+  return undefined;
+}
+
 type InlineModelEntry = ModelDefinitionConfig & { provider: string };
 
 export function buildInlineProviderModels(
@@ -71,22 +154,21 @@ export function resolveModel(
         modelRegistry,
       };
     }
-    // Supplemental Anthropic models not yet in the SDK catalog.
-    // This fallback is bypassed once the SDK includes the model natively.
-    if (provider === "anthropic" && modelId === "claude-opus-4-6") {
-      const supplemental: Model<Api> = normalizeModelCompat({
-        id: "claude-opus-4-6",
-        name: "Claude Opus 4.6",
-        api: "anthropic-messages",
-        provider: "anthropic",
-        baseUrl: "https://api.anthropic.com",
-        reasoning: true,
-        input: ["text", "image"],
-        cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
-        contextWindow: 200_000,
-        maxTokens: 64_000,
-      } as Model<Api>);
-      return { model: supplemental, authStorage, modelRegistry };
+    const anthropicForwardCompat = resolveAnthropicOpus46ForwardCompatModel(
+      provider,
+      modelId,
+      modelRegistry,
+    );
+    if (anthropicForwardCompat) {
+      return { model: anthropicForwardCompat, authStorage, modelRegistry };
+    }
+    const antigravityForwardCompat = resolveAntigravityOpus46ForwardCompatModel(
+      provider,
+      modelId,
+      modelRegistry,
+    );
+    if (antigravityForwardCompat) {
+      return { model: antigravityForwardCompat, authStorage, modelRegistry };
     }
     const providerCfg = providers[provider];
     if (providerCfg || modelId.startsWith("mock-")) {

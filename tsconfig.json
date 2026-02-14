@@ -5,7 +5,6 @@
     "moduleResolution": "NodeNext",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,15 +16,20 @@
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "*": ["./*"],
+      "crocbot/plugin-sdk": ["./src/plugin-sdk/index.ts"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "extensions/**/*"],
   "exclude": [
     "node_modules",
     "dist",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/test-helpers.ts",
-    "src/**/test-helpers.*.ts"
+    "src/**/test-helpers.*.ts",
+    "extensions/**/*.test.ts"
   ]
 }

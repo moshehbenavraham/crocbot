@@ -1,6 +1,8 @@
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { crocbotConfig } from "./types.js";
+import { expandHomePrefix, resolveRequiredHomeDir } from "../infra/home-dir.js";
 
 /**
  * Nix mode detection: When CROCBOT_NIX_MODE=1, the gateway is running under Nix.
@@ -18,6 +20,11 @@ export const isNixMode = resolveIsNixMode();
 const LEGACY_STATE_DIRNAME = ".crocbot";
 const NEW_STATE_DIRNAME = ".crocbot";
 const CONFIG_FILENAME = "crocbot.json";
+
+/** Build a homedir thunk that respects CROCBOT_HOME for the given env. */
+function envHomedir(env: NodeJS.ProcessEnv): () => string {
+  return () => resolveRequiredHomeDir(env, os.homedir);
+}
 
 function legacyStateDir(homedir: () => string = os.homedir): string {
   return path.join(homedir(), LEGACY_STATE_DIRNAME);
@@ -38,18 +45,35 @@ export function resolveStateDir(
 ): string {
   const override = env.crocbot_STATE_DIR?.trim() || env.CROCBOT_STATE_DIR?.trim();
   if (override) {
-    return resolveUserPath(override);
+    return resolveUserPath(override, env, homedir);
   }
-  return legacyStateDir(homedir);
+  const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
+  const newDir = newStateDir(effectiveHomedir);
+  if (fs.existsSync(newDir)) {
+    return newDir;
+  }
+  const legacy = legacyStateDir(effectiveHomedir);
+  if (fs.existsSync(legacy)) {
+    return legacy;
+  }
+  return newDir;
 }
 
-function resolveUserPath(input: string): string {
+function resolveUserPath(
+  input: string,
+  env: NodeJS.ProcessEnv = process.env,
+  homedir: () => string = os.homedir,
+): string {
   const trimmed = input.trim();
   if (!trimmed) {
     return trimmed;
   }
   if (trimmed.startsWith("~")) {
-    const expanded = trimmed.replace(/^~(?=$|[\\/])/, os.homedir());
+    const expanded = expandHomePrefix(trimmed, {
+      home: resolveRequiredHomeDir(env, homedir),
+      env,
+      homedir,
+    });
     return path.resolve(expanded);
   }
   return path.resolve(trimmed);
@@ -68,7 +92,7 @@ export function resolveConfigPath(
 ): string {
   const override = env.crocbot_CONFIG_PATH?.trim() || env.CROCBOT_CONFIG_PATH?.trim();
   if (override) {
-    return resolveUserPath(override);
+    return resolveUserPath(override, env);
   }
   return path.join(stateDir, CONFIG_FILENAME);
 }
@@ -85,21 +109,24 @@ export function resolveDefaultConfigCandidates(
 ): string[] {
   const explicit = env.crocbot_CONFIG_PATH?.trim() || env.CROCBOT_CONFIG_PATH?.trim();
   if (explicit) {
-    return [resolveUserPath(explicit)];
+    return [resolveUserPath(explicit, env, homedir)];
   }
 
+  const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
   const candidates: string[] = [];
   const crocbotStateDir = env.crocbot_STATE_DIR?.trim();
   if (crocbotStateDir) {
-    candidates.push(path.join(resolveUserPath(crocbotStateDir), CONFIG_FILENAME));
+    candidates.push(path.join(resolveUserPath(crocbotStateDir, env, homedir), CONFIG_FILENAME));
   }
   const legacyStateDirOverride = env.CROCBOT_STATE_DIR?.trim();
   if (legacyStateDirOverride) {
-    candidates.push(path.join(resolveUserPath(legacyStateDirOverride), CONFIG_FILENAME));
+    candidates.push(
+      path.join(resolveUserPath(legacyStateDirOverride, env, homedir), CONFIG_FILENAME),
+    );
   }
 
-  candidates.push(path.join(newStateDir(homedir), CONFIG_FILENAME));
-  candidates.push(path.join(legacyStateDir(homedir), CONFIG_FILENAME));
+  candidates.push(path.join(newStateDir(effectiveHomedir), CONFIG_FILENAME));
+  candidates.push(path.join(legacyStateDir(effectiveHomedir), CONFIG_FILENAME));
   return candidates;
 }
 
@@ -132,7 +159,7 @@ export function resolveOAuthDir(
 ): string {
   const override = env.CROCBOT_OAUTH_DIR?.trim();
   if (override) {
-    return resolveUserPath(override);
+    return resolveUserPath(override, env);
   }
   return path.join(stateDir, "credentials");
 }

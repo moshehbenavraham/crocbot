@@ -4,7 +4,7 @@ import type { ChannelAccountSnapshot } from "../../channels/plugins/types.js";
 import { withProgress } from "../../cli/progress.js";
 import { type crocbotConfig, readConfigFileSnapshot } from "../../config/config.js";
 import { callGateway } from "../../gateway/call.js";
-import { formatAge } from "../../infra/channel-summary.js";
+import { formatTimeAgo } from "../../infra/format-time/format-relative.js";
 import { collectChannelStatusIssues } from "../../infra/channels-status-issues.js";
 import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";
 import { formatDocsLink } from "../../terminal/links.js";
@@ -48,10 +48,10 @@ export function formatGatewayChannelsStatusLines(payload: Record<string, unknown
           ? account.lastOutboundAt
           : null;
       if (inboundAt) {
-        bits.push(`in:${formatAge(Date.now() - inboundAt)}`);
+        bits.push(`in:${formatTimeAgo(Date.now() - inboundAt)}`);
       }
       if (outboundAt) {
-        bits.push(`out:${formatAge(Date.now() - outboundAt)}`);
+        bits.push(`out:${formatTimeAgo(Date.now() - outboundAt)}`);
       }
       if (typeof account.mode === "string" && account.mode.length > 0) {
         bits.push(`mode:${account.mode}`);

@@ -29,7 +29,7 @@ describe("resolveOutboundSessionRoute", () => {
       target: "@alice",
     });
 
-    expect(route?.sessionKey).toBe("agent:main:telegram:dm:@alice");
+    expect(route?.sessionKey).toBe("agent:main:telegram:direct:@alice");
     expect(route?.chatType).toBe("direct");
   });
 
@@ -42,7 +42,7 @@ describe("resolveOutboundSessionRoute", () => {
       target: "123456",
     });
 
-    expect(route?.sessionKey).toBe("agent:main:zalouser:dm:123456");
+    expect(route?.sessionKey).toBe("agent:main:zalouser:direct:123456");
     expect(route?.chatType).toBe("direct");
   });
 });

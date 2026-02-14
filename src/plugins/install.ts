@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { scanDirectoryWithSummary } from "../security/skill-scanner.js";
 import { CONFIG_DIR, resolveUserPath } from "../utils.js";
 import {
   extractArchive,
@@ -190,6 +191,31 @@ async function installPluginFromPackageDir(params: {
 
   if (backupDir) {
     await fs.rm(backupDir, { recursive: true, force: true }).catch(() => undefined);
+  }
+
+  // Scan plugin source for dangerous code patterns (warn-only; never blocks install)
+  try {
+    const forcedScanEntries = extensions.map((e) => path.resolve(targetDir, e));
+    const scanSummary = await scanDirectoryWithSummary(targetDir, {
+      includeFiles: forcedScanEntries,
+    });
+    if (scanSummary.critical > 0) {
+      const criticalDetails = scanSummary.findings
+        .filter((f) => f.severity === "critical")
+        .map((f) => `[${f.ruleId}] ${f.message} (${path.relative(targetDir, f.file)}:${f.line})`)
+        .join("; ");
+      logger.warn?.(
+        `WARNING: Plugin "${pluginId}" contains dangerous code patterns: ${criticalDetails}`,
+      );
+    } else if (scanSummary.warn > 0) {
+      logger.warn?.(
+        `Plugin "${pluginId}" has ${scanSummary.warn} suspicious code pattern(s). Run "crocbot security audit --deep" for details.`,
+      );
+    }
+  } catch (err) {
+    logger.warn?.(
+      `Plugin "${pluginId}" code safety scan failed (${String(err)}). Installation continues.`,
+    );
   }
 
   return {

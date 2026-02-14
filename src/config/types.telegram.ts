@@ -144,6 +144,8 @@ export type TelegramTopicConfig = {
   allowFrom?: Array<string | number>;
   /** Optional system prompt snippet for this topic. */
   systemPrompt?: string;
+  /** Override group policy for this topic. */
+  groupPolicy?: GroupPolicy;
 };
 
 export type TelegramGroupConfig = {
@@ -161,6 +163,8 @@ export type TelegramGroupConfig = {
   allowFrom?: Array<string | number>;
   /** Optional system prompt snippet for this group. */
   systemPrompt?: string;
+  /** Override group policy for this group. */
+  groupPolicy?: GroupPolicy;
 };
 
 export type TelegramConfig = {

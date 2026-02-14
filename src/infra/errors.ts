@@ -1,5 +1,13 @@
 import { SecretsRegistry } from "./secrets/registry.js";
 
+export function isErrno(err: unknown): err is NodeJS.ErrnoException {
+  return err instanceof Error && "code" in err;
+}
+
+export function hasErrnoCode(err: unknown, code: string): boolean {
+  return isErrno(err) && err.code === code;
+}
+
 export function extractErrorCode(err: unknown): string | undefined {
   if (!err || typeof err !== "object") {
     return undefined;

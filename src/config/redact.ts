@@ -64,10 +64,31 @@ const SENSITIVE_KEY_EXACT: Set<string> = new Set([
 const _SENSITIVE_NESTED_KEYS: Set<string> = new Set(["auth", "remote", "tls"]);
 
 /**
+ * Non-sensitive field names that happen to match sensitive patterns.
+ * These are explicitly excluded from redaction.
+ */
+const SENSITIVE_KEY_WHITELIST = new Set([
+  "maxtokens",
+  "maxoutputtokens",
+  "maxinputtokens",
+  "maxcompletiontokens",
+  "contexttokens",
+  "totaltokens",
+  "tokencount",
+  "tokenlimit",
+  "tokenbudget",
+]);
+
+/**
  * Determines if a key name indicates a sensitive value.
  */
 function isSensitiveKey(key: string): boolean {
-  // Check exact matches first
+  // Check whitelist first — these match sensitive patterns but are not secrets
+  if (SENSITIVE_KEY_WHITELIST.has(key.toLowerCase())) {
+    return false;
+  }
+
+  // Check exact matches
   if (SENSITIVE_KEY_EXACT.has(key)) {
     return true;
   }

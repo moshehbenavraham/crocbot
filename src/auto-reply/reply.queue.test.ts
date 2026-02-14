@@ -109,7 +109,6 @@ describe("queue followups", () => {
         p.includes("[Queued messages while agent was busy]"),
       );
       expect(queuedPrompt).toBeTruthy();
-      expect(queuedPrompt).toContain("[message_id: m-1]");
     });
   });
 

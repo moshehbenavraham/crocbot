@@ -1,5 +1,6 @@
 import { afterEach, expect, test } from "vitest";
 
+import { sleep } from "../utils.js";
 import { createExecTool } from "./bash-tools.exec";
 import {
   getFinishedSession,
@@ -7,8 +8,6 @@ import {
   resetProcessRegistryForTests,
 } from "./bash-process-registry";
 import { killProcessTree } from "./shell-utils";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 afterEach(() => {
   resetProcessRegistryForTests();

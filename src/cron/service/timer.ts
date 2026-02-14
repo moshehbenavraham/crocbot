@@ -1,16 +1,19 @@
 import type { HeartbeatRunResult } from "../../infra/heartbeat-wake.js";
 import type { CronJob } from "../types.js";
+import type { CronEvent, CronServiceState } from "./state.js";
+import { DEFAULT_AGENT_ID } from "../../routing/session-key.js";
+import { sweepCronRunSessions } from "../session-reaper.js";
 import {
   computeJobNextRunAtMs,
   nextWakeAtMs,
-  recomputeNextRuns,
+  recomputeNextRunsForMaintenance,
   resolveJobPayloadTextForMain,
 } from "./jobs.js";
 import { locked } from "./locked.js";
-import type { CronEvent, CronServiceState } from "./state.js";
 import { ensureLoaded, persist } from "./store.js";
 
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
+const MAX_TIMER_DELAY_MS = 60_000;
 const MAX_CLOCK_DRIFT_MS = 5 * 60 * 1000; // 5 minutes - threshold for clock jump detection
 
 // Module-level state for clock jump detection
@@ -52,21 +55,21 @@ export function armTimer(state: CronServiceState) {
     return;
   }
   const delay = Math.max(nextAt - state.deps.nowMs(), 0);
-  // Avoid TimeoutOverflowWarning when a job is far in the future.
-  const clampedDelay = Math.min(delay, MAX_TIMEOUT_MS);
+  // Wake at least once a minute to avoid schedule drift and recover quickly
+  // when the process was paused or wall-clock time jumps.
+  const clampedDelay = Math.min(delay, MAX_TIMER_DELAY_MS);
   state.timer = setTimeout(() => {
     void onTimer(state).catch((err) => {
       state.deps.log.error({ err: String(err) }, "cron: timer tick failed");
     });
   }, clampedDelay);
-  state.timer.unref?.();
 }
 
 async function handleClockJump(state: CronServiceState) {
   state.deps.log.info({}, "cron: handling clock jump - recomputing schedules");
   await locked(state, async () => {
     await ensureLoaded(state);
-    recomputeNextRuns(state);
+    recomputeNextRunsForMaintenance(state);
     await persist(state);
     armTimer(state);
   });
@@ -74,6 +77,25 @@ async function handleClockJump(state: CronServiceState) {
 
 export async function onTimer(state: CronServiceState) {
   if (state.running) {
+    // Re-arm the timer so the scheduler keeps ticking even when a job is
+    // still executing.  Without this, a long-running job (e.g. an agentTurn
+    // exceeding MAX_TIMER_DELAY_MS) causes the clamped timer to fire while
+    // `running` is true.  The early return then leaves no timer set,
+    // silently killing the scheduler until the next gateway restart.
+    //
+    // We use MAX_TIMER_DELAY_MS as a fixed re-check interval to avoid a
+    // zero-delay hot-loop when past-due jobs are waiting for the current
+    // execution to finish.
+    if (state.timer) {
+      clearTimeout(state.timer);
+    }
+    state.timer = setTimeout(async () => {
+      try {
+        await onTimer(state);
+      } catch (err) {
+        state.deps.log.error({ err: String(err) }, "cron: timer tick failed");
+      }
+    }, MAX_TIMER_DELAY_MS);
     return;
   }
 
@@ -89,10 +111,11 @@ export async function onTimer(state: CronServiceState) {
         { lastTickMs, now, drift },
         "cron: timer detected clock drift, recomputing schedules",
       );
-      // Recompute schedules before running jobs
+      // Maintenance-only recompute: fill missing nextRunAtMs without
+      // overwriting past-due values (which would silently skip the run).
       await locked(state, async () => {
         await ensureLoaded(state);
-        recomputeNextRuns(state);
+        recomputeNextRunsForMaintenance(state);
         await persist(state);
       });
     }
@@ -105,10 +128,43 @@ export async function onTimer(state: CronServiceState) {
       await ensureLoaded(state);
       await runDueJobs(state);
       await persist(state);
-      armTimer(state);
     });
+    // Piggyback session reaper on timer tick (self-throttled to every 5 min).
+    const storePaths = new Set<string>();
+    if (state.deps.resolveSessionStorePath) {
+      const defaultAgentId = state.deps.defaultAgentId ?? DEFAULT_AGENT_ID;
+      if (state.store?.jobs?.length) {
+        for (const job of state.store.jobs) {
+          const agentId =
+            typeof job.agentId === "string" && job.agentId.trim() ? job.agentId : defaultAgentId;
+          storePaths.add(state.deps.resolveSessionStorePath(agentId));
+        }
+      } else {
+        storePaths.add(state.deps.resolveSessionStorePath(defaultAgentId));
+      }
+    } else if (state.deps.sessionStorePath) {
+      storePaths.add(state.deps.sessionStorePath);
+    }
+
+    if (storePaths.size > 0) {
+      const nowMs = state.deps.nowMs();
+      for (const storePath of storePaths) {
+        try {
+          await sweepCronRunSessions({
+            cronConfig: state.deps.cronConfig,
+            sessionStorePath: storePath,
+            nowMs,
+            log: state.deps.log,
+          });
+        } catch (err) {
+          state.deps.log.warn({ err: String(err), storePath }, "cron: session reaper sweep failed");
+        }
+      }
+    }
   } finally {
     state.running = false;
+    // Always re-arm so transient errors (e.g. ENOSPC) don't kill the scheduler.
+    armTimer(state);
   }
 }
 
@@ -237,7 +293,7 @@ export async function executeJob(
 
         let heartbeatResult: HeartbeatRunResult;
         for (;;) {
-          heartbeatResult = await state.deps.runHeartbeatOnce({ reason });
+          heartbeatResult = await state.deps.runHeartbeatOnce({ reason, agentId: job.agentId });
           if (
             heartbeatResult.status !== "skipped" ||
             heartbeatResult.reason !== "requests-in-flight"

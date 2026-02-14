@@ -20,6 +20,8 @@
  * ```
  */
 
+import { isPlainObject } from "../utils.js";
+
 // Pattern for valid uppercase env var names: starts with letter or underscore,
 // followed by letters, numbers, or underscores (all uppercase)
 const ENV_VAR_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
@@ -32,15 +34,6 @@ export class MissingEnvVarError extends Error {
     super(`Missing env var "${varName}" referenced at config path: ${configPath}`);
     this.name = "MissingEnvVarError";
   }
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.prototype.toString.call(value) === "[object Object]"
-  );
 }
 
 function substituteString(value: string, env: NodeJS.ProcessEnv, configPath: string): string {

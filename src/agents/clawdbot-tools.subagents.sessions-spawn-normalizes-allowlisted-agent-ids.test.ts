@@ -21,6 +21,10 @@ vi.mock("../config/config.js", async (importOriginal) => {
   };
 });
 
+vi.mock("./tools/agent-step.js", () => ({
+  readLatestAssistantReply: vi.fn(async () => "subagent output"),
+}));
+
 import { emitAgentEvent } from "../infra/agent-events.js";
 import "./test-helpers/fast-core-tools.js";
 import { createcrocbotTools } from "./crocbot-tools.js";
@@ -239,7 +243,7 @@ describe("crocbot-tools: subagents", () => {
       | undefined;
     expect(second?.sessionKey).toBe("discord:group:req");
     expect(second?.deliver).toBe(true);
-    expect(second?.message).toContain("background task");
+    expect(second?.message).toContain("subagent task");
 
     const sendCalls = calls.filter((c) => c.method === "send");
     expect(sendCalls.length).toBe(0);

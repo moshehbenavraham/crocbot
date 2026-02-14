@@ -16,6 +16,7 @@ export {
   parseApiErrorInfo,
   sanitizeUserFacingText,
   isBillingErrorMessage,
+  isCloudflareOrHtmlErrorPage,
   isCloudCodeAssistFormatError,
   isCompactionFailureError,
   isContextOverflowError,
@@ -27,6 +28,7 @@ export {
   isRawApiErrorPayload,
   isRateLimitAssistantError,
   isRateLimitErrorMessage,
+  isTransientHttpError,
   isTimeoutErrorMessage,
   parseImageDimensionError,
 } from "./pi-embedded-helpers/errors.js";

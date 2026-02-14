@@ -1,5 +1,7 @@
+import type { ChatType } from "../channels/chat-type.js";
 import { resolveDefaultAgentId } from "../agents/agent-scope.js";
 import type { crocbotConfig } from "../config/config.js";
+import { normalizeChatType } from "../channels/chat-type.js";
 import { listBindings } from "./bindings.js";
 import {
   buildAgentMainSessionKey,
@@ -10,10 +12,11 @@ import {
   sanitizeAgentId,
 } from "./session-key.js";
 
-export type RoutePeerKind = "dm" | "group" | "channel";
+/** @deprecated Use ChatType from channels/chat-type.js */
+export type RoutePeerKind = ChatType;
 
 export type RoutePeer = {
-  kind: RoutePeerKind;
+  kind: ChatType;
   id: string;
 };
 
@@ -22,6 +25,8 @@ export type ResolveAgentRouteInput = {
   channel: string;
   accountId?: string | null;
   peer?: RoutePeer | null;
+  /** Parent peer for threads — used for binding inheritance when peer doesn't match directly. */
+  parentPeer?: RoutePeer | null;
   guildId?: string | null;
   teamId?: string | null;
 };
@@ -37,6 +42,7 @@ export type ResolvedAgentRoute = {
   /** Match description for debugging/logging. */
   matchedBy:
     | "binding.peer"
+    | "binding.peer.parent"
     | "binding.guild"
     | "binding.team"
     | "binding.account"
@@ -73,6 +79,7 @@ function matchesAccountId(match: string | undefined, actual: string): boolean {
 export function buildAgentSessionKey(params: {
   agentId: string;
   channel: string;
+  accountId?: string | null;
   peer?: RoutePeer | null;
   /** DM session scope. */
   dmScope?: "main" | "per-peer" | "per-channel-peer";
@@ -84,7 +91,8 @@ export function buildAgentSessionKey(params: {
     agentId: params.agentId,
     mainKey: DEFAULT_MAIN_KEY,
     channel,
-    peerKind: peer?.kind ?? "dm",
+    accountId: params.accountId,
+    peerKind: peer?.kind ?? "direct",
     peerId: peer ? normalizeId(peer.id) || "unknown" : null,
     dmScope: params.dmScope,
     identityLinks: params.identityLinks,
@@ -132,7 +140,8 @@ function matchesPeer(
   if (!m) {
     return false;
   }
-  const kind = normalizeToken(m.kind);
+  // Backward compat: normalize "dm" to "direct" in config match rules
+  const kind = normalizeChatType(m.kind);
   const id = normalizeId(m.id);
   if (!kind || !id) {
     return false;
@@ -206,6 +215,17 @@ export function resolveAgentRoute(input: ResolveAgentRouteInput): ResolvedAgentR
     const peerMatch = bindings.find((b) => matchesPeer(b.match, peer));
     if (peerMatch) {
       return choose(peerMatch.agentId, "binding.peer");
+    }
+  }
+
+  // Thread parent inheritance: if peer (thread) didn't match, check parent peer binding
+  const parentPeer = input.parentPeer
+    ? { kind: input.parentPeer.kind, id: normalizeId(input.parentPeer.id) }
+    : null;
+  if (parentPeer && parentPeer.id) {
+    const parentPeerMatch = bindings.find((b) => matchesPeer(b.match, parentPeer));
+    if (parentPeerMatch) {
+      return choose(parentPeerMatch.agentId, "binding.peer.parent");
     }
   }
 

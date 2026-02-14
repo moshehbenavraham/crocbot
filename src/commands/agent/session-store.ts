@@ -2,7 +2,7 @@ import { setCliSessionId } from "../../agents/cli-session.js";
 import { lookupContextTokens } from "../../agents/context.js";
 import { DEFAULT_CONTEXT_TOKENS } from "../../agents/defaults.js";
 import { isCliProvider } from "../../agents/model-selection.js";
-import { hasNonzeroUsage } from "../../agents/usage.js";
+import { deriveSessionTotalTokens, hasNonzeroUsage } from "../../agents/usage.js";
 import type { crocbotConfig } from "../../config/config.js";
 import { type SessionEntry, updateSessionStore } from "../../config/sessions.js";
 
@@ -64,10 +64,9 @@ export async function updateSessionStoreAfterAgentRun(params: {
   if (hasNonzeroUsage(usage)) {
     const input = usage.input ?? 0;
     const output = usage.output ?? 0;
-    const promptTokens = input + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0);
     next.inputTokens = input;
     next.outputTokens = output;
-    next.totalTokens = promptTokens > 0 ? promptTokens : (usage.total ?? input);
+    next.totalTokens = deriveSessionTotalTokens({ usage, contextTokens }) ?? input;
   }
   sessionStore[sessionKey] = next;
   await updateSessionStore(storePath, (store) => {

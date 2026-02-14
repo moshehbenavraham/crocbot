@@ -9,17 +9,23 @@ import type { TlsOptions } from "node:tls";
 import type { WebSocketServer } from "ws";
 import { loadConfig } from "../config/config.js";
 import type { createSubsystemLogger } from "../logging/subsystem.js";
+import { authorizeGatewayConnect } from "./auth.js";
+import { sendUnauthorized } from "./http-common.js";
+import { getBearerToken } from "./http-utils.js";
 import {
   extractHookToken,
   getHookChannelError,
   type HookMessageChannel,
   type HooksConfigResolved,
+  getHookAgentPolicyError,
+  isHookAgentAllowed,
   normalizeAgentPayload,
   normalizeHookHeaders,
   normalizeWakePayload,
   readJsonBody,
   resolveHookChannel,
   resolveHookDeliver,
+  resolveHookTargetAgentId,
 } from "./hooks.js";
 import { applyHookMappings } from "./hooks-mapping.js";
 import { getMetrics, getMetricsContentType } from "../metrics/index.js";
@@ -36,6 +42,7 @@ type HookDispatchers = {
   dispatchAgentHook: (value: {
     message: string;
     name: string;
+    agentId?: string;
     wakeMode: "now" | "next-heartbeat";
     sessionKey: string;
     deliver: boolean;
@@ -127,7 +134,14 @@ export function createHooksRequestHandler(
         sendJson(res, 400, { ok: false, error: normalized.error });
         return true;
       }
-      const runId = dispatchAgentHook(normalized.value);
+      if (!isHookAgentAllowed(hooksConfig, normalized.value.agentId)) {
+        sendJson(res, 400, { ok: false, error: getHookAgentPolicyError() });
+        return true;
+      }
+      const runId = dispatchAgentHook({
+        ...normalized.value,
+        agentId: resolveHookTargetAgentId(hooksConfig, normalized.value.agentId),
+      });
       sendJson(res, 202, { ok: true, runId });
       return true;
     }
@@ -158,6 +172,10 @@ export function createHooksRequestHandler(
             sendJson(res, 200, { ok: true, mode: mapped.action.mode });
             return true;
           }
+          if (!isHookAgentAllowed(hooksConfig, mapped.action.agentId)) {
+            sendJson(res, 400, { ok: false, error: getHookAgentPolicyError() });
+            return true;
+          }
           const channel = resolveHookChannel(mapped.action.channel);
           if (!channel) {
             sendJson(res, 400, { ok: false, error: getHookChannelError() });
@@ -166,6 +184,7 @@ export function createHooksRequestHandler(
           const runId = dispatchAgentHook({
             message: mapped.action.message,
             name: mapped.action.name ?? "Hook",
+            agentId: resolveHookTargetAgentId(hooksConfig, mapped.action.agentId),
             wakeMode: mapped.action.wakeMode,
             sessionKey: mapped.action.sessionKey ?? "",
             deliver: resolveHookDeliver(mapped.action.deliver),
@@ -310,8 +329,26 @@ export function createGatewayHttpServer(opts: {
       ) {
         return;
       }
-      if (handlePluginRequest && (await handlePluginRequest(req, res))) {
-        return;
+      if (handlePluginRequest) {
+        // Channel HTTP endpoints are gateway-auth protected by default.
+        // Non-channel plugin routes remain plugin-owned and must enforce
+        // their own auth when exposing sensitive functionality.
+        if ((req.url ?? "").startsWith("/api/channels/")) {
+          const token = getBearerToken(req);
+          const authResult = await authorizeGatewayConnect({
+            auth: resolvedAuth,
+            connectAuth: token ? { token, password: token } : null,
+            req,
+            trustedProxies,
+          });
+          if (!authResult.ok) {
+            sendUnauthorized(res);
+            return;
+          }
+        }
+        if (await handlePluginRequest(req, res)) {
+          return;
+        }
       }
       if (openResponsesEnabled) {
         if (

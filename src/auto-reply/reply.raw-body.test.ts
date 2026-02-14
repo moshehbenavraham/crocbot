@@ -233,8 +233,8 @@ describe("RawBody directive parsing", () => {
       expect(text).toBe("ok");
       expect(runEmbeddedPiAgent).toHaveBeenCalledOnce();
       const prompt = vi.mocked(runEmbeddedPiAgent).mock.calls[0]?.[0]?.prompt ?? "";
-      expect(prompt).toContain("[Chat messages since your last reply - for context]");
-      expect(prompt).toContain("Peter: hello");
+      // With sender spoofing protection, history is no longer embedded as plaintext in the body.
+      // The clean RawBody text is used for the prompt via BodyForAgent fallback.
       expect(prompt).toContain("status please");
       expect(prompt).not.toContain("/think:high");
     });

@@ -4,7 +4,7 @@ import path from "node:path";
 import { discovercrocbotPlugins } from "../../plugins/discovery.js";
 import type { PluginOrigin } from "../../plugins/types.js";
 import type { crocbotPackageManifest } from "../../plugins/manifest.js";
-import { CONFIG_DIR, resolveUserPath } from "../../utils.js";
+import { CONFIG_DIR, isRecord, resolveUserPath } from "../../utils.js";
 import type { ChannelMeta } from "./types.js";
 
 export type ChannelUiMetaEntry = {
@@ -59,10 +59,6 @@ const DEFAULT_CATALOG_PATHS = [
 ];
 
 const ENV_CATALOG_PATHS = ["CROCBOT_PLUGIN_CATALOG_PATHS", "CROCBOT_MPM_CATALOG_PATHS"];
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value && typeof value === "object" && !Array.isArray(value));
-}
 
 function parseCatalogEntries(raw: unknown): ExternalCatalogEntry[] {
   if (Array.isArray(raw)) {

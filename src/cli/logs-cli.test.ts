@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { formatLogTimestamp } from "./logs-cli.js";
 
 const callGatewayFromCli = vi.fn();
 
@@ -81,5 +82,37 @@ describe("logs cli", () => {
     stderrSpy.mockRestore();
 
     expect(stderrWrites.join("")).toContain("output stdout closed");
+  });
+});
+
+describe("formatLogTimestamp", () => {
+  it("formats UTC timestamp in plain mode", () => {
+    const result = formatLogTimestamp("2026-01-15T10:30:00.000Z", "plain");
+    expect(result).toBe("2026-01-15T10:30:00.000Z");
+  });
+
+  it("formats UTC timestamp in pretty mode", () => {
+    const result = formatLogTimestamp("2026-01-15T10:30:00.000Z", "pretty");
+    expect(result).toBe("10:30:00");
+  });
+
+  it("formats local time in plain mode", () => {
+    const result = formatLogTimestamp("2026-01-15T10:30:00.000Z", "plain", true);
+    expect(result).not.toContain("Z");
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}$/);
+  });
+
+  it("formats local time in pretty mode", () => {
+    const result = formatLogTimestamp("2026-01-15T10:30:00.000Z", "pretty", true);
+    expect(result).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+  });
+
+  it("returns empty string for empty input", () => {
+    expect(formatLogTimestamp("")).toBe("");
+    expect(formatLogTimestamp(undefined)).toBe("");
+  });
+
+  it("preserves original value for invalid dates", () => {
+    expect(formatLogTimestamp("not-a-date")).toBe("not-a-date");
   });
 });

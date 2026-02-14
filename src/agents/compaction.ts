@@ -3,6 +3,7 @@ import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { estimateTokens, generateSummary } from "@mariozechner/pi-coding-agent";
 
 import { DEFAULT_CONTEXT_TOKENS } from "./defaults.js";
+import { repairToolUseResultPairing } from "./session-transcript-repair.js";
 
 export const BASE_CHUNK_RATIO = 0.4;
 export const MIN_CHUNK_RATIO = 0.15;
@@ -334,11 +335,21 @@ export function pruneHistoryForContextShare(params: {
       break;
     }
     const [dropped, ...rest] = chunks;
+    const flatRest = rest.flat();
+
+    // After dropping a chunk, repair tool_use/tool_result pairing to handle
+    // orphaned tool_results (whose tool_use was in the dropped chunk).
+    // repairToolUseResultPairing drops orphaned tool_results, preventing
+    // "unexpected tool_use_id" errors from Anthropic's API.
+    const repairReport = repairToolUseResultPairing(flatRest);
+    const repairedKept = repairReport.messages;
+    const orphanedCount = repairReport.droppedOrphanCount;
+
     droppedChunks += 1;
-    droppedMessages += dropped.length;
+    droppedMessages += dropped.length + orphanedCount;
     droppedTokens += estimateMessagesTokens(dropped);
     allDroppedMessages.push(...dropped);
-    keptMessages = rest.flat();
+    keptMessages = repairedKept;
   }
 
   return {

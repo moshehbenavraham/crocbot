@@ -8,7 +8,7 @@ import type {
   ChannelPlugin,
 } from "../../channels/plugins/types.js";
 import type { crocbotConfig } from "../../config/config.js";
-import { formatAge } from "./format.js";
+import { formatTimeAgo } from "./format.js";
 
 export type ChannelRow = {
   id: ChannelId;
@@ -440,7 +440,7 @@ export async function buildChannelsTable(
           extra.push(link.selfE164);
         }
         if (link.linked && link.authAgeMs != null && link.authAgeMs >= 0) {
-          extra.push(`auth ${formatAge(link.authAgeMs)}`);
+          extra.push(`auth ${formatTimeAgo(link.authAgeMs)}`);
         }
         if (accounts.length > 1 || plugin.meta.forceAccountBinding) {
           extra.push(`accounts ${accounts.length || 1}`);

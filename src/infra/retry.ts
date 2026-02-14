@@ -27,7 +27,7 @@ const DEFAULT_RETRY_CONFIG = {
   jitter: 0,
 };
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { sleep } from "../utils.js";
 
 const asFiniteNumber = (value: unknown): number | undefined =>
   typeof value === "number" && Number.isFinite(value) ? value : undefined;

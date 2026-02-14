@@ -18,6 +18,9 @@ import type { CronServiceState } from "./state.js";
 
 const STUCK_RUN_MS = 2 * 60 * 60 * 1000;
 
+/** Maximum consecutive schedule errors before auto-disabling a job. */
+const MAX_SCHEDULE_ERRORS = 3;
+
 export function assertSupportedJobSpec(job: Pick<CronJob, "sessionTarget" | "payload">) {
   if (job.sessionTarget === "main" && job.payload.kind !== "systemEvent") {
     throw new Error('main cron jobs require payload.kind="systemEvent"');
@@ -40,8 +43,10 @@ export function computeJobNextRunAtMs(job: CronJob, nowMs: number): number | und
     return undefined;
   }
   if (job.schedule.kind === "at") {
-    // One-shot jobs stay due until they successfully finish.
-    if (job.state.lastStatus === "ok" && job.state.lastRunAtMs) {
+    // Any terminal status (ok, error, skipped) means the job already
+    // ran at least once.  Don't re-fire it on restart — applyJobResult
+    // disables one-shot jobs, but guard here defensively (#13845).
+    if (job.state.lastStatus) {
       return undefined;
     }
     return job.schedule.atMs;
@@ -81,7 +86,67 @@ export function recomputeNextRuns(state: CronServiceState) {
       continue;
     }
 
-    job.state.nextRunAtMs = computeJobNextRunAtMs(job, now);
+    try {
+      const newNext = computeJobNextRunAtMs(job, now);
+      job.state.nextRunAtMs = newNext;
+      // Clear schedule error count on successful computation.
+      if (job.state.scheduleErrorCount) {
+        job.state.scheduleErrorCount = undefined;
+      }
+    } catch (err) {
+      const errorCount = (job.state.scheduleErrorCount ?? 0) + 1;
+      job.state.scheduleErrorCount = errorCount;
+      job.state.nextRunAtMs = undefined;
+      job.state.lastError = `schedule error: ${String(err)}`;
+
+      if (errorCount >= MAX_SCHEDULE_ERRORS) {
+        job.enabled = false;
+        state.deps.log.error(
+          { jobId: job.id, name: job.name, errorCount, err: String(err) },
+          "cron: auto-disabled job after repeated schedule errors",
+        );
+      } else {
+        state.deps.log.warn(
+          { jobId: job.id, name: job.name, errorCount, err: String(err) },
+          "cron: failed to compute next run for job (skipping)",
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Maintenance-only recompute: fills in missing nextRunAtMs and cleans up stale
+ * state, but never overwrites an existing nextRunAtMs.  This prevents a past-due
+ * job from being silently advanced to its next future occurrence when the timer
+ * fires with no due jobs (#13992).
+ */
+export function recomputeNextRunsForMaintenance(state: CronServiceState) {
+  if (!state.store) {
+    return;
+  }
+  const now = state.deps.nowMs();
+  for (const job of state.store.jobs) {
+    if (!job.state) {
+      job.state = {};
+    }
+    if (!job.enabled) {
+      job.state.nextRunAtMs = undefined;
+      job.state.runningAtMs = undefined;
+      continue;
+    }
+    const runningAt = job.state.runningAtMs;
+    if (typeof runningAt === "number" && now - runningAt > STUCK_RUN_MS) {
+      state.deps.log.warn(
+        { jobId: job.id, runningAtMs: runningAt },
+        "cron: clearing stuck running marker",
+      );
+      job.state.runningAtMs = undefined;
+    }
+    // Only fill in missing nextRunAtMs — never overwrite an existing value.
+    if (job.state.nextRunAtMs === undefined) {
+      job.state.nextRunAtMs = computeJobNextRunAtMs(job, now);
+    }
   }
 }
 

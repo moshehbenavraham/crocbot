@@ -1,5 +1,6 @@
+import { isRecord } from "../../../utils.js";
 import type { ChannelAccountSnapshot, ChannelStatusIssue } from "../types.js";
-import { appendMatchMetadata, asString, isRecord } from "./shared.js";
+import { appendMatchMetadata, asString } from "./shared.js";
 
 type TelegramAccountStatus = {
   accountId?: unknown;

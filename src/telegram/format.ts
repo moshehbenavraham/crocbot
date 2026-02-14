@@ -46,6 +46,7 @@ function renderTelegramHtml(ir: MarkdownIR): string {
       strikethrough: { open: "<s>", close: "</s>" },
       code: { open: "<code>", close: "</code>" },
       code_block: { open: "<pre><code>", close: "</code></pre>" },
+      spoiler: { open: "<tg-spoiler>", close: "</tg-spoiler>" },
     },
     escapeText: escapeHtml,
     buildLink: buildTelegramLink,
@@ -58,7 +59,8 @@ export function markdownToTelegramHtml(
 ): string {
   const ir = markdownToIR(markdown ?? "", {
     linkify: true,
-    headingStyle: "bold",
+    enableSpoilers: true,
+    headingStyle: "none",
     blockquotePrefix: "",
     tableMode: options.tableMode,
   });
@@ -83,7 +85,8 @@ export function markdownToTelegramChunks(
 ): TelegramFormattedChunk[] {
   const ir = markdownToIR(markdown ?? "", {
     linkify: true,
-    headingStyle: "bold",
+    enableSpoilers: true,
+    headingStyle: "none",
     blockquotePrefix: "",
     tableMode: options.tableMode,
   });

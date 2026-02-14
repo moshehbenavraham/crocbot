@@ -4,6 +4,7 @@ export const loggingState = {
   cachedConsoleSettings: null as unknown,
   overrideSettings: null as unknown,
   consolePatched: false,
+  streamErrorHandlersInstalled: false,
   forceConsoleToStderr: false,
   consoleTimestampPrefix: false,
   consoleSubsystemFilter: null as string[] | null,

@@ -3,6 +3,7 @@ import type { SkillCommandSpec } from "../agents/skills.js";
 import { getChatCommands, getNativeCommandSurfaces } from "./commands-registry.data.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { resolveConfiguredModelRef } from "../agents/model-selection.js";
+import { escapeRegExp } from "../utils.js";
 import type {
   ChatCommandDefinition,
   CommandArgChoiceContext,
@@ -66,10 +67,6 @@ function getTextAliasMap(): Map<string, TextAliasSpec> {
   cachedTextAliasMap = map;
   cachedTextAliasCommands = commands;
   return map;
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function buildSkillCommandDefinitions(skillCommands?: SkillCommandSpec[]): ChatCommandDefinition[] {

@@ -1,6 +1,7 @@
 import fsSync from "node:fs";
 
 import type { BrowserConfig, BrowserProfileConfig, crocbotConfig } from "../config/config.js";
+import { isLoopbackHost } from "../gateway/net.js";
 import {
   deriveDefaultBrowserCdpPortRange,
   deriveDefaultBrowserControlPort,
@@ -54,19 +55,6 @@ function isDockerContainer(): boolean {
   } catch {
     return false;
   }
-}
-
-function isLoopbackHost(host: string) {
-  const h = host.trim().toLowerCase();
-  return (
-    h === "localhost" ||
-    h === "127.0.0.1" ||
-    h === "0.0.0.0" ||
-    h === "[::1]" ||
-    h === "::1" ||
-    h === "[::]" ||
-    h === "::"
-  );
 }
 
 function normalizeHexColor(raw: string | undefined) {

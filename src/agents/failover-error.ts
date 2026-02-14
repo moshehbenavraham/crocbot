@@ -157,6 +157,9 @@ export function resolveFailoverReasonFromError(err: unknown): FailoverReason | n
   if (status === 401 || status === 403) {
     return "auth";
   }
+  if (status === 400) {
+    return "format";
+  }
   if (status === 408) {
     return "timeout";
   }

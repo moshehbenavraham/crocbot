@@ -53,6 +53,7 @@ tmp
 # Large app trees not needed for CLI build
 apps/
 Peekaboo/
+Swabble/
 Core/
 Users/
 vendor/

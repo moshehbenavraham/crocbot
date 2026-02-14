@@ -140,7 +140,7 @@ describe("applyMediaUnderstanding", () => {
       Body: "<media:audio>",
       MediaUrl: "https://example.com/note.ogg",
       MediaType: "audio/ogg",
-      ChatType: "dm",
+      ChatType: "direct",
     };
     const cfg: crocbotConfig = {
       tools: {

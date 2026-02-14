@@ -3,11 +3,8 @@ import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
 import type { crocbotConfig } from "../../config/config.js";
 import { recordSessionMetaFromInbound, resolveStorePath } from "../../config/sessions.js";
-import {
-  buildAgentSessionKey,
-  type RoutePeer,
-  type RoutePeerKind,
-} from "../../routing/resolve-route.js";
+import type { ChatType } from "../../channels/chat-type.js";
+import { buildAgentSessionKey, type RoutePeer } from "../../routing/resolve-route.js";
 import { resolveThreadSessionKeys } from "../../routing/session-key.js";
 import { buildTelegramGroupPeerId } from "../../telegram/bot/helpers.js";
 import { resolveTelegramTargetChatType } from "../../telegram/inline-buttons.js";
@@ -66,10 +63,10 @@ function stripKindPrefix(raw: string): string {
 function inferPeerKind(params: {
   channel: ChannelId;
   resolvedTarget?: ResolvedMessagingTarget;
-}): RoutePeerKind {
+}): ChatType {
   const resolvedKind = params.resolvedTarget?.kind;
   if (resolvedKind === "user") {
-    return "dm";
+    return "direct";
   }
   if (resolvedKind === "channel") {
     return "channel";
@@ -84,7 +81,7 @@ function inferPeerKind(params: {
     }
     return "group";
   }
-  return "dm";
+  return "direct";
 }
 
 function buildBaseSessionKey(params: {
@@ -124,7 +121,7 @@ function resolveTelegramSession(
       params.resolvedTarget.kind !== "user");
   const peerId = isGroup ? buildTelegramGroupPeerId(chatId, resolvedThreadId) : chatId;
   const peer: RoutePeer = {
-    kind: isGroup ? "group" : "dm",
+    kind: isGroup ? "group" : "direct",
     id: peerId,
   };
   const baseSessionKey = buildBaseSessionKey({
@@ -154,7 +151,7 @@ function resolveMatrixSession(
   if (!rawId) {
     return null;
   }
-  const peer: RoutePeer = { kind: isUser ? "dm" : "channel", id: rawId };
+  const peer: RoutePeer = { kind: isUser ? "direct" : "channel", id: rawId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -188,7 +185,7 @@ function resolveMattermostSession(
   if (!rawId) {
     return null;
   }
-  const peer: RoutePeer = { kind: isUser ? "dm" : "channel", id: rawId };
+  const peer: RoutePeer = { kind: isUser ? "direct" : "channel", id: rawId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -251,7 +248,7 @@ function resolveZaloSession(
   }
   const isGroup = trimmed.toLowerCase().startsWith("group:");
   const peerId = stripKindPrefix(trimmed);
-  const peer: RoutePeer = { kind: isGroup ? "group" : "dm", id: peerId };
+  const peer: RoutePeer = { kind: isGroup ? "group" : "direct", id: peerId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -280,7 +277,7 @@ function resolveZalouserSession(
   const isGroup = trimmed.toLowerCase().startsWith("group:");
   const peerId = stripKindPrefix(trimmed);
   // Keep DM vs group aligned with inbound sessions for Zalo Personal.
-  const peer: RoutePeer = { kind: isGroup ? "group" : "dm", id: peerId };
+  const peer: RoutePeer = { kind: isGroup ? "group" : "direct", id: peerId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -304,7 +301,7 @@ function resolveNostrSession(
   if (!trimmed) {
     return null;
   }
-  const peer: RoutePeer = { kind: "dm", id: trimmed };
+  const peer: RoutePeer = { kind: "direct", id: trimmed };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -366,7 +363,7 @@ function resolveTlonSession(
     peerId = normalizeTlonShip(trimmed);
   }
 
-  const peer: RoutePeer = { kind: isGroup ? "group" : "dm", id: peerId };
+  const peer: RoutePeer = { kind: isGroup ? "group" : "direct", id: peerId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
     agentId: params.agentId,
@@ -405,10 +402,12 @@ function resolveFallbackSession(
     channel: params.channel,
     peer,
   });
-  const chatType = peerKind === "dm" ? "direct" : peerKind === "channel" ? "channel" : "group";
+  const chatType = peerKind === "direct" ? "direct" : peerKind === "channel" ? "channel" : "group";
   const from =
-    peerKind === "dm" ? `${params.channel}:${peerId}` : `${params.channel}:${peerKind}:${peerId}`;
-  const toPrefix = peerKind === "dm" ? "user" : "channel";
+    peerKind === "direct"
+      ? `${params.channel}:${peerId}`
+      : `${params.channel}:${peerKind}:${peerId}`;
+  const toPrefix = peerKind === "direct" ? "user" : "channel";
   return {
     sessionKey: baseSessionKey,
     baseSessionKey,

@@ -4,6 +4,7 @@ import {
   loadConfig,
   parseConfigJson5,
   readConfigFileSnapshot,
+  redactConfigObject,
   redactConfigSnapshot,
   resolveConfigSnapshotHash,
   validateConfigObjectWithPlugins,
@@ -194,7 +195,7 @@ export const configHandlers: GatewayRequestHandlers = {
       {
         ok: true,
         path: CONFIG_PATH,
-        config: validated.config,
+        config: redactConfigObject(validated.config),
       },
       undefined,
     );
@@ -309,7 +310,7 @@ export const configHandlers: GatewayRequestHandlers = {
       {
         ok: true,
         path: CONFIG_PATH,
-        config: validated.config,
+        config: redactConfigObject(validated.config),
         restart,
         sentinel: {
           path: sentinelPath,
@@ -406,7 +407,7 @@ export const configHandlers: GatewayRequestHandlers = {
       {
         ok: true,
         path: CONFIG_PATH,
-        config: validated.config,
+        config: redactConfigObject(validated.config),
         restart,
         sentinel: {
           path: sentinelPath,
