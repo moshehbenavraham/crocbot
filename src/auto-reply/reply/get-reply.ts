@@ -3,6 +3,7 @@ import {
   resolveAgentWorkspaceDir,
   resolveSessionAgentId,
 } from "../../agents/agent-scope.js";
+import { createModelRouter } from "../../agents/model-router.js";
 import { resolveModelRefFromString } from "../../agents/model-selection.js";
 import { resolveAgentTimeoutMs } from "../../agents/timeout.js";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../../agents/workspace.js";
@@ -47,6 +48,7 @@ export async function getReplyFromConfig(
   let provider = defaultProvider;
   let model = defaultModel;
   if (opts?.isHeartbeat) {
+    // Precedence: heartbeat.model (explicit) > roles.utility (router) > reasoning (default)
     const heartbeatRaw = agentCfg?.heartbeat?.model?.trim() ?? "";
     const heartbeatRef = heartbeatRaw
       ? resolveModelRefFromString({
@@ -58,6 +60,17 @@ export async function getReplyFromConfig(
     if (heartbeatRef) {
       provider = heartbeatRef.ref.provider;
       model = heartbeatRef.ref.model;
+    } else {
+      // No explicit heartbeat model -- try utility model via router
+      const heartbeatRouter = createModelRouter(
+        cfg.agents?.defaults?.roles,
+        `${defaultProvider}/${defaultModel}`,
+      );
+      const heartbeatRouterResult = heartbeatRouter.resolve({ taskType: "heartbeat" });
+      if (!heartbeatRouterResult.isFallback) {
+        provider = heartbeatRouterResult.provider;
+        model = heartbeatRouterResult.modelId;
+      }
     }
   }
 

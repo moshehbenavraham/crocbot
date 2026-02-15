@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { resolveAgentModelFallbacksOverride } from "../../agents/agent-scope.js";
 import { runWithModelFallback } from "../../agents/model-fallback.js";
+import { createModelRouter } from "../../agents/model-router.js";
 import { isCliProvider } from "../../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../../agents/pi-embedded.js";
 import { resolveSandboxConfigForAgent, resolveSandboxRuntimeStatus } from "../../agents/sandbox.js";
@@ -95,16 +96,33 @@ export async function runMemoryFlushIfNeeded(params: {
   ]
     .filter(Boolean)
     .join("\n\n");
+
+  // Route memory flush to the utility model when configured.
+  const primaryProvider = params.followupRun.run.provider;
+  const primaryModel = params.followupRun.run.model;
+  const flushRouter = createModelRouter(
+    params.cfg?.agents?.defaults?.roles,
+    `${primaryProvider}/${primaryModel}`,
+  );
+  const flushRouterResult = flushRouter.resolve({ taskType: "memory-flush" });
+  const flushProvider = flushRouterResult.provider || primaryProvider;
+  const flushModel = flushRouterResult.modelId || primaryModel;
+
+  logVerbose(
+    `memory flush model routing: taskType=memory-flush provider=${flushProvider} modelId=${flushModel} isFallback=${flushRouterResult.isFallback} role=${flushRouterResult.isFallback ? "reasoning" : "utility"}`,
+  );
+
   try {
     await runWithModelFallback({
       cfg: params.followupRun.run.config,
-      provider: params.followupRun.run.provider,
-      model: params.followupRun.run.model,
+      provider: flushProvider,
+      model: flushModel,
       agentDir: params.followupRun.run.agentDir,
       fallbacksOverride: resolveAgentModelFallbacksOverride(
         params.followupRun.run.config,
         resolveAgentIdFromSessionKey(params.followupRun.run.sessionKey),
       ),
+      role: flushRouterResult.isFallback ? "reasoning" : "utility",
       run: (provider, model) => {
         const authProfileId =
           provider === params.followupRun.run.provider

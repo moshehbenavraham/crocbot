@@ -231,6 +231,8 @@ export async function runWithModelFallback<T>(params: {
   fallbacksOverride?: string[];
   /** Optional per-provider rate limiter. When absent, zero behavior change. */
   rateLimiter?: ProviderRateLimiter;
+  /** Model role label for structured log context (e.g. "reasoning", "utility"). */
+  role?: string;
   run: (provider: string, model: string) => Promise<T>;
   /** Called after a successful run to extract token usage for rate limiter recording. */
   onSuccess?: (result: T, provider: string, model: string) => { totalTokens?: number } | void;
@@ -290,6 +292,7 @@ export async function runWithModelFallback<T>(params: {
           rejectedBy: check.rejectedBy ?? "unknown",
           retryAfterMs: check.retryAfterMs,
           context: "model-fallback",
+          role: params.role,
         });
         attempts.push({
           provider: candidate.provider,

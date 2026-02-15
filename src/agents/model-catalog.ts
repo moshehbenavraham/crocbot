@@ -70,17 +70,9 @@ export async function loadModelCatalog(params?: {
       const piSdk = await importPiSdk();
       const agentDir = resolvecrocbotAgentDir();
       // discoverAuthStorage/discoverModels were removed in pi-coding-agent 0.50+.
-      // Use the class constructors (AuthStorage/ModelRegistry) via the local
-      // compatibility layer, falling back to the SDK export if still present.
-      const authStorage =
-        typeof piSdk.discoverAuthStorage === "function"
-          ? piSdk.discoverAuthStorage(agentDir)
-          : new piSdk.AuthStorage(path.join(agentDir, "auth.json"));
-      const registry = (
-        typeof piSdk.discoverModels === "function"
-          ? piSdk.discoverModels(authStorage, agentDir)
-          : new piSdk.ModelRegistry(authStorage, path.join(agentDir, "models.json"))
-      ) as
+      // Use the class constructors (AuthStorage/ModelRegistry) directly.
+      const authStorage = new piSdk.AuthStorage(path.join(agentDir, "auth.json"));
+      const registry = new piSdk.ModelRegistry(authStorage, path.join(agentDir, "models.json")) as
         | {
             getAll: () => Array<DiscoveredModel>;
           }

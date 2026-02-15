@@ -99,7 +99,9 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     }
     const stateDir = await fs.mkdtemp(path.join(tempHome, prefix));
     process.env.CROCBOT_STATE_DIR = stateDir;
-    delete process.env.CROCBOT_CONFIG_PATH;
+    // IMPORTANT: always point CONFIG_PATH to a temp file — never delete it,
+    // because resolveConfigPath() falls back to the REAL ~/.crocbot/crocbot.json.
+    process.env.CROCBOT_CONFIG_PATH = path.join(stateDir, "crocbot.json");
     return stateDir;
   };
 

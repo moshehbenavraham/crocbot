@@ -37,9 +37,15 @@ describe("loadModelCatalog", () => {
       if (call === 1) {
         throw new Error("boom");
       }
+      const FakeAuthStorage = class {};
+      const FakeModelRegistry = class {
+        getAll() {
+          return [{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }];
+        }
+      };
       return {
-        discoverAuthStorage: () => ({}),
-        discoverModels: () => [{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }],
+        AuthStorage: FakeAuthStorage,
+        ModelRegistry: FakeModelRegistry,
       } as unknown as PiSdkModule;
     });
 
@@ -66,12 +72,12 @@ describe("loadModelCatalog", () => {
   it("returns partial results on discovery errors", async () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    __setModelCatalogImportForTest(
-      async () =>
-        ({
-          discoverAuthStorage: () => ({}),
-          discoverModels: () => ({
-            getAll: () => [
+    __setModelCatalogImportForTest(async () =>
+      (() => {
+        const FakeAuthStorage = class {};
+        const FakeModelRegistry = class {
+          getAll() {
+            return [
               { id: "gpt-4.1", name: "GPT-4.1", provider: "openai" },
               {
                 get id() {
@@ -80,9 +86,14 @@ describe("loadModelCatalog", () => {
                 provider: "openai",
                 name: "bad",
               },
-            ],
-          }),
-        }) as unknown as PiSdkModule,
+            ];
+          }
+        };
+        return {
+          AuthStorage: FakeAuthStorage,
+          ModelRegistry: FakeModelRegistry,
+        } as unknown as PiSdkModule;
+      })(),
     );
 
     const result = await loadModelCatalog({ config: {} as crocbotConfig });

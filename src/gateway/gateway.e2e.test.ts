@@ -168,8 +168,12 @@ describe("gateway e2e", () => {
 
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-wizard-home-"));
     process.env.HOME = tempHome;
-    delete process.env.CROCBOT_STATE_DIR;
-    delete process.env.CROCBOT_CONFIG_PATH;
+    const tempStateDir = path.join(tempHome, ".crocbot");
+    await fs.mkdir(tempStateDir, { recursive: true });
+    // IMPORTANT: always point STATE_DIR and CONFIG_PATH to temp — never delete them,
+    // because resolveConfigPath() falls back to the REAL ~/.crocbot/crocbot.json.
+    process.env.CROCBOT_STATE_DIR = tempStateDir;
+    process.env.CROCBOT_CONFIG_PATH = path.join(tempStateDir, "crocbot.json");
 
     const wizardToken = `wiz-${randomUUID()}`;
     const port = await getFreeGatewayPort();

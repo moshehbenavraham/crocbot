@@ -89,6 +89,10 @@ export type EmbeddedRunAttemptParams = {
   streamParams?: AgentStreamParams;
   ownerNumbers?: string[];
   enforceFinalTag?: boolean;
+  /** Task type for model role routing observability (e.g. "compaction", "memory-flush"). */
+  taskType?: string;
+  /** Resolved model role for logging context (e.g. "reasoning", "utility"). */
+  role?: string;
 };
 
 export type EmbeddedRunAttemptResult = {

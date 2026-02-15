@@ -8,6 +8,9 @@ import {
   SettingsManager,
 } from "@mariozechner/pi-coding-agent";
 
+import { createModelRouter } from "../model-router.js";
+import type { TaskType } from "../task-classifier.js";
+
 import { resolveHeartbeatPrompt } from "../../auto-reply/heartbeat.js";
 import type { ReasoningLevel, ThinkLevel } from "../../auto-reply/thinking.js";
 import { listChannelSupportedActions, resolveChannelMessageToolHints } from "../channel-tools.js";
@@ -63,7 +66,7 @@ import { log } from "./logger.js";
 import { buildModelAliasLines, resolveModel } from "./model.js";
 import { buildEmbeddedSandboxInfo } from "./sandbox-info.js";
 import { prewarmSessionFile, trackSessionManagerAccess } from "./session-manager-cache.js";
-import { buildEmbeddedSystemPrompt, createSystemPromptOverride } from "./system-prompt.js";
+import { buildEmbeddedSystemPrompt } from "./system-prompt.js";
 import { splitSdkTools } from "./tool-split.js";
 import type { EmbeddedPiCompactResult } from "./types.js";
 import { formatUserTime, resolveUserTimeFormat, resolveUserTimezone } from "../date-time.js";
@@ -113,8 +116,23 @@ export async function compactEmbeddedPiSessionDirect(
   const resolvedWorkspace = resolveUserPath(params.workspaceDir);
   const prevCwd = process.cwd();
 
-  const provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
-  const modelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+  const primaryProvider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
+  const primaryModelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+
+  // Route compaction to the utility model when configured.
+  const taskType: TaskType = "compaction";
+  const router = createModelRouter(
+    params.config?.agents?.defaults?.roles,
+    `${primaryProvider}/${primaryModelId}`,
+  );
+  const routerResult = router.resolve({ taskType });
+  const provider = routerResult.provider || primaryProvider;
+  const modelId = routerResult.modelId || primaryModelId;
+
+  log.debug(
+    `compaction model routing: taskType=${taskType} provider=${provider} modelId=${modelId} isFallback=${routerResult.isFallback} role=${routerResult.isFallback ? "reasoning" : "utility"}`,
+  );
+
   const agentDir = params.agentDir ?? resolvecrocbotAgentDir();
   await ensurecrocbotModelsJson(params.config, agentDir);
   const { model, error, authStorage, modelRegistry } = resolveModel(
@@ -317,7 +335,9 @@ export async function compactEmbeddedPiSessionDirect(
       cwd: process.cwd(),
       moduleUrl: import.meta.url,
     });
-    const appendPrompt = buildEmbeddedSystemPrompt({
+    // System prompt computed but not currently passed to createAgentSession
+    // (removed from SDK interface in pi-coding-agent 0.50+). Kept for forward-compat.
+    const _appendPrompt = buildEmbeddedSystemPrompt({
       workspaceDir: effectiveWorkspace,
       defaultThinkLevel: params.thinkLevel,
       reasoningLevel: params.reasoningLevel ?? "off",
@@ -341,8 +361,6 @@ export async function compactEmbeddedPiSessionDirect(
       userTimeFormat,
       contextFiles,
     });
-    const systemPrompt = createSystemPromptOverride(appendPrompt);
-
     const sessionLock = await acquireSessionWriteLock({
       sessionFile: params.sessionFile,
     });
@@ -364,7 +382,8 @@ export async function compactEmbeddedPiSessionDirect(
         settingsManager,
         minReserveTokens: resolveCompactionReserveTokensFloor(params.config),
       });
-      const additionalExtensionPaths = buildEmbeddedExtensionPaths({
+      // buildEmbeddedExtensionPaths has side effects (sets compaction/pruning runtime state).
+      buildEmbeddedExtensionPaths({
         cfg: params.config,
         sessionManager,
         provider,
@@ -385,15 +404,11 @@ export async function compactEmbeddedPiSessionDirect(
         modelRegistry,
         model,
         thinkingLevel: mapThinkingLevel(params.thinkLevel),
-        systemPrompt,
         tools: builtInTools,
         customTools,
         sessionManager,
         settingsManager,
-        skills: [],
-        contextFiles: [],
-        additionalExtensionPaths,
-      }));
+      } as Parameters<typeof createAgentSession>[0]));
 
       try {
         const prior = await sanitizeSessionHistory({
