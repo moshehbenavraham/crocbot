@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { parseProjectSubcommand, executeProjectSubcommand } from "./project-command.js";
+import {
+  parseProjectSubcommand,
+  executeProjectSubcommand,
+  readChatActiveProject,
+  writeChatActiveProject,
+} from "./project-command.js";
 
 /* ------------------------------------------------------------------ */
 /* Mocks                                                              */
@@ -253,5 +258,90 @@ describe("executeProjectSubcommand", () => {
     expect(result.ok).toBe(false);
     expect(result.text).toContain("already exists");
     expect(mocks.writeConfigFile).not.toHaveBeenCalled();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* readChatActiveProject / writeChatActiveProject                     */
+/* ------------------------------------------------------------------ */
+
+describe("readChatActiveProject", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns default when no project is stored", async () => {
+    const result = await readChatActiveProject("12345", "main");
+    expect(result).toBe("default");
+  });
+
+  it("returns stored value after write", async () => {
+    const fs = await import("node:fs/promises");
+    const store: Record<string, string> = {};
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    vi.mocked(fs.default.writeFile).mockImplementation(async (_p, data) => {
+      const parsed = JSON.parse(data as string);
+      Object.assign(store, parsed);
+    });
+
+    await writeChatActiveProject("12345", "main", "webapp");
+    const result = await readChatActiveProject("12345", "main");
+    expect(result).toBe("webapp");
+  });
+
+  it("clears stored project when writing default", async () => {
+    const store: Record<string, string> = { "12345:main": "webapp" };
+    const fs = await import("node:fs/promises");
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    vi.mocked(fs.default.writeFile).mockImplementation(async (_p, data) => {
+      const parsed = JSON.parse(data as string);
+      // Replace store contents
+      for (const key of Object.keys(store)) {
+        delete store[key];
+      }
+      Object.assign(store, parsed);
+    });
+
+    await writeChatActiveProject("12345", "main", "default");
+    // After writing default, the key should be deleted from the store
+    expect(store["12345:main"]).toBeUndefined();
+  });
+
+  it("isolates projects by chat id", async () => {
+    const store: Record<string, string> = {};
+    const fs = await import("node:fs/promises");
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    vi.mocked(fs.default.writeFile).mockImplementation(async (_p, data) => {
+      const parsed = JSON.parse(data as string);
+      Object.assign(store, parsed);
+    });
+
+    await writeChatActiveProject("111", "main", "projectA");
+    await writeChatActiveProject("222", "main", "projectB");
+
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    const resultA = await readChatActiveProject("111", "main");
+    const resultB = await readChatActiveProject("222", "main");
+    expect(resultA).toBe("projecta");
+    expect(resultB).toBe("projectb");
+  });
+
+  it("isolates projects by agent id", async () => {
+    const store: Record<string, string> = {};
+    const fs = await import("node:fs/promises");
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    vi.mocked(fs.default.writeFile).mockImplementation(async (_p, data) => {
+      const parsed = JSON.parse(data as string);
+      Object.assign(store, parsed);
+    });
+
+    await writeChatActiveProject("111", "agentA", "projectX");
+    await writeChatActiveProject("111", "agentB", "projectY");
+
+    vi.mocked(fs.default.readFile).mockImplementation(async () => JSON.stringify(store));
+    const resultA = await readChatActiveProject("111", "agentA");
+    const resultB = await readChatActiveProject("111", "agentB");
+    expect(resultA).toBe("projectx");
+    expect(resultB).toBe("projecty");
   });
 });

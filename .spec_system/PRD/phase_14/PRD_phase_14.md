@@ -1,10 +1,10 @@
 # PRD Phase 14: Projects and Isolated Workspaces
 
-**Status**: In Progress
-**Sessions**: 5 (initial estimate)
+**Status**: Complete
+**Sessions**: 5
 **Estimated Duration**: 10-20 days
 
-**Progress**: 4/5 sessions (80%)
+**Progress**: 5/5 sessions (100%)
 
 ---
 
@@ -24,7 +24,7 @@ Currently everything is scoped by `agentId` with a 1:1 agent-to-workspace mappin
 | 02 | Project Configuration and Storage Layer | Complete | 20 | 2026-02-16 |
 | 03 | Workspace and Memory Isolation | Complete | 20 | 2026-02-16 |
 | 04 | CLI and Telegram Project Switching | Complete | 20 | 2026-02-16 |
-| 05 | Integration Testing and Validation | Not Started | ~15 | - |
+| 05 | Integration Testing and Validation | Complete | 20 | 2026-02-16 |
 
 ---
 
@@ -56,11 +56,11 @@ Currently everything is scoped by `agentId` with a 1:1 agent-to-workspace mappin
 - **Deliverables**: CLI --project flag, Telegram /project command (list/switch/create/current), 5 gateway JSON-RPC methods, extended session key format, project-aware prompt resolution, unit tests
 - **Notes**: User-facing surface for project isolation. Created 6 new files (858 lines implementation, 858 lines tests). Extended session key format with backward-compatible project segment. Per-file prompt fallback from project to agent workspace. All 5554 tests pass.
 
----
-
-## Upcoming Sessions
-
-- Session 05: Integration Testing and Validation
+### Session 05: Integration Testing and Validation
+- **Completed**: 2026-02-16
+- **Tasks**: 20/20
+- **Deliverables**: Integration tests (lifecycle + backward-compat), extended unit tests (session-key, project-command, gateway projects), user-facing documentation, CONSIDERATIONS.md update
+- **Notes**: Final validation session. Created 2 integration test files (45 tests) and extended 3 existing test files (+23 tests). Added user-facing documentation at docs/features/projects.md. Full audit: 763 test files, 5622 tests, zero build/lint errors, all files ASCII/LF.
 
 ---
 
@@ -126,15 +126,15 @@ Currently everything is scoped by `agentId` with a 1:1 agent-to-workspace mappin
 ## Success Criteria
 
 Phase complete when:
-- [ ] All 5 sessions completed
-- [ ] Projects have isolated memory indexes (no cross-project recall)
-- [ ] Project switching works via CLI flag (`--project`) and Telegram command (`/project`)
-- [ ] Default project provides backward compatibility for existing agents
-- [ ] Per-project workspace with MEMORY.md and prompt overrides functional
-- [ ] Session transcripts scoped to active project
-- [ ] Memory consolidation operates within project scope
-- [ ] Gateway API supports project CRUD operations
-- [ ] All existing tests pass without modification (backward compatibility)
+- [x] All 5 sessions completed
+- [x] Projects have isolated memory indexes (no cross-project recall)
+- [x] Project switching works via CLI flag (`--project`) and Telegram command (`/project`)
+- [x] Default project provides backward compatibility for existing agents
+- [x] Per-project workspace with MEMORY.md and prompt overrides functional
+- [x] Session transcripts scoped to active project
+- [x] Memory consolidation operates within project scope
+- [x] Gateway API supports project CRUD operations
+- [x] All existing tests pass without modification (backward compatibility)
 
 ---
 

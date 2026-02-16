@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildProjectAwareSessionKey, extractProjectFromSessionKey } from "./session-key.js";
+import {
+  buildProjectAwareSessionKey,
+  extractProjectFromSessionKey,
+  stripProjectFromSessionKey,
+} from "./session-key.js";
 import { parseAgentSessionKey } from "../sessions/session-key-utils.js";
 
 /* ------------------------------------------------------------------ */
@@ -118,5 +122,88 @@ describe("session key round-trip", () => {
       projectId: "default",
     });
     expect(extractProjectFromSessionKey(built)).toBeUndefined();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* stripProjectFromSessionKey                                         */
+/* ------------------------------------------------------------------ */
+
+describe("stripProjectFromSessionKey", () => {
+  it("strips project segment and restores base key", () => {
+    expect(stripProjectFromSessionKey("agent:main:project:myapp:telegram:group:123")).toBe(
+      "agent:main:telegram:group:123",
+    );
+  });
+
+  it("returns key unchanged when no project segment", () => {
+    const key = "agent:main:telegram:group:123";
+    expect(stripProjectFromSessionKey(key)).toBe(key);
+  });
+
+  it("restores main key when project is the only rest segment", () => {
+    expect(stripProjectFromSessionKey("agent:main:project:myapp")).toBe("agent:main:main");
+  });
+
+  it("returns empty string for empty input", () => {
+    expect(stripProjectFromSessionKey("")).toBe("");
+    expect(stripProjectFromSessionKey(null)).toBe("");
+    expect(stripProjectFromSessionKey(undefined)).toBe("");
+  });
+
+  it("returns non-agent key unchanged", () => {
+    const key = "some:other:key";
+    expect(stripProjectFromSessionKey(key)).toBe(key);
+  });
+
+  it("handles DM session keys with project", () => {
+    expect(stripProjectFromSessionKey("agent:main:project:webapp:telegram:dm:456")).toBe(
+      "agent:main:telegram:dm:456",
+    );
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Full round-trip: build -> extract -> strip                         */
+/* ------------------------------------------------------------------ */
+
+describe("session key full round-trip (build -> extract -> strip)", () => {
+  it("build -> extract recovers project, strip restores base", () => {
+    const base = "agent:main:telegram:group:42";
+    const built = buildProjectAwareSessionKey({ baseSessionKey: base, projectId: "webapp" });
+    expect(extractProjectFromSessionKey(built)).toBe("webapp");
+    expect(stripProjectFromSessionKey(built)).toBe(base);
+  });
+
+  it("default project produces identity round-trip", () => {
+    const base = "agent:main:telegram:dm:999";
+    const built = buildProjectAwareSessionKey({ baseSessionKey: base, projectId: "default" });
+    expect(built).toBe(base);
+    expect(extractProjectFromSessionKey(built)).toBeUndefined();
+    expect(stripProjectFromSessionKey(built)).toBe(base);
+  });
+
+  it("null project produces identity round-trip", () => {
+    const base = "agent:main:main";
+    const built = buildProjectAwareSessionKey({ baseSessionKey: base, projectId: null });
+    expect(built).toBe(base);
+    expect(stripProjectFromSessionKey(built)).toBe(base);
+  });
+
+  it("strip is idempotent on already-stripped keys", () => {
+    const base = "agent:main:telegram:group:42";
+    const stripped = stripProjectFromSessionKey(base);
+    expect(stripProjectFromSessionKey(stripped)).toBe(base);
+  });
+
+  it("parseAgentSessionKey extracts projectId from built key", () => {
+    const built = buildProjectAwareSessionKey({
+      baseSessionKey: "agent:main:telegram:dm:100",
+      projectId: "analytics",
+    });
+    const parsed = parseAgentSessionKey(built);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.projectId).toBe("analytics");
+    expect(parsed?.agentId).toBe("main");
   });
 });

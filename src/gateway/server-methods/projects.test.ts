@@ -467,3 +467,122 @@ describe("projects.switch", () => {
     );
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* projects.current -- sessionKey parameter resolution                */
+/* ------------------------------------------------------------------ */
+
+describe("projects.current sessionKey resolution", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.loadConfigReturn = {};
+    mocks.listAgentIds.mockReturnValue(["main"]);
+    mocks.listAgentEntries.mockReturnValue([{ id: "main" }]);
+    delete process.env.CROCBOT_ACTIVE_PROJECT;
+  });
+
+  it("extracts project from sessionKey when present", () => {
+    const { respond } = makeCall("projects.current", {
+      agentId: "main",
+      sessionKey: "agent:main:project:webapp:telegram:dm:100",
+    });
+
+    expect(respond).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ projectId: "webapp", isDefault: false }),
+      undefined,
+    );
+  });
+
+  it("sessionKey takes precedence over env var", () => {
+    process.env.CROCBOT_ACTIVE_PROJECT = "envproject";
+    const { respond } = makeCall("projects.current", {
+      agentId: "main",
+      sessionKey: "agent:main:project:keyproject:telegram:dm:100",
+    });
+
+    expect(respond).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ projectId: "keyproject" }),
+      undefined,
+    );
+    delete process.env.CROCBOT_ACTIVE_PROJECT;
+  });
+
+  it("falls back to env when sessionKey has no project segment", () => {
+    process.env.CROCBOT_ACTIVE_PROJECT = "envproject";
+    const { respond } = makeCall("projects.current", {
+      agentId: "main",
+      sessionKey: "agent:main:telegram:dm:100",
+    });
+
+    expect(respond).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ projectId: "envproject" }),
+      undefined,
+    );
+    delete process.env.CROCBOT_ACTIVE_PROJECT;
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Validation error shape consistency                                 */
+/* ------------------------------------------------------------------ */
+
+describe("projects error shape consistency", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.loadConfigReturn = {};
+    mocks.listAgentIds.mockReturnValue(["main"]);
+    mocks.listAgentEntries.mockReturnValue([{ id: "main", projects: [] }]);
+    mocks.findAgentEntryIndex.mockReturnValue(0);
+  });
+
+  it("projects.list error includes code and message", async () => {
+    mocks.listAgentIds.mockReturnValue(["main"]);
+    const { respond, promise } = makeCall("projects.list", { agentId: "ghost" });
+    await promise;
+
+    const errorArg = respond.mock.calls[0][2];
+    expect(errorArg).toHaveProperty("code");
+    expect(errorArg).toHaveProperty("message");
+    expect(typeof errorArg.message).toBe("string");
+  });
+
+  it("projects.create error includes code and message", async () => {
+    const { respond, promise } = makeCall("projects.create", {
+      agentId: "main",
+      projectId: "default",
+    });
+    await promise;
+
+    const errorArg = respond.mock.calls[0][2];
+    expect(errorArg).toHaveProperty("code");
+    expect(errorArg).toHaveProperty("message");
+  });
+
+  it("projects.delete error includes code and message", async () => {
+    const { respond, promise } = makeCall("projects.delete", {
+      agentId: "main",
+      projectId: "default",
+    });
+    await promise;
+
+    const errorArg = respond.mock.calls[0][2];
+    expect(errorArg).toHaveProperty("code");
+    expect(errorArg).toHaveProperty("message");
+  });
+
+  it("projects.switch error includes code and message", async () => {
+    mocks.listAgentEntries.mockReturnValue([{ id: "main", projects: [] }]);
+    const { respond, promise } = makeCall("projects.switch", {
+      agentId: "main",
+      projectId: "nonexistent",
+    });
+    await promise;
+
+    const errorArg = respond.mock.calls[0][2];
+    expect(errorArg).toHaveProperty("code");
+    expect(errorArg).toHaveProperty("message");
+  });
+});
