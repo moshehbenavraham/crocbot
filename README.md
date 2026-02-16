@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.122**
+> **v0.1.127**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -115,7 +115,7 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
           (stdio, SSE, HTTP)
 ```
 
-The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat) to a cheaper model. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat, consolidation) to a cheaper model. At session end, the auto-memorize pipeline extracts solutions, facts, and instruments from the conversation transcript and stores them as categorized memories. The consolidation engine deduplicates on every save via LLM-driven analysis. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
 
 Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
 
@@ -133,7 +133,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Multi-model support](https://aiwithapex.mintlify.app/concepts/models)** — Anthropic, OpenAI, Google Gemini, Bedrock, Ollama, OpenRouter, and more
 - **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
 - **[MCP integration](https://aiwithapex.mintlify.app/concepts/mcp)** — native MCP client (stdio/SSE/HTTP) and server mode with SSRF-guarded transports
-- **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
+- **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search, AI-powered consolidation (dedup on save), 4-area categorization (facts, solutions, preferences, instruments), and auto-extraction of solutions/facts post-conversation
 - **[Model roles](docs/concepts/model-roles)** — 2-role architecture (reasoning + utility) routes background tasks to cheap models for cost savings
 - **[Rate limiting](docs/ARCHITECTURE)** — per-provider RPM/TPM throttling, API key round-robin rotation, transient error retry with backoff
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
