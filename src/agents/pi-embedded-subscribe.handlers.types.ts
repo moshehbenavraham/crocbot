@@ -10,6 +10,8 @@ import type {
   BlockReplyChunking,
   SubscribeEmbeddedPiSessionParams,
 } from "./pi-embedded-subscribe.types.js";
+import type { ChatGenerationResult, ThinkingPair } from "./reasoning/generation-result.js";
+import type { ReasoningStreamAdapter } from "./reasoning/types.js";
 import type { NormalizedUsage } from "./usage.js";
 
 export type EmbeddedSubscribeLogger = {
@@ -71,6 +73,13 @@ export type EmbeddedPiSubscribeContext = {
   blockChunking?: BlockReplyChunking;
   blockChunker: EmbeddedBlockChunker | null;
   streamMasker?: StreamMasker;
+
+  /** Active reasoning adapter for the current message (resolved at message_start). */
+  reasoningAdapter?: ReasoningStreamAdapter;
+  /** Active reasoning accumulator for the current message (created at message_start). */
+  generationResult?: ChatGenerationResult;
+  /** Thinking pairs from the last finalized message (for downstream trace storage). */
+  lastThinkingPairs?: readonly ThinkingPair[];
 
   shouldEmitToolResult: () => boolean;
   shouldEmitToolOutput: () => boolean;

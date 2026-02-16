@@ -1,4 +1,5 @@
 import type { AgentEvent, AgentMessage } from "@mariozechner/pi-agent-core";
+import type { AssistantMessageEvent } from "@mariozechner/pi-ai";
 
 import { parseReplyDirectives } from "../auto-reply/reply/reply-directives.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
@@ -18,6 +19,8 @@ import {
   promoteThinkingTagsToBlocks,
 } from "./pi-embedded-utils.js";
 import { createInlineCodeState } from "../markdown/code-spans.js";
+import { ChatGenerationResult } from "./reasoning/generation-result.js";
+import { resolveAdapter } from "./reasoning/adapter-registry.js";
 
 export function handleMessageStart(
   ctx: EmbeddedPiSubscribeContext,
@@ -29,13 +32,25 @@ export function handleMessageStart(
   }
 
   // KNOWN: Resetting at `text_end` is unsafe (late/duplicate end events).
-  // ASSUME: `message_start` is the only reliable boundary for “new assistant message begins”.
+  // ASSUME: `message_start` is the only reliable boundary for "new assistant message begins".
   // Start-of-message is a safer reset point than message_end: some providers
   // may deliver late text_end updates after message_end, which would otherwise
   // re-trigger block replies.
   ctx.resetAssistantMessageState(ctx.state.assistantTexts.length);
   // Reset the stream masker for the new message to clear any stale tail buffer.
   ctx.streamMasker?.reset();
+
+  // Initialize reasoning accumulator and resolve adapter for this message.
+  // Extract model/provider from the SDK event's partial (available on message_start).
+  const partial = (evt as { message?: { model?: string; provider?: string } }).message;
+  const model = typeof partial?.model === "string" ? partial.model : "";
+  const provider = typeof partial?.provider === "string" ? partial.provider : "";
+  ctx.reasoningAdapter = resolveAdapter({ model, provider });
+  ctx.reasoningAdapter.reset();
+  ctx.generationResult = new ChatGenerationResult({
+    adapterId: ctx.reasoningAdapter.id,
+  });
+
   // Use assistant message_start as the earliest "writing" signal for typing.
   void ctx.params.onAssistantMessageStart?.();
 }
@@ -55,6 +70,21 @@ export function handleMessageUpdate(
       ? (assistantEvent as Record<string, unknown>)
       : undefined;
   const evtType = typeof assistantRecord?.type === "string" ? assistantRecord.type : "";
+
+  // Route native thinking events through the reasoning adapter/accumulator.
+  if (evtType === "thinking_start" || evtType === "thinking_delta" || evtType === "thinking_end") {
+    if (ctx.reasoningAdapter && ctx.generationResult && ctx.state.streamReasoning) {
+      const chunk = ctx.reasoningAdapter.parseChunk(assistantEvent as AssistantMessageEvent);
+      if (chunk) {
+        ctx.generationResult.addChunk(chunk);
+        const delta = ctx.generationResult.getReasoningDelta();
+        if (delta) {
+          ctx.emitReasoningStream(ctx.generationResult.reasoningText);
+        }
+      }
+    }
+    return;
+  }
 
   if (evtType !== "text_delta" && evtType !== "text_start" && evtType !== "text_end") {
     return;
@@ -120,8 +150,22 @@ export function handleMessageUpdate(
   }
 
   if (ctx.state.streamReasoning) {
-    // Handle partial <think> tags: stream whatever reasoning is visible so far.
-    ctx.emitReasoningStream(extractThinkingFromTaggedStream(ctx.state.deltaBuffer));
+    // Feed text_delta events through the adapter for tag-fallback reasoning extraction.
+    if (ctx.reasoningAdapter && ctx.generationResult && evtType === "text_delta") {
+      const reasoningChunk = ctx.reasoningAdapter.parseChunk(
+        assistantEvent as AssistantMessageEvent,
+      );
+      if (reasoningChunk) {
+        ctx.generationResult.addChunk(reasoningChunk);
+        const accDelta = ctx.generationResult.getReasoningDelta();
+        if (accDelta) {
+          ctx.emitReasoningStream(ctx.generationResult.reasoningText);
+        }
+      }
+    } else {
+      // Fallback: use tag extraction directly when no adapter is available.
+      ctx.emitReasoningStream(extractThinkingFromTaggedStream(ctx.state.deltaBuffer));
+    }
   }
 
   const next = ctx
@@ -338,6 +382,13 @@ export function handleMessageEnd(
       }
     }
   }
+
+  // Finalize the reasoning accumulator and store thinking pairs for downstream access.
+  if (ctx.generationResult) {
+    ctx.lastThinkingPairs = ctx.generationResult.finalize();
+    ctx.generationResult = undefined;
+  }
+  ctx.reasoningAdapter = undefined;
 
   ctx.state.deltaBuffer = "";
   ctx.state.rawDeltaLength = 0;

@@ -18,3 +18,7 @@ export { OpenAiReasoningAdapter } from "./adapters/openai.js";
 
 // Registry
 export { getAdapters, resolveAdapter } from "./adapter-registry.js";
+
+// Accumulator
+export { ChatGenerationResult } from "./generation-result.js";
+export type { ChatGenerationResultOptions, ThinkingPair } from "./generation-result.js";
