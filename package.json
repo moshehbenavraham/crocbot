@@ -1,6 +1,6 @@
 {
   "name": "crocbot",
-  "version": "0.1.124",
+  "version": "0.1.125",
   "description": "Telegram gateway CLI with Pi RPC agent",
   "type": "module",
   "main": "dist/index.js",

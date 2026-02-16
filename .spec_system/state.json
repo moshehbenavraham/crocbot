@@ -3,7 +3,7 @@
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
   "current_phase": 12,
-  "current_session": null,
+  "current_session": "phase12-session05-integration-testing-and-validation",
   "phases": {
     "0": {
       "name": "Strip Moltbot to minimal footprint for VPS/Coolify/Ubuntu deployment",
@@ -1763,6 +1763,11 @@
       "date": "2026-02-16",
       "session": "phase12-session04-auto-memorize-hooks",
       "status": "completed"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase12-session05-integration-testing-and-validation",
+      "status": "recommended"
     }
   ]
 }
