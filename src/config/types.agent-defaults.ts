@@ -94,6 +94,15 @@ export type CliBackendConfig = {
   serialize?: boolean;
 };
 
+export type AutoMemorizeConfig = {
+  /** Enable auto-memorize extraction at session end (default: false). */
+  enabled?: boolean;
+  /** Maximum transcript characters to send to the utility model (default: 12000). */
+  maxTranscriptChars?: number;
+  /** Timeout in milliseconds for each extraction LLM call (default: 30000). */
+  extractionTimeoutMs?: number;
+};
+
 export type AgentDefaultsConfig = {
   /** Primary model and fallbacks (provider/model). */
   model?: AgentModelListConfig;
@@ -242,6 +251,8 @@ export type AgentDefaultsConfig = {
     /** Auto-prune sandbox containers. */
     prune?: SandboxPruneSettings;
   };
+  /** Auto-memorize: extract solutions, fragments, and instruments from conversations at session end. */
+  autoMemorize?: AutoMemorizeConfig;
 };
 
 export type AgentCompactionMode = "default" | "safeguard";

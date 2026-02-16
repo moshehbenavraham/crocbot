@@ -510,6 +510,89 @@ export class MemoryIndexManager {
     return this.syncing;
   }
 
+  /**
+   * Store an extracted chunk from auto-memorize and trigger consolidation.
+   * Used by the auto-memorize pipeline to persist extracted memories.
+   */
+  async storeExtractedChunk(params: {
+    text: string;
+    embedding: number[];
+    area: string;
+    importance: number;
+  }): Promise<void> {
+    const { text, embedding, area, importance } = params;
+    const id = hashText(`auto-memorize:${area}:${text}:${this.provider.model}`);
+    const now = Date.now();
+    const source: MemorySource = "memory";
+    const chunkPath = `auto-memorize/${area}`;
+
+    this.db
+      .prepare(
+        `INSERT INTO chunks (id, path, source, start_line, end_line, hash, model, text, embedding, updated_at, area, importance)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           hash=excluded.hash,
+           model=excluded.model,
+           text=excluded.text,
+           embedding=excluded.embedding,
+           updated_at=excluded.updated_at,
+           area=excluded.area,
+           importance=excluded.importance`,
+      )
+      .run(
+        id,
+        chunkPath,
+        source,
+        0,
+        0,
+        hashText(text),
+        this.provider.model,
+        text,
+        JSON.stringify(embedding),
+        now,
+        area,
+        importance,
+      );
+
+    const vectorReady =
+      embedding.length > 0 ? await this.ensureVectorReady(embedding.length) : false;
+    if (vectorReady) {
+      try {
+        this.db.prepare(`DELETE FROM ${VECTOR_TABLE} WHERE id = ?`).run(id);
+      } catch {}
+      this.db
+        .prepare(`INSERT INTO ${VECTOR_TABLE} (id, embedding) VALUES (?, ?)`)
+        .run(id, vectorToBlob(embedding));
+    }
+
+    if (this.fts.enabled && this.fts.available) {
+      this.db
+        .prepare(
+          `INSERT INTO ${FTS_TABLE} (text, id, path, source, model, start_line, end_line, area)` +
+            ` VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(text, id, chunkPath, source, this.provider.model, 0, 0, area);
+    }
+
+    // Fire-and-forget consolidation
+    if (this.consolidationEngine && embedding.length > 0) {
+      this.consolidationEngine
+        .processNewChunk({
+          chunkId: id,
+          text,
+          embedding,
+          area: area as import("./consolidation-actions.js").MemoryArea,
+          path: chunkPath,
+          model: this.provider.model,
+        })
+        .catch((err) => {
+          log.warn(
+            `consolidation failed for auto-memorize chunk ${id}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        });
+    }
+  }
+
   async readFile(params: {
     relPath: string;
     from?: number;

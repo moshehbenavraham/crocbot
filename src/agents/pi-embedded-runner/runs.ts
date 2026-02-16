@@ -124,6 +124,16 @@ export function setActiveEmbeddedRun(sessionId: string, handle: EmbeddedPiQueueH
   }
 }
 
+/** Callback invoked asynchronously after a session run completes. */
+export type OnSessionEndCallback = (sessionId: string) => void;
+
+let onSessionEndCallback: OnSessionEndCallback | null = null;
+
+/** Register a callback to fire after each session run ends. */
+export function setOnSessionEndCallback(cb: OnSessionEndCallback | null): void {
+  onSessionEndCallback = cb;
+}
+
 export function clearActiveEmbeddedRun(sessionId: string, handle: EmbeddedPiQueueHandle) {
   if (ACTIVE_EMBEDDED_RUNS.get(sessionId) === handle) {
     ACTIVE_EMBEDDED_RUNS.delete(sessionId);
@@ -132,6 +142,16 @@ export function clearActiveEmbeddedRun(sessionId: string, handle: EmbeddedPiQueu
       diag.debug(`run cleared: sessionId=${sessionId} totalActive=${ACTIVE_EMBEDDED_RUNS.size}`);
     }
     notifyEmbeddedRunEnded(sessionId);
+    // Fire-and-forget: invoke auto-memorize hook after session completes
+    if (onSessionEndCallback && !sessionId.startsWith("probe-")) {
+      try {
+        onSessionEndCallback(sessionId);
+      } catch (err) {
+        diag.warn(
+          `onSessionEnd callback error: sessionId=${sessionId} error=${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
   } else {
     diag.debug(`run clear skipped: sessionId=${sessionId} reason=handle_mismatch`);
   }
