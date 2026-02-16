@@ -77,6 +77,8 @@ export type SessionEntry = {
   compactionCount?: number;
   memoryFlushAt?: number;
   memoryFlushCompactionCount?: number;
+  /** Active project identifier for this session. */
+  projectId?: string;
   cliSessionIds?: Record<string, string>;
   claudeCliSessionId?: string;
   label?: string;

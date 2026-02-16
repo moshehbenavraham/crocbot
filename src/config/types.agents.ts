@@ -7,6 +7,7 @@ import type {
   SandboxDockerSettings,
   SandboxPruneSettings,
 } from "./types.sandbox.js";
+import type { ProjectConfig } from "./types.projects.js";
 import type { AgentToolsConfig, MemorySearchConfig } from "./types.tools.js";
 
 export type AgentModelConfig =
@@ -61,6 +62,10 @@ export type AgentConfig = {
     prune?: SandboxPruneSettings;
   };
   tools?: AgentToolsConfig;
+  /** Per-agent project configurations (isolated workspaces). */
+  projects?: ProjectConfig[];
+  /** Default project ID for this agent (must reference an existing project). */
+  defaultProject?: string;
 };
 
 export type AgentsConfig = {
