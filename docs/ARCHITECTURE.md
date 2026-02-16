@@ -31,7 +31,11 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
       |    LLM Providers
       |   (Claude, OpenAI, ...)
       +---> MCP Client
-           (stdio, SSE, HTTP)
+      |    (stdio, SSE, HTTP)
+      +---> Reasoning Adapter
+      |    (reasoning_delta / tags)
+      +---> Project Workspaces
+           (isolated memory/prompts)
 ```
 
 ## Components
@@ -124,6 +128,19 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Location**: `src/mcp/` (server.ts, server-auth.ts, server-tools.ts, server-mount.ts)
 - **Key modules**: `server-auth.ts` (Bearer token with timing-safe comparison), `server-tools.ts` (send_message, finish_chat, query_memory, list_capabilities), `server-mount.ts` (HTTP route mounting)
 
+### Reasoning Model Support (`src/agents/`, `src/shared/text/`)
+- **Purpose**: Native reasoning stream parsing for o1/o3, DeepSeek-R1, and Claude extended thinking
+- **Tech**: Provider-specific stream adapters, tag-based fallback, SQLite trace storage
+- **Key modules**: `reasoning-stream-adapter.ts` (per-provider `reasoning_delta` detection), `chat-generation-result.ts` (chunk accumulator separating reasoning from response), `reasoning-trace-storage.ts` (queryable trace table by session/turn/model), `reasoning-tags.ts` (XML tag parsing with strict/preserve modes)
+- **Capabilities**: Native `reasoning_delta` streaming for providers that support it, tag-based fallback (`<think>`, `<thinking>`, `<thought>`) for others. `ChatGenerationResult` accumulator handles cross-chunk boundaries and provides delta computation. Reasoning token budget tracking per session. CLI display modes (`on`/`stream`/`off`), Telegram blocking of reasoning content, WebSocket broadcast of thinking events.
+
+### Project Workspaces (`src/agents/`, `src/config/`)
+- **Purpose**: Isolated memory, prompts, knowledge base, and sessions per project
+- **Tech**: Project-scoped directory layout under state dir, per-project sqlite-vec indexes
+- **Key modules**: `project-scope.ts` (10 exported functions: `resolveProjectDir`, `listProjects`, `getProjectConfig`, `setProjectConfig`, `getActiveProject`, `setActiveProject`, `isDefaultProject`, `resolveProjectMemoryDir`, `resolveProjectSessionsDir`, `stripProjectFromSessionKey`), `types.projects.ts` (ProjectConfig, ProjectsConfig types)
+- **Storage layout**: `{stateDir}/agents/{agentId}/projects/{projectName}/` with subdirectories for `memory/`, `sessions/`, and config files. Default project uses agent-level paths (no "default" subdirectory).
+- **Switching**: CLI (`crocbot --project <name>`, `/project` subcommands), Telegram (`/project <name>`), RPC (`projects.list`, `projects.current`, `projects.switch`, `projects.create`, `projects.delete`).
+
 ## Tech Stack Rationale
 
 | Technology | Purpose | Why Chosen |
@@ -141,15 +158,16 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 
 1. User sends message via Telegram (or external AI calls MCP server endpoint)
 2. grammY bot receives message, routes to Gateway
-3. Gateway creates/resumes session, invokes agent
-4. Agent builds context: system prompt + memory recall + conversation history
+3. Gateway creates/resumes session, resolves active project (default or project-scoped)
+4. Agent builds context: system prompt + project-scoped memory recall + conversation history
 5. SecretsRegistry masks any credentials in LLM context before provider call
 6. Model router classifies the task type and resolves the appropriate model (reasoning or utility)
 7. Rate limiter checks RPM/TPM capacity; KeyPool selects best API key via round-robin
 8. Agent processes message with LLM provider (transient errors retried with backoff), invoking MCP client tools as needed
-9. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
-10. Tool results masked before persistence and display
-11. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
+9. Reasoning adapter separates `reasoning_delta` from `text_delta` streams; traces stored to reasoning_traces table
+10. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
+11. Tool results masked before persistence and display
+12. Response streamed back through Gateway to Telegram (masked) and persisted to project-scoped session transcript (masked)
 
 ## Key Architectural Decisions
 
@@ -161,6 +179,8 @@ See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0005: Per-Provider Rate Limiting](adr/0005-per-provider-rate-limiting)
 - [ADR-0006: 4-Model-Role Architecture](adr/0006-4-model-role-architecture)
 - [ADR-0007: Memory Consolidation Architecture](adr/0007-memory-consolidation-architecture)
+- [ADR-0008: Reasoning Model Support](adr/0008-reasoning-model-support)
+- [ADR-0009: Project-Scoped Workspaces](adr/0009-project-scoped-workspaces)
 
 ## Directory Structure
 

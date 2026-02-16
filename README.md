@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.127**
+> **v0.1.138**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -112,10 +112,14 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
      |    LLM Providers
      |   (Claude, GPT, Gemini)
      +---> MCP Client
-          (stdio, SSE, HTTP)
+     |    (stdio, SSE, HTTP)
+     +---> Reasoning Adapter
+     |    (reasoning_delta / tags)
+     +---> Project Workspaces
+          (isolated memory/prompts)
 ```
 
-The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat, consolidation) to a cheaper model. At session end, the auto-memorize pipeline extracts solutions, facts, and instruments from the conversation transcript and stores them as categorized memories. The consolidation engine deduplicates on every save via LLM-driven analysis. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat, consolidation) to a cheaper model. At session end, the auto-memorize pipeline extracts solutions, facts, and instruments from the conversation transcript and stores them as categorized memories. The consolidation engine deduplicates on every save via LLM-driven analysis. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems. The Reasoning Adapter handles native `reasoning_delta` streams from o1/o3, DeepSeek-R1, and Claude extended thinking, with tag-based fallback and dedicated trace storage. Project Workspaces provide isolated memory, prompts, and knowledge base per project, switchable via CLI (`--project`) or Telegram (`/project`).
 
 Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
 
@@ -136,6 +140,8 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search, AI-powered consolidation (dedup on save), 4-area categorization (facts, solutions, preferences, instruments), and auto-extraction of solutions/facts post-conversation
 - **[Model roles](docs/concepts/model-roles)** — 2-role architecture (reasoning + utility) routes background tasks to cheap models for cost savings
 - **[Rate limiting](docs/ARCHITECTURE)** — per-provider RPM/TPM throttling, API key round-robin rotation, transient error retry with backoff
+- **[Reasoning models](docs/features/reasoning)** — native `reasoning_delta` parsing for o1/o3, DeepSeek-R1, Claude extended thinking; tag-based fallback; trace storage and budget tracking
+- **[Project workspaces](docs/features/projects)** — isolated memory, prompts, and knowledge per project; CLI (`--project`) and Telegram (`/project`) switching
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
 
 ---
@@ -223,6 +229,7 @@ crocbot pairing approve telegram <code>
 | `/tts on\|off` | Control text-to-speech |
 | `/skill <name>` | Run a skill by name |
 | `/whoami` | Show your sender ID |
+| `/project <name>` | Switch active project |
 | `/help` | Show available commands |
 
 Groups: configure `channels.telegram.groups` for allowlisting, mention gating, and activation modes.

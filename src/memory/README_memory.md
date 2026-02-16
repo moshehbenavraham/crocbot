@@ -68,4 +68,9 @@ Each extraction checks the rate limiter budget before calling the utility model.
 - Model routing (utility model): `src/agents/model-router.ts`
 - Session end hook: `src/agents/pi-embedded-runner/runs.ts`
 - Config type: `AutoMemorizeConfig` in `src/config/types.agent-defaults.ts`
+- Project scoping: `src/agents/project-scope.ts` (per-project memory isolation)
 - State directory: configured via `CROCBOT_STATE_DIR`
+
+### Project-Scoped Memory (Phase 14)
+
+Each project gets an isolated sqlite-vec index. `resolveStorePath()` accepts an optional `projectId` parameter; non-default projects store memory under `{stateDir}/agents/{agentId}/projects/{projectName}/memory/`. Default project continues using agent-level paths for backward compatibility. Cache keys include a project segment to prevent cross-project contamination.

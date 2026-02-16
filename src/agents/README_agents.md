@@ -27,6 +27,8 @@ agents/
 - **Tool Streaming** — tools emit results as they execute
 - **Session Repair** — crash-resilient transcript and file recovery (`session-transcript-repair.ts`, `session-file-repair.ts`)
 - **Model Routing** — 2-role architecture (reasoning + utility) routes background tasks to cheap models (`model-router.ts`, `task-classifier.ts`, `model-roles.ts`)
+- **Reasoning Support** — native `reasoning_delta` stream parsing for o1/o3, DeepSeek-R1, Claude extended thinking; tag-based fallback; trace storage and budget tracking
+- **Project Scoping** — project-scoped workspaces with isolated memory, sessions, and prompts (`project-scope.ts`, `types.projects.ts`)
 
 ## Memory Consolidation
 
@@ -37,9 +39,23 @@ The agent integrates with the memory consolidation system via two pathways:
 
 All consolidation and extraction LLM calls use `taskType: "consolidation"` to route through the utility model role (cheap model), not the reasoning model.
 
+## Project Workspaces
+
+The agent supports project-scoped workspaces (Phase 14) with isolated memory, sessions, and prompt overrides per project:
+
+- `project-scope.ts` -- 10 exported functions for project CRUD, resolution, and path management
+- `types.projects.ts` -- `ProjectConfig`, `ProjectsConfig` types (extends `AgentConfig`)
+- CLI: `crocbot --project <name>`, `/project list|current|switch|create`
+- Telegram: `/project <name>` command
+- RPC: `projects.list`, `projects.current`, `projects.switch`, `projects.create`, `projects.delete`
+
+Default project uses agent-level paths. Non-default projects isolate under `{stateDir}/agents/{agentId}/projects/{projectName}/`.
+
 ## Related
 
 - Agent configuration: `src/config/`
 - Session management: `src/sessions/`
 - Memory subsystem: `src/memory/`
+- Reasoning architecture: `docs/adr/0008-reasoning-model-support.md`
+- Project architecture: `docs/adr/0009-project-scoped-workspaces.md`
 - Compiled extensions output: `/pi-extensions/`
