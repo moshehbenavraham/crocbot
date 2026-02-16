@@ -91,9 +91,14 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Location**: `src/cron/`
 
 ### Memory
-- **Purpose**: Conversation memory and context management
-- **Tech**: File-based storage
+- **Purpose**: Conversation memory, context management, and AI-powered consolidation
+- **Tech**: SQLite + sqlite-vec (vector similarity), file-based storage, utility model for consolidation/extraction
 - **Location**: `src/memory/`
+- **Key modules**: `consolidation.ts` (5-action consolidation engine), `auto-memorize.ts` (post-conversation extraction pipeline), `consolidation-schema.ts` (schema migration), `consolidation-actions.ts` (types, DI interfaces)
+- **Consolidation engine**: Processes new memory chunks through a pipeline: vector similarity search -> candidate validation -> LLM analysis (utility model) -> atomic DB action (MERGE, REPLACE, KEEP_SEPARATE, UPDATE, SKIP). Safety gates enforce minimum similarity (0.9) for destructive REPLACE. All decisions logged to `consolidation_log` audit table with reasoning, source IDs, and timestamps.
+- **4-area schema**: Memories categorized into `main` (general), `fragments` (facts/preferences), `solutions` (problem/solution pairs), `instruments` (tools/techniques). Area metadata stored on each chunk; recall queries filter by area.
+- **Auto-memorize hooks**: Fire-and-forget extraction at session end. Three extraction types (solutions, fragments, instruments) run independently via `Promise.allSettled`. Budget-aware: each type checks rate limiter before LLM call, skips gracefully when exhausted. Extracted items stored with area metadata, triggering consolidation for dedup.
+- **Composition**: AutoMemorize (transcript extraction) -> storeExtractedChunk (categorized storage) -> ConsolidationEngine (dedup pipeline). All LLM calls use `taskType: "consolidation"` to route through the utility model role.
 
 ### Rate Limiting (`src/infra/`)
 - **Purpose**: Per-provider rate limiting, API key rotation, and transient error retry
@@ -155,6 +160,7 @@ See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0004: Secrets Masking Pipeline](adr/0004-secrets-masking-pipeline)
 - [ADR-0005: Per-Provider Rate Limiting](adr/0005-per-provider-rate-limiting)
 - [ADR-0006: 4-Model-Role Architecture](adr/0006-4-model-role-architecture)
+- [ADR-0007: Memory Consolidation Architecture](adr/0007-memory-consolidation-architecture)
 
 ## Directory Structure
 

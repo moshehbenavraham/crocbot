@@ -28,8 +28,18 @@ agents/
 - **Session Repair** — crash-resilient transcript and file recovery (`session-transcript-repair.ts`, `session-file-repair.ts`)
 - **Model Routing** — 2-role architecture (reasoning + utility) routes background tasks to cheap models (`model-router.ts`, `task-classifier.ts`, `model-roles.ts`)
 
+## Memory Consolidation
+
+The agent integrates with the memory consolidation system via two pathways:
+
+- **Consolidation engine** (`src/memory/consolidation.ts`) -- When a new memory chunk is stored, the engine finds similar existing chunks using vector search, asks the utility model to decide an action (MERGE, REPLACE, KEEP_SEPARATE, UPDATE, SKIP), and applies it atomically. All decisions are logged to `consolidation_log` for audit.
+- **Auto-memorize lifecycle hook** (`src/memory/auto-memorize.ts`) -- At session end, extracts problem/solution pairs, key facts, and tool references from the conversation transcript. Three extraction types run independently via `Promise.allSettled` (partial failures do not block others). Each type checks budget before calling the utility model, skipping gracefully when rate-limited. Extracted items are stored with area metadata (solutions, fragments, instruments) and trigger consolidation for dedup.
+
+All consolidation and extraction LLM calls use `taskType: "consolidation"` to route through the utility model role (cheap model), not the reasoning model.
+
 ## Related
 
 - Agent configuration: `src/config/`
 - Session management: `src/sessions/`
+- Memory subsystem: `src/memory/`
 - Compiled extensions output: `/pi-extensions/`
