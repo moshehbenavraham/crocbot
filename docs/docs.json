@@ -899,6 +899,7 @@
           "concepts/oauth",
           "concepts/agent-workspace",
           "features/projects",
+          "features/knowledge-import",
           "concepts/memory",
           "concepts/multi-agent",
           "concepts/compaction",
