@@ -9,6 +9,7 @@ export type MemorySearchManagerResult = {
 export async function getMemorySearchManager(params: {
   cfg: crocbotConfig;
   agentId: string;
+  projectId?: string | null;
 }): Promise<MemorySearchManagerResult> {
   try {
     const { MemoryIndexManager } = await import("./manager.js");

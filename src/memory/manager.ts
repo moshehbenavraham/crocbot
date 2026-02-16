@@ -8,6 +8,7 @@ import chokidar, { type FSWatcher } from "chokidar";
 import { resolveAgentDir, resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import type { ResolvedMemorySearchConfig } from "../agents/memory-search.js";
 import { resolveMemorySearchConfig } from "../agents/memory-search.js";
+import { isDefaultProject, resolveProjectWorkspaceDir } from "../agents/project-scope.js";
 import type { crocbotConfig } from "../config/config.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions/paths.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -132,6 +133,7 @@ export class MemoryIndexManager {
   private readonly cacheKey: string;
   private readonly cfg: crocbotConfig;
   private readonly agentId: string;
+  private readonly projectId: string | null | undefined;
   private readonly workspaceDir: string;
   private readonly settings: ResolvedMemorySearchConfig;
   private provider: EmbeddingProvider;
@@ -189,14 +191,18 @@ export class MemoryIndexManager {
   static async get(params: {
     cfg: crocbotConfig;
     agentId: string;
+    projectId?: string | null;
   }): Promise<MemoryIndexManager | null> {
-    const { cfg, agentId } = params;
-    const settings = resolveMemorySearchConfig(cfg, agentId);
+    const { cfg, agentId, projectId } = params;
+    const settings = resolveMemorySearchConfig(cfg, agentId, projectId);
     if (!settings) {
       return null;
     }
-    const workspaceDir = resolveAgentWorkspaceDir(cfg, agentId);
-    const key = `${agentId}:${workspaceDir}:${JSON.stringify(settings)}`;
+    const workspaceDir = isDefaultProject(projectId)
+      ? resolveAgentWorkspaceDir(cfg, agentId)
+      : resolveProjectWorkspaceDir(cfg, agentId, projectId);
+    const projectSegment = isDefaultProject(projectId) ? "default" : projectId;
+    const key = `${agentId}:${projectSegment}:${workspaceDir}:${JSON.stringify(settings)}`;
     const existing = INDEX_CACHE.get(key);
     if (existing) {
       return existing;
@@ -214,6 +220,7 @@ export class MemoryIndexManager {
       cacheKey: key,
       cfg,
       agentId,
+      projectId,
       workspaceDir,
       settings,
       providerResult,
@@ -226,6 +233,7 @@ export class MemoryIndexManager {
     cacheKey: string;
     cfg: crocbotConfig;
     agentId: string;
+    projectId?: string | null;
     workspaceDir: string;
     settings: ResolvedMemorySearchConfig;
     providerResult: EmbeddingProviderResult;
@@ -233,6 +241,7 @@ export class MemoryIndexManager {
     this.cacheKey = params.cacheKey;
     this.cfg = params.cfg;
     this.agentId = params.agentId;
+    this.projectId = params.projectId;
     this.workspaceDir = params.workspaceDir;
     this.settings = params.settings;
     this.provider = params.providerResult.provider;
@@ -1181,7 +1190,12 @@ export class MemoryIndexManager {
     if (!sessionFile) {
       return false;
     }
-    const sessionsDir = resolveSessionTranscriptsDirForAgent(this.agentId);
+    const sessionsDir = resolveSessionTranscriptsDirForAgent(
+      this.agentId,
+      undefined,
+      undefined,
+      this.projectId,
+    );
     const resolvedFile = path.resolve(sessionFile);
     const resolvedDir = path.resolve(sessionsDir);
     return resolvedFile.startsWith(`${resolvedDir}${path.sep}`);
@@ -1255,7 +1269,7 @@ export class MemoryIndexManager {
       params.progress.report({
         completed: params.progress.completed,
         total: params.progress.total,
-        label: this.batch.enabled ? "Indexing memory files (batch)..." : "Indexing memory files…",
+        label: this.batch.enabled ? "Indexing memory files (batch)..." : "Indexing memory files...",
       });
     }
 
@@ -1329,7 +1343,9 @@ export class MemoryIndexManager {
       params.progress.report({
         completed: params.progress.completed,
         total: params.progress.total,
-        label: this.batch.enabled ? "Indexing session files (batch)..." : "Indexing session files…",
+        label: this.batch.enabled
+          ? "Indexing session files (batch)..."
+          : "Indexing session files...",
       });
     }
 
@@ -1446,7 +1462,7 @@ export class MemoryIndexManager {
       progress.report({
         completed: progress.completed,
         total: progress.total,
-        label: "Loading vector extension…",
+        label: "Loading vector extension...",
       });
     }
     const vectorReady = await this.ensureVectorReady();
@@ -1709,7 +1725,12 @@ export class MemoryIndexManager {
   }
 
   private async listSessionFiles(): Promise<string[]> {
-    const dir = resolveSessionTranscriptsDirForAgent(this.agentId);
+    const dir = resolveSessionTranscriptsDirForAgent(
+      this.agentId,
+      undefined,
+      undefined,
+      this.projectId,
+    );
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
       return entries

@@ -100,7 +100,7 @@
       "name": "Projects and Isolated Workspaces",
       "description": "Project-scoped workspaces with isolated memory, MEMORY.md, knowledge base, and prompt overrides. Project switching via CLI flag or Telegram command.",
       "status": "in_progress",
-      "sessions_completed": 2,
+      "sessions_completed": 3,
       "session_count": 5
     },
     "15": {
@@ -181,7 +181,8 @@
     "phase13-session04-reasoning-trace-storage-and-budget-tracking",
     "phase13-session05-integration-testing-and-validation",
     "phase14-session01-research-and-architecture-design",
-    "phase14-session02-project-configuration-and-storage-layer"
+    "phase14-session02-project-configuration-and-storage-layer",
+    "phase14-session03-workspace-and-memory-isolation"
   ],
   "next_session_history": [
     {
@@ -1972,6 +1973,31 @@
     {
       "date": "2026-02-16",
       "session": "phase14-session02-project-configuration-and-storage-layer",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase14-session03-workspace-and-memory-isolation",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase14-session03-workspace-and-memory-isolation",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase14-session03-workspace-and-memory-isolation",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase14-session03-workspace-and-memory-isolation",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase14-session03-workspace-and-memory-isolation",
       "status": "completed"
     }
   ]

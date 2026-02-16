@@ -233,4 +233,83 @@ describe("memory search config", () => {
     const resolved = resolveMemorySearchConfig(cfg, "main");
     expect(resolved?.sources).toContain("sessions");
   });
+
+  describe("project-scoped store path", () => {
+    it("uses agent-level path when projectId is undefined", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: { enabled: true },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main");
+      expect(resolved?.store.path).toMatch(/main\.sqlite$/);
+      expect(resolved?.store.path).not.toContain(".default.");
+    });
+
+    it("uses agent-level path when projectId is null", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: { enabled: true },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main", null);
+      expect(resolved?.store.path).toMatch(/main\.sqlite$/);
+    });
+
+    it("uses agent-level path when projectId is 'default'", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: { enabled: true },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main", "default");
+      expect(resolved?.store.path).toMatch(/main\.sqlite$/);
+    });
+
+    it("uses project-scoped path for named project", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: { enabled: true },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main", "my-project");
+      expect(resolved?.store.path).toMatch(/main\.my-project\.sqlite$/);
+    });
+
+    it("normalizes project ID in store path", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: { enabled: true },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main", "My Project");
+      expect(resolved?.store.path).toMatch(/main\.my-project\.sqlite$/);
+    });
+
+    it("uses custom store path when explicitly configured (ignores projectId)", () => {
+      const cfg = {
+        agents: {
+          defaults: {
+            memorySearch: {
+              enabled: true,
+              store: { path: "/custom/{agentId}.sqlite" },
+            },
+          },
+        },
+      };
+      const resolved = resolveMemorySearchConfig(cfg, "main", "my-project");
+      expect(resolved?.store.path).toMatch(/main\.sqlite$/);
+      expect(resolved?.store.path).not.toContain("my-project");
+    });
+  });
 });

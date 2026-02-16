@@ -5,6 +5,7 @@ import type { crocbotConfig, MemorySearchConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import { clampInt, clampNumber, resolveUserPath } from "../utils.js";
 import { resolveAgentConfig } from "./agent-scope.js";
+import { isDefaultProject, normalizeProjectId } from "./project-scope.js";
 
 export type ResolvedMemorySearchConfig = {
   enabled: boolean;
@@ -106,9 +107,13 @@ function normalizeSources(
   return Array.from(normalized);
 }
 
-function resolveStorePath(agentId: string, raw?: string): string {
+function resolveStorePath(agentId: string, raw?: string, projectId?: string | null): string {
   const stateDir = resolveStateDir(process.env, os.homedir);
-  const fallback = path.join(stateDir, "memory", `${agentId}.sqlite`);
+  const useProject = !isDefaultProject(projectId);
+  const dbName = useProject
+    ? `${agentId}.${normalizeProjectId(projectId)}.sqlite`
+    : `${agentId}.sqlite`;
+  const fallback = path.join(stateDir, "memory", dbName);
   if (!raw) {
     return fallback;
   }
@@ -120,6 +125,7 @@ function mergeConfig(
   defaults: MemorySearchConfig | undefined,
   overrides: MemorySearchConfig | undefined,
   agentId: string,
+  projectId?: string | null,
 ): ResolvedMemorySearchConfig {
   const enabled = overrides?.enabled ?? defaults?.enabled ?? true;
   const sessionMemory =
@@ -177,7 +183,7 @@ function mergeConfig(
   };
   const store = {
     driver: overrides?.store?.driver ?? defaults?.store?.driver ?? "sqlite",
-    path: resolveStorePath(agentId, overrides?.store?.path ?? defaults?.store?.path),
+    path: resolveStorePath(agentId, overrides?.store?.path ?? defaults?.store?.path, projectId),
     vector,
   };
   const chunking = {
@@ -284,10 +290,11 @@ function mergeConfig(
 export function resolveMemorySearchConfig(
   cfg: crocbotConfig,
   agentId: string,
+  projectId?: string | null,
 ): ResolvedMemorySearchConfig | null {
   const defaults = cfg.agents?.defaults?.memorySearch;
   const overrides = resolveAgentConfig(cfg, agentId)?.memorySearch;
-  const resolved = mergeConfig(defaults, overrides, agentId);
+  const resolved = mergeConfig(defaults, overrides, agentId, projectId);
   if (!resolved.enabled) {
     return null;
   }

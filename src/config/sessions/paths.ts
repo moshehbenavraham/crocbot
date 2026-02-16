@@ -1,5 +1,6 @@
 import os from "node:os";
 import path from "node:path";
+import { isDefaultProject, normalizeProjectId } from "../../agents/project-scope.js";
 import { DEFAULT_AGENT_ID, normalizeAgentId } from "../../routing/session-key.js";
 import { resolveStateDir } from "../paths.js";
 import type { SessionEntry } from "./types.js";
@@ -25,8 +26,33 @@ export function resolveSessionTranscriptsDirForAgent(
   agentId?: string,
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
+  projectId?: string | null,
 ): string {
+  if (!isDefaultProject(projectId)) {
+    return resolveProjectSessionsDir(agentId, projectId, env, homedir);
+  }
   return resolveAgentSessionsDir(agentId, env, homedir);
+}
+
+/**
+ * Resolve the sessions directory for a project.
+ *
+ * For the default project, delegates to the agent-level sessions dir.
+ * For named projects, returns `{STATE_DIR}/agents/{agentId}/projects/{projectId}/sessions/`.
+ */
+export function resolveProjectSessionsDir(
+  agentId?: string,
+  projectId?: string | null,
+  env: NodeJS.ProcessEnv = process.env,
+  homedir: () => string = os.homedir,
+): string {
+  if (isDefaultProject(projectId)) {
+    return resolveAgentSessionsDir(agentId, env, homedir);
+  }
+  const root = resolveStateDir(env, homedir);
+  const id = normalizeAgentId(agentId ?? DEFAULT_AGENT_ID);
+  const normalizedProject = normalizeProjectId(projectId);
+  return path.join(root, "agents", id, "projects", normalizedProject, "sessions");
 }
 
 export function resolveDefaultSessionStorePath(agentId?: string): string {
@@ -37,6 +63,7 @@ export function resolveSessionTranscriptPath(
   sessionId: string,
   agentId?: string,
   topicId?: string | number,
+  projectId?: string | null,
 ): string {
   const safeTopicId =
     typeof topicId === "string"
@@ -46,7 +73,10 @@ export function resolveSessionTranscriptPath(
         : undefined;
   const fileName =
     safeTopicId !== undefined ? `${sessionId}-topic-${safeTopicId}.jsonl` : `${sessionId}.jsonl`;
-  return path.join(resolveAgentSessionsDir(agentId), fileName);
+  const dir = isDefaultProject(projectId)
+    ? resolveAgentSessionsDir(agentId)
+    : resolveProjectSessionsDir(agentId, projectId);
+  return path.join(dir, fileName);
 }
 
 export function resolveSessionFilePath(

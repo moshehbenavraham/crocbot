@@ -59,6 +59,8 @@ export interface AutoMemorizeDeps {
   checkBudget: CheckBudgetFn;
   getTranscript: GetTranscriptFn;
   log: SubsystemLogger;
+  /** Optional project ID for scoping transcript reads and memory storage. */
+  projectId?: string | null;
 }
 
 // ---------------------------------------------------------------------------

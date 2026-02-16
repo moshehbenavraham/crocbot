@@ -10,6 +10,7 @@ import path from "node:path";
 import os from "node:os";
 import type { crocbotConfig } from "../../../config/config.js";
 import { resolveAgentWorkspaceDir } from "../../../agents/agent-scope.js";
+import { isDefaultProject, resolveProjectWorkspaceDir } from "../../../agents/project-scope.js";
 import { resolveAgentIdFromSessionKey } from "../../../routing/session-key.js";
 import type { HookHandler } from "../../hooks.js";
 
@@ -73,8 +74,11 @@ const saveSessionToMemory: HookHandler = async (event) => {
     const context = event.context || {};
     const cfg = context.cfg as crocbotConfig | undefined;
     const agentId = resolveAgentIdFromSessionKey(event.sessionKey);
+    const projectId = (context.projectId as string | undefined) ?? undefined;
     const workspaceDir = cfg
-      ? resolveAgentWorkspaceDir(cfg, agentId)
+      ? !isDefaultProject(projectId)
+        ? resolveProjectWorkspaceDir(cfg, agentId, projectId)
+        : resolveAgentWorkspaceDir(cfg, agentId)
       : path.join(os.homedir(), "croc");
     const memoryDir = path.join(workspaceDir, "memory");
     await fs.mkdir(memoryDir, { recursive: true });
