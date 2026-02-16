@@ -118,6 +118,13 @@ import type {
   SessionsResetParamsSchema,
   SessionsResolveParamsSchema,
 } from "./sessions.js";
+import type {
+  ProjectsListParamsSchema,
+  ProjectsCurrentParamsSchema,
+  ProjectsCreateParamsSchema,
+  ProjectsDeleteParamsSchema,
+  ProjectsSwitchParamsSchema,
+} from "./projects.js";
 import type { PresenceEntrySchema, SnapshotSchema, StateVersionSchema } from "./snapshot.js";
 import type {
   WizardCancelParamsSchema,
@@ -237,3 +244,8 @@ export type ChatEvent = Static<typeof ChatEventSchema>;
 export type UpdateRunParams = Static<typeof UpdateRunParamsSchema>;
 export type TickEvent = Static<typeof TickEventSchema>;
 export type ShutdownEvent = Static<typeof ShutdownEventSchema>;
+export type ProjectsListParams = Static<typeof ProjectsListParamsSchema>;
+export type ProjectsCurrentParams = Static<typeof ProjectsCurrentParamsSchema>;
+export type ProjectsCreateParams = Static<typeof ProjectsCreateParamsSchema>;
+export type ProjectsDeleteParams = Static<typeof ProjectsDeleteParamsSchema>;
+export type ProjectsSwitchParams = Static<typeof ProjectsSwitchParamsSchema>;

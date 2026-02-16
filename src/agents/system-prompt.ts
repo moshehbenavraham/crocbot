@@ -198,6 +198,8 @@ export function buildAgentSystemPrompt(params: {
     level: "minimal" | "extensive";
     channel: string;
   };
+  /** Active project ID for project-scoped context (omit or "default" for the default project). */
+  projectId?: string | null;
 }) {
   const coreToolSummaries: Record<string, string> = {
     read: "Read file contents",
@@ -516,6 +518,12 @@ export function buildAgentSystemPrompt(params: {
   }
   if (reasoningHint) {
     lines.push("## Reasoning Format", reasoningHint, "");
+  }
+
+  // Project scope identification
+  const activeProjectId = params.projectId?.trim() || "";
+  if (activeProjectId && activeProjectId !== "default") {
+    lines.push("## Active Project", `Project: ${activeProjectId}`, "");
   }
 
   const contextFiles = params.contextFiles ?? [];

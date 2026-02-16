@@ -19,6 +19,7 @@ import { resolveDefaultModel } from "./directive-handling.js";
 import { resolveReplyDirectives } from "./get-reply-directives.js";
 import { handleInlineActions } from "./get-reply-inline-actions.js";
 import { runPreparedReply } from "./get-reply-run.js";
+import { resolveStoredProjectId } from "./model-selection.js";
 import { finalizeInboundContext } from "./inbound-context.js";
 import { initSessionState } from "./session.js";
 import { applyResetModelOverride } from "./session-reset-model.js";
@@ -267,6 +268,16 @@ export async function getReplyFromConfig(
     workspaceDir,
   });
 
+  const projectId =
+    resolveStoredProjectId({
+      sessionEntry,
+      sessionStore,
+      sessionKey,
+      parentSessionKey: ctx.ParentSessionKey,
+    }) ||
+    process.env.CROCBOT_ACTIVE_PROJECT?.trim() ||
+    undefined;
+
   return runPreparedReply({
     ctx,
     sessionCtx,
@@ -311,5 +322,6 @@ export async function getReplyFromConfig(
     storePath,
     workspaceDir,
     abortedLastRun,
+    projectId,
   });
 }

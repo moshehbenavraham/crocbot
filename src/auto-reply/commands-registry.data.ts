@@ -516,6 +516,36 @@ function buildChatCommands(): ChatCommandDefinition[] {
       ],
     }),
     defineChatCommand({
+      key: "project",
+      nativeName: "project",
+      description: "Manage projects (list, switch, create, current).",
+      textAlias: "/project",
+      category: "management",
+      acceptsArgs: true,
+      args: [
+        {
+          name: "action",
+          description: "list, current, switch, or create",
+          type: "string",
+          choices: ["list", "current", "switch", "create"],
+        },
+        {
+          name: "name",
+          description: "Project name (for switch/create)",
+          type: "string",
+        },
+      ],
+      argsMenu: {
+        arg: "action",
+        title:
+          "Project commands:\n" +
+          "- list - List all projects\n" +
+          "- current - Show active project\n" +
+          "- switch - Switch to a project\n" +
+          "- create - Create a new project",
+      },
+    }),
+    defineChatCommand({
       key: "models",
       nativeName: "models",
       description: "List model providers or provider models.",

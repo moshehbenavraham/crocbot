@@ -51,6 +51,14 @@ import {
 } from "./bot/helpers.js";
 import { firstDefined, isSenderAllowed, normalizeAllowFromWithStore } from "./bot-access.js";
 import { readTelegramAllowFromStore } from "./pairing-store.js";
+import { DEFAULT_PROJECT_ID } from "../config/types.projects.js";
+import { isDefaultProject } from "../agents/project-scope.js";
+import {
+  executeProjectSubcommand,
+  parseProjectSubcommand,
+  readChatActiveProject,
+  writeChatActiveProject,
+} from "./project-command.js";
 
 type TelegramNativeCommandContext = Context & { match?: string };
 
@@ -381,6 +389,72 @@ export const registerTelegramNativeCommands = ({
             topicConfig,
             commandAuthorized,
           } = auth;
+
+          // Direct handler for /project command
+          if (command.name === "project") {
+            const rawText = ctx.match?.trim() ?? "";
+            const sub = parseProjectSubcommand(rawText);
+            const parentPeer = buildTelegramParentPeer({ isGroup, resolvedThreadId, chatId });
+            const route = resolveAgentRoute({
+              cfg,
+              channel: "telegram",
+              accountId,
+              peer: {
+                kind: isGroup ? "group" : "direct",
+                id: isGroup ? buildTelegramGroupPeerId(chatId, resolvedThreadId) : String(chatId),
+              },
+              parentPeer,
+            });
+            const agentId = route.agentId;
+            const result = await executeProjectSubcommand(sub, {
+              agentId,
+              getActiveProjectId: () => {
+                // Synchronous read not possible; use env fallback for now
+                return process.env.CROCBOT_ACTIVE_PROJECT?.trim() || DEFAULT_PROJECT_ID;
+              },
+              setActiveProjectId: (projectId) => {
+                // Update env for this gateway process
+                if (isDefaultProject(projectId)) {
+                  delete process.env.CROCBOT_ACTIVE_PROJECT;
+                } else {
+                  process.env.CROCBOT_ACTIVE_PROJECT = projectId;
+                }
+                // Persist to chat-specific store (fire-and-forget)
+                void writeChatActiveProject(chatId, agentId, projectId).catch(() => {});
+              },
+            });
+            // Pre-load the active project from persistent store for get
+            if (sub.action === "current" || sub.action === "list") {
+              const stored = await readChatActiveProject(chatId, agentId);
+              const updatedResult = await executeProjectSubcommand(sub, {
+                agentId,
+                getActiveProjectId: () => stored,
+                setActiveProjectId: () => {},
+              });
+              await withTelegramApiErrorLogging({
+                operation: "sendMessage",
+                runtime,
+                fn: () =>
+                  bot.api.sendMessage(
+                    chatId,
+                    updatedResult.text,
+                    resolvedThreadId != null ? { message_thread_id: resolvedThreadId } : {},
+                  ),
+              });
+              return;
+            }
+            await withTelegramApiErrorLogging({
+              operation: "sendMessage",
+              runtime,
+              fn: () =>
+                bot.api.sendMessage(
+                  chatId,
+                  result.text,
+                  resolvedThreadId != null ? { message_thread_id: resolvedThreadId } : {},
+                ),
+            });
+            return;
+          }
 
           const commandDefinition = findCommandByNativeName(command.name, "telegram");
           const rawText = ctx.match?.trim() ?? "";

@@ -104,6 +104,8 @@ type RunPreparedReplyParams = {
   storePath?: string;
   workspaceDir: string;
   abortedLastRun: boolean;
+  /** Active project ID resolved from session entry metadata or environment. */
+  projectId?: string;
 };
 
 export async function runPreparedReply(
@@ -402,6 +404,7 @@ export async function runPreparedReply(
       ownerNumbers: command.ownerList.length > 0 ? command.ownerList : undefined,
       extraSystemPrompt: extraSystemPrompt || undefined,
       ...(isReasoningTagProvider(provider) ? { enforceFinalTag: true } : {}),
+      ...(params.projectId ? { projectId: params.projectId } : {}),
     },
   };
 

@@ -45,6 +45,8 @@ export type EmbeddedRunAttemptParams = {
   sessionFile: string;
   workspaceDir: string;
   agentDir?: string;
+  /** Active project ID for project-scoped workspace and memory isolation. */
+  projectId?: string | null;
   config?: crocbotConfig;
   skillsSnapshot?: SkillSnapshot;
   prompt: string;

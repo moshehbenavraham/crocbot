@@ -215,6 +215,22 @@ import {
   WizardStatusResultSchema,
   type WizardStep,
   WizardStepSchema,
+  type ProjectsListParams,
+  ProjectsListParamsSchema,
+  type ProjectsCurrentParams,
+  ProjectsCurrentParamsSchema,
+  type ProjectsCreateParams,
+  ProjectsCreateParamsSchema,
+  type ProjectsDeleteParams,
+  ProjectsDeleteParamsSchema,
+  type ProjectsSwitchParams,
+  ProjectsSwitchParamsSchema,
+  ProjectsListResultSchema,
+  ProjectsCurrentResultSchema,
+  ProjectsCreateResultSchema,
+  ProjectsDeleteResultSchema,
+  ProjectsSwitchResultSchema,
+  ProjectSummarySchema,
 } from "./schema.js";
 
 const ajv = new (AjvPkg as unknown as new (opts?: object) => import("ajv").default)({
@@ -357,6 +373,19 @@ export const validateUpdateRunParams = ajv.compile<UpdateRunParams>(UpdateRunPar
 export const validateWebLoginStartParams =
   ajv.compile<WebLoginStartParams>(WebLoginStartParamsSchema);
 export const validateWebLoginWaitParams = ajv.compile<WebLoginWaitParams>(WebLoginWaitParamsSchema);
+export const validateProjectsListParams = ajv.compile<ProjectsListParams>(ProjectsListParamsSchema);
+export const validateProjectsCurrentParams = ajv.compile<ProjectsCurrentParams>(
+  ProjectsCurrentParamsSchema,
+);
+export const validateProjectsCreateParams = ajv.compile<ProjectsCreateParams>(
+  ProjectsCreateParamsSchema,
+);
+export const validateProjectsDeleteParams = ajv.compile<ProjectsDeleteParams>(
+  ProjectsDeleteParamsSchema,
+);
+export const validateProjectsSwitchParams = ajv.compile<ProjectsSwitchParams>(
+  ProjectsSwitchParamsSchema,
+);
 
 export function formatValidationErrors(errors: ErrorObject[] | null | undefined) {
   if (!errors?.length) {
@@ -485,6 +514,17 @@ export {
   PROTOCOL_VERSION,
   ErrorCodes,
   errorShape,
+  ProjectSummarySchema,
+  ProjectsListParamsSchema,
+  ProjectsListResultSchema,
+  ProjectsCurrentParamsSchema,
+  ProjectsCurrentResultSchema,
+  ProjectsCreateParamsSchema,
+  ProjectsCreateResultSchema,
+  ProjectsDeleteParamsSchema,
+  ProjectsDeleteResultSchema,
+  ProjectsSwitchParamsSchema,
+  ProjectsSwitchResultSchema,
 };
 
 export type {
@@ -583,4 +623,9 @@ export type {
   PollParams,
   UpdateRunParams,
   ChatInjectParams,
+  ProjectsListParams,
+  ProjectsCurrentParams,
+  ProjectsCreateParams,
+  ProjectsDeleteParams,
+  ProjectsSwitchParams,
 };

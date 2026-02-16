@@ -1,4 +1,5 @@
 import type { ChatType } from "../channels/chat-type.js";
+import { DEFAULT_PROJECT_ID } from "../config/types.projects.js";
 import { parseAgentSessionKey, type ParsedAgentSessionKey } from "../sessions/session-key-utils.js";
 
 export {
@@ -260,4 +261,86 @@ export function resolveThreadSessionKeys(params: {
     ? `${params.baseSessionKey}:thread:${normalizedThreadId}`
     : params.baseSessionKey;
   return { sessionKey, parentSessionKey: params.parentSessionKey };
+}
+
+// -- Project-aware session key helpers --
+
+const PROJECT_SEGMENT_PREFIX = "project:";
+
+/**
+ * Builds a project-aware session key by inserting a `project:{id}` segment
+ * after the `agent:{agentId}:` prefix. For the default project (or falsy input),
+ * returns the base key unchanged.
+ *
+ * Example: `agent:main:telegram:group:123` + `myproject`
+ *   -> `agent:main:project:myproject:telegram:group:123`
+ */
+export function buildProjectAwareSessionKey(params: {
+  baseSessionKey: string;
+  projectId?: string | null;
+}): string {
+  const projectId = (params.projectId ?? "").trim().toLowerCase();
+  if (!projectId || projectId === DEFAULT_PROJECT_ID) {
+    return params.baseSessionKey;
+  }
+  const parsed = parseAgentSessionKey(params.baseSessionKey);
+  if (!parsed) {
+    return params.baseSessionKey;
+  }
+  return `agent:${parsed.agentId}:${PROJECT_SEGMENT_PREFIX}${projectId}:${parsed.rest}`;
+}
+
+/**
+ * Extracts a project ID from a session key. Returns `undefined` when no
+ * project segment is present (backward-compatible with old format).
+ *
+ * Handles keys like `agent:main:project:myproject:telegram:group:123`.
+ */
+export function extractProjectFromSessionKey(
+  sessionKey: string | undefined | null,
+): string | undefined {
+  const parsed = parseAgentSessionKey(sessionKey);
+  if (!parsed) {
+    return undefined;
+  }
+  const rest = parsed.rest;
+  if (!rest.startsWith(PROJECT_SEGMENT_PREFIX)) {
+    return undefined;
+  }
+  // rest = "project:myproject:telegram:group:123" -> extract "myproject"
+  const afterPrefix = rest.slice(PROJECT_SEGMENT_PREFIX.length);
+  const colonIdx = afterPrefix.indexOf(":");
+  if (colonIdx < 0) {
+    // rest = "project:myproject" (no further segments)
+    return afterPrefix || undefined;
+  }
+  const projectId = afterPrefix.slice(0, colonIdx);
+  return projectId || undefined;
+}
+
+/**
+ * Strips the project segment from a session key, returning the base key
+ * suitable for session lookup when project context is resolved separately.
+ */
+export function stripProjectFromSessionKey(sessionKey: string | undefined | null): string {
+  const raw = (sessionKey ?? "").trim();
+  if (!raw) {
+    return raw;
+  }
+  const parsed = parseAgentSessionKey(raw);
+  if (!parsed) {
+    return raw;
+  }
+  const rest = parsed.rest;
+  if (!rest.startsWith(PROJECT_SEGMENT_PREFIX)) {
+    return raw;
+  }
+  const afterPrefix = rest.slice(PROJECT_SEGMENT_PREFIX.length);
+  const colonIdx = afterPrefix.indexOf(":");
+  if (colonIdx < 0) {
+    // Key was just "agent:main:project:myproject" -- restore as agent:main:main
+    return `agent:${parsed.agentId}:${DEFAULT_MAIN_KEY}`;
+  }
+  const remainingRest = afterPrefix.slice(colonIdx + 1);
+  return `agent:${parsed.agentId}:${remainingRest}`;
 }

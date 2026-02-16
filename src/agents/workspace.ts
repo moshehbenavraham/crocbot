@@ -328,3 +328,88 @@ export function filterBootstrapFilesForSession(
   }
   return files.filter((file) => SUBAGENT_BOOTSTRAP_ALLOWLIST.has(file.name));
 }
+
+/**
+ * Load workspace bootstrap files with per-file project-to-agent fallback.
+ *
+ * For each bootstrap file:
+ *   1. Try loading from `projectWorkspaceDir` first.
+ *   2. If missing, fall back to `agentWorkspaceDir`.
+ *
+ * This enables project workspaces to selectively override specific files
+ * (e.g. SOUL.md) while inheriting others (e.g. AGENTS.md) from the agent.
+ *
+ * When `projectWorkspaceDir` equals `agentWorkspaceDir` (default project),
+ * this behaves identically to `loadWorkspaceBootstrapFiles`.
+ */
+export async function loadProjectAwareBootstrapFiles(params: {
+  projectWorkspaceDir: string;
+  agentWorkspaceDir: string;
+}): Promise<WorkspaceBootstrapFile[]> {
+  const resolvedProject = resolveUserPath(params.projectWorkspaceDir);
+  const resolvedAgent = resolveUserPath(params.agentWorkspaceDir);
+
+  // If same directory, no fallback needed
+  if (resolvedProject === resolvedAgent) {
+    return loadWorkspaceBootstrapFiles(resolvedProject);
+  }
+
+  const bootstrapNames: WorkspaceBootstrapFileName[] = [
+    DEFAULT_AGENTS_FILENAME,
+    DEFAULT_SOUL_FILENAME,
+    DEFAULT_TOOLS_FILENAME,
+    DEFAULT_IDENTITY_FILENAME,
+    DEFAULT_USER_FILENAME,
+    DEFAULT_HEARTBEAT_FILENAME,
+    DEFAULT_BOOTSTRAP_FILENAME,
+  ];
+
+  const result: WorkspaceBootstrapFile[] = [];
+
+  for (const name of bootstrapNames) {
+    const projectPath = path.join(resolvedProject, name);
+    const agentPath = path.join(resolvedAgent, name);
+
+    // Try project workspace first
+    try {
+      const content = await fs.readFile(projectPath, "utf-8");
+      result.push({ name, path: projectPath, content, missing: false });
+      continue;
+    } catch {
+      // Fall through to agent workspace
+    }
+
+    // Fall back to agent workspace
+    try {
+      const content = await fs.readFile(agentPath, "utf-8");
+      result.push({ name, path: agentPath, content, missing: false });
+    } catch {
+      result.push({ name, path: agentPath, missing: true });
+    }
+  }
+
+  // Memory files: try project first, fall back to agent
+  const projectMemory = await resolveMemoryBootstrapEntries(resolvedProject);
+  if (projectMemory.length > 0) {
+    for (const entry of projectMemory) {
+      try {
+        const content = await fs.readFile(entry.filePath, "utf-8");
+        result.push({ name: entry.name, path: entry.filePath, content, missing: false });
+      } catch {
+        result.push({ name: entry.name, path: entry.filePath, missing: true });
+      }
+    }
+  } else {
+    const agentMemory = await resolveMemoryBootstrapEntries(resolvedAgent);
+    for (const entry of agentMemory) {
+      try {
+        const content = await fs.readFile(entry.filePath, "utf-8");
+        result.push({ name: entry.name, path: entry.filePath, content, missing: false });
+      } catch {
+        result.push({ name: entry.name, path: entry.filePath, missing: true });
+      }
+    }
+  }
+
+  return result;
+}

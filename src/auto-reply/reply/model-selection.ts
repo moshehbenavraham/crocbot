@@ -151,6 +151,32 @@ export function resolveStoredModelOverride(params: {
   return { ...parentOverride, source: "parent" };
 }
 
+/**
+ * Read the active project from session entry metadata.
+ * Falls back to parent session when the direct entry has no projectId,
+ * mirroring the same parent-inheritance pattern as model overrides.
+ */
+export function resolveStoredProjectId(params: {
+  sessionEntry?: SessionEntry;
+  sessionStore?: Record<string, SessionEntry>;
+  sessionKey?: string;
+  parentSessionKey?: string;
+}): string | undefined {
+  const direct = params.sessionEntry?.projectId?.trim();
+  if (direct) {
+    return direct;
+  }
+  const parentKey = resolveParentSessionKeyCandidate({
+    sessionKey: params.sessionKey,
+    parentSessionKey: params.parentSessionKey,
+  });
+  if (!parentKey || !params.sessionStore) {
+    return undefined;
+  }
+  const parentEntry = params.sessionStore[parentKey];
+  return parentEntry?.projectId?.trim() || undefined;
+}
+
 function scoreFuzzyMatch(params: {
   provider: string;
   model: string;

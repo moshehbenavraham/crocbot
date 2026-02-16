@@ -1,6 +1,8 @@
 export type ParsedAgentSessionKey = {
   agentId: string;
   rest: string;
+  /** Project ID extracted from `project:{id}` segment, if present. */
+  projectId?: string;
 };
 
 export function parseAgentSessionKey(
@@ -21,6 +23,21 @@ export function parseAgentSessionKey(
   const rest = parts.slice(2).join(":");
   if (!agentId || !rest) {
     return null;
+  }
+  // Extract optional project segment: "project:{id}:{remaining rest}"
+  const PROJECT_PREFIX = "project:";
+  if (rest.startsWith(PROJECT_PREFIX)) {
+    const afterPrefix = rest.slice(PROJECT_PREFIX.length);
+    const colonIdx = afterPrefix.indexOf(":");
+    if (colonIdx < 0) {
+      // rest is "project:{id}" with no further segments
+      const projectId = afterPrefix.trim();
+      return projectId ? { agentId, rest, projectId } : { agentId, rest };
+    }
+    const projectId = afterPrefix.slice(0, colonIdx).trim();
+    if (projectId) {
+      return { agentId, rest, projectId };
+    }
   }
   return { agentId, rest };
 }

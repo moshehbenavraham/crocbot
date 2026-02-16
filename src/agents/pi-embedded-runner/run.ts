@@ -3,6 +3,8 @@ import type { ThinkLevel } from "../../auto-reply/thinking.js";
 import { enqueueCommandInLane } from "../../process/command-queue.js";
 import { resolveUserPath } from "../../utils.js";
 import { isMarkdownCapableMessageChannel } from "../../utils/message-channel.js";
+import { isDefaultProject, resolveProjectWorkspaceDir } from "../project-scope.js";
+import { parseAgentSessionKey } from "../../sessions/session-key-utils.js";
 import { resolvecrocbotAgentDir } from "../agent-paths.js";
 import {
   isProfileInCooldown,
@@ -177,6 +179,13 @@ export async function runEmbeddedPiAgent(
     enqueueGlobal(async () => {
       const started = Date.now();
       const resolvedWorkspace = resolveUserPath(params.workspaceDir);
+      // Resolve project-scoped workspace when a non-default project is active
+      const parsedSession = parseAgentSessionKey(params.sessionKey);
+      const runAgentId = parsedSession?.agentId ?? "main";
+      const projectWorkspace =
+        params.projectId && !isDefaultProject(params.projectId) && params.config
+          ? resolveProjectWorkspaceDir(params.config, runAgentId, params.projectId)
+          : undefined;
       const prevCwd = process.cwd();
 
       const provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
@@ -420,8 +429,9 @@ export async function runEmbeddedPiAgent(
             replyToMode: params.replyToMode,
             hasRepliedRef: params.hasRepliedRef,
             sessionFile: params.sessionFile,
-            workspaceDir: params.workspaceDir,
+            workspaceDir: projectWorkspace ?? params.workspaceDir,
             agentDir,
+            projectId: params.projectId,
             config: params.config,
             skillsSnapshot: params.skillsSnapshot,
             prompt,
@@ -520,7 +530,9 @@ export async function runEmbeddedPiAgent(
                 agentAccountId: params.agentAccountId,
                 authProfileId: lastProfileId,
                 sessionFile: params.sessionFile,
-                workspaceDir: resolvedWorkspace,
+                workspaceDir: projectWorkspace
+                  ? resolveUserPath(projectWorkspace)
+                  : resolvedWorkspace,
                 agentDir,
                 config: params.config,
                 skillsSnapshot: params.skillsSnapshot,
