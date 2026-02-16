@@ -4,22 +4,22 @@ Vector embeddings, semantic search, conversation memory management, and AI-power
 
 ## Key Files
 
-| File | Purpose |
-| --- | --- |
-| `manager.ts` | Memory index manager, search orchestration, area-filtered recall |
-| `manager-search.ts` | Vector and keyword search with area/importance propagation |
-| `hybrid.ts` | Hybrid search (keyword + semantic) with weighted merge |
-| `embeddings.ts` | Vector embedding generation (OpenAI, Gemini, local) |
-| `memory-schema.ts` | Schema creation, version tracking, FTS5 rebuild |
-| `consolidation.ts` | Consolidation engine (MERGE/REPLACE/KEEP_SEPARATE/UPDATE/SKIP) |
-| `consolidation-actions.ts` | Types, enums, DI interfaces, config factory |
-| `consolidation-prompts.ts` | System/message prompts for LLM consolidation decisions |
-| `consolidation-schema.ts` | Schema migration for consolidation_log and area/importance columns |
-| `auto-memorize.ts` | Post-conversation extraction (solutions, fragments, instruments) |
-| `auto-memorize-prompts.ts` | Extraction prompt templates and registry |
-| `index.ts` | Public API re-exports |
-| `cache.ts` | Embedding cache layer |
-| `internal.ts` | Markdown chunking, file-hash change detection |
+| File                       | Purpose                                                            |
+| -------------------------- | ------------------------------------------------------------------ |
+| `manager.ts`               | Memory index manager, search orchestration, area-filtered recall   |
+| `manager-search.ts`        | Vector and keyword search with area/importance propagation         |
+| `hybrid.ts`                | Hybrid search (keyword + semantic) with weighted merge             |
+| `embeddings.ts`            | Vector embedding generation (OpenAI, Gemini, local)                |
+| `memory-schema.ts`         | Schema creation, version tracking, FTS5 rebuild                    |
+| `consolidation.ts`         | Consolidation engine (MERGE/REPLACE/KEEP_SEPARATE/UPDATE/SKIP)     |
+| `consolidation-actions.ts` | Types, enums, DI interfaces, config factory                        |
+| `consolidation-prompts.ts` | System/message prompts for LLM consolidation decisions             |
+| `consolidation-schema.ts`  | Schema migration for consolidation_log and area/importance columns |
+| `auto-memorize.ts`         | Post-conversation extraction (solutions, fragments, instruments)   |
+| `auto-memorize-prompts.ts` | Extraction prompt templates and registry                           |
+| `index.ts`                 | Public API re-exports                                              |
+| `cache.ts`                 | Embedding cache layer                                              |
+| `internal.ts`              | Markdown chunking, file-hash change detection                      |
 
 ## How It Works
 
@@ -32,6 +32,7 @@ Vector embeddings, semantic search, conversation memory management, and AI-power
 ### Memory Consolidation (Phase 12)
 
 On every memory save, the consolidation engine:
+
 1. Finds similar existing chunks via vector search
 2. Sends new + similar chunks to the utility model for analysis
 3. LLM decides: MERGE, REPLACE, KEEP_SEPARATE, UPDATE, or SKIP
@@ -43,6 +44,7 @@ Safety gates: REPLACE requires >= 0.9 similarity. Empty merge content downgrades
 ### 4-Area Categorization
 
 Memories are categorized into four areas:
+
 - `main` -- general conversation memory
 - `fragments` -- key facts and preferences
 - `solutions` -- reusable problem/solution pairs
@@ -53,6 +55,7 @@ Area metadata stored on each chunk. Error-like queries automatically surface `so
 ### Auto-Memorize Hooks
 
 At session end, three extraction types run independently:
+
 - **Solutions**: problem/solution pairs from the conversation
 - **Fragments**: key facts, preferences, decisions
 - **Instruments**: tools, commands, techniques used

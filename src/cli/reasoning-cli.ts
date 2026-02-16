@@ -14,7 +14,7 @@ import type { Command } from "commander";
 import { ReasoningTraceStore } from "../agents/reasoning/trace-store.js";
 import type { ReasoningTrace, TraceQueryOptions } from "../agents/reasoning/trace-store.js";
 import { resolveStateDir } from "../config/paths.js";
-import { colorize, theme } from "../terminal/theme.js";
+import { colorize, isRich, theme } from "../terminal/theme.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
 import { defaultRuntime } from "../runtime.js";
 
@@ -79,7 +79,7 @@ function formatTraceTable(traces: ReasoningTrace[]): string {
     "Created".padEnd(20),
   ].join("  ");
 
-  lines.push(colorize(header, theme.muted));
+  lines.push(colorize(isRich(), theme.muted, header));
   lines.push("-".repeat(header.length));
 
   for (const t of traces) {
