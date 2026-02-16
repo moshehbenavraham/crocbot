@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.113**
+> **v0.1.121**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -105,15 +105,17 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
   Agents  Sessions     Cron    MCP Server
   (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
      |                              ^
-     +---> Rate Limiter + KeyPool    |
-     |         |                  External AI
-     |    LLM Providers           Systems
+     +---> Model Router              |
+     |    (reasoning / utility)   External AI
+     +---> Rate Limiter + KeyPool  Systems
+     |         |
+     |    LLM Providers
      |   (Claude, GPT, Gemini)
      +---> MCP Client
           (stdio, SSE, HTTP)
 ```
 
-The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat) to a cheaper model. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems.
 
 Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
 
@@ -132,6 +134,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Media pipeline](https://aiwithapex.mintlify.app/nodes/images)** — image/audio/video processing with AI understanding and transcription
 - **[MCP integration](https://aiwithapex.mintlify.app/concepts/mcp)** — native MCP client (stdio/SSE/HTTP) and server mode with SSRF-guarded transports
 - **[Memory system](https://aiwithapex.mintlify.app/concepts/memory)** — conversation memory with semantic search
+- **[Model roles](docs/concepts/model-roles)** — 2-role architecture (reasoning + utility) routes background tasks to cheap models for cost savings
 - **[Rate limiting](docs/ARCHITECTURE)** — per-provider RPM/TPM throttling, API key round-robin rotation, transient error retry with backoff
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
 

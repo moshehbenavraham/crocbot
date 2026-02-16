@@ -24,9 +24,11 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
   Agents  Sessions     Cron    MCP Server
   (Pi RT) (Storage)   (Jobs)  (SSE + HTTP)
       |                              ^
-      +---> Rate Limiter + KeyPool    |
-      |         |                  External AI
-      |    LLM Providers           Systems
+      +---> Model Router              |
+      |    (reasoning / utility)   External AI
+      +---> Rate Limiter + KeyPool  Systems
+      |         |
+      |    LLM Providers
       |   (Claude, OpenAI, ...)
       +---> MCP Client
            (stdio, SSE, HTTP)
@@ -99,6 +101,12 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Key modules**: `provider-rate-limiter.ts` (sliding window RPM/TPM enforcement), `key-pool.ts` (health-aware round-robin with rate limiter integration), `llm-retry.ts` (transient error classification and Retry-After parsing), `rate-limit-middleware.ts` (pre-flight/post-flight wrapper for LLM call sites)
 - **Composition**: Four-layer pipeline -- ProviderRateLimiter (sliding window) -> KeyPool (key selection) -> retryAsync + createLlmRetryOptions (transient retry) -> withRateLimitCheck (call-site middleware). Zero overhead when no limits configured (pass-through mode).
 
+### Model Roles (`src/agents/`)
+- **Purpose**: Route LLM calls to specialized models by task type for cost optimization
+- **Tech**: Pattern-based task classification, 2-role architecture (reasoning + utility)
+- **Key modules**: `model-router.ts` (ModelRouter interface, createModelRouter factory), `task-classifier.ts` (fixed task-type-to-role mapping), `model-roles.ts` (config parsing, role resolution, fallback logic)
+- **Composition**: TaskClassifier (call-site classification) -> ModelRouter (role resolution) -> resolveModel (provider/model selection). Utility tasks (compaction, memory-flush, heartbeat, llm-task) route to cheap model; reasoning tasks use primary model. Missing config gracefully degrades to primary model.
+
 ### MCP Client
 - **Purpose**: In-process client connecting to external MCP tool servers
 - **Tech**: @modelcontextprotocol/sdk, stdio/SSE/HTTP transports
@@ -131,11 +139,12 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 3. Gateway creates/resumes session, invokes agent
 4. Agent builds context: system prompt + memory recall + conversation history
 5. SecretsRegistry masks any credentials in LLM context before provider call
-6. Rate limiter checks RPM/TPM capacity; KeyPool selects best API key via round-robin
-7. Agent processes message with LLM provider (transient errors retried with backoff), invoking MCP client tools as needed
-8. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
-9. Tool results masked before persistence and display
-10. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
+6. Model router classifies the task type and resolves the appropriate model (reasoning or utility)
+7. Rate limiter checks RPM/TPM capacity; KeyPool selects best API key via round-robin
+8. Agent processes message with LLM provider (transient errors retried with backoff), invoking MCP client tools as needed
+9. StreamMasker masks secrets in streaming response chunks (cross-boundary detection)
+10. Tool results masked before persistence and display
+11. Response streamed back through Gateway to Telegram (masked) and persisted to session transcript (masked)
 
 ## Key Architectural Decisions
 
@@ -145,12 +154,13 @@ See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0003: Native MCP Integration](adr/0003-native-mcp-integration)
 - [ADR-0004: Secrets Masking Pipeline](adr/0004-secrets-masking-pipeline)
 - [ADR-0005: Per-Provider Rate Limiting](adr/0005-per-provider-rate-limiting)
+- [ADR-0006: 4-Model-Role Architecture](adr/0006-4-model-role-architecture)
 
 ## Directory Structure
 
 ```
 src/
-  agents/           # Agent runtime, tools, session repair
+  agents/           # Agent runtime, tools, session repair, model routing
   alerting/         # Error reporting and alerting
   auto-reply/       # Message dispatch and routing
   browser/          # Browser control (CDP)

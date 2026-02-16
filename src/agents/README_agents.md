@@ -26,6 +26,7 @@ agents/
 - **RPC Mode** — agents communicate with the gateway over JSON-RPC
 - **Tool Streaming** — tools emit results as they execute
 - **Session Repair** — crash-resilient transcript and file recovery (`session-transcript-repair.ts`, `session-file-repair.ts`)
+- **Model Routing** — 2-role architecture (reasoning + utility) routes background tasks to cheap models (`model-router.ts`, `task-classifier.ts`, `model-roles.ts`)
 
 ## Related
 
