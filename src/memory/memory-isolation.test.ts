@@ -19,6 +19,9 @@ import {
 } from "../config/sessions/paths.js";
 
 const FAKE_HOME = "/fakehome";
+// path.resolve ensures the expected value matches the resolved path on all
+// platforms (on Windows, path.resolve("/fakehome") prepends the drive letter).
+const RESOLVED_HOME = path.resolve(FAKE_HOME);
 const fakeHomedir = () => FAKE_HOME;
 
 const minimalCfg = {
@@ -79,7 +82,7 @@ describe("cross-project memory isolation", () => {
     it("project session dir uses projects/{projectId}/sessions/ structure", () => {
       const dir = resolveProjectSessionsDir("main", "my-project", {}, fakeHomedir);
       const expected = path.join(
-        FAKE_HOME,
+        RESOLVED_HOME,
         ".crocbot",
         "agents",
         "main",

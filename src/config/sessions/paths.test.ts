@@ -8,35 +8,38 @@ import {
 } from "./paths.js";
 
 const FAKE_HOME = "/fakehome";
+// path.resolve ensures the expected value matches the resolved path on all
+// platforms (on Windows, path.resolve("/fakehome") prepends the drive letter).
+const RESOLVED_HOME = path.resolve(FAKE_HOME);
 const fakeHomedir = () => FAKE_HOME;
 
 describe("resolveProjectSessionsDir", () => {
   it("returns agent-level sessions dir for undefined projectId", () => {
     const result = resolveProjectSessionsDir("main", undefined, {}, fakeHomedir);
-    expect(result).toBe(path.join(FAKE_HOME, ".crocbot", "agents", "main", "sessions"));
+    expect(result).toBe(path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "sessions"));
   });
 
   it("returns agent-level sessions dir for null projectId", () => {
     const result = resolveProjectSessionsDir("main", null, {}, fakeHomedir);
-    expect(result).toBe(path.join(FAKE_HOME, ".crocbot", "agents", "main", "sessions"));
+    expect(result).toBe(path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "sessions"));
   });
 
   it("returns agent-level sessions dir for 'default' projectId", () => {
     const result = resolveProjectSessionsDir("main", "default", {}, fakeHomedir);
-    expect(result).toBe(path.join(FAKE_HOME, ".crocbot", "agents", "main", "sessions"));
+    expect(result).toBe(path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "sessions"));
   });
 
   it("returns project-scoped sessions dir for named project", () => {
     const result = resolveProjectSessionsDir("main", "my-project", {}, fakeHomedir);
     expect(result).toBe(
-      path.join(FAKE_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
+      path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
     );
   });
 
   it("normalizes project ID", () => {
     const result = resolveProjectSessionsDir("main", "My Project", {}, fakeHomedir);
     expect(result).toBe(
-      path.join(FAKE_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
+      path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
     );
   });
 
@@ -44,7 +47,14 @@ describe("resolveProjectSessionsDir", () => {
     const env = { CROCBOT_STATE_DIR: "/custom/state" };
     const result = resolveProjectSessionsDir("main", "test-proj", env, fakeHomedir);
     expect(result).toBe(
-      path.join("/custom/state", "agents", "main", "projects", "test-proj", "sessions"),
+      path.join(
+        path.resolve("/custom/state"),
+        "agents",
+        "main",
+        "projects",
+        "test-proj",
+        "sessions",
+      ),
     );
   });
 });
@@ -52,13 +62,13 @@ describe("resolveProjectSessionsDir", () => {
 describe("resolveSessionTranscriptsDirForAgent with projectId", () => {
   it("returns agent-level sessions dir when projectId is undefined", () => {
     const result = resolveSessionTranscriptsDirForAgent("main", {}, fakeHomedir);
-    expect(result).toBe(path.join(FAKE_HOME, ".crocbot", "agents", "main", "sessions"));
+    expect(result).toBe(path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "sessions"));
   });
 
   it("returns project-scoped sessions dir for named project", () => {
     const result = resolveSessionTranscriptsDirForAgent("main", {}, fakeHomedir, "my-project");
     expect(result).toBe(
-      path.join(FAKE_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
+      path.join(RESOLVED_HOME, ".crocbot", "agents", "main", "projects", "my-project", "sessions"),
     );
   });
 });
