@@ -169,6 +169,20 @@ export const AgentDefaultsSchema = z
       })
       .strict()
       .optional(),
+    reasoningBudget: z
+      .object({
+        maxReasoningTokensPerSession: z.number().int().nonnegative().optional(),
+        warningThresholdPercent: z.number().int().min(1).max(100).optional(),
+      })
+      .strict()
+      .optional(),
+    reasoningTraces: z
+      .object({
+        enabled: z.boolean().optional(),
+        retentionDays: z.number().int().positive().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .optional();

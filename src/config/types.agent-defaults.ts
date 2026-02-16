@@ -103,6 +103,20 @@ export type AutoMemorizeConfig = {
   extractionTimeoutMs?: number;
 };
 
+export type ReasoningBudgetConfig = {
+  /** Max reasoning tokens allowed per session before warning (0 = unlimited, default: 0). */
+  maxReasoningTokensPerSession?: number;
+  /** Percentage of max at which to emit a warning event (default: 80). */
+  warningThresholdPercent?: number;
+};
+
+export type ReasoningTracesConfig = {
+  /** Enable reasoning trace persistence (default: true). */
+  enabled?: boolean;
+  /** Days to retain traces before cleanup (default: 7). */
+  retentionDays?: number;
+};
+
 export type AgentDefaultsConfig = {
   /** Primary model and fallbacks (provider/model). */
   model?: AgentModelListConfig;
@@ -253,6 +267,10 @@ export type AgentDefaultsConfig = {
   };
   /** Auto-memorize: extract solutions, fragments, and instruments from conversations at session end. */
   autoMemorize?: AutoMemorizeConfig;
+  /** Per-session reasoning token budget tracking and warning thresholds. */
+  reasoningBudget?: ReasoningBudgetConfig;
+  /** Reasoning trace persistence and retention settings. */
+  reasoningTraces?: ReasoningTracesConfig;
 };
 
 export type AgentCompactionMode = "default" | "safeguard";

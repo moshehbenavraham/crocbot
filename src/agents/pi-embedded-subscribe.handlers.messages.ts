@@ -21,6 +21,7 @@ import {
 import { createInlineCodeState } from "../markdown/code-spans.js";
 import { ChatGenerationResult } from "./reasoning/generation-result.js";
 import { resolveAdapter } from "./reasoning/adapter-registry.js";
+import { parseReasoningTokens } from "./reasoning/trace-store.js";
 
 export function handleMessageStart(
   ctx: EmbeddedPiSubscribeContext,
@@ -386,6 +387,39 @@ export function handleMessageEnd(
   // Finalize the reasoning accumulator and store thinking pairs for downstream access.
   if (ctx.generationResult) {
     ctx.lastThinkingPairs = ctx.generationResult.finalize();
+
+    // Emit a "thinking" event with finalized trace data for persistence.
+    const reasoningText = ctx.generationResult.reasoningText;
+    if (reasoningText) {
+      const partial = (evt as { message?: { model?: string; provider?: string } }).message;
+      const traceModel = typeof partial?.model === "string" ? partial.model : "";
+      const traceProvider = typeof partial?.provider === "string" ? partial.provider : "";
+      const usage = (assistantMessage as { usage?: unknown }).usage;
+      emitAgentEvent({
+        runId: ctx.params.runId,
+        stream: "thinking",
+        data: {
+          sessionKey: (ctx.params.session as { id?: string }).id ?? "",
+          runId: ctx.params.runId,
+          model: traceModel,
+          provider: traceProvider,
+          reasoningText,
+          reasoningTokens: parseReasoningTokens(traceProvider, usage),
+          totalTokens:
+            usage && typeof usage === "object"
+              ? typeof (usage as Record<string, unknown>).total_tokens === "number"
+                ? ((usage as Record<string, unknown>).total_tokens as number)
+                : 0
+              : 0,
+          durationMs: 0,
+          metadata: {
+            adapterId: ctx.generationResult.adapterId,
+            thinkingPairCount: ctx.lastThinkingPairs?.length ?? 0,
+          },
+        },
+      });
+    }
+
     ctx.generationResult = undefined;
   }
   ctx.reasoningAdapter = undefined;

@@ -4,7 +4,7 @@
 **Sessions**: 5
 **Estimated Duration**: 5-10 days
 
-**Progress**: 3/5 sessions (60%)
+**Progress**: 4/5 sessions (80%)
 
 ---
 
@@ -21,7 +21,7 @@ Complete native reasoning model support for o1/o3, DeepSeek-R1, and Claude exten
 | 01 | Research and Architecture Design | Complete | 20 | 2026-02-16 |
 | 02 | Reasoning Stream Adapter Layer | Complete | 20 | 2026-02-16 |
 | 03 | Chat Generation Result Accumulator | Complete | 20 | 2026-02-16 |
-| 04 | Reasoning Trace Storage and Budget Tracking | Not Started | ~20 | - |
+| 04 | Reasoning Trace Storage and Budget Tracking | Complete | 20 | 2026-02-16 |
 | 05 | Integration Testing and Validation | Not Started | ~20 | - |
 
 ---
@@ -46,11 +46,17 @@ Complete native reasoning model support for o1/o3, DeepSeek-R1, and Claude exten
 - **Deliverables**: ChatGenerationResult accumulator class, cursor-based delta extraction, thinking pairs, event filter expansion, 31 unit + 13 integration tests
 - **Key Decision**: Accumulator uses monotonic buffers with cursor-based deltas; addResponseText() bypasses adapter for text_delta path
 
+### Session 04: Reasoning Trace Storage and Budget Tracking
+- **Completed**: 2026-02-16
+- **Tasks**: 20/20
+- **Deliverables**: ReasoningTraceStore (SQLite CRUD with retention), ReasoningBudgetTracker (per-session token tracking with threshold warnings), reasoning_traces schema migration, CLI subcommands (traces list/export), 64 tests
+- **Key Decision**: Separate `reasoning_schema_version` in meta table to avoid conflicts with memory schema; budget tracker is in-memory per session (no persistence across restarts)
+
 ---
 
 ## Upcoming Sessions
 
-- Session 04: Reasoning Trace Storage and Budget Tracking
+- Session 05: Integration Testing and Validation
 
 ---
 
