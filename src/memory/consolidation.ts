@@ -344,7 +344,7 @@ function getConsolidationLogImpl(
   },
 ): ConsolidationLogEntry[] {
   const conditions: string[] = [];
-  const values: unknown[] = [];
+  const values: (string | number | null)[] = [];
 
   if (params.area) {
     conditions.push("area = ?");
