@@ -60,8 +60,8 @@ describe("classifyTask", () => {
       expect(unique.size).toBe(labels.length);
     });
 
-    it("TASK_TYPES contains exactly 5 entries", () => {
-      expect(TASK_TYPES).toHaveLength(5);
+    it("TASK_TYPES contains exactly 6 entries", () => {
+      expect(TASK_TYPES).toHaveLength(6);
     });
   });
 

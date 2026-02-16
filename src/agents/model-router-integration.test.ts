@@ -587,8 +587,8 @@ describe("model-router-integration", () => {
       expect(classification.role).toBe("reasoning");
     });
 
-    it("TASK_TYPES contains exactly 5 entries", () => {
-      expect(TASK_TYPES).toHaveLength(5);
+    it("TASK_TYPES contains exactly 6 entries", () => {
+      expect(TASK_TYPES).toHaveLength(6);
     });
   });
 

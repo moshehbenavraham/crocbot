@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.121**
+> **v0.1.122**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>

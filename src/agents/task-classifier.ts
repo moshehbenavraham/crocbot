@@ -15,7 +15,13 @@ import type { ModelRole } from "../config/types.model-roles.js";
 // ---------------------------------------------------------------------------
 
 /** Supported task type identifiers for LLM call sites. */
-export type TaskType = "reasoning" | "compaction" | "memory-flush" | "heartbeat" | "llm-task";
+export type TaskType =
+  | "reasoning"
+  | "compaction"
+  | "memory-flush"
+  | "heartbeat"
+  | "llm-task"
+  | "consolidation";
 
 /** All valid task types as a const array for iteration and validation. */
 export const TASK_TYPES = [
@@ -24,6 +30,7 @@ export const TASK_TYPES = [
   "memory-flush",
   "heartbeat",
   "llm-task",
+  "consolidation",
 ] as const satisfies readonly TaskType[];
 
 // ---------------------------------------------------------------------------
@@ -52,6 +59,7 @@ const TASK_CLASSIFICATION_MAP: Record<TaskType, TaskClassification> = {
   "memory-flush": { taskType: "memory-flush", role: "utility", label: "memory-flush" },
   heartbeat: { taskType: "heartbeat", role: "utility", label: "heartbeat" },
   "llm-task": { taskType: "llm-task", role: "utility", label: "llm-task" },
+  consolidation: { taskType: "consolidation", role: "utility", label: "consolidation" },
 };
 
 // ---------------------------------------------------------------------------
