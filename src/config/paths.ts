@@ -21,11 +21,6 @@ const LEGACY_STATE_DIRNAME = ".crocbot";
 const NEW_STATE_DIRNAME = ".crocbot";
 const CONFIG_FILENAME = "crocbot.json";
 
-/** Build a homedir thunk that respects CROCBOT_HOME for the given env. */
-function envHomedir(env: NodeJS.ProcessEnv): () => string {
-  return () => resolveRequiredHomeDir(env, os.homedir);
-}
-
 function legacyStateDir(homedir: () => string = os.homedir): string {
   return path.join(homedir(), LEGACY_STATE_DIRNAME);
 }

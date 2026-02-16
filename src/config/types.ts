@@ -12,6 +12,7 @@ export * from "./types.crocbot.js";
 export * from "./types.cron.js";
 export * from "./types.gateway.js";
 export * from "./types.hooks.js";
+export * from "./types.memory.js";
 export * from "./types.messages.js";
 export * from "./types.model-roles.js";
 export * from "./types.models.js";

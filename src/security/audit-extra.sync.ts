@@ -5,7 +5,7 @@
  */
 import type { SandboxToolPolicy } from "../agents/sandbox/types.js";
 import type { crocbotConfig } from "../config/config.js";
-import type { AgentToolsConfig } from "../config/types.tools.js";
+
 import { isToolAllowedByPolicies } from "../agents/pi-tools.policy.js";
 import {
   resolveSandboxConfigForAgent,
@@ -13,7 +13,7 @@ import {
 } from "../agents/sandbox.js";
 import { resolveToolProfilePolicy } from "../agents/tool-policy.js";
 import { resolveBrowserConfig } from "../browser/config.js";
-import { formatCliCommand } from "../cli/command-format.js";
+
 import { resolveGatewayAuth } from "../gateway/auth.js";
 
 export type SecurityAuditFinding = {
@@ -98,14 +98,14 @@ function collectModels(cfg: crocbotConfig): ModelRef[] {
       const id =
         typeof agent.id === "string" ? agent.id : typeof agent.name === "string" ? agent.name : "?";
       addModel(models, agent.model, `agents.list[${id}].model`);
-      if (Array.isArray(agent.models)) {
-        for (const altModel of agent.models) {
-          addModel(models, altModel, `agents.list[${id}].models[]`);
+      const agentModel = agent.model;
+      if (agentModel && typeof agentModel === "object" && Array.isArray(agentModel.fallbacks)) {
+        for (const altModel of agentModel.fallbacks) {
+          addModel(models, altModel, `agents.list[${id}].model.fallbacks[]`);
         }
       }
     }
   }
-  addModel(models, cfg.model, "model");
   return models;
 }
 
@@ -174,10 +174,10 @@ function pickToolPolicy(config?: { allow?: string[]; deny?: string[] }): Sandbox
   const allow = config.allow;
   const deny = config.deny;
   if (Array.isArray(allow) && allow.length) {
-    return { mode: "allowlist", list: allow };
+    return { allow };
   }
   if (Array.isArray(deny) && deny.length) {
-    return { mode: "denylist", list: deny };
+    return { deny };
   }
   return null;
 }
@@ -188,9 +188,12 @@ function resolveToolPolicies(params: { cfg: crocbotConfig; agentId: string }): {
 } {
   const sbxCfg = resolveSandboxConfigForAgent(params.cfg, params.agentId);
   const sandbox = resolveSandboxToolPolicyForAgent(params.cfg, params.agentId);
-  const profileRaw = resolveToolProfilePolicy(params.cfg, params.agentId);
-  const profile: SandboxToolPolicy | null =
-    profileRaw && profileRaw.mode !== "none" ? profileRaw : null;
+  const agentEntry = params.cfg.agents?.list?.find((a) => a.id === params.agentId);
+  const profileName = agentEntry?.tools?.profile ?? params.cfg.tools?.profile;
+  const profileRaw = resolveToolProfilePolicy(profileName);
+  const profile: SandboxToolPolicy | null = profileRaw
+    ? { allow: profileRaw.allow, deny: profileRaw.deny }
+    : null;
   const directAllow = pickToolPolicy(
     (sbxCfg as Record<string, unknown> | undefined)?.tools as
       | { allow?: string[]; deny?: string[] }
@@ -201,9 +204,7 @@ function resolveToolPolicies(params: { cfg: crocbotConfig; agentId: string }): {
 
 function hasWebSearchKey(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean {
   return Boolean(
-    (typeof cfg.keys?.tavily === "string" && cfg.keys.tavily.trim()) ||
-    (typeof cfg.keys?.brave === "string" && cfg.keys.brave.trim()) ||
-    (typeof cfg.keys?.serper === "string" && cfg.keys.serper.trim()) ||
+    cfg.tools?.web?.search?.apiKey?.trim() ||
     env.TAVILY_API_KEY?.trim() ||
     env.BRAVE_API_KEY?.trim() ||
     env.SERPER_API_KEY?.trim(),
@@ -211,7 +212,7 @@ function hasWebSearchKey(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean {
 }
 
 function isWebSearchEnabled(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean {
-  const explicit = cfg.tools?.webSearch?.enabled;
+  const explicit = cfg.tools?.web?.search?.enabled;
   if (typeof explicit === "boolean") {
     return explicit;
   }
@@ -219,7 +220,7 @@ function isWebSearchEnabled(cfg: crocbotConfig, env: NodeJS.ProcessEnv): boolean
 }
 
 function isWebFetchEnabled(cfg: crocbotConfig): boolean {
-  const explicit = cfg.tools?.webFetch?.enabled;
+  const explicit = cfg.tools?.web?.fetch?.enabled;
   if (typeof explicit === "boolean") {
     return explicit;
   }
@@ -227,7 +228,7 @@ function isWebFetchEnabled(cfg: crocbotConfig): boolean {
 }
 
 function isBrowserEnabled(cfg: crocbotConfig): boolean {
-  const browserCfg = resolveBrowserConfig(cfg);
+  const browserCfg = resolveBrowserConfig(cfg.browser, cfg);
   return browserCfg.enabled;
 }
 
@@ -316,7 +317,7 @@ export function collectSyncedFolderFindings(params: {
 
 export function collectSecretsInConfigFindings(cfg: crocbotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
-  const auth = resolveGatewayAuth(cfg);
+  const auth = resolveGatewayAuth({ authConfig: cfg.gateway?.auth });
   if (auth.mode === "password" && auth.password && !looksLikeEnvRef(auth.password)) {
     findings.push({
       checkId: "secrets.gateway_password",
@@ -358,12 +359,8 @@ export function collectHooksHardeningFindings(cfg: crocbotConfig): SecurityAudit
       remediation: "Regenerate with at least 32 random characters (e.g. `openssl rand -hex 16`).",
     });
   }
-  const gatewayAuth = resolveGatewayAuth(cfg);
-  if (
-    hooksToken &&
-    gatewayAuth.mode === "token" &&
-    gatewayAuth.tokens?.some((t) => t === hooksToken)
-  ) {
+  const gatewayAuth = resolveGatewayAuth({ authConfig: cfg.gateway?.auth });
+  if (hooksToken && gatewayAuth.mode === "token" && gatewayAuth.token === hooksToken) {
     findings.push({
       checkId: "hooks.reused_gateway_token",
       severity: "critical",
@@ -372,7 +369,7 @@ export function collectHooksHardeningFindings(cfg: crocbotConfig): SecurityAudit
       remediation: "Use a unique, random token for hooks.",
     });
   }
-  const hooksList = cfg.hooks?.list;
+  const hooksList = cfg.hooks?.mappings;
   if (Array.isArray(hooksList)) {
     const catchAll = hooksList.some(
       (h) => h && typeof h === "object" && (h as Record<string, unknown>).path === "/",
@@ -456,16 +453,16 @@ export function collectSmallModelRiskFindings(params: {
     const { sandbox, profile } = resolveToolPolicies({ cfg, agentId });
 
     const policies = [sandbox, profile].filter(Boolean) as SandboxToolPolicy[];
-    const sandboxBlocks = policies.length > 0 && !isToolAllowedByPolicies(policies, "exec");
+    const sandboxBlocks = policies.length > 0 && !isToolAllowedByPolicies("exec", policies);
     if (sandboxBlocks) {
       continue;
     }
 
     const webBlocked =
       policies.length > 0 &&
-      !isToolAllowedByPolicies(policies, "web_search") &&
-      !isToolAllowedByPolicies(policies, "web_fetch");
-    const browserBlocked = policies.length > 0 && !isToolAllowedByPolicies(policies, "browser");
+      !isToolAllowedByPolicies("web_search", policies) &&
+      !isToolAllowedByPolicies("web_fetch", policies);
+    const browserBlocked = policies.length > 0 && !isToolAllowedByPolicies("browser", policies);
     if (webBlocked && browserBlocked) {
       continue;
     }

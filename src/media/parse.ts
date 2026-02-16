@@ -14,7 +14,7 @@ export function normalizeMediaSource(src: string) {
 // modifiers, and other non-path Unicode decorations that LLMs sometimes append to paths.
 // Uses Unicode property escapes (ES2018) to match any Emoji presentation character.
 const TRAILING_EMOJI_RE =
-  /[\p{Emoji_Presentation}\p{Extended_Pictographic}\u200D\uFE0E\uFE0F\u{1F3FB}-\u{1F3FF}]+$/u;
+  /(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|[\uFE0E\uFE0F]|[\u{1F3FB}-\u{1F3FF}])+$/u;
 
 /**
  * Sanitize a media path/URL by stripping trailing whitespace and emoji characters

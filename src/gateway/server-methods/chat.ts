@@ -151,7 +151,7 @@ function appendAssistantTranscriptMessage(params: {
   try {
     const sessionManager = SessionManager.open(transcriptPath);
     const messageId = sessionManager.appendMessage(messageBody);
-    return { ok: true, messageId, message: messageBody as Record<string, unknown> };
+    return { ok: true, messageId, message: messageBody as unknown as Record<string, unknown> };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }

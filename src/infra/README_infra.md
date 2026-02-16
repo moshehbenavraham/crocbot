@@ -14,21 +14,21 @@ infra/
 
 ## Key Files
 
-| File                            | Purpose                                                            |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `net/ssrf.ts`                   | SSRF protection: private IP/hostname blocking, redirect validation |
-| `net/fetch-guard.ts`            | Guarded fetch wrapper with timeouts and DNS pinning                |
-| `exec-approvals.ts`             | Shell command allowlisting and token blocking                      |
-| `provider-rate-limiter.ts`      | Sliding window RPM/TPM enforcement per provider                    |
-| `provider-rate-limiter-config.ts` | Rate limiter config types and resolution                         |
-| `rate-limiter-instance.ts`      | Singleton rate limiter instance                                    |
-| `key-pool.ts`                   | Health-aware round-robin API key selection                         |
-| `llm-retry.ts`                  | LLM transient error classification and retry policy                |
-| `retry.ts`                      | Generic retry with exponential backoff and jitter                  |
-| `retry-policy.ts`               | Retry policy types                                                 |
-| `rate-limit-middleware.ts`      | Pre-flight/post-flight wrapper for LLM call sites                  |
-| `update-check.ts`               | Version update checking                                            |
-| `update-runner.ts`              | Runs the update process                                            |
+| File                              | Purpose                                                            |
+| --------------------------------- | ------------------------------------------------------------------ |
+| `net/ssrf.ts`                     | SSRF protection: private IP/hostname blocking, redirect validation |
+| `net/fetch-guard.ts`              | Guarded fetch wrapper with timeouts and DNS pinning                |
+| `exec-approvals.ts`               | Shell command allowlisting and token blocking                      |
+| `provider-rate-limiter.ts`        | Sliding window RPM/TPM enforcement per provider                    |
+| `provider-rate-limiter-config.ts` | Rate limiter config types and resolution                           |
+| `rate-limiter-instance.ts`        | Singleton rate limiter instance                                    |
+| `key-pool.ts`                     | Health-aware round-robin API key selection                         |
+| `llm-retry.ts`                    | LLM transient error classification and retry policy                |
+| `retry.ts`                        | Generic retry with exponential backoff and jitter                  |
+| `retry-policy.ts`                 | Retry policy types                                                 |
+| `rate-limit-middleware.ts`        | Pre-flight/post-flight wrapper for LLM call sites                  |
+| `update-check.ts`                 | Version update checking                                            |
+| `update-runner.ts`                | Runs the update process                                            |
 
 ## Secrets Masking (`secrets/`)
 
@@ -56,15 +56,16 @@ Per-provider rate limiting with API key rotation and transient error retry. Four
 4. **withRateLimitCheck** -- Call-site middleware wrapping LLM fetch calls with pre-flight capacity check and post-flight usage recording.
 
 Configuration via `rateLimits` in crocbot config:
+
 ```json5
 {
   rateLimits: {
     defaults: { rpm: 60, tpm: 100000 },
     providers: {
       anthropic: { rpm: 50, tpm: 80000 },
-      openai: { rpm: 60 }
-    }
-  }
+      openai: { rpm: 60 },
+    },
+  },
 }
 ```
 

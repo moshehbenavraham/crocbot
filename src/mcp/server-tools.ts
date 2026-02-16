@@ -223,7 +223,7 @@ async function handleListCapabilities(
     const capabilities = {
       tools: TOOLS.map((t) => t.name),
       model: cfg.agents?.defaults?.model ?? null,
-      memory: Boolean(cfg.memory),
+      memory: Boolean((cfg as Record<string, unknown>).memory),
       mcpClientEnabled: Boolean(cfg.mcp && Object.keys(cfg.mcp).length > 0),
     };
     return {

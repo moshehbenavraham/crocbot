@@ -7,6 +7,7 @@ import type { ChannelsConfig } from "./types.channels.js";
 import type { CronConfig } from "./types.cron.js";
 import type { DiscoveryConfig, GatewayConfig, TalkConfig } from "./types.gateway.js";
 import type { HooksConfig } from "./types.hooks.js";
+import type { MemoryConfig } from "./types.memory.js";
 import type { RateLimiterConfig } from "../infra/provider-rate-limiter-config.js";
 import type { McpGlobalConfig } from "../mcp/types.js";
 import type {
@@ -95,6 +96,8 @@ export type crocbotConfig = {
   rateLimits?: RateLimiterConfig;
   /** MCP server connections for tool discovery and invocation. */
   mcp?: McpGlobalConfig;
+  /** Memory backend configuration (builtin or qmd). */
+  memory?: MemoryConfig;
 };
 
 export type ConfigValidationIssue = {

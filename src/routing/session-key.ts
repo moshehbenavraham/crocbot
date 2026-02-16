@@ -8,6 +8,19 @@ export {
   type ParsedAgentSessionKey,
 } from "../sessions/session-key-utils.js";
 
+export type SessionKeyShape = "missing" | "agent" | "malformed_agent" | "legacy_or_alias";
+
+export function classifySessionKeyShape(sessionKey: string | undefined | null): SessionKeyShape {
+  const raw = (sessionKey ?? "").trim();
+  if (!raw) {
+    return "missing";
+  }
+  if (parseAgentSessionKey(raw)) {
+    return "agent";
+  }
+  return raw.toLowerCase().startsWith("agent:") ? "malformed_agent" : "legacy_or_alias";
+}
+
 export const DEFAULT_AGENT_ID = "main";
 export const DEFAULT_MAIN_KEY = "main";
 export const DEFAULT_ACCOUNT_ID = "default";
