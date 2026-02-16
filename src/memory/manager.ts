@@ -47,6 +47,9 @@ import { searchKeyword, searchVector } from "./manager-search.js";
 import { ensureMemoryIndexSchema } from "./memory-schema.js";
 import { requireNodeSqlite } from "./sqlite.js";
 import { loadSqliteVecExtension } from "./sqlite-vec.js";
+import type { ConsolidationEngine } from "./consolidation-actions.js";
+import { createDefaultConsolidationConfig } from "./consolidation-actions.js";
+import { createConsolidationEngine } from "./consolidation.js";
 
 type MemorySource = "memory" | "sessions";
 
@@ -57,6 +60,8 @@ export type MemorySearchResult = {
   score: number;
   snippet: string;
   source: MemorySource;
+  area: string;
+  importance: number;
 };
 
 type MemoryIndexMeta = {
@@ -89,6 +94,13 @@ type MemorySyncProgressState = {
   label?: string;
   report: (update: MemorySyncProgressUpdate) => void;
 };
+
+const ERROR_LIKE_PATTERNS =
+  /\b(error|fail|crash|exception|bug|broken|traceback|panic|segfault|abort)\b/i;
+
+function isErrorLikeQuery(query: string): boolean {
+  return ERROR_LIKE_PATTERNS.test(query);
+}
 
 const META_KEY = "memory_index_meta_v1";
 const SNIPPET_MAX_CHARS = 700;
@@ -172,6 +184,7 @@ export class MemoryIndexManager {
   >();
   private sessionWarm = new Set<string>();
   private syncing: Promise<void> | null = null;
+  private consolidationEngine: ConsolidationEngine | null = null;
 
   static async get(params: {
     cfg: crocbotConfig;
@@ -251,6 +264,7 @@ export class MemoryIndexManager {
     this.ensureIntervalSync();
     this.dirty = this.sources.has("memory");
     this.batch = this.resolveBatchConfig();
+    this.initConsolidationEngine();
   }
 
   async warmSession(sessionKey?: string): Promise<void> {
@@ -275,6 +289,7 @@ export class MemoryIndexManager {
       maxResults?: number;
       minScore?: number;
       sessionKey?: string;
+      area?: string;
     },
   ): Promise<MemorySearchResult[]> {
     void this.warmSession(opts?.sessionKey);
@@ -294,34 +309,80 @@ export class MemoryIndexManager {
       200,
       Math.max(1, Math.floor(maxResults * hybrid.candidateMultiplier)),
     );
+    const areaFilter = opts?.area ? this.buildAreaFilter(opts.area) : undefined;
 
     const keywordResults = hybrid.enabled
-      ? await this.searchKeyword(cleaned, candidates).catch(() => [])
+      ? await this.searchKeyword(cleaned, candidates, areaFilter).catch(() => [])
       : [];
 
     const queryVec = await this.embedQueryWithTimeout(cleaned);
     const hasVector = queryVec.some((v) => v !== 0);
     const vectorResults = hasVector
-      ? await this.searchVector(queryVec, candidates).catch(() => [])
+      ? await this.searchVector(queryVec, candidates, areaFilter).catch(() => [])
       : [];
 
+    let results: MemorySearchResult[];
     if (!hybrid.enabled) {
-      return vectorResults.filter((entry) => entry.score >= minScore).slice(0, maxResults);
+      results = vectorResults.filter((entry) => entry.score >= minScore).slice(0, maxResults);
+    } else {
+      const merged = this.mergeHybridResults({
+        vector: vectorResults,
+        keyword: keywordResults,
+        vectorWeight: hybrid.vectorWeight,
+        textWeight: hybrid.textWeight,
+      });
+      results = merged.filter((entry) => entry.score >= minScore).slice(0, maxResults);
     }
 
-    const merged = this.mergeHybridResults({
-      vector: vectorResults,
-      keyword: keywordResults,
-      vectorWeight: hybrid.vectorWeight,
-      textWeight: hybrid.textWeight,
-    });
+    // Importance-weighted ranking: boost score by (0.5 + importance)
+    for (const r of results) {
+      r.score = r.score * (0.5 + r.importance);
+    }
+    results.sort((a, b) => b.score - a.score);
 
-    return merged.filter((entry) => entry.score >= minScore).slice(0, maxResults);
+    // Solution recall: for error-like queries, union in solutions area results
+    if (!opts?.area && isErrorLikeQuery(cleaned)) {
+      const solutionFilter = this.buildAreaFilter("solutions");
+      const solutionVec = hasVector
+        ? await this.searchVector(queryVec, candidates, solutionFilter).catch(() => [])
+        : [];
+      const solutionKw = hybrid.enabled
+        ? await this.searchKeyword(cleaned, candidates, solutionFilter).catch(() => [])
+        : [];
+      let solutionResults: MemorySearchResult[];
+      if (!hybrid.enabled) {
+        solutionResults = solutionVec;
+      } else {
+        solutionResults = this.mergeHybridResults({
+          vector: solutionVec,
+          keyword: solutionKw,
+          vectorWeight: hybrid.vectorWeight,
+          textWeight: hybrid.textWeight,
+        });
+      }
+      for (const r of solutionResults) {
+        r.score = r.score * (0.5 + r.importance);
+      }
+      // Add solutions not already present in results
+      const existingIds = new Set(results.map((r) => `${r.path}:${r.startLine}:${r.endLine}`));
+      for (const s of solutionResults) {
+        const key = `${s.path}:${s.startLine}:${s.endLine}`;
+        if (!existingIds.has(key) && s.score >= minScore) {
+          results.push(s);
+          existingIds.add(key);
+        }
+      }
+      results.sort((a, b) => b.score - a.score);
+      results = results.slice(0, maxResults);
+    }
+
+    return results;
   }
 
   private async searchVector(
     queryVec: number[],
     limit: number,
+    areaFilter?: { sql: string; params: string[] },
   ): Promise<Array<MemorySearchResult & { id: string }>> {
     const results = await searchVector({
       db: this.db,
@@ -333,6 +394,7 @@ export class MemoryIndexManager {
       ensureVectorReady: async (dimensions) => await this.ensureVectorReady(dimensions),
       sourceFilterVec: this.buildSourceFilter("c"),
       sourceFilterChunks: this.buildSourceFilter(),
+      areaFilter,
     });
     return results.map((entry) => entry as MemorySearchResult & { id: string });
   }
@@ -344,6 +406,7 @@ export class MemoryIndexManager {
   private async searchKeyword(
     query: string,
     limit: number,
+    areaFilter?: { sql: string; params: string[] },
   ): Promise<Array<MemorySearchResult & { id: string; textScore: number }>> {
     if (!this.fts.enabled || !this.fts.available) {
       return [];
@@ -359,6 +422,7 @@ export class MemoryIndexManager {
       sourceFilter,
       buildFtsQuery: (raw) => this.buildFtsQuery(raw),
       bm25RankToScore,
+      areaFilter,
     });
     return results.map((entry) => entry as MemorySearchResult & { id: string; textScore: number });
   }
@@ -378,6 +442,8 @@ export class MemoryIndexManager {
         source: r.source,
         snippet: r.snippet,
         vectorScore: r.score,
+        area: r.area,
+        importance: r.importance,
       })),
       keyword: params.keyword.map((r) => ({
         id: r.id,
@@ -387,11 +453,47 @@ export class MemoryIndexManager {
         source: r.source,
         snippet: r.snippet,
         textScore: r.textScore,
+        area: r.area,
+        importance: r.importance,
       })),
       vectorWeight: params.vectorWeight,
       textWeight: params.textWeight,
     });
     return merged.map((entry) => entry as MemorySearchResult);
+  }
+
+  private buildAreaFilter(area: string): { sql: string; params: string[] } {
+    return { sql: ` AND c.area = ?`, params: [area] };
+  }
+
+  private initConsolidationEngine(): void {
+    try {
+      const config = createDefaultConsolidationConfig();
+      this.consolidationEngine = createConsolidationEngine({
+        db: this.db,
+        embedText: async (text: string) => {
+          const result = await this.embedQueryWithTimeout(text);
+          return result;
+        },
+        callLlm: async (_params) => {
+          // Consolidation LLM calls are a no-op until a callLlm provider is
+          // wired in by the gateway layer. For now the engine will SKIP when
+          // no similar candidates are found, and the LLM call path is only
+          // reached when candidates exist. This stub ensures the engine can
+          // be instantiated without API keys.
+          throw new Error("consolidation callLlm not yet wired");
+        },
+        config,
+        log,
+        providerModel: this.provider.model,
+        vectorTable: VECTOR_TABLE,
+      });
+    } catch (err) {
+      log.warn(
+        `consolidation engine init failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+      this.consolidationEngine = null;
+    }
   }
 
   async sync(params?: {
@@ -2311,8 +2413,8 @@ export class MemoryIndexManager {
       if (this.fts.enabled && this.fts.available) {
         this.db
           .prepare(
-            `INSERT INTO ${FTS_TABLE} (text, id, path, source, model, start_line, end_line)\n` +
-              ` VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO ${FTS_TABLE} (text, id, path, source, model, start_line, end_line, area)\n` +
+              ` VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           )
           .run(
             chunk.text,
@@ -2322,7 +2424,25 @@ export class MemoryIndexManager {
             this.provider.model,
             chunk.startLine,
             chunk.endLine,
+            "main",
           );
+      }
+      // Fire-and-forget consolidation for each indexed chunk
+      if (this.consolidationEngine && embedding.length > 0) {
+        this.consolidationEngine
+          .processNewChunk({
+            chunkId: id,
+            text: chunk.text,
+            embedding,
+            area: "main",
+            path: entry.path,
+            model: this.provider.model,
+          })
+          .catch((err) => {
+            log.warn(
+              `consolidation failed for chunk ${id}: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          });
       }
     }
     this.db

@@ -8,6 +8,8 @@ export type HybridVectorResult = {
   source: HybridSource;
   snippet: string;
   vectorScore: number;
+  area: string;
+  importance: number;
 };
 
 export type HybridKeywordResult = {
@@ -18,6 +20,8 @@ export type HybridKeywordResult = {
   source: HybridSource;
   snippet: string;
   textScore: number;
+  area: string;
+  importance: number;
 };
 
 export function buildFtsQuery(raw: string): string | null {
@@ -50,6 +54,8 @@ export function mergeHybridResults(params: {
   score: number;
   snippet: string;
   source: HybridSource;
+  area: string;
+  importance: number;
 }> {
   const byId = new Map<
     string,
@@ -62,6 +68,8 @@ export function mergeHybridResults(params: {
       snippet: string;
       vectorScore: number;
       textScore: number;
+      area: string;
+      importance: number;
     }
   >();
 
@@ -75,6 +83,8 @@ export function mergeHybridResults(params: {
       snippet: r.snippet,
       vectorScore: r.vectorScore,
       textScore: 0,
+      area: r.area,
+      importance: r.importance,
     });
   }
 
@@ -95,6 +105,8 @@ export function mergeHybridResults(params: {
         snippet: r.snippet,
         vectorScore: 0,
         textScore: r.textScore,
+        area: r.area,
+        importance: r.importance,
       });
     }
   }
@@ -108,6 +120,8 @@ export function mergeHybridResults(params: {
       score,
       snippet: entry.snippet,
       source: entry.source,
+      area: entry.area,
+      importance: entry.importance,
     };
   });
 

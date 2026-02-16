@@ -16,6 +16,8 @@ export type SearchRowResult = {
   score: number;
   snippet: string;
   source: SearchSource;
+  area: string;
+  importance: number;
 };
 
 export async function searchVector(params: {
@@ -28,19 +30,22 @@ export async function searchVector(params: {
   ensureVectorReady: (dimensions: number) => Promise<boolean>;
   sourceFilterVec: { sql: string; params: SearchSource[] };
   sourceFilterChunks: { sql: string; params: SearchSource[] };
+  areaFilter?: { sql: string; params: string[] };
 }): Promise<SearchRowResult[]> {
   if (params.queryVec.length === 0 || params.limit <= 0) {
     return [];
   }
+  const areaFilterSql = params.areaFilter?.sql ?? "";
+  const areaFilterParams = params.areaFilter?.params ?? [];
   if (await params.ensureVectorReady(params.queryVec.length)) {
     const rows = params.db
       .prepare(
         `SELECT c.id, c.path, c.start_line, c.end_line, c.text,\n` +
-          `       c.source,\n` +
+          `       c.source, c.area, c.importance,\n` +
           `       vec_distance_cosine(v.embedding, ?) AS dist\n` +
           `  FROM ${params.vectorTable} v\n` +
           `  JOIN chunks c ON c.id = v.id\n` +
-          ` WHERE c.model = ?${params.sourceFilterVec.sql}\n` +
+          ` WHERE c.model = ?${params.sourceFilterVec.sql}${areaFilterSql}\n` +
           ` ORDER BY dist ASC\n` +
           ` LIMIT ?`,
       )
@@ -48,6 +53,7 @@ export async function searchVector(params: {
         vectorToBlob(params.queryVec),
         params.providerModel,
         ...params.sourceFilterVec.params,
+        ...areaFilterParams,
         params.limit,
       ) as Array<{
       id: string;
@@ -56,6 +62,8 @@ export async function searchVector(params: {
       end_line: number;
       text: string;
       source: SearchSource;
+      area: string | null;
+      importance: number | null;
       dist: number;
     }>;
     return rows.map((row) => ({
@@ -66,6 +74,8 @@ export async function searchVector(params: {
       score: 1 - row.dist,
       snippet: truncateUtf16Safe(row.text, params.snippetMaxChars),
       source: row.source,
+      area: row.area ?? "main",
+      importance: row.importance ?? 0.5,
     }));
   }
 
@@ -80,7 +90,9 @@ export async function searchVector(params: {
       score: cosineSimilarity(params.queryVec, chunk.embedding),
     }))
     .filter((entry) => Number.isFinite(entry.score));
-  return scored
+  const areaValue = areaFilterParams[0];
+  const filtered = areaValue ? scored.filter((entry) => entry.chunk.area === areaValue) : scored;
+  return filtered
     .toSorted((a, b) => b.score - a.score)
     .slice(0, params.limit)
     .map((entry) => ({
@@ -91,6 +103,8 @@ export async function searchVector(params: {
       score: entry.score,
       snippet: truncateUtf16Safe(entry.chunk.text, params.snippetMaxChars),
       source: entry.chunk.source,
+      area: entry.chunk.area,
+      importance: entry.chunk.importance,
     }));
 }
 
@@ -106,10 +120,12 @@ export function listChunks(params: {
   text: string;
   embedding: number[];
   source: SearchSource;
+  area: string;
+  importance: number;
 }> {
   const rows = params.db
     .prepare(
-      `SELECT id, path, start_line, end_line, text, embedding, source\n` +
+      `SELECT id, path, start_line, end_line, text, embedding, source, area, importance\n` +
         `  FROM chunks\n` +
         ` WHERE model = ?${params.sourceFilter.sql}`,
     )
@@ -121,6 +137,8 @@ export function listChunks(params: {
     text: string;
     embedding: string;
     source: SearchSource;
+    area: string | null;
+    importance: number | null;
   }>;
 
   return rows.map((row) => ({
@@ -131,6 +149,8 @@ export function listChunks(params: {
     text: row.text,
     embedding: parseEmbedding(row.embedding),
     source: row.source,
+    area: row.area ?? "main",
+    importance: row.importance ?? 0.5,
   }));
 }
 
@@ -144,6 +164,7 @@ export async function searchKeyword(params: {
   sourceFilter: { sql: string; params: SearchSource[] };
   buildFtsQuery: (raw: string) => string | null;
   bm25RankToScore: (rank: number) => number;
+  areaFilter?: { sql: string; params: string[] };
 }): Promise<Array<SearchRowResult & { textScore: number }>> {
   if (params.limit <= 0) {
     return [];
@@ -153,24 +174,49 @@ export async function searchKeyword(params: {
     return [];
   }
 
+  // Query FTS table directly (area available as FTS column since v2 schema).
+  // Look up importance from chunks table in a second step since FTS5 JOINs
+  // can interfere with bm25() ranking.
+  const areaFilterSql = params.areaFilter ? ` AND area = ?` : "";
+  const areaFilterParams = params.areaFilter?.params ?? [];
   const rows = params.db
     .prepare(
-      `SELECT id, path, source, start_line, end_line, text,\n` +
+      `SELECT id, path, source, start_line, end_line, text, area,\n` +
         `       bm25(${params.ftsTable}) AS rank\n` +
         `  FROM ${params.ftsTable}\n` +
-        ` WHERE ${params.ftsTable} MATCH ? AND model = ?${params.sourceFilter.sql}\n` +
+        ` WHERE ${params.ftsTable} MATCH ? AND model = ?${params.sourceFilter.sql}${areaFilterSql}\n` +
         ` ORDER BY rank ASC\n` +
         ` LIMIT ?`,
     )
-    .all(ftsQuery, params.providerModel, ...params.sourceFilter.params, params.limit) as Array<{
+    .all(
+      ftsQuery,
+      params.providerModel,
+      ...params.sourceFilter.params,
+      ...areaFilterParams,
+      params.limit,
+    ) as Array<{
     id: string;
     path: string;
     source: SearchSource;
     start_line: number;
     end_line: number;
     text: string;
+    area: string | null;
     rank: number;
   }>;
+
+  // Batch lookup importance from chunks table
+  const importanceMap = new Map<string, number>();
+  if (rows.length > 0) {
+    const ids = rows.map((r) => r.id);
+    const placeholders = ids.map(() => "?").join(", ");
+    const impRows = params.db
+      .prepare(`SELECT id, importance FROM chunks WHERE id IN (${placeholders})`)
+      .all(...ids) as Array<{ id: string; importance: number | null }>;
+    for (const ir of impRows) {
+      importanceMap.set(ir.id, ir.importance ?? 0.5);
+    }
+  }
 
   return rows.map((row) => {
     const textScore = params.bm25RankToScore(row.rank);
@@ -183,6 +229,8 @@ export async function searchKeyword(params: {
       textScore,
       snippet: truncateUtf16Safe(row.text, params.snippetMaxChars),
       source: row.source,
+      area: row.area ?? "main",
+      importance: importanceMap.get(row.id) ?? 0.5,
     };
   });
 }
