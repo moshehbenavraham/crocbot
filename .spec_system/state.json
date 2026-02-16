@@ -107,7 +107,7 @@
       "name": "Knowledge Base Import Pipeline",
       "description": "CLI command to import URLs and documents into project-scoped vector knowledge base with chunking, embedding, deduplication, and categorized storage.",
       "status": "in_progress",
-      "sessions_completed": 3,
+      "sessions_completed": 4,
       "session_count": 5
     }
   },
@@ -188,7 +188,8 @@
     "phase14-session05-integration-testing-and-validation",
     "phase15-session01-research-and-architecture-design",
     "phase15-session02-document-parser-framework",
-    "phase15-session03-import-pipeline-core"
+    "phase15-session03-import-pipeline-core",
+    "phase15-session04-cli-command-and-incremental-updates"
   ],
   "next_session_history": [
     {
@@ -2124,6 +2125,31 @@
     {
       "date": "2026-02-16",
       "session": "phase15-session03-import-pipeline-core",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase15-session04-cli-command-and-incremental-updates",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase15-session04-cli-command-and-incremental-updates",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase15-session04-cli-command-and-incremental-updates",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase15-session04-cli-command-and-incremental-updates",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase15-session04-cli-command-and-incremental-updates",
       "status": "completed"
     }
   ]

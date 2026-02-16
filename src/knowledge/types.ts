@@ -90,6 +90,23 @@ export interface ImportStateStore {
   delete(sourceValue: string): void;
 }
 
+// -- Incremental re-import types (consumed by session 04) --
+
+/** Action to take for an incremental re-import. */
+export type IncrementalAction = "new" | "unchanged" | "changed";
+
+/** Result of classifying a source for incremental re-import. */
+export interface IncrementalResult {
+  readonly action: IncrementalAction;
+  readonly sourceValue: string;
+  /** Content hash of the incoming document. */
+  readonly incomingHash: string;
+  /** Content hash stored from the previous import (null for new sources). */
+  readonly storedHash: string | null;
+  /** Number of chunks from the previous import (0 for new sources). */
+  readonly previousChunkCount: number;
+}
+
 // -- Pipeline types (consumed by session 03-04) --
 
 /** Stage labels for progress reporting. */
