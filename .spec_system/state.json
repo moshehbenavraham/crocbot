@@ -2,7 +2,7 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 12,
+  "current_phase": 13,
   "current_session": null,
   "phases": {
     "0": {
@@ -91,9 +91,10 @@
     },
     "13": {
       "name": "Reasoning Model Support",
-      "description": "Add reasoning/response stream splitter for o1/o3, DeepSeek-R1, Claude extended thinking. Store reasoning traces for debugging and audit.",
-      "status": "not_started",
-      "session_count": 0
+      "description": "Native reasoning_delta stream parsing for o1/o3, DeepSeek-R1, Claude extended thinking. ChatGenerationResult accumulator, reasoning token budget tracking, and dedicated trace storage for debugging and audit.",
+      "status": "in_progress",
+      "sessions_completed": 2,
+      "session_count": 5
     },
     "14": {
       "name": "Projects and Isolated Workspaces",
@@ -172,7 +173,9 @@
     "phase12-session02-consolidation-engine-core",
     "phase12-session03-memory-categorization-and-schema-extensions",
     "phase12-session04-auto-memorize-hooks",
-    "phase12-session05-integration-testing-and-validation"
+    "phase12-session05-integration-testing-and-validation",
+    "phase13-session01-research-and-architecture-design",
+    "phase13-session02-reasoning-stream-adapter-layer"
   ],
   "next_session_history": [
     {
@@ -1788,6 +1791,56 @@
     {
       "date": "2026-02-16",
       "session": "phase12-session05-integration-testing-and-validation",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session01-research-and-architecture-design",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session01-research-and-architecture-design",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session01-research-and-architecture-design",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session01-research-and-architecture-design",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session01-research-and-architecture-design",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session02-reasoning-stream-adapter-layer",
+      "status": "recommended"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session02-reasoning-stream-adapter-layer",
+      "status": "spec_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session02-reasoning-stream-adapter-layer",
+      "status": "tasks_created"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session02-reasoning-stream-adapter-layer",
+      "status": "validated"
+    },
+    {
+      "date": "2026-02-16",
+      "session": "phase13-session02-reasoning-stream-adapter-layer",
       "status": "completed"
     }
   ]
