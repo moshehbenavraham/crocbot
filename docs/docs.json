@@ -917,6 +917,7 @@
           "concepts/retry",
           "concepts/model-providers",
           "concepts/models",
+          "concepts/model-roles",
           "concepts/model-selection",
           "concepts/model-failover",
           "concepts/usage-tracking",

@@ -1156,6 +1156,33 @@ Example: Opus 4.5 primary with MiniMax M2.1 fallback (hosted MiniMax):
 
 MiniMax auth: set `MINIMAX_API_KEY` (env) or configure `models.providers.minimax`.
 
+#### `agents.defaults.model.roles` (optional)
+
+Route specific task types to different models for cost optimization. Utility tasks
+(compaction, memory flush, heartbeat, generic LLM tasks) can be routed to a cheaper,
+faster model while the primary reasoning model handles user-facing conversations.
+
+Both fields are optional -- missing entries fall back to `model.primary`.
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-sonnet-4-5",
+        roles: {
+          utility: "openai/gpt-4o-mini"
+        }
+      }
+    }
+  }
+}
+```
+
+String shorthand (`"provider/model"`) and object form (`{ model, params }`) are both
+supported. See [Model Roles](/concepts/model-roles) for details, task type mapping, and
+fallback behavior.
+
 #### `agents.defaults.cliBackends` (CLI fallback)
 
 Optional CLI backends for text-only fallback runs (no tool calls). These are useful as a
