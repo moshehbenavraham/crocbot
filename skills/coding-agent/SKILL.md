@@ -1,5 +1,5 @@
 ---
-name: coding-agent
+name: coding_agent
 description: Run Claude Code (preferred), Codex CLI, OpenCode, or Pi Coding Agent via background process for programmatic control.
 metadata: {"crocbot":{"emoji":"🧩","requires":{"anyBins":["claude","codex","opencode","pi"]}}}
 ---

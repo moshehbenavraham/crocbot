@@ -50,6 +50,7 @@ services:
     command:
       [
         "node",
+        "--disable-warning=ExperimentalWarning",
         "dist/index.js",
         "gateway",
         "--bind",

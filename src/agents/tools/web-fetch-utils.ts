@@ -7,14 +7,30 @@ function decodeEntities(value: string): string {
     /&(?:nbsp|amp|quot|lt|gt|#39|#x([0-9a-f]+)|#(\d+));/gi,
     (match, hex, dec) => {
       const lower = match.toLowerCase();
-      if (lower === "&nbsp;") return " ";
-      if (lower === "&amp;") return "&";
-      if (lower === "&quot;") return '"';
-      if (lower === "&#39;") return "'";
-      if (lower === "&lt;") return "<";
-      if (lower === "&gt;") return ">";
-      if (hex !== undefined) return String.fromCharCode(Number.parseInt(hex, 16));
-      if (dec !== undefined) return String.fromCharCode(Number.parseInt(dec, 10));
+      if (lower === "&nbsp;") {
+        return " ";
+      }
+      if (lower === "&amp;") {
+        return "&";
+      }
+      if (lower === "&quot;") {
+        return '"';
+      }
+      if (lower === "&#39;") {
+        return "'";
+      }
+      if (lower === "&lt;") {
+        return "<";
+      }
+      if (lower === "&gt;") {
+        return ">";
+      }
+      if (hex !== undefined) {
+        return String.fromCharCode(Number.parseInt(hex, 16));
+      }
+      if (dec !== undefined) {
+        return String.fromCharCode(Number.parseInt(dec, 10));
+      }
       return match;
     },
   );

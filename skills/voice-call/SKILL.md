@@ -1,5 +1,5 @@
 ---
-name: voice-call
+name: voice_call
 description: Start voice calls via the crocbot voice-call plugin.
 metadata: {"crocbot":{"emoji":"📞","skillKey":"voice-call","requires":{"config":["plugins.entries.voice-call.enabled"]}}}
 ---

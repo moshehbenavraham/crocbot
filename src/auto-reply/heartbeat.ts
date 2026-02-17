@@ -144,9 +144,13 @@ export function stripHeartbeatToken(
     s = s.replace(/&nbsp;/gi, " ");
     // Remove markdown-ish wrappers at the edges.
     let start = 0;
-    while (start < s.length && "*`~_".includes(s[start])) start++;
+    while (start < s.length && "*`~_".includes(s[start])) {
+      start++;
+    }
     let end = s.length;
-    while (end > start && "*`~_".includes(s[end - 1])) end--;
+    while (end > start && "*`~_".includes(s[end - 1])) {
+      end--;
+    }
     return s.slice(start, end);
   };
 

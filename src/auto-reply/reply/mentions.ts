@@ -121,7 +121,9 @@ export function stripStructuralPrefixes(text: string): string {
       if (close > i + 1) {
         // Found [content] — skip it and any trailing whitespace
         let j = close + 1;
-        while (j < afterMarker.length && (afterMarker[j] === " " || afterMarker[j] === "\t")) j++;
+        while (j < afterMarker.length && (afterMarker[j] === " " || afterMarker[j] === "\t")) {
+          j++;
+        }
         i = j;
         continue;
       }

@@ -1,5 +1,5 @@
 ---
-name: self-repair
+name: self_repair
 description: Fix, explore, and refactor the crocbot codebase safely using Claude Code as a high-thinking-budget sub-agent. Use when the user requests codebase repairs, complex refactors, or deep exploration of the crocbot project structure.
 ---
 

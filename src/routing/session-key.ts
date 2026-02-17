@@ -32,9 +32,13 @@ const INVALID_CHARS_RE = /[^a-z0-9_-]+/g;
 
 function trimDashes(str: string): string {
   let start = 0;
-  while (start < str.length && str[start] === "-") start++;
+  while (start < str.length && str[start] === "-") {
+    start++;
+  }
   let end = str.length;
-  while (end > start && str[end - 1] === "-") end--;
+  while (end > start && str[end - 1] === "-") {
+    end--;
+  }
   return str.slice(start, end);
 }
 

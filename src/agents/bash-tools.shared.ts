@@ -247,7 +247,9 @@ function tokenizeCommand(command: string): string[] {
     } else {
       if (current) {
         const stripped = stripQuotes(current);
-        if (stripped) tokens.push(stripped);
+        if (stripped) {
+          tokens.push(stripped);
+        }
       }
       current = m[0];
     }
@@ -255,7 +257,9 @@ function tokenizeCommand(command: string): string[] {
   }
   if (current) {
     const stripped = stripQuotes(current);
-    if (stripped) tokens.push(stripped);
+    if (stripped) {
+      tokens.push(stripped);
+    }
   }
 
   return tokens;

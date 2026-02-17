@@ -229,7 +229,7 @@ export async function saveMediaSource(
     buffer = await fs.readFile(source);
   } catch (err) {
     if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EISDIR") {
-      throw new Error("Media path is not a file");
+      throw new Error("Media path is not a file", { cause: err });
     }
     throw err;
   }

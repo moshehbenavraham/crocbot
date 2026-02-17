@@ -196,7 +196,7 @@ export async function handlePostRestartReport(opts: { defaultUserId?: string }):
 
   const userId = state.notifiedUserId ?? opts.defaultUserId;
   if (!userId) {
-    log.warn("restart state found but no user ID to notify");
+    log.debug("restart state found but no user ID configured — skipping post-restart report");
     return;
   }
 

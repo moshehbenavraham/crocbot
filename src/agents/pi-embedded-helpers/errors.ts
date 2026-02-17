@@ -33,9 +33,10 @@ export function isContextOverflowError(errorMessage?: string): boolean {
  */
 function matchesContextWindowTooSmall(lower: string): boolean {
   const idx = lower.indexOf("context window");
-  if (idx < 0) return false;
-  const rest = lower.slice(idx);
-  return rest.includes("too small") || rest.includes("minimum is");
+  if (idx < 0) {
+    return false;
+  }
+  return lower.includes("too small", idx) || lower.includes("minimum is", idx);
 }
 
 /** Phrases that indicate context overflow when they appear after "context window". */
@@ -77,8 +78,7 @@ function matchesContextOverflowHint(lower: string): boolean {
   // "context window" followed by overflow-related phrases
   const cwIdx = lower.indexOf("context window");
   if (cwIdx >= 0) {
-    const rest = lower.slice(cwIdx);
-    if (CONTEXT_WINDOW_OVERFLOW_HINTS.some((hint) => rest.includes(hint))) {
+    if (CONTEXT_WINDOW_OVERFLOW_HINTS.some((hint) => lower.includes(hint, cwIdx))) {
       return true;
     }
   }
@@ -87,8 +87,7 @@ function matchesContextOverflowHint(lower: string): boolean {
   for (const prefix of ["prompt", "request", "input"] as const) {
     const pIdx = lower.indexOf(prefix);
     if (pIdx >= 0) {
-      const rest = lower.slice(pIdx);
-      if (PROMPT_OVERFLOW_HINTS.some((hint) => rest.includes(hint))) {
+      if (PROMPT_OVERFLOW_HINTS.some((hint) => lower.includes(hint, pIdx))) {
         return true;
       }
     }
