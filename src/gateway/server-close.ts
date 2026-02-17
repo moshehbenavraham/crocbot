@@ -10,7 +10,9 @@ import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("gateway/close");
 
-const RESTART_NOTIFY_USER_ID = process.env.CROCBOT_ADMIN_USER_ID ?? "";
+function getRestartNotifyUserId(): string {
+  return process.env.CROCBOT_ADMIN_USER_ID ?? "";
+}
 
 export function createGatewayCloseHandler(params: {
   tailscaleCleanup: (() => Promise<void>) | null;
@@ -50,7 +52,7 @@ export function createGatewayCloseHandler(params: {
       log.info("sending pre-restart notification...");
       try {
         notificationSent = await sendPreRestartNotification({
-          userId: RESTART_NOTIFY_USER_ID,
+          userId: getRestartNotifyUserId(),
           reason,
           restartExpectedMs,
         });
@@ -63,7 +65,7 @@ export function createGatewayCloseHandler(params: {
         await persistRestartState({
           reason,
           notificationSent,
-          notifiedUserId: notificationSent ? RESTART_NOTIFY_USER_ID : undefined,
+          notifiedUserId: notificationSent ? getRestartNotifyUserId() : undefined,
         });
       } catch (err) {
         log.warn(`failed to persist restart state: ${String(err)}`);

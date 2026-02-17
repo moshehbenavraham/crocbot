@@ -132,6 +132,10 @@ export async function sendPreRestartNotification(opts: {
   restartExpectedMs?: number | null;
 }): Promise<boolean> {
   const { userId, reason, restartExpectedMs } = opts;
+  if (!userId) {
+    log.debug("pre-restart notification skipped — no admin user ID configured");
+    return false;
+  }
   const _cfg = loadConfig();
 
   // Collect info about running/finished processes
