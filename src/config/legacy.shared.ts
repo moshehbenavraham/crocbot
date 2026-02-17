@@ -29,9 +29,11 @@ export const ensureRecord = (
   return next;
 };
 
+const UNSAFE_MERGE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 export const mergeMissing = (target: Record<string, unknown>, source: Record<string, unknown>) => {
   for (const [key, value] of Object.entries(source)) {
-    if (value === undefined) {
+    if (value === undefined || UNSAFE_MERGE_KEYS.has(key)) {
       continue;
     }
     const existing = target[key];

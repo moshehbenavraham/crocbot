@@ -35,7 +35,9 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
       +---> Reasoning Adapter
       |    (reasoning_delta / tags)
       +---> Project Workspaces
-           (isolated memory/prompts)
+      |    (isolated memory/prompts)
+      +---> Knowledge Import
+           (parse/chunk/embed/dedup)
 ```
 
 ## Components
@@ -141,6 +143,14 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Storage layout**: `{stateDir}/agents/{agentId}/projects/{projectName}/` with subdirectories for `memory/`, `sessions/`, and config files. Default project uses agent-level paths (no "default" subdirectory).
 - **Switching**: CLI (`crocbot --project <name>`, `/project` subcommands), Telegram (`/project <name>`), RPC (`projects.list`, `projects.current`, `projects.switch`, `projects.create`, `projects.delete`).
 
+### Knowledge Import Pipeline (`src/knowledge/`)
+- **Purpose**: Ingest external documents and URLs into project-scoped vector knowledge base
+- **Tech**: Parser registry (strategy pattern), heading-aware chunking, content-hash dedup, sqlite-vec storage
+- **Key modules**: `pipeline.ts` (6-stage orchestrator: fetch/parse/chunk/embed/dedup/store), `parsers/registry.ts` (priority-ordered parser dispatch), `chunker.ts` (heading-aware splitting with overlap), `dedup.ts` (hash-first then similarity dedup), `storage.ts` (sqlite-vec knowledge_chunks/knowledge_vectors schema), `state.ts` (incremental re-import state machine), `incremental.ts` (new/unchanged/changed classification)
+- **Parsers**: `text-parser.ts` (universal fallback), `markdown-parser.ts` (frontmatter extraction), `pdf-parser.ts` (pdfjs-dist, lazy-loaded), `url-parser.ts` (cheerio + node-html-markdown, SSRF-guarded fetch)
+- **CLI**: `crocbot knowledge import <source>` (URL/file/text, `--project`, `--category`, `--dry-run`, `--force`, `--batch`), `crocbot knowledge list`, `crocbot knowledge remove <source>`
+- **Composition**: ParserRegistry (format detection) -> chunker (heading-aware splitting) -> embedChunksInBatches -> deduplicateChunks (hash + similarity) -> KnowledgeStorage (sqlite-vec). Incremental re-import via content-hash state machine skips unchanged sources.
+
 ## Tech Stack Rationale
 
 | Technology | Purpose | Why Chosen |
@@ -181,6 +191,7 @@ See [Architecture Decision Records](adr/) for detailed history:
 - [ADR-0007: Memory Consolidation Architecture](adr/0007-memory-consolidation-architecture)
 - [ADR-0008: Reasoning Model Support](adr/0008-reasoning-model-support)
 - [ADR-0009: Project-Scoped Workspaces](adr/0009-project-scoped-workspaces)
+- [ADR-0010: Knowledge Import Pipeline](adr/0010-knowledge-import-pipeline)
 
 ## Directory Structure
 
@@ -199,6 +210,7 @@ src/
   gateway/          # Gateway control plane
   hooks/            # Hook system
   infra/            # Infrastructure (exec, net/SSRF, secrets masking, rate limiting)
+  knowledge/        # Knowledge import pipeline (parsers, chunking, dedup, storage)
   logging/          # Structured logging (tslog)
   media/            # Media pipeline
   media-understanding/  # Media analysis

@@ -26,6 +26,7 @@ import { authorizeGatewayConnect, type ResolvedGatewayAuth } from "./auth.js";
 import { getBearerToken, getHeader } from "./http-utils.js";
 import {
   readJsonBodyOrError,
+  safeErrorMessage,
   sendInvalidRequest,
   sendJson,
   sendMethodNotAllowed,
@@ -272,7 +273,7 @@ export async function handleToolsInvokeHttpRequest(
   } catch (err) {
     sendJson(res, 400, {
       ok: false,
-      error: { type: "tool_error", message: err instanceof Error ? err.message : String(err) },
+      error: { type: "tool_error", message: safeErrorMessage(err) },
     });
   }
 

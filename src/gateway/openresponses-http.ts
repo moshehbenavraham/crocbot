@@ -18,6 +18,7 @@ import { authorizeGatewayConnect, type ResolvedGatewayAuth } from "./auth.js";
 import { getBearerToken, resolveAgentIdForRequest, resolveSessionKey } from "./http-utils.js";
 import {
   readJsonBodyOrError,
+  safeErrorMessage,
   sendJson,
   sendMethodNotAllowed,
   sendUnauthorized,
@@ -453,7 +454,7 @@ export async function handleOpenResponsesHttpRequest(
     }
   } catch (err) {
     sendJson(res, 400, {
-      error: { message: String(err), type: "invalid_request_error" },
+      error: { message: safeErrorMessage(err), type: "invalid_request_error" },
     });
     return true;
   }
@@ -470,7 +471,7 @@ export async function handleOpenResponsesHttpRequest(
     toolChoicePrompt = toolChoiceResult.extraSystemPrompt;
   } catch (err) {
     sendJson(res, 400, {
-      error: { message: String(err), type: "invalid_request_error" },
+      error: { message: safeErrorMessage(err), type: "invalid_request_error" },
     });
     return true;
   }
@@ -589,7 +590,7 @@ export async function handleOpenResponsesHttpRequest(
         model,
         status: "failed",
         output: [],
-        error: { code: "api_error", message: String(err) },
+        error: { code: "api_error", message: safeErrorMessage(err) },
       });
       sendJson(res, 500, response);
     }
@@ -889,7 +890,7 @@ export async function handleOpenResponsesHttpRequest(
         model,
         status: "failed",
         output: [],
-        error: { code: "api_error", message: String(err) },
+        error: { code: "api_error", message: safeErrorMessage(err) },
         usage: finalUsage,
       });
 

@@ -82,8 +82,12 @@ async function readUnixListeners(
   port: number,
 ): Promise<{ listeners: PortListener[]; detail?: string; errors: string[] }> {
   const errors: string[] = [];
+  const safePort = Math.trunc(port);
+  if (!Number.isFinite(safePort) || safePort < 0 || safePort > 65535) {
+    return { listeners: [], errors: ["invalid port number"] };
+  }
   const lsof = await resolveLsofCommand();
-  const res = await runCommandSafe([lsof, "-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-FpFcn"]);
+  const res = await runCommandSafe([lsof, "-nP", `-iTCP:${safePort}`, "-sTCP:LISTEN", "-FpFcn"]);
   if (res.code === 0) {
     const listeners = parseLsofFieldOutput(res.stdout);
     await Promise.all(

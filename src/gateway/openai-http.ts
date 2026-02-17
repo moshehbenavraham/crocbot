@@ -9,6 +9,7 @@ import { defaultRuntime } from "../runtime.js";
 import { authorizeGatewayConnect, type ResolvedGatewayAuth } from "./auth.js";
 import {
   readJsonBodyOrError,
+  safeErrorMessage,
   sendJson,
   sendMethodNotAllowed,
   sendUnauthorized,
@@ -263,7 +264,7 @@ export async function handleOpenAiHttpRequest(
       });
     } catch (err) {
       sendJson(res, 500, {
-        error: { message: String(err), type: "api_error" },
+        error: { message: safeErrorMessage(err), type: "api_error" },
       });
     }
     return true;
@@ -403,7 +404,7 @@ export async function handleOpenAiHttpRequest(
         choices: [
           {
             index: 0,
-            delta: { content: `Error: ${String(err)}` },
+            delta: { content: `Error: ${safeErrorMessage(err)}` },
             finish_reason: "stop",
           },
         ],

@@ -14,6 +14,20 @@ export function sendText(res: ServerResponse, status: number, body: string) {
   res.end(body);
 }
 
+/**
+ * Extract a safe error message from an unknown error, stripping stack traces
+ * to prevent leaking internal implementation details to API consumers.
+ */
+export function safeErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  const str = String(err);
+  // Strip anything after a newline to remove stack traces from stringified errors
+  const firstLine = str.split("\n")[0] ?? "Internal server error";
+  return firstLine;
+}
+
 export function sendMethodNotAllowed(res: ServerResponse, allow = "POST") {
   res.setHeader("Allow", allow);
   sendText(res, 405, "Method Not Allowed");

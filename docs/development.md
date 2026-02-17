@@ -154,6 +154,7 @@ src/
   gateway/          # Gateway server
   hooks/            # Hook system
   infra/            # Infrastructure (exec, net/SSRF, secrets masking)
+  knowledge/        # Knowledge import pipeline (parsers, chunking, dedup)
   logging/          # Structured logging (tslog)
   mcp/              # MCP client, server, transports, tool bridge
   media/            # Media processing

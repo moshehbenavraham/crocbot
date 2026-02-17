@@ -47,12 +47,19 @@ export function createPdfParser(): DocumentParser {
       const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
       const data = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
-      const doc = await getDocument({ data, useSystemFonts: true }).promise;
+      // pdfjs-dist/legacy/build/pdf.mjs types don't expose the full
+      // DocumentInitParameters; the runtime API does accept useSystemFonts.
+      const doc = await getDocument({ data, useSystemFonts: true } as Parameters<
+        typeof getDocument
+      >[0]).promise;
 
       let title = "";
       try {
-        const metadata = await doc.getMetadata();
-        const info = metadata?.info as Record<string, unknown> | undefined;
+        // The .mjs entry point types omit getMetadata; cast to access it.
+        const metadata = await (
+          doc as unknown as { getMetadata(): Promise<{ info: Record<string, unknown> }> }
+        ).getMetadata();
+        const info = metadata?.info;
         if (info && typeof info.Title === "string" && info.Title.trim()) {
           title = info.Title.trim();
         }

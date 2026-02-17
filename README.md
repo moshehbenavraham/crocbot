@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.138**
+> **v0.1.142**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -116,10 +116,12 @@ See [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml). F
      +---> Reasoning Adapter
      |    (reasoning_delta / tags)
      +---> Project Workspaces
-          (isolated memory/prompts)
+     |    (isolated memory/prompts)
+     +---> Knowledge Import
+          (parse/chunk/embed/dedup)
 ```
 
-The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat, consolidation) to a cheaper model. At session end, the auto-memorize pipeline extracts solutions, facts, and instruments from the conversation transcript and stores them as categorized memories. The consolidation engine deduplicates on every save via LLM-driven analysis. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems. The Reasoning Adapter handles native `reasoning_delta` streams from o1/o3, DeepSeek-R1, and Claude extended thinking, with tag-based fallback and dedicated trace storage. Project Workspaces provide isolated memory, prompts, and knowledge base per project, switchable via CLI (`--project`) or Telegram (`/project`).
+The Gateway is the single control plane. Telegram messages flow in, get routed to agent sessions, and responses stream back. The CLI connects to the same Gateway over WebSocket. The Model Router classifies each LLM call as reasoning or utility and routes utility tasks (compaction, memory flush, heartbeat, consolidation) to a cheaper model. At session end, the auto-memorize pipeline extracts solutions, facts, and instruments from the conversation transcript and stores them as categorized memories. The consolidation engine deduplicates on every save via LLM-driven analysis. The MCP client connects to external tool servers (stdio/SSE/HTTP); MCP server mode exposes crocbot as infrastructure for other AI systems. The Reasoning Adapter handles native `reasoning_delta` streams from o1/o3, DeepSeek-R1, and Claude extended thinking, with tag-based fallback and dedicated trace storage. Project Workspaces provide isolated memory, prompts, and knowledge base per project, switchable via CLI (`--project`) or Telegram (`/project`). The Knowledge Import Pipeline ingests external documents and URLs via `crocbot knowledge import`, parsing (text, markdown, PDF, HTML), chunking with heading-aware boundaries, embedding, deduplicating, and storing into the project-scoped vector knowledge base with incremental re-import support.
 
 Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/concepts/architecture)
 
@@ -142,6 +144,7 @@ Full architecture: [Architecture overview](https://aiwithapex.mintlify.app/conce
 - **[Rate limiting](docs/ARCHITECTURE)** — per-provider RPM/TPM throttling, API key round-robin rotation, transient error retry with backoff
 - **[Reasoning models](docs/features/reasoning)** — native `reasoning_delta` parsing for o1/o3, DeepSeek-R1, Claude extended thinking; tag-based fallback; trace storage and budget tracking
 - **[Project workspaces](docs/features/projects)** — isolated memory, prompts, and knowledge per project; CLI (`--project`) and Telegram (`/project`) switching
+- **[Knowledge import](docs/features/knowledge-import)** — ingest URLs, PDFs, markdown, and text into project-scoped vector knowledge base with incremental re-import, deduplication, and heading-aware chunking
 - **[Security layer](https://aiwithapex.mintlify.app/gateway/security)** — SSRF protection, path traversal validation, exec allowlisting, secrets masking, DM pairing
 
 ---

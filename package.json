@@ -1,6 +1,6 @@
 {
   "name": "crocbot",
-  "version": "0.1.142",
+  "version": "0.1.143",
   "description": "Telegram gateway CLI with Pi RPC agent",
   "type": "module",
   "main": "dist/index.js",
@@ -162,7 +162,7 @@
     "jszip": "^3.10.1",
     "linkedom": "^0.18.12",
     "long": "5.3.2",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^14.1.1",
     "node-edge-tts": "^1.2.9",
     "node-html-markdown": "^2.0.0",
     "osc-progress": "^0.3.0",
@@ -208,7 +208,8 @@
     "wireit": "^0.14.12"
   },
   "overrides": {
-    "tar": "7.5.7"
+    "tar": "7.5.7",
+    "qs": ">=6.14.2"
   },
   "pnpm": {
     "minimumReleaseAge": 2880,
@@ -218,7 +219,8 @@
       "cmake-js": "^8.0.0",
       "fast-xml-parser": ">=5.3.4",
       "@isaacs/brace-expansion": ">=5.0.1",
-      "axios": ">=1.13.5"
+      "axios": ">=1.13.5",
+      "qs": ">=6.14.2"
     }
   },
   "vitest": {
