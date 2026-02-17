@@ -38,7 +38,7 @@ function quoteCmdArg(value: string): string {
   if (!/[ \t"]/g.test(value)) {
     return value;
   }
-  return `"${value.replace(/"/g, '\\"')}"`;
+  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
 function resolveTaskUser(env: Record<string, string | undefined>): string | null {

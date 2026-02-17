@@ -463,7 +463,8 @@ describe("createcrocbotCodingTools", () => {
   });
   it("applies sandbox path guards to file_path alias", async () => {
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-sbx-"));
-    const outsidePath = path.join(os.tmpdir(), "crocbot-outside.txt");
+    const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-outside-"));
+    const outsidePath = path.join(outsideDir, "outside.txt");
     await fs.writeFile(outsidePath, "outside", "utf8");
     try {
       const readTool = createSandboxedReadTool(tmpDir);
@@ -471,7 +472,7 @@ describe("createcrocbotCodingTools", () => {
         /sandbox root/i,
       );
     } finally {
-      await fs.rm(outsidePath, { force: true });
+      await fs.rm(outsideDir, { recursive: true, force: true });
       await fs.rm(tmpDir, { recursive: true, force: true });
     }
   });

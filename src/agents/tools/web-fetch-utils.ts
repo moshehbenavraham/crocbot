@@ -1,19 +1,35 @@
 export type ExtractMode = "markdown" | "text";
 
 function decodeEntities(value: string): string {
-  return value
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16)))
-    .replace(/&#(\d+);/gi, (_, dec) => String.fromCharCode(Number.parseInt(dec, 10)));
+  // Decode &lt;/&gt;/&amp;/&quot;/&#39; and numeric entities in a single pass
+  // to avoid double-decoding (e.g. &amp;lt; → & + lt; vs. &amp;lt; → &lt; → <).
+  return value.replace(
+    /&(?:nbsp|amp|quot|lt|gt|#39|#x([0-9a-f]+)|#(\d+));/gi,
+    (match, hex, dec) => {
+      const lower = match.toLowerCase();
+      if (lower === "&nbsp;") return " ";
+      if (lower === "&amp;") return "&";
+      if (lower === "&quot;") return '"';
+      if (lower === "&#39;") return "'";
+      if (lower === "&lt;") return "<";
+      if (lower === "&gt;") return ">";
+      if (hex !== undefined) return String.fromCharCode(Number.parseInt(hex, 16));
+      if (dec !== undefined) return String.fromCharCode(Number.parseInt(dec, 10));
+      return match;
+    },
+  );
 }
 
 function stripTags(value: string): string {
-  return decodeEntities(value.replace(/<[^>]+>/g, ""));
+  // Loop until no more tags remain — a single pass of /<[^>]+>/g can leave
+  // residual tags when nested or intentionally crafted (e.g. "<<b>b>").
+  let result = value;
+  let prev: string;
+  do {
+    prev = result;
+    result = result.replace(/<[^>]+>/g, "");
+  } while (result !== prev);
+  return decodeEntities(result);
 }
 
 function normalizeWhitespace(value: string): string {
@@ -28,10 +44,17 @@ function normalizeWhitespace(value: string): string {
 export function htmlToMarkdown(html: string): { text: string; title?: string } {
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const title = titleMatch ? normalizeWhitespace(stripTags(titleMatch[1])) : undefined;
-  let text = html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, "");
+  // Strip script/style/noscript blocks — loop until stable to handle
+  // nested or intentionally crafted bypass patterns like <<script>script>.
+  let text = html;
+  let prevText: string;
+  do {
+    prevText = text;
+    text = text
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<noscript[\s\S]*?<\/noscript>/gi, "");
+  } while (text !== prevText);
   text = text.replace(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, href, body) => {
     const label = normalizeWhitespace(stripTags(body));
     if (!label) {

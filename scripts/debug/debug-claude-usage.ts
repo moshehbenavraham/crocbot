@@ -17,6 +17,16 @@ const mask = (value: string) => {
   return `${compact.slice(0, edge)}…${compact.slice(-edge)}`;
 };
 
+/** Redact potential secrets from API response bodies when not in --reveal mode. */
+const redactResponseBody = (body: string, maxLen: number) => {
+  const truncated = body.slice(0, maxLen).replace(/\s+/g, " ").trim();
+  // Redact common token/key patterns (sk-ant-*, Bearer tokens, long hex strings)
+  return truncated
+    .replace(/sk-ant-[A-Za-z0-9_-]+/g, "sk-ant-***")
+    .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer ***")
+    .replace(/[A-Za-z0-9_-]{40,}/g, (m) => `${m.slice(0, 6)}…[redacted]`);
+};
+
 const parseArgs = (): Args => {
   const args = process.argv.slice(2);
   let agentId = "main";
@@ -289,7 +299,7 @@ const main = async () => {
     console.log(
       `OAuth usage (keychain): HTTP ${oauth.status} (${oauth.contentType ?? "no content-type"})`,
     );
-    console.log(oauth.text.slice(0, 200).replace(/\s+/g, " ").trim());
+    console.log(opts.reveal ? oauth.text.slice(0, 200).replace(/\s+/g, " ").trim() : redactResponseBody(oauth.text, 200));
   } else {
     console.log("Claude Code CLI keychain: missing/unreadable");
   }
@@ -306,7 +316,7 @@ const main = async () => {
       console.log(
         `OAuth usage (${entry.profileId}): HTTP ${oauth.status} (${oauth.contentType ?? "no content-type"})`,
       );
-      console.log(oauth.text.slice(0, 200).replace(/\s+/g, " ").trim());
+      console.log(opts.reveal ? oauth.text.slice(0, 200).replace(/\s+/g, " ").trim() : redactResponseBody(oauth.text, 200));
     }
   }
 
@@ -333,11 +343,11 @@ const main = async () => {
   const web = await fetchClaudeWebUsage(sessionKey);
   if (!web.ok) {
     console.log(`Claude web: ${web.step} HTTP ${web.status}`);
-    console.log(String(web.body).slice(0, 400).replace(/\s+/g, " ").trim());
+    console.log(opts.reveal ? String(web.body).slice(0, 400).replace(/\s+/g, " ").trim() : redactResponseBody(String(web.body), 400));
     return;
   }
   console.log(`Claude web: org=${web.orgId} OK`);
-  console.log(web.body.slice(0, 400).replace(/\s+/g, " ").trim());
+  console.log(opts.reveal ? web.body.slice(0, 400).replace(/\s+/g, " ").trim() : redactResponseBody(web.body, 400));
 };
 
 await main();

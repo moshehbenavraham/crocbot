@@ -18,20 +18,20 @@ const resolveGitHead = (startDir: string) => {
   for (let i = 0; i < 12; i += 1) {
     const gitPath = path.join(current, ".git");
     try {
-      const stat = fs.statSync(gitPath);
-      if (stat.isDirectory()) {
+      // Try reading as file first (gitdir worktree pointer).
+      // If .git is a directory, readFileSync will throw EISDIR.
+      const raw = fs.readFileSync(gitPath, "utf-8");
+      const match = raw.match(/gitdir:\s*(.+)/i);
+      if (match?.[1]) {
+        const resolved = path.resolve(current, match[1].trim());
+        return path.join(resolved, "HEAD");
+      }
+    } catch (err) {
+      // EISDIR means .git is a directory — check for HEAD inside it
+      if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EISDIR") {
         return path.join(gitPath, "HEAD");
       }
-      if (stat.isFile()) {
-        const raw = fs.readFileSync(gitPath, "utf-8");
-        const match = raw.match(/gitdir:\s*(.+)/i);
-        if (match?.[1]) {
-          const resolved = path.resolve(current, match[1].trim());
-          return path.join(resolved, "HEAD");
-        }
-      }
-    } catch {
-      // ignore missing .git at this level
+      // ENOENT or other errors — try parent directory
     }
     const parent = path.dirname(current);
     if (parent === current) {

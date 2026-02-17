@@ -230,8 +230,12 @@ export function registerBrowserAgentStorageRoutes(
     if (!headers) {
       return jsonError(res, 400, "headers is required");
     }
-    const parsed: Record<string, string> = {};
+    const parsed: Record<string, string> = Object.create(null);
     for (const [k, v] of Object.entries(headers)) {
+      // Skip prototype-polluting keys (CodeQL js/remote-property-injection)
+      if (k === "__proto__" || k === "constructor" || k === "prototype") {
+        continue;
+      }
       if (typeof v === "string") {
         parsed[k] = v;
       }

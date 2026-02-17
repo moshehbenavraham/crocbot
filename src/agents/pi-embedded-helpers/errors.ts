@@ -27,19 +27,86 @@ export function isContextOverflowError(errorMessage?: string): boolean {
   );
 }
 
-const CONTEXT_WINDOW_TOO_SMALL_RE = /context window.*(too small|minimum is)/i;
-const CONTEXT_OVERFLOW_HINT_RE =
-  /context.*overflow|context window.*(too (?:large|long)|exceed|over|limit|max(?:imum)?|requested|sent|tokens)|(?:prompt|request|input).*(too (?:large|long)|exceed|over|limit|max(?:imum)?)/i;
+/**
+ * Linear-time check: does the string contain "context window" followed later by
+ * one of the target phrases? Replaces a `.*`-based regex to avoid ReDoS.
+ */
+function matchesContextWindowTooSmall(lower: string): boolean {
+  const idx = lower.indexOf("context window");
+  if (idx < 0) return false;
+  const rest = lower.slice(idx);
+  return rest.includes("too small") || rest.includes("minimum is");
+}
+
+/** Phrases that indicate context overflow when they appear after "context window". */
+const CONTEXT_WINDOW_OVERFLOW_HINTS = [
+  "too large",
+  "too long",
+  "exceed",
+  "over",
+  "limit",
+  "max",
+  "maximum",
+  "requested",
+  "sent",
+  "tokens",
+] as const;
+
+/** Phrases that indicate context overflow when they appear after "prompt", "request", or "input". */
+const PROMPT_OVERFLOW_HINTS = [
+  "too large",
+  "too long",
+  "exceed",
+  "over",
+  "limit",
+  "max",
+  "maximum",
+] as const;
+
+/**
+ * Linear-time heuristic for context overflow errors.
+ * Replaces the polynomial CONTEXT_OVERFLOW_HINT_RE regex.
+ */
+function matchesContextOverflowHint(lower: string): boolean {
+  // "context" followed later by "overflow" (anywhere)
+  const ctxIdx = lower.indexOf("context");
+  if (ctxIdx >= 0 && lower.indexOf("overflow", ctxIdx) >= 0) {
+    return true;
+  }
+
+  // "context window" followed by overflow-related phrases
+  const cwIdx = lower.indexOf("context window");
+  if (cwIdx >= 0) {
+    const rest = lower.slice(cwIdx);
+    if (CONTEXT_WINDOW_OVERFLOW_HINTS.some((hint) => rest.includes(hint))) {
+      return true;
+    }
+  }
+
+  // "prompt", "request", or "input" followed by overflow-related phrases
+  for (const prefix of ["prompt", "request", "input"] as const) {
+    const pIdx = lower.indexOf(prefix);
+    if (pIdx >= 0) {
+      const rest = lower.slice(pIdx);
+      if (PROMPT_OVERFLOW_HINTS.some((hint) => rest.includes(hint))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 export function isLikelyContextOverflowError(errorMessage?: string): boolean {
   if (!errorMessage) {
     return false;
   }
-  if (CONTEXT_WINDOW_TOO_SMALL_RE.test(errorMessage)) {
+  const lower = errorMessage.toLowerCase();
+  if (matchesContextWindowTooSmall(lower)) {
     return false;
   }
-  // Rate limit errors can match the broad CONTEXT_OVERFLOW_HINT_RE pattern
-  // (e.g., "request reached organization TPD rate limit" matches request.*limit).
+  // Rate limit errors can match the broad overflow heuristic
+  // (e.g., "request reached organization TPD rate limit" matches request + limit).
   // Exclude them before checking context overflow heuristics.
   if (isRateLimitErrorMessage(errorMessage)) {
     return false;
@@ -47,7 +114,7 @@ export function isLikelyContextOverflowError(errorMessage?: string): boolean {
   if (isContextOverflowError(errorMessage)) {
     return true;
   }
-  return CONTEXT_OVERFLOW_HINT_RE.test(errorMessage);
+  return matchesContextOverflowHint(lower);
 }
 
 export function isCompactionFailureError(errorMessage?: string): boolean {
@@ -71,7 +138,9 @@ export function isCompactionFailureError(errorMessage?: string): boolean {
 
 const ERROR_PAYLOAD_PREFIX_RE =
   /^(?:error|api\s*error|apierror|openai\s*error|anthropic\s*error|gateway\s*error)[:\s-]+/i;
-const FINAL_TAG_RE = /<\s*\/?\s*final\s*>/gi;
+// ReDoS-safe: merged adjacent \s* groups that overlapped when \/? was absent.
+// Now: optional whitespace, optional /, optional whitespace — each slot is distinct.
+const FINAL_TAG_RE = /<\s*(?:\/\s*)?final\s*>/gi;
 const ERROR_PREFIX_RE =
   /^(?:error|api\s*error|openai\s*error|anthropic\s*error|gateway\s*error|request failed|failed|exception)[:\s-]+/i;
 const HTTP_STATUS_PREFIX_RE = /^(?:http\s*)?(\d{3})\s+(.+)$/i;

@@ -223,21 +223,25 @@ export async function saveMediaSource(
     await fs.rename(tempDest, finalDest);
     return { id, path: finalDest, size, contentType: mime };
   }
-  // local path
-  const stat = await fs.stat(source);
-  if (!stat.isFile()) {
-    throw new Error("Media path is not a file");
+  // local path — read first to avoid TOCTOU race between stat and readFile
+  let buffer: Buffer;
+  try {
+    buffer = await fs.readFile(source);
+  } catch (err) {
+    if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EISDIR") {
+      throw new Error("Media path is not a file");
+    }
+    throw err;
   }
-  if (stat.size > MAX_BYTES) {
+  if (buffer.length > MAX_BYTES) {
     throw new Error("Media exceeds 5MB limit");
   }
-  const buffer = await fs.readFile(source);
   const mime = await detectMime({ buffer, filePath: source });
   const ext = extensionForMime(mime) ?? path.extname(source);
   const id = ext ? `${baseId}${ext}` : baseId;
   const dest = path.join(dir, id);
   await fs.writeFile(dest, buffer, { mode: 0o600 });
-  return { id, path: dest, size: stat.size, contentType: mime };
+  return { id, path: dest, size: buffer.length, contentType: mime };
 }
 
 export async function saveMediaBuffer(

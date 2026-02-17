@@ -735,13 +735,13 @@ export class CallManager {
   async getCallHistory(limit = 50): Promise<CallRecord[]> {
     const logPath = path.join(this.storePath, "calls.jsonl");
 
+    let content: string;
     try {
-      await fsp.access(logPath);
+      content = await fsp.readFile(logPath, "utf-8");
     } catch {
       return [];
     }
 
-    const content = await fsp.readFile(logPath, "utf-8");
     const lines = content.trim().split("\n").filter(Boolean);
     const calls: CallRecord[] = [];
 

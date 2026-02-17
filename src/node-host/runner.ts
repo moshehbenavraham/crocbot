@@ -326,16 +326,25 @@ function collectBrowserProxyPaths(payload: unknown): string[] {
 }
 
 async function readBrowserProxyFile(filePath: string): Promise<BrowserProxyFile | null> {
-  const stat = await fsPromises.stat(filePath).catch(() => null);
-  if (!stat || !stat.isFile()) {
-    return null;
+  let buffer: Buffer;
+  try {
+    buffer = await fsPromises.readFile(filePath);
+  } catch (err) {
+    // ENOENT (missing), EISDIR (directory), EACCES (permissions) — skip gracefully
+    if (
+      err &&
+      typeof err === "object" &&
+      ["ENOENT", "EISDIR", "EACCES"].includes((err as NodeJS.ErrnoException).code ?? "")
+    ) {
+      return null;
+    }
+    throw err;
   }
-  if (stat.size > BROWSER_PROXY_MAX_FILE_BYTES) {
+  if (buffer.length > BROWSER_PROXY_MAX_FILE_BYTES) {
     throw new Error(
       `browser proxy file exceeds ${Math.round(BROWSER_PROXY_MAX_FILE_BYTES / (1024 * 1024))}MB`,
     );
   }
-  const buffer = await fsPromises.readFile(filePath);
   const mimeType = await detectMime({ buffer, filePath });
   return { path: filePath, base64: buffer.toString("base64"), mimeType };
 }
@@ -351,7 +360,7 @@ function formatCommand(argv: string[]): string {
       if (!needsQuotes) {
         return trimmed;
       }
-      return `"${trimmed.replace(/"/g, '\\"')}"`;
+      return `"${trimmed.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
     })
     .join(" ");
 }

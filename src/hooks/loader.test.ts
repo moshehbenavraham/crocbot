@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -17,9 +18,8 @@ describe("loader", () => {
 
   beforeEach(async () => {
     clearInternalHooks();
-    // Create a temp directory for test modules
-    tmpDir = path.join(os.tmpdir(), `crocbot-test-${Date.now()}`);
-    await fs.mkdir(tmpDir, { recursive: true });
+    // Create a secure temp directory for test modules
+    tmpDir = mkdtempSync(path.join(os.tmpdir(), "crocbot-test-"));
 
     // Disable bundled hooks during tests by setting env var to non-existent directory
     originalBundledDir = process.env.CROCBOT_BUNDLED_HOOKS_DIR;

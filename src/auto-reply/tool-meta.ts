@@ -135,7 +135,11 @@ function isPathLike(value: string): boolean {
   if (value.includes("&&") || value.includes("||")) {
     return false;
   }
-  return /^~?(\/[^\s]+)+$/.test(value);
+  // ReDoS-safe: replaced nested quantifier `(\/[^\s]+)+$` (exponential backtracking
+  // when `/` chars could be consumed by [^\s]+ or start a new group iteration).
+  // Since whitespace is already excluded above, we just verify: optional ~, starts
+  // with /, at least one non-whitespace char after the first /, only non-whitespace.
+  return /^~?\/[^\s]+$/.test(value);
 }
 
 function maybeWrapMarkdown(value: string, markdown?: boolean): string {

@@ -25,7 +25,7 @@ function slugAllowToken(value?: string) {
   text = text.replace(/^[@#]+/, "");
   text = text.replace(/[\s_]+/g, "-");
   text = text.replace(/[^a-z0-9-]+/g, "-");
-  return text.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+  return text.replace(/-{2,}/g, "-").replace(/^-+/, "").replace(/-+$/, "");
 }
 
 const SENDER_PREFIXES = [

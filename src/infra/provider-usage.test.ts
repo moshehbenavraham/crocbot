@@ -80,12 +80,15 @@ describe("provider usage loading", () => {
     const mockFetch = vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>(async (input) => {
       const url =
         typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
-      if (url.includes("api.anthropic.com")) {
+      // Use URL hostname parsing instead of substring matching to prevent
+      // spoofable host checks (CodeQL js/incomplete-url-substring-sanitization).
+      const hostname = new URL(url).hostname;
+      if (hostname === "api.anthropic.com") {
         return makeResponse(200, {
           five_hour: { utilization: 20, resets_at: "2026-01-07T01:00:00Z" },
         });
       }
-      if (url.includes("api.z.ai")) {
+      if (hostname === "api.z.ai") {
         return makeResponse(200, {
           success: true,
           code: 200,
@@ -103,7 +106,7 @@ describe("provider usage loading", () => {
           },
         });
       }
-      if (url.includes("api.minimaxi.com/v1/api/openplatform/coding_plan/remains")) {
+      if (hostname === "api.minimaxi.com") {
         return makeResponse(200, {
           base_resp: { status_code: 0, status_msg: "ok" },
           data: {

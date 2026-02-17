@@ -1,5 +1,4 @@
-import { randomUUID } from "node:crypto";
-import fs from "node:fs";
+import fs, { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -13,8 +12,7 @@ const tempDirs: string[] = [];
 const EMPTY_PLUGIN_SCHEMA = { type: "object", additionalProperties: false, properties: {} };
 
 function makeTempDir() {
-  const dir = path.join(os.tmpdir(), `crocbot-plugin-tools-${randomUUID()}`);
-  fs.mkdirSync(dir, { recursive: true });
+  const dir = mkdtempSync(path.join(os.tmpdir(), "crocbot-plugin-tools-"));
   tempDirs.push(dir);
   return dir;
 }

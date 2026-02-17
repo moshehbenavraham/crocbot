@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs, { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -42,10 +42,8 @@ const makeRuntime = () => {
 };
 
 const writeStore = (data: unknown) => {
-  const file = path.join(
-    os.tmpdir(),
-    `sessions-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
-  );
+  const dir = mkdtempSync(path.join(os.tmpdir(), "crocbot-sessions-test-"));
+  const file = path.join(dir, "sessions.json");
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
   return file;
 };
@@ -74,7 +72,7 @@ describe("sessionsCommand", () => {
     const { runtime, logs } = makeRuntime();
     await sessionsCommand({ store }, runtime);
 
-    fs.rmSync(store);
+    fs.rmSync(path.dirname(store), { recursive: true, force: true });
 
     const tableHeader = logs.find((line) => line.includes("Tokens (ctx %"));
     expect(tableHeader).toBeTruthy();
@@ -97,7 +95,7 @@ describe("sessionsCommand", () => {
     const { runtime, logs } = makeRuntime();
     await sessionsCommand({ store }, runtime);
 
-    fs.rmSync(store);
+    fs.rmSync(path.dirname(store), { recursive: true, force: true });
 
     const row = logs.find((line) => line.includes("discord:group:demo")) ?? "";
     expect(row).toContain("-".padEnd(20));

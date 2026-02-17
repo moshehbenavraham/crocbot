@@ -3,6 +3,9 @@ import { verifyTwilioWebhook } from "../../webhook-security.js";
 
 import type { TwilioProviderOptions } from "../twilio.js";
 
+/** Strip newlines and control characters from external strings before logging. */
+const sanitizeLogStr = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 500);
+
 export function verifyTwilioProviderWebhook(params: {
   ctx: WebhookContext;
   authToken: string;
@@ -21,9 +24,9 @@ export function verifyTwilioProviderWebhook(params: {
   });
 
   if (!result.ok) {
-    console.warn(`[twilio] Webhook verification failed: ${result.reason}`);
+    console.warn(`[twilio] Webhook verification failed: ${sanitizeLogStr(result.reason ?? "unknown")}`);
     if (result.verificationUrl) {
-      console.warn(`[twilio] Verification URL: ${result.verificationUrl}`);
+      console.warn(`[twilio] Verification URL: ${sanitizeLogStr(result.verificationUrl)}`);
     }
   }
 

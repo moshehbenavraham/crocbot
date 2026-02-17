@@ -358,11 +358,12 @@ export class MediaAttachmentCache {
       timeoutMs: params.timeoutMs,
     });
     const extension = path.extname(bufferResult.fileName || "") || "";
-    const tmpPath = path.join(os.tmpdir(), `crocbot-media-${crypto.randomUUID()}${extension}`);
-    await fs.writeFile(tmpPath, bufferResult.buffer);
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-media-"));
+    const tmpPath = path.join(tmpDir, `media-${crypto.randomUUID()}${extension}`);
+    await fs.writeFile(tmpPath, bufferResult.buffer, { mode: 0o600 });
     entry.tempPath = tmpPath;
     entry.tempCleanup = async () => {
-      await fs.unlink(tmpPath).catch(() => {});
+      await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     };
     return { path: tmpPath, cleanup: entry.tempCleanup };
   }

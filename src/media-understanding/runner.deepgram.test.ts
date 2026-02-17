@@ -1,3 +1,4 @@
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -15,7 +16,8 @@ import {
 
 describe("runCapability deepgram provider options", () => {
   it("merges provider options, headers, and baseUrl overrides", async () => {
-    const tmpPath = path.join(os.tmpdir(), `crocbot-deepgram-${Date.now()}.wav`);
+    const tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "crocbot-deepgram-"));
+    const tmpPath = path.join(tmpDir, "test.wav");
     await fs.writeFile(tmpPath, Buffer.from("RIFF"));
     const ctx: MsgContext = { MediaPath: tmpPath, MediaType: "audio/wav" };
     const media = normalizeMediaAttachments(ctx);
@@ -106,7 +108,7 @@ describe("runCapability deepgram provider options", () => {
       expect((seenQuery as Record<string, unknown>)["detectLanguage"]).toBeUndefined();
     } finally {
       await cache.cleanup();
-      await fs.unlink(tmpPath).catch(() => {});
+      await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
   });
 });

@@ -1,6 +1,9 @@
 import crypto from "node:crypto";
 
 import type { TelnyxConfig } from "../config.js";
+
+/** Strip newlines and control characters from external strings before logging. */
+const sanitizeLogStr = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 500);
 import type {
   EndReason,
   HangupCallInput,
@@ -272,7 +275,7 @@ export class TelnyxProvider implements VoiceCallProvider {
       default:
         // Unknown cause - log it for debugging and return completed
         if (cause) {
-          console.warn(`[telnyx] Unknown hangup cause: ${cause}`);
+          console.warn(`[telnyx] Unknown hangup cause: ${sanitizeLogStr(cause)}`);
         }
         return "completed";
     }

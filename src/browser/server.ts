@@ -3,6 +3,7 @@ import express from "express";
 
 import { loadConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
+import { createRateLimiter } from "../gateway/rate-limit.js";
 import { resolveBrowserConfig, resolveProfile } from "./config.js";
 import { ensureChromeExtensionRelayServer } from "./extension-relay.js";
 import { registerBrowserRoutes } from "./routes/index.js";
@@ -26,6 +27,19 @@ export async function startBrowserControlServerFromConfig(): Promise<BrowserServ
 
   const app = express();
   app.use(express.json({ limit: "1mb" }));
+
+  // Defense-in-depth rate limiting (CodeQL js/missing-rate-limiting).
+  // Browser control server is localhost-only but still good practice.
+  const limiter = createRateLimiter({ maxRequests: 120, windowMs: 60_000 });
+  app.use((req, res, next) => {
+    const clientIp = req.ip ?? "unknown";
+    const rl = limiter.check(clientIp);
+    if (!rl.allowed) {
+      res.status(429).json({ ok: false, error: "too many requests" });
+      return;
+    }
+    next();
+  });
 
   const ctx = createBrowserRouteContext({
     getState: () => state,

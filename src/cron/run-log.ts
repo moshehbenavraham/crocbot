@@ -22,12 +22,15 @@ export function resolveCronRunLogPath(params: { storePath: string; jobId: string
 const writesByPath = new Map<string, Promise<void>>();
 
 async function pruneIfNeeded(filePath: string, opts: { maxBytes: number; keepLines: number }) {
-  const stat = await fs.stat(filePath).catch(() => null);
-  if (!stat || stat.size <= opts.maxBytes) {
+  let raw: string;
+  try {
+    raw = await fs.readFile(filePath, "utf-8");
+  } catch {
     return;
   }
-
-  const raw = await fs.readFile(filePath, "utf-8").catch(() => "");
+  if (Buffer.byteLength(raw, "utf-8") <= opts.maxBytes) {
+    return;
+  }
   const lines = raw
     .split("\n")
     .map((l) => l.trim())

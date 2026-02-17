@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import * as fsSync from "node:fs";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -68,7 +69,9 @@ export function cameraTempPath(opts: {
   tmpDir?: string;
   id?: string;
 }) {
-  const tmpDir = opts.tmpDir ?? os.tmpdir();
+  // When no tmpDir is provided, create a secure subdirectory under os.tmpdir()
+  // with mode 0o700 (owner-only access) to prevent symlink attacks.
+  const tmpDir = opts.tmpDir ?? fsSync.mkdtempSync(path.join(os.tmpdir(), "crocbot-camera-"));
   const id = opts.id ?? randomUUID();
   const facingPart = opts.facing ? `-${opts.facing}` : "";
   const ext = opts.ext.startsWith(".") ? opts.ext : `.${opts.ext}`;

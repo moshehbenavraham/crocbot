@@ -102,9 +102,14 @@ export function resolveOllamaApiBase(configuredBaseUrl?: string): string {
   if (!configuredBaseUrl) {
     return OLLAMA_API_BASE_URL;
   }
-  // Strip trailing slash, then strip /v1 suffix if present
-  const trimmed = configuredBaseUrl.replace(/\/+$/, "");
-  return trimmed.replace(/\/v1$/i, "");
+  // Strip trailing slashes, then strip /v1 suffix if present.
+  // Uses programmatic trimming instead of /\/+$/ regex to avoid ReDoS on
+  // pathological inputs (the regex is O(n²) when many / chars precede a non-/ tail).
+  let trimmed = configuredBaseUrl;
+  while (trimmed.endsWith("/")) {
+    trimmed = trimmed.slice(0, -1);
+  }
+  return trimmed.endsWith("/v1") || trimmed.endsWith("/V1") ? trimmed.slice(0, -3) : trimmed;
 }
 
 async function discoverOllamaModels(baseUrl?: string): Promise<ModelDefinitionConfig[]> {

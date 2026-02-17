@@ -79,7 +79,15 @@ describe("markdownToTelegramHtml", () => {
     expect(html).not.toMatch(/<b>[^<]*<a[^>]*>[^<]*<\/b>/);
     expect(html).not.toMatch(/<a[^>]*>[^<]*<\/b>[^<]*<\/a>/);
     // Verify the text content is preserved
-    expect(html.replace(/<[^>]+>/g, "")).toBe("hello world here");
+    // Strip all HTML tags to verify plain text content is preserved.
+    // Use loop-until-stable to satisfy CodeQL js/incomplete-multi-character-sanitization.
+    let plain = html;
+    let prev: string;
+    do {
+      prev = plain;
+      plain = plain.replace(/<[^>]+>/g, "");
+    } while (plain !== prev);
+    expect(plain).toBe("hello world here");
   });
 
   it("renders blockquote with inline formatting", () => {

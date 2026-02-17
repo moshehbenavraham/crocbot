@@ -59,8 +59,10 @@ async function readLogSlice(params: {
   limit: number;
   maxBytes: number;
 }) {
-  const stat = await fs.stat(params.file).catch(() => null);
-  if (!stat) {
+  let handle: Awaited<ReturnType<typeof fs.open>>;
+  try {
+    handle = await fs.open(params.file, "r");
+  } catch {
     return {
       cursor: 0,
       size: 0,
@@ -70,47 +72,46 @@ async function readLogSlice(params: {
     };
   }
 
-  const size = stat.size;
-  const maxBytes = clamp(params.maxBytes, 1, MAX_BYTES);
-  const limit = clamp(params.limit, 1, MAX_LIMIT);
-  let cursor =
-    typeof params.cursor === "number" && Number.isFinite(params.cursor)
-      ? Math.max(0, Math.floor(params.cursor))
-      : undefined;
-  let reset = false;
-  let truncated = false;
-  let start = 0;
+  try {
+    const stat = await handle.stat();
+    const size = stat.size;
+    const maxBytes = clamp(params.maxBytes, 1, MAX_BYTES);
+    const limit = clamp(params.limit, 1, MAX_LIMIT);
+    let cursor =
+      typeof params.cursor === "number" && Number.isFinite(params.cursor)
+        ? Math.max(0, Math.floor(params.cursor))
+        : undefined;
+    let reset = false;
+    let truncated = false;
+    let start = 0;
 
-  if (cursor != null) {
-    if (cursor > size) {
-      reset = true;
+    if (cursor != null) {
+      if (cursor > size) {
+        reset = true;
+        start = Math.max(0, size - maxBytes);
+        truncated = start > 0;
+      } else {
+        start = cursor;
+        if (size - start > maxBytes) {
+          reset = true;
+          truncated = true;
+          start = Math.max(0, size - maxBytes);
+        }
+      }
+    } else {
       start = Math.max(0, size - maxBytes);
       truncated = start > 0;
-    } else {
-      start = cursor;
-      if (size - start > maxBytes) {
-        reset = true;
-        truncated = true;
-        start = Math.max(0, size - maxBytes);
-      }
     }
-  } else {
-    start = Math.max(0, size - maxBytes);
-    truncated = start > 0;
-  }
 
-  if (size === 0 || size <= start) {
-    return {
-      cursor: size,
-      size,
-      lines: [] as string[],
-      truncated,
-      reset,
-    };
-  }
-
-  const handle = await fs.open(params.file, "r");
-  try {
+    if (size === 0 || size <= start) {
+      return {
+        cursor: size,
+        size,
+        lines: [] as string[],
+        truncated,
+        reset,
+      };
+    }
     let prefix = "";
     if (start > 0) {
       const prefixBuf = Buffer.alloc(1);

@@ -11,7 +11,10 @@ function normalizeGroupLabel(raw?: string) {
   }
   const dashed = trimmed.replace(/\s+/g, "-");
   const cleaned = dashed.replace(/[^a-z0-9#@._+-]+/g, "-");
-  return cleaned.replace(/-{2,}/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+  return cleaned
+    .replace(/-{2,}/g, "-")
+    .replace(/^[-.]+/, "")
+    .replace(/[-.]+$/, "");
 }
 
 function shortenGroupId(value?: string) {

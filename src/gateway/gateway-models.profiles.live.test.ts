@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import { createServer } from "node:net";
 import os from "node:os";
@@ -241,10 +241,9 @@ function randomImageProbeCode(len = 6): string {
   // Notably: 0↔8, B↔8, 6↔9, 3↔B, D↔0.
   // Must stay within the glyph set in `src/gateway/live-image-probe.ts`.
   const alphabet = "24567ACEF";
-  const bytes = randomBytes(len);
   let out = "";
   for (let i = 0; i < len; i += 1) {
-    out += alphabet[bytes[i] % alphabet.length];
+    out += alphabet[randomInt(alphabet.length)];
   }
   return out;
 }

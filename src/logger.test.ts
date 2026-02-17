@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -46,7 +45,6 @@ describe("logger helpers", () => {
 
   it("writes to configured log file at configured level", () => {
     const logPath = pathForTest();
-    cleanup(logPath);
     setLoggerOverride({ level: "info", file: logPath });
     fs.writeFileSync(logPath, "");
     logInfo("hello");
@@ -54,17 +52,18 @@ describe("logger helpers", () => {
     const content = fs.readFileSync(logPath, "utf-8");
     expect(content.length).toBeGreaterThan(0);
     cleanup(logPath);
+    cleanupDir(logPath);
   });
 
   it("filters messages below configured level", () => {
     const logPath = pathForTest();
-    cleanup(logPath);
     setLoggerOverride({ level: "warn", file: logPath });
     logInfo("info-only");
     logWarn("warn-only");
     const content = fs.readFileSync(logPath, "utf-8");
     expect(content).toContain("warn-only");
     cleanup(logPath);
+    cleanupDir(logPath);
   });
 
   it("uses daily rolling default log file and prunes old ones", () => {
@@ -91,14 +90,24 @@ describe("logger helpers", () => {
 });
 
 function pathForTest() {
-  const file = path.join(os.tmpdir(), `crocbot-log-${crypto.randomUUID()}.log`);
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  return file;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-log-"));
+  return path.join(dir, "test.log");
 }
 
 function cleanup(file: string) {
   try {
     fs.rmSync(file, { force: true });
+  } catch {
+    // ignore
+  }
+}
+
+function cleanupDir(file: string) {
+  try {
+    const dir = path.dirname(file);
+    if (dir !== os.tmpdir() && dir !== DEFAULT_LOG_DIR) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   } catch {
     // ignore
   }

@@ -15,8 +15,10 @@ export function upsertSharedEnvVar(params: {
   const value = params.value;
 
   let raw = "";
-  if (fs.existsSync(filepath)) {
+  try {
     raw = fs.readFileSync(filepath, "utf8");
+  } catch {
+    // file doesn't exist yet — will be created below
   }
 
   const lines = raw.length ? raw.split(/\r?\n/) : [];
@@ -43,13 +45,10 @@ export function upsertSharedEnvVar(params: {
     updated = true;
   }
 
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  }
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
 
   const output = `${nextLines.join("\n")}\n`;
-  fs.writeFileSync(filepath, output, "utf8");
-  fs.chmodSync(filepath, 0o600);
+  fs.writeFileSync(filepath, output, { encoding: "utf8", mode: 0o600 });
 
   return { path: filepath, updated, created: !raw };
 }

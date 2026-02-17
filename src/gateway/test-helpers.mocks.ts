@@ -153,7 +153,7 @@ export const resetTestPluginRegistry = () => {
 };
 
 const testConfigRoot = {
-  value: path.join(os.tmpdir(), `crocbot-gateway-test-${process.pid}-${crypto.randomUUID()}`),
+  value: fsSync.mkdtempSync(path.join(os.tmpdir(), "crocbot-gateway-test-")),
 };
 
 export const setTestConfigRoot = (root: string) => {
@@ -264,21 +264,6 @@ vi.mock("../config/config.js", async () => {
     }
     const configPath = resolveConfigPath();
     try {
-      await fs.access(configPath);
-    } catch {
-      return {
-        path: configPath,
-        exists: false,
-        raw: null,
-        parsed: {},
-        valid: true,
-        config: {},
-        hash: hashConfigRaw(null),
-        issues: [],
-        legacyIssues: [],
-      };
-    }
-    try {
       const raw = await fs.readFile(configPath, "utf-8");
       const parsed = JSON.parse(raw) as Record<string, unknown>;
       return {
@@ -293,6 +278,19 @@ vi.mock("../config/config.js", async () => {
         legacyIssues: [],
       };
     } catch (err) {
+      if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "ENOENT") {
+        return {
+          path: configPath,
+          exists: false,
+          raw: null,
+          parsed: {},
+          valid: true,
+          config: {},
+          hash: hashConfigRaw(null),
+          issues: [],
+          legacyIssues: [],
+        };
+      }
       return {
         path: configPath,
         exists: true,

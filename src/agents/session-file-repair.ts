@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -70,8 +71,9 @@ export async function repairSessionFileIfNeeded(params: {
   }
 
   const cleaned = `${entries.map((entry) => JSON.stringify(entry)).join("\n")}\n`;
-  const backupPath = `${sessionFile}.bak-${process.pid}-${Date.now()}`;
-  const tmpPath = `${sessionFile}.repair-${process.pid}-${Date.now()}.tmp`;
+  const suffix = crypto.randomBytes(8).toString("hex");
+  const backupPath = `${sessionFile}.bak-${suffix}`;
+  const tmpPath = `${sessionFile}.repair-${suffix}.tmp`;
   try {
     const stat = await fs.stat(sessionFile).catch(() => null);
     await fs.writeFile(backupPath, content, "utf-8");

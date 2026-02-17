@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs, { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -15,8 +15,7 @@ describe("Session Store Cache", () => {
 
   beforeEach(() => {
     // Create a temporary directory for test
-    testDir = path.join(os.tmpdir(), `session-cache-test-${Date.now()}`);
-    fs.mkdirSync(testDir, { recursive: true });
+    testDir = mkdtempSync(path.join(os.tmpdir(), "session-cache-test-"));
     storePath = path.join(testDir, "sessions.json");
 
     // Clear cache before each test

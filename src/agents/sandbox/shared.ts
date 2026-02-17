@@ -7,11 +7,14 @@ import { resolveAgentIdFromSessionKey } from "../agent-scope.js";
 
 export function slugifySessionKey(value: string) {
   const trimmed = value.trim() || "session";
-  const hash = crypto.createHash("sha1").update(trimmed).digest("hex").slice(0, 8);
+  const hash = crypto.createHash("sha256").update(trimmed).digest("hex").slice(0, 8);
   const safe = trimmed
     .toLowerCase()
     .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    // ReDoS-safe: separate leading/trailing dash removal avoids alternation
+    // with `+` quantifier on the same char that caused polynomial backtracking.
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
   const base = safe.slice(0, 32) || "session";
   return `${base}-${hash}`;
 }

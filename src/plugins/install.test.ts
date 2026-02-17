@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
-import fs from "node:fs";
+import fs, { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import JSZip from "jszip";
@@ -9,8 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 const tempDirs: string[] = [];
 
 function makeTempDir() {
-  const dir = path.join(os.tmpdir(), `crocbot-plugin-install-${randomUUID()}`);
-  fs.mkdirSync(dir, { recursive: true });
+  const dir = mkdtempSync(path.join(os.tmpdir(), "crocbot-plugin-install-"));
   tempDirs.push(dir);
   return dir;
 }

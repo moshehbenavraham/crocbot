@@ -109,8 +109,8 @@ export async function buildFileEntry(
   absPath: string,
   workspaceDir: string,
 ): Promise<MemoryFileEntry> {
-  const stat = await fs.stat(absPath);
   const content = await fs.readFile(absPath, "utf-8");
+  const stat = await fs.stat(absPath);
   const hash = hashText(content);
   return {
     path: path.relative(workspaceDir, absPath).replace(/\\/g, "/"),

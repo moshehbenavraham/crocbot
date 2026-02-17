@@ -1,3 +1,4 @@
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -17,7 +18,8 @@ describe("runCapability auto audio entries", () => {
   it("uses provider keys to auto-enable audio transcription", async () => {
     const originalPath = process.env.PATH;
     process.env.PATH = "/usr/bin:/bin";
-    const tmpPath = path.join(os.tmpdir(), `crocbot-auto-audio-${Date.now()}.wav`);
+    const tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "crocbot-auto-audio-"));
+    const tmpPath = path.join(tmpDir, "test.wav");
     await fs.writeFile(tmpPath, Buffer.from("RIFF"));
     const ctx: MsgContext = { MediaPath: tmpPath, MediaType: "audio/wav" };
     const media = normalizeMediaAttachments(ctx);
@@ -61,14 +63,15 @@ describe("runCapability auto audio entries", () => {
     } finally {
       process.env.PATH = originalPath;
       await cache.cleanup();
-      await fs.unlink(tmpPath).catch(() => {});
+      await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
   });
 
   it("skips auto audio when disabled", async () => {
     const originalPath = process.env.PATH;
     process.env.PATH = "/usr/bin:/bin";
-    const tmpPath = path.join(os.tmpdir(), `crocbot-auto-audio-${Date.now()}.wav`);
+    const tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "crocbot-auto-audio-"));
+    const tmpPath = path.join(tmpDir, "test.wav");
     await fs.writeFile(tmpPath, Buffer.from("RIFF"));
     const ctx: MsgContext = { MediaPath: tmpPath, MediaType: "audio/wav" };
     const media = normalizeMediaAttachments(ctx);
@@ -114,7 +117,7 @@ describe("runCapability auto audio entries", () => {
     } finally {
       process.env.PATH = originalPath;
       await cache.cleanup();
-      await fs.unlink(tmpPath).catch(() => {});
+      await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
   });
 });

@@ -1,11 +1,44 @@
 import { DEFAULT_MAX_LINKS } from "./defaults.js";
 
 // Remove markdown link syntax so only bare URLs are considered.
-const MARKDOWN_LINK_RE = /\[[^\]]*]\((https?:\/\/\S+?)\)/gi;
+// Uses indexOf-based scanning to avoid polynomial backtracking on repeated '[' chars.
 const BARE_LINK_RE = /https?:\/\/\S+/gi;
 
 function stripMarkdownLinks(message: string): string {
-  return message.replace(MARKDOWN_LINK_RE, " ");
+  // Replace [text](url) patterns with spaces using linear-time string scanning.
+  let result = "";
+  let i = 0;
+  while (i < message.length) {
+    if (message[i] !== "[") {
+      result += message[i];
+      i++;
+      continue;
+    }
+    // Found '[', look for closing ']'
+    const closeB = message.indexOf("]", i + 1);
+    if (closeB < 0) {
+      // No ']' found — keep rest as-is
+      result += message.slice(i);
+      break;
+    }
+    // Check for '(' immediately after ']'
+    if (closeB + 1 < message.length && message[closeB + 1] === "(") {
+      const closeP = message.indexOf(")", closeB + 2);
+      if (closeP >= 0) {
+        const url = message.slice(closeB + 2, closeP);
+        if (/^https?:\/\/\S+$/i.test(url)) {
+          // Valid markdown link — replace with space
+          result += " ";
+          i = closeP + 1;
+          continue;
+        }
+      }
+    }
+    // Not a valid markdown link — keep the '['
+    result += message[i];
+    i++;
+  }
+  return result;
 }
 
 function resolveMaxLinks(value?: number): number {

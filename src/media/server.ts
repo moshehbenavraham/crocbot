@@ -4,6 +4,7 @@ import express, { type Express } from "express";
 import { danger } from "../globals.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
 import { SafeOpenError, openFileWithinRoot } from "../infra/fs-safe.js";
+import { createRateLimiter } from "../gateway/rate-limit.js";
 import { detectMime } from "./mime.js";
 import { cleanOldMedia, getMediaDir, MEDIA_MAX_BYTES } from "./store.js";
 
@@ -31,8 +32,20 @@ export function attachMediaRoutes(
   _runtime: RuntimeEnv = defaultRuntime,
 ) {
   const mediaDir = getMediaDir();
+  // Defense-in-depth rate limiting (CodeQL js/missing-rate-limiting).
+  // Media server is localhost-only but still good practice.
+  const limiter = createRateLimiter({ maxRequests: 120, windowMs: 60_000 });
 
   app.get("/media/:id", async (req, res) => {
+    const clientIp = req.ip ?? "unknown";
+    const rl = limiter.check(clientIp);
+    if (!rl.allowed) {
+      res
+        .status(429)
+        .set("Retry-After", String(rl.resetAt - Math.floor(Date.now() / 1000)))
+        .send("too many requests");
+      return;
+    }
     const id = req.params.id;
     if (!isValidMediaId(id)) {
       res.status(400).send("invalid path");

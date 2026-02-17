@@ -113,7 +113,9 @@ function parseSearchOutput(raw: string): DocResult[] {
 }
 
 function escapeMarkdown(text: string): string {
-  return text.replace(/[()[\]]/g, "\\$&");
+  // Escape backslashes first (markdown escape char), then link-syntax and
+  // inline-formatting characters to prevent injection into markdown output.
+  return text.replace(/\\/g, "\\\\").replace(/[()[\]`*_~#>|]/g, "\\$&");
 }
 
 function buildMarkdown(query: string, results: DocResult[]): string {

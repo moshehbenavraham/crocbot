@@ -14,6 +14,9 @@ import type { NormalizedEvent, WebhookContext } from "./types.js";
 
 const MAX_WEBHOOK_BODY_BYTES = 1024 * 1024;
 
+/** Strip newlines and control characters from external strings before logging. */
+const sanitizeLogStr = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 500);
+
 /**
  * HTTP server for receiving voice call webhooks from providers.
  * Supports WebSocket upgrades for media streams when streaming is enabled.
@@ -285,7 +288,7 @@ export class VoiceCallWebhookServer {
     const verification = this.provider.verifyWebhook(ctx);
     if (!verification.ok) {
       console.warn(
-        `[voice-call] Webhook verification failed: ${verification.reason}`,
+        `[voice-call] Webhook verification failed: ${sanitizeLogStr(verification.reason ?? "unknown")}`,
       );
       res.statusCode = 401;
       res.end("Unauthorized");

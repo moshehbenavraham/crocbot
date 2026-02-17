@@ -111,9 +111,27 @@ export function stripStructuralPrefixes(text: string): string {
     ? text.slice(text.indexOf(CURRENT_MESSAGE_MARKER) + CURRENT_MESSAGE_MARKER.length).trimStart()
     : text;
 
-  return afterMarker
-    .replace(/\[[^\]]+\]\s*/g, "")
-    .replace(/^[ \t]*[A-Za-z0-9+()\-_. ]+:\s*/gm, "")
+  // Strip bracket-wrapped labels like [timestamp] or [sender] using linear scanning
+  // instead of /\[[^\]]+\]\s*/g which has O(n^2) backtracking on repeated '[' chars.
+  let stripped = "";
+  let i = 0;
+  while (i < afterMarker.length) {
+    if (afterMarker[i] === "[") {
+      const close = afterMarker.indexOf("]", i + 1);
+      if (close > i + 1) {
+        // Found [content] — skip it and any trailing whitespace
+        let j = close + 1;
+        while (j < afterMarker.length && (afterMarker[j] === " " || afterMarker[j] === "\t")) j++;
+        i = j;
+        continue;
+      }
+    }
+    stripped += afterMarker[i];
+    i++;
+  }
+
+  return stripped
+    .replace(/^[ \t]*[A-Za-z0-9+()\-_.]+[A-Za-z0-9+()\-_. ]*:\s*/gm, "")
     .replace(/\\n/g, " ")
     .replace(/\s+/g, " ")
     .trim();

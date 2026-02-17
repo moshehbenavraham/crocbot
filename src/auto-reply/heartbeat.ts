@@ -118,15 +118,37 @@ export function stripHeartbeatToken(
 
   // Normalize lightweight markup so HEARTBEAT_OK wrapped in HTML/Markdown
   // (e.g., <b>HEARTBEAT_OK</b> or **HEARTBEAT_OK**) still strips.
-  const stripMarkup = (text: string) =>
-    text
-      // Drop HTML tags.
-      .replace(/<[^>]*>/g, " ")
-      // Decode common nbsp variant.
-      .replace(/&nbsp;/gi, " ")
-      // Remove markdown-ish wrappers at the edges.
-      .replace(/^[*`~_]+/, "")
-      .replace(/[*`~_]+$/, "");
+  // Strip HTML tags using linear-time scanning instead of /<[^>]*>/g
+  // which has O(n^2) behavior on strings with many '<' and no '>'.
+  const stripHtmlTags = (text: string): string => {
+    let result = "";
+    let i = 0;
+    while (i < text.length) {
+      if (text[i] === "<") {
+        const close = text.indexOf(">", i + 1);
+        if (close >= 0) {
+          result += " ";
+          i = close + 1;
+          continue;
+        }
+      }
+      result += text[i];
+      i++;
+    }
+    return result;
+  };
+
+  const stripMarkup = (text: string) => {
+    let s = stripHtmlTags(text);
+    // Decode common nbsp variant.
+    s = s.replace(/&nbsp;/gi, " ");
+    // Remove markdown-ish wrappers at the edges.
+    let start = 0;
+    while (start < s.length && "*`~_".includes(s[start])) start++;
+    let end = s.length;
+    while (end > start && "*`~_".includes(s[end - 1])) end--;
+    return s.slice(start, end);
+  };
 
   const trimmedNormalized = stripMarkup(trimmed);
   const hasToken = trimmed.includes(HEARTBEAT_TOKEN) || trimmedNormalized.includes(HEARTBEAT_TOKEN);

@@ -63,9 +63,6 @@ async function ensureSessionHeader(params: {
   sessionFile: string;
   sessionId: string;
 }): Promise<void> {
-  if (fs.existsSync(params.sessionFile)) {
-    return;
-  }
   await fs.promises.mkdir(path.dirname(params.sessionFile), { recursive: true });
   const header = {
     type: "session",
@@ -74,7 +71,17 @@ async function ensureSessionHeader(params: {
     timestamp: new Date().toISOString(),
     cwd: process.cwd(),
   };
-  await fs.promises.writeFile(params.sessionFile, `${JSON.stringify(header)}\n`, "utf-8");
+  try {
+    await fs.promises.writeFile(params.sessionFile, `${JSON.stringify(header)}\n`, {
+      encoding: "utf-8",
+      flag: "wx",
+    });
+  } catch (err) {
+    if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EEXIST") {
+      return;
+    }
+    throw err;
+  }
 }
 
 export async function appendAssistantMessageToSessionTranscript(params: {

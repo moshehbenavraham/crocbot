@@ -230,8 +230,35 @@ export function deriveSessionName(command: string): string | undefined {
 }
 
 function tokenizeCommand(command: string): string[] {
-  const matches = command.match(/(?:[^\s"']+|"(?:\\.|[^"])*"|'(?:\\.|[^'])*')+/g) ?? [];
-  return matches.map((token) => stripQuotes(token)).filter(Boolean);
+  // ReDoS-safe: the original outer `+` on `(?:...)` created exponential backtracking
+  // because `[^\s"']+` inside the group could match one char per iteration.
+  // Fix: use a single-pass loop that manually concatenates adjacent quoted/unquoted
+  // segments into tokens, achieving the same semantics without nested quantifiers.
+  const tokenRe = /[^\s"']+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g;
+  const tokens: string[] = [];
+  let m: RegExpExecArray | null;
+  let lastEnd = -1;
+  let current = "";
+
+  while ((m = tokenRe.exec(command)) !== null) {
+    if (current && m.index === lastEnd) {
+      // Adjacent to previous match (no whitespace gap) — concatenate
+      current += m[0];
+    } else {
+      if (current) {
+        const stripped = stripQuotes(current);
+        if (stripped) tokens.push(stripped);
+      }
+      current = m[0];
+    }
+    lastEnd = m.index + m[0].length;
+  }
+  if (current) {
+    const stripped = stripQuotes(current);
+    if (stripped) tokens.push(stripped);
+  }
+
+  return tokens;
 }
 
 function stripQuotes(value: string): string {

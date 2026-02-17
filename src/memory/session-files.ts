@@ -75,8 +75,8 @@ export function extractSessionText(content: unknown): string | null {
 
 export async function buildSessionEntry(absPath: string): Promise<SessionFileEntry | null> {
   try {
-    const stat = await fs.stat(absPath);
     const raw = await fs.readFile(absPath, "utf-8");
+    const stat = await fs.stat(absPath);
     const lines = raw.split("\n");
     const collected: string[] = [];
     for (const line of lines) {

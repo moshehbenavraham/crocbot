@@ -72,9 +72,6 @@ function ensureTranscriptFile(params: { transcriptPath: string; sessionId: strin
   ok: boolean;
   error?: string;
 } {
-  if (fs.existsSync(params.transcriptPath)) {
-    return { ok: true };
-  }
   try {
     fs.mkdirSync(path.dirname(params.transcriptPath), { recursive: true });
     const header = {
@@ -85,9 +82,14 @@ function ensureTranscriptFile(params: { transcriptPath: string; sessionId: strin
       cwd: process.cwd(),
     };
     const line = SecretsRegistry.getInstance().mask(JSON.stringify(header));
-    fs.writeFileSync(params.transcriptPath, `${line}\n`, "utf-8");
+    // Use 'wx' flag for atomic exclusive create — if file exists, EEXIST is thrown
+    fs.writeFileSync(params.transcriptPath, `${line}\n`, { encoding: "utf-8", flag: "wx" });
     return { ok: true };
   } catch (err) {
+    // EEXIST means file already exists — that's fine, it was already created
+    if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EEXIST") {
+      return { ok: true };
+    }
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }

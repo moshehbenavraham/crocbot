@@ -94,37 +94,39 @@ export function detectImageReferences(prompt: string): DetectedImageRef[] {
     refs.push({ raw: trimmed, type: "path", resolved });
   };
 
+  // Image extension pattern shared across all detectors (anchored, no backtracking).
+  const IMAGE_EXT_RE = /\.(?:png|jpe?g|gif|webp|bmp|tiff?|heic|heif)$/i;
+
   // Pattern for [media attached: path (type) | url] or [media attached N/M: path (type) | url] format
   // Each bracket = ONE file. The | separates path from URL, not multiple files.
   // Multi-file format uses separate brackets on separate lines.
-  const mediaAttachedPattern = /\[media attached(?:\s+\d+\/\d+)?:\s*([^\]]+)\]/gi;
+  // ReDoS-safe: [^\]]+ is bounded by the ] delimiter (single char class).
+  const mediaAttachedPattern = /\[media attached(?: \d+\/\d+)?:\s?([^\]]+)\]/gi;
   let match: RegExpExecArray | null;
   while ((match = mediaAttachedPattern.exec(prompt)) !== null) {
     const content = match[1];
 
     // Skip "[media attached: N files]" header lines
-    if (/^\d+\s+files?$/i.test(content.trim())) {
+    if (/^\d+ files?$/i.test(content.trim())) {
       continue;
     }
 
     // Extract path before the (mime/type) or | delimiter
     // Format is: path (type) | url  OR  just: path (type)
     // Path may contain spaces (e.g., "ChatGPT Image Apr 21.png")
-    // Use non-greedy .+? to stop at first image extension
-    const pathMatch = content.match(
-      /^\s*(.+?\.(?:png|jpe?g|gif|webp|bmp|tiff?|heic|heif))\s*(?:\(|$|\|)/i,
-    );
-    if (pathMatch?.[1]) {
-      addPathRef(pathMatch[1].trim());
+    // ReDoS-safe: split on delimiters first, then check extension (no backtracking).
+    const pathPart = content.split(/[|(]/)[0]?.trim();
+    if (pathPart && IMAGE_EXT_RE.test(pathPart)) {
+      addPathRef(pathPart);
     }
   }
 
   // Pattern for [Image: source: /path/...] format from messaging systems
-  const messageImagePattern =
-    /\[Image:\s*source:\s*([^\]]+\.(?:png|jpe?g|gif|webp|bmp|tiff?|heic|heif))\]/gi;
+  // ReDoS-safe: [^\]]+ is bounded by ], then we test extension separately.
+  const messageImagePattern = /\[Image:\s?source:\s?([^\]]+)\]/gi;
   while ((match = messageImagePattern.exec(prompt)) !== null) {
     const raw = match[1]?.trim();
-    if (raw) {
+    if (raw && IMAGE_EXT_RE.test(raw)) {
       addPathRef(raw);
     }
   }
@@ -132,9 +134,14 @@ export function detectImageReferences(prompt: string): DetectedImageRef[] {
   // Remote HTTP(S) URLs are intentionally ignored. Native image injection is local-only.
 
   // Pattern for file:// URLs - treat as paths since loadWebMedia handles them
-  const fileUrlPattern = /file:\/\/[^\s<>"'`\]]+\.(?:png|jpe?g|gif|webp|bmp|tiff?|heic|heif)/gi;
+  // ReDoS-safe: [^\s<>"'`\]]+ is a single character class with no nested quantifiers.
+  // We check the extension separately to avoid backtracking on the dot.
+  const fileUrlPattern = /file:\/\/[^\s<>"'`\]]+/gi;
   while ((match = fileUrlPattern.exec(prompt)) !== null) {
     const raw = match[0];
+    if (!IMAGE_EXT_RE.test(raw)) {
+      continue;
+    }
     if (seen.has(raw.toLowerCase())) {
       continue;
     }
@@ -154,11 +161,12 @@ export function detectImageReferences(prompt: string): DetectedImageRef[] {
   // - ./relative/path.ext
   // - ../parent/path.ext
   // - ~/home/path.ext
-  const pathPattern =
-    /(?:^|\s|["'`(])((\.\.?\/|[~/])[^\s"'`()[\]]*\.(?:png|jpe?g|gif|webp|bmp|tiff?|heic|heif))/gi;
+  // ReDoS-safe: [^\s"'`()[\]]+ is a single character class (no nested quantifiers).
+  // Extension check is done separately to avoid backtracking on dots.
+  const pathPattern = /(?:^|\s|["'`(])((\.\.?\/|[~/])[^\s"'`()[\]]+)/gi;
   while ((match = pathPattern.exec(prompt)) !== null) {
     // Use capture group 1 (the path without delimiter prefix); skip if undefined
-    if (match[1]) {
+    if (match[1] && IMAGE_EXT_RE.test(match[1])) {
       addPathRef(match[1]);
     }
   }

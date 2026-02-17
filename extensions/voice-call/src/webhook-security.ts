@@ -367,10 +367,16 @@ export function verifyTwilioWebhook(
     return { ok: true, verificationUrl };
   }
 
-  // Check if this is ngrok free tier - the URL might have different format
-  const isNgrokFreeTier =
-    verificationUrl.includes(".ngrok-free.app") ||
-    verificationUrl.includes(".ngrok.io");
+  // Check if this is ngrok free tier - the URL might have different format.
+  // Use URL hostname parsing instead of substring matching to prevent spoofing
+  // (CodeQL js/incomplete-url-substring-sanitization).
+  let isNgrokFreeTier = false;
+  try {
+    const host = new URL(verificationUrl).hostname;
+    isNgrokFreeTier = host.endsWith(".ngrok-free.app") || host.endsWith(".ngrok.io");
+  } catch {
+    // Invalid URL — not ngrok
+  }
 
   if (
     isNgrokFreeTier &&

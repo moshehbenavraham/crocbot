@@ -56,15 +56,15 @@ describe("security fix", () => {
       ]),
     );
 
+    const parsed = JSON.parse(await fs.readFile(configPath, "utf-8")) as Record<string, unknown>;
+    const channels = parsed.channels as Record<string, Record<string, unknown>>;
+    expect(channels.telegram.groupPolicy).toBe("allowlist");
+
     const stateMode = (await fs.stat(stateDir)).mode & 0o777;
     expectPerms(stateMode, 0o700);
 
     const configMode = (await fs.stat(configPath)).mode & 0o777;
     expectPerms(configMode, 0o600);
-
-    const parsed = JSON.parse(await fs.readFile(configPath, "utf-8")) as Record<string, unknown>;
-    const channels = parsed.channels as Record<string, Record<string, unknown>>;
-    expect(channels.telegram.groupPolicy).toBe("allowlist");
   });
 
   it("returns ok=false for invalid config but still tightens perms", async () => {
