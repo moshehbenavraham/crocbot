@@ -59,6 +59,56 @@ function resolveAnthropicOpus46ForwardCompatModel(
   return undefined;
 }
 
+// Anthropic Sonnet 4.6 forward-compat: resolve by cloning from Sonnet 4.5 template.
+const ANTHROPIC_SONNET_46_MODEL_ID = "claude-sonnet-4-6";
+const ANTHROPIC_SONNET_46_DOT_MODEL_ID = "claude-sonnet-4.6";
+const ANTHROPIC_SONNET_TEMPLATE_MODEL_IDS = ["claude-sonnet-4-5", "claude-sonnet-4.5"] as const;
+
+function resolveAnthropicSonnet46ForwardCompatModel(
+  provider: string,
+  modelId: string,
+  modelRegistry: ReturnType<typeof discoverModels>,
+): Model<Api> | undefined {
+  const normalizedProvider = normalizeProviderId(provider);
+  if (normalizedProvider !== "anthropic") {
+    return undefined;
+  }
+
+  const trimmedModelId = modelId.trim();
+  const lower = trimmedModelId.toLowerCase();
+  const isSonnet46 =
+    lower === ANTHROPIC_SONNET_46_MODEL_ID ||
+    lower === ANTHROPIC_SONNET_46_DOT_MODEL_ID ||
+    lower.startsWith(`${ANTHROPIC_SONNET_46_MODEL_ID}-`) ||
+    lower.startsWith(`${ANTHROPIC_SONNET_46_DOT_MODEL_ID}-`);
+  if (!isSonnet46) {
+    return undefined;
+  }
+
+  const templateIds: string[] = [];
+  if (lower.startsWith(ANTHROPIC_SONNET_46_MODEL_ID)) {
+    templateIds.push(lower.replace(ANTHROPIC_SONNET_46_MODEL_ID, "claude-sonnet-4-5"));
+  }
+  if (lower.startsWith(ANTHROPIC_SONNET_46_DOT_MODEL_ID)) {
+    templateIds.push(lower.replace(ANTHROPIC_SONNET_46_DOT_MODEL_ID, "claude-sonnet-4.5"));
+  }
+  templateIds.push(...ANTHROPIC_SONNET_TEMPLATE_MODEL_IDS);
+
+  for (const templateId of [...new Set(templateIds)].filter(Boolean)) {
+    const template = modelRegistry.find(normalizedProvider, templateId) as Model<Api> | null;
+    if (!template) {
+      continue;
+    }
+    return normalizeModelCompat({
+      ...template,
+      id: trimmedModelId,
+      name: trimmedModelId,
+    } as Model<Api>);
+  }
+
+  return undefined;
+}
+
 // Google Antigravity forward-compat: resolve Opus 4.6 model IDs by cloning from 4.5 template.
 const ANTIGRAVITY_OPUS_46_STEMS = ["claude-opus-4-6", "claude-opus-4.6"] as const;
 const ANTIGRAVITY_OPUS_45_TEMPLATES = ["claude-opus-4-5-thinking", "claude-opus-4-5"] as const;
@@ -154,13 +204,21 @@ export function resolveModel(
         modelRegistry,
       };
     }
-    const anthropicForwardCompat = resolveAnthropicOpus46ForwardCompatModel(
+    const anthropicOpus46ForwardCompat = resolveAnthropicOpus46ForwardCompatModel(
       provider,
       modelId,
       modelRegistry,
     );
-    if (anthropicForwardCompat) {
-      return { model: anthropicForwardCompat, authStorage, modelRegistry };
+    if (anthropicOpus46ForwardCompat) {
+      return { model: anthropicOpus46ForwardCompat, authStorage, modelRegistry };
+    }
+    const anthropicSonnet46ForwardCompat = resolveAnthropicSonnet46ForwardCompatModel(
+      provider,
+      modelId,
+      modelRegistry,
+    );
+    if (anthropicSonnet46ForwardCompat) {
+      return { model: anthropicSonnet46ForwardCompat, authStorage, modelRegistry };
     }
     const antigravityForwardCompat = resolveAntigravityOpus46ForwardCompatModel(
       provider,

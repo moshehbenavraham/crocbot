@@ -62,6 +62,9 @@ function normalizeAnthropicModelId(model: string): string {
   if (lower === "opus-4.5") {
     return "claude-opus-4-5";
   }
+  if (lower === "sonnet-4.6") {
+    return "claude-sonnet-4-6";
+  }
   if (lower === "sonnet-4.5") {
     return "claude-sonnet-4-5";
   }

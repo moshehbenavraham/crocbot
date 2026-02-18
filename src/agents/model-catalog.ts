@@ -108,6 +108,14 @@ export async function loadModelCatalog(params?: {
           reasoning: true,
           input: ["text", "image"],
         },
+        {
+          id: "claude-sonnet-4-6",
+          name: "Claude Sonnet 4.6",
+          provider: "anthropic",
+          contextWindow: 200_000,
+          reasoning: true,
+          input: ["text", "image"],
+        },
       ];
       for (const entry of supplemental) {
         const exists = models.some((m) => m.provider === entry.provider && m.id === entry.id);
