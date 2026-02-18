@@ -40,7 +40,7 @@ RUN pnpm install --frozen-lockfile
 
 # Layer 3: Copy source and static assets
 COPY src ./src
-COPY tsconfig.json tsdown.config.ts ./
+COPY tsconfig.json tsconfig.plugin-sdk.dts.json tsdown.config.ts ./
 COPY docs ./docs
 COPY assets ./assets
 COPY skills ./skills
@@ -103,14 +103,17 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
 COPY --from=builder /app/patches ./patches
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /root/.cache/node/corepack /root/.cache/node/corepack
 
 # Prune dev dependencies and remove large optional packages not needed for gateway
-RUN pnpm prune --prod --ignore-scripts && \
+# --loglevel=error suppresses cosmetic WARN about bin-link failures for
+# playwright/vite (pnpm tries to link bins during reconciliation before
+# removing dev deps; harmless but noisy)
+RUN pnpm prune --prod --ignore-scripts --loglevel=error && \
     rm -rf node_modules/.pnpm/@node-llama-cpp* \
            node_modules/.pnpm/node-llama-cpp* \
            node_modules/.pnpm/@napi-rs+canvas* \
            node_modules/.pnpm/typescript* \
-           node_modules/.pnpm/playwright@* \
            node_modules/.pnpm/*linuxmusl* \
            node_modules/.pnpm/*linux-arm* \
            node_modules/@node-llama-cpp \
