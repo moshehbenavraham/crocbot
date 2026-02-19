@@ -19,15 +19,16 @@ export function loadActiveCallsFromStore(storePath: string): {
   processedEventIds: Set<string>;
 } {
   const logPath = path.join(storePath, "calls.jsonl");
-  if (!fs.existsSync(logPath)) {
+  let content: string;
+  try {
+    content = fs.readFileSync(logPath, "utf-8");
+  } catch {
     return {
       activeCalls: new Map(),
       providerCallIdMap: new Map(),
       processedEventIds: new Set(),
     };
   }
-
-  const content = fs.readFileSync(logPath, "utf-8");
   const lines = content.split("\n");
 
   const callMap = new Map<CallId, CallRecord>();
