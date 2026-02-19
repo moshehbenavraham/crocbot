@@ -63,6 +63,14 @@ describe("loadModelCatalog", () => {
         reasoning: true,
         input: ["text", "image"],
       },
+      {
+        id: "claude-sonnet-4-6",
+        name: "Claude Sonnet 4.6",
+        provider: "anthropic",
+        contextWindow: 200_000,
+        reasoning: true,
+        input: ["text", "image"],
+      },
       { id: "gpt-4.1", name: "GPT-4.1", provider: "openai" },
     ]);
     expect(call).toBe(2);
