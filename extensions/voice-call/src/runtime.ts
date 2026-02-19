@@ -4,8 +4,6 @@ import { resolveVoiceCallConfig, validateProviderConfig } from "./config.js";
 import { CallManager } from "./manager.js";
 import type { VoiceCallProvider } from "./providers/base.js";
 import { MockProvider } from "./providers/mock.js";
-import { PlivoProvider } from "./providers/plivo.js";
-import { TelnyxProvider } from "./providers/telnyx.js";
 import { TwilioProvider } from "./providers/twilio.js";
 import type { TelephonyTtsRuntime } from "./telephony-tts.js";
 import { createTelephonyTtsProvider } from "./telephony-tts.js";
@@ -47,18 +45,6 @@ function resolveProvider(config: VoiceCallConfig): VoiceCallProvider {
       false);
 
   switch (config.provider) {
-    case "telnyx":
-      return new TelnyxProvider(
-        {
-          apiKey: config.telnyx?.apiKey,
-          connectionId: config.telnyx?.connectionId,
-          publicKey: config.telnyx?.publicKey,
-        },
-        {
-          allowUnsignedWebhooks:
-            config.inboundPolicy === "open" || config.inboundPolicy === "disabled",
-        },
-      );
     case "twilio":
       return new TwilioProvider(
         {
@@ -72,19 +58,6 @@ function resolveProvider(config: VoiceCallConfig): VoiceCallProvider {
           streamPath: config.streaming?.enabled
             ? config.streaming.streamPath
             : undefined,
-          webhookSecurity: config.webhookSecurity,
-        },
-      );
-    case "plivo":
-      return new PlivoProvider(
-        {
-          authId: config.plivo?.authId,
-          authToken: config.plivo?.authToken,
-        },
-        {
-          publicUrl: config.publicUrl,
-          skipVerification: config.skipSignatureVerification,
-          ringTimeoutSec: Math.max(1, Math.floor(config.ringTimeoutMs / 1000)),
           webhookSecurity: config.webhookSecurity,
         },
       );

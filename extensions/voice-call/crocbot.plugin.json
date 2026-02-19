@@ -3,7 +3,7 @@
   "uiHints": {
     "provider": {
       "label": "Provider",
-      "help": "Use twilio, telnyx, or mock for dev/no-network."
+      "help": "Use twilio or mock for dev/no-network."
     },
     "fromNumber": {
       "label": "From Number",
@@ -22,17 +22,6 @@
     "inboundGreeting": {
       "label": "Inbound Greeting",
       "advanced": true
-    },
-    "telnyx.apiKey": {
-      "label": "Telnyx API Key",
-      "sensitive": true
-    },
-    "telnyx.connectionId": {
-      "label": "Telnyx Connection ID"
-    },
-    "telnyx.publicKey": {
-      "label": "Telnyx Public Key",
-      "sensitive": true
     },
     "twilio.accountSid": {
       "label": "Twilio Account SID"
@@ -169,44 +158,15 @@
       "provider": {
         "type": "string",
         "enum": [
-          "telnyx",
           "twilio",
-          "plivo",
           "mock"
         ]
-      },
-      "telnyx": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "apiKey": {
-            "type": "string"
-          },
-          "connectionId": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          }
-        }
       },
       "twilio": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "accountSid": {
-            "type": "string"
-          },
-          "authToken": {
-            "type": "string"
-          }
-        }
-      },
-      "plivo": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "authId": {
             "type": "string"
           },
           "authToken": {

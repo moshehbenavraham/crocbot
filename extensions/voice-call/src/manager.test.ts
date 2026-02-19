@@ -19,7 +19,7 @@ import type {
 import type { VoiceCallProvider } from "./providers/base.js";
 
 class FakeProvider implements VoiceCallProvider {
-  readonly name = "plivo" as const;
+  readonly name = "mock" as const;
   readonly playTtsCalls: PlayTtsInput[] = [];
 
   verifyWebhook(_ctx: WebhookContext): WebhookVerificationResult {
@@ -43,7 +43,7 @@ describe("CallManager", () => {
   it("upgrades providerCallId mapping when provider ID changes", async () => {
     const config = VoiceCallConfigSchema.parse({
       enabled: true,
-      provider: "plivo",
+      provider: "mock",
       fromNumber: "+15550000000",
     });
 
@@ -76,7 +76,7 @@ describe("CallManager", () => {
   it("speaks initial message on answered for notify mode (non-Twilio)", async () => {
     const config = VoiceCallConfigSchema.parse({
       enabled: true,
-      provider: "plivo",
+      provider: "mock",
       fromNumber: "+15550000000",
     });
 

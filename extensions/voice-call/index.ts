@@ -33,16 +33,13 @@ const voiceCallConfigSchema = {
   uiHints: {
     provider: {
       label: "Provider",
-      help: "Use twilio, telnyx, or mock for dev/no-network.",
+      help: "Use twilio or mock for dev/no-network.",
     },
     fromNumber: { label: "From Number", placeholder: "+15550001234" },
     toNumber: { label: "Default To Number", placeholder: "+15550001234" },
     inboundPolicy: { label: "Inbound Policy" },
     allowFrom: { label: "Inbound Allowlist" },
     inboundGreeting: { label: "Inbound Greeting", advanced: true },
-    "telnyx.apiKey": { label: "Telnyx API Key", sensitive: true },
-    "telnyx.connectionId": { label: "Telnyx Connection ID" },
-    "telnyx.publicKey": { label: "Telnyx Public Key", sensitive: true },
     "twilio.accountSid": { label: "Twilio Account SID" },
     "twilio.authToken": { label: "Twilio Auth Token", sensitive: true },
     "outbound.defaultMode": { label: "Default Call Mode" },
@@ -142,7 +139,7 @@ const VoiceCallToolSchema = Type.Union([
 const voiceCallPlugin = {
   id: "voice-call",
   name: "Voice Call",
-  description: "Voice-call plugin with Telnyx/Twilio/Plivo providers",
+  description: "Voice-call plugin with Twilio provider",
   configSchema: voiceCallConfigSchema,
   register(api) {
     const config = resolveVoiceCallConfig(
