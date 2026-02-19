@@ -247,8 +247,15 @@ export class VoiceCallWebhookServer {
   ): Promise<void> {
     const url = new URL(req.url || "/", `http://${req.headers.host}`);
 
+    console.log(
+      `[voice-call] webhook ${req.method} ${sanitizeLogStr(url.pathname)}` +
+      `${url.search ? ` ?${sanitizeLogStr(url.search)}` : ""}` +
+      ` from ${sanitizeLogStr(req.socket.remoteAddress ?? "unknown")}`,
+    );
+
     // Check path
     if (!url.pathname.startsWith(webhookPath)) {
+      console.log(`[voice-call] webhook 404: path ${sanitizeLogStr(url.pathname)} not under ${webhookPath}`);
       res.statusCode = 404;
       res.end("Not Found");
       return;
@@ -256,6 +263,7 @@ export class VoiceCallWebhookServer {
 
     // Only accept POST
     if (req.method !== "POST") {
+      console.log(`[voice-call] webhook 405: method ${req.method} rejected`);
       res.statusCode = 405;
       res.end("Method Not Allowed");
       return;
@@ -267,6 +275,7 @@ export class VoiceCallWebhookServer {
       body = await this.readBody(req, MAX_WEBHOOK_BODY_BYTES);
     } catch (err) {
       if (err instanceof Error && err.message === "PayloadTooLarge") {
+        console.log("[voice-call] webhook 413: payload too large");
         res.statusCode = 413;
         res.end("Payload Too Large");
         return;
@@ -321,7 +330,11 @@ export class VoiceCallWebhookServer {
       }
     }
 
-    res.end(result.providerResponseBody || "OK");
+    const responseBody = result.providerResponseBody || "OK";
+    console.log(
+      `[voice-call] webhook -> ${res.statusCode} (${result.events.length} events) body=${sanitizeLogStr(responseBody).slice(0, 200)}`,
+    );
+    res.end(responseBody);
   }
 
   /**
