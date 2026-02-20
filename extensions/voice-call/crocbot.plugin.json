@@ -328,6 +328,27 @@
           }
         }
       },
+      "webhookSecurity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "allowedHosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trustForwardingHeaders": {
+            "type": "boolean"
+          },
+          "trustedProxyIPs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "publicUrl": {
         "type": "string"
       },

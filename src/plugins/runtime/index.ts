@@ -85,6 +85,7 @@ import {
 import { resolveSlackChannelAllowlist } from "../../slack/resolve-channels.js";
 import { resolveSlackUserAllowlist } from "../../slack/resolve-users.js";
 import { registerMemoryCli } from "../../cli/memory-cli.js";
+import { textToSpeechTelephony } from "../../tts/tts.js";
 import { formatNativeDependencyHint } from "./native-deps.js";
 
 import type { PluginRuntime } from "./types.js";
@@ -125,6 +126,9 @@ export function createPluginRuntime(): PluginRuntime {
       isVoiceCompatibleAudio,
       getImageMetadata,
       resizeToJpeg,
+    },
+    tts: {
+      textToSpeechTelephony,
     },
     tools: {
       createMemoryGetTool,
