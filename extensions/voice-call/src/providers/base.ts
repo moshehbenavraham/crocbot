@@ -14,7 +14,7 @@ import type {
 /**
  * Abstract base interface for voice call providers.
  *
- * Each provider (Telnyx, Twilio, etc.) implements this interface to provide
+ * Each provider (Twilio, Mock, etc.) implements this interface to provide
  * a consistent API for the call manager.
  *
  * Responsibilities:
