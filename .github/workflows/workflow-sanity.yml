@@ -2,7 +2,9 @@ name: Workflow Sanity
 
 on:
   pull_request:
+    branches: [main, master, develop]
   push:
+    branches: [main, master, develop]
 
 jobs:
   no-tabs:
