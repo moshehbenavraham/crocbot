@@ -14,12 +14,31 @@ const noopLogger = {
   error: vi.fn(),
 };
 
+async function rmRetry(dir: string): Promise<void> {
+  // On Windows, jobs.json.bak may still be locked briefly after the cron
+  // store flushes. Retry up to 20 times yielding to the event loop each time.
+  for (let i = 0; i < 20; i++) {
+    try {
+      await fs.rm(dir, { recursive: true, force: true });
+      return;
+    } catch (err) {
+      const code = (err as { code?: unknown } | null)?.code;
+      if (code === "EBUSY" || code === "EPERM" || code === "EACCES" || code === "ENOTEMPTY") {
+        await fs.stat(process.cwd()).catch(() => {});
+        continue;
+      }
+      throw err;
+    }
+  }
+  await fs.rm(dir, { recursive: true, force: true });
+}
+
 async function makeStorePath() {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-cron-"));
   return {
     storePath: path.join(dir, "cron", "jobs.json"),
     cleanup: async () => {
-      await fs.rm(dir, { recursive: true, force: true });
+      await rmRetry(dir);
     },
   };
 }
