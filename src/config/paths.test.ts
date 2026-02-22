@@ -46,7 +46,9 @@ describe("state + config path candidates", () => {
   it("orders default config candidates as new then legacy", () => {
     const home = "/home/test";
     const candidates = resolveDefaultConfigCandidates({} as NodeJS.ProcessEnv, () => home);
-    expect(candidates[0]).toBe(path.join(home, ".crocbot", "crocbot.json"));
-    expect(candidates[1]).toBe(path.join(home, ".crocbot", "crocbot.json"));
+    // resolveRequiredHomeDir calls path.resolve() internally, so expectations must match
+    const resolvedHome = path.resolve(home);
+    expect(candidates[0]).toBe(path.join(resolvedHome, ".crocbot", "crocbot.json"));
+    expect(candidates[1]).toBe(path.join(resolvedHome, ".crocbot", "crocbot.json"));
   });
 });
