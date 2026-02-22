@@ -29,10 +29,10 @@ crocbot knowledge remove https://example.com/docs/guide
 
 ## Run Commands
 
-| Command | Purpose |
-|---------|---------|
-| `crocbot knowledge import <source>` | Import URL, file, or text |
-| `crocbot knowledge list` | List all imported sources |
+| Command                             | Purpose                      |
+| ----------------------------------- | ---------------------------- |
+| `crocbot knowledge import <source>` | Import URL, file, or text    |
+| `crocbot knowledge list`            | List all imported sources    |
 | `crocbot knowledge remove <source>` | Remove source and its chunks |
 
 ## Architecture
