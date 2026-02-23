@@ -202,6 +202,13 @@ export type GatewayRateLimitConfig = {
   windowMs?: number;
 };
 
+export type GatewayToolsConfig = {
+  /** Tools to deny via gateway HTTP /tools/invoke (extends defaults). */
+  deny?: string[];
+  /** Tools to explicitly allow (removes from default deny list). */
+  allow?: string[];
+};
+
 export type GatewayConfig = {
   /** Single multiplexed port for Gateway WS + HTTP (default: 18789). */
   port?: number;
@@ -242,6 +249,8 @@ export type GatewayConfig = {
    * not in this list will be rejected. Loopback connections are always allowed.
    */
   allowedWsOrigins?: string[];
+  /** Tool-level allow/deny policy for HTTP /tools/invoke. */
+  tools?: GatewayToolsConfig;
   /** HTTP rate limiting per client IP (applied to non-health endpoints). */
   rateLimit?: GatewayRateLimitConfig;
   /** Alerting configuration for error notifications. */

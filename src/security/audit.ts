@@ -4,6 +4,7 @@ import type { ChannelId } from "../channels/plugins/types.js";
 import type { crocbotConfig } from "../config/config.js";
 import { resolveBrowserConfig, resolveProfile } from "../browser/config.js";
 import { resolveConfigPath, resolveStateDir } from "../config/paths.js";
+import { DEFAULT_GATEWAY_HTTP_TOOL_DENY } from "../agents/tool-policy.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { buildGatewayConnectionDetails } from "../gateway/call.js";
@@ -329,6 +330,33 @@ function collectGatewayConfigFindings(
       title: "Gateway token looks short",
       detail: `gateway auth token is ${token.length} chars; prefer a long random token.`,
     });
+  }
+
+  // Warn when gateway.tools.allow re-enables tools from the default HTTP deny list.
+  const gatewayToolsAllowRaw = cfg.gateway?.tools?.allow;
+  if (Array.isArray(gatewayToolsAllowRaw) && gatewayToolsAllowRaw.length > 0) {
+    const gatewayToolsAllow = new Set(
+      gatewayToolsAllowRaw
+        .map((v) => (typeof v === "string" ? v.trim().toLowerCase() : ""))
+        .filter(Boolean),
+    );
+    const reenabledOverHttp = DEFAULT_GATEWAY_HTTP_TOOL_DENY.filter((name) =>
+      gatewayToolsAllow.has(name),
+    );
+    if (reenabledOverHttp.length > 0) {
+      const extraRisk = bind !== "loopback" || tailscaleMode === "funnel";
+      findings.push({
+        checkId: "gateway.tools_invoke_http.dangerous_allow",
+        severity: extraRisk ? "critical" : "warn",
+        title: "Gateway HTTP /tools/invoke re-enables dangerous tools",
+        detail:
+          `gateway.tools.allow includes ${reenabledOverHttp.join(", ")} which removes them from the default HTTP deny list. ` +
+          "This can allow remote session spawning / control-plane actions via HTTP and increases RCE blast radius if the gateway is reachable.",
+        remediation:
+          "Remove these entries from gateway.tools.allow (recommended). " +
+          "If you keep them enabled, keep gateway.bind loopback-only (or tailnet-only), restrict network exposure, and treat the gateway token/password as full-admin.",
+      });
+    }
   }
 
   return findings;

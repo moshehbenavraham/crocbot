@@ -1,10 +1,11 @@
 # PRD Phase 16: Critical Security Hardening II
 
-**Status**: In Progress
-**Sessions**: 5 (initial estimate)
+**Status**: Complete
+**Sessions**: 5
 **Estimated Duration**: 10-20 days
+**Completed**: 2026-02-23
 
-**Progress**: 4/5 sessions (80%)
+**Progress**: 5/5 sessions (100%)
 
 ---
 
@@ -34,7 +35,7 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 | 02 | Network, SSRF, and Filesystem Hardening | Complete | 14 (5A+9Ad) | 20 | ~1 | 2026-02-23 |
 | 03 | Input Sanitization and Auth Hardening | Complete | 16 (8A+8Ad) | 20 | ~1 | 2026-02-23 |
 | 04 | Execution Hardening and Data Leak Prevention | Complete | 17 (5A+12Ad) | 22 | ~2 | 2026-02-23 |
-| 05 | ACP Fixes and Security Validation | Not Started | 5 (0A+5Ad) | 15-20 | 3-4 | - |
+| 05 | ACP Fixes and Security Validation | Complete | 5 (0A+5Ad) | 20 | ~1 | 2026-02-23 |
 
 ---
 
@@ -72,9 +73,27 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 
 ---
 
-## Upcoming Sessions
+### Session 05: ACP Fixes and Security Validation
+- **Completed**: 2026-02-23
+- **Duration**: ~1 hour
+- **Tasks**: 20/20
+- **Result**: Closed 5 ACP security items (all Adapt). Introduced `DEFAULT_GATEWAY_HTTP_TOOL_DENY` constant blocking exec, process, write, edit, apply_patch, browser, sessions_spawn, sessions_send, gateway from HTTP gateway auto-approval. Refactored ACP `requestPermission` handler to evaluate tool safety via `classifyToolSafety()` instead of blindly selecting `allow_once`. Added safe-kind inference (conservative boundary-matching classifier), non-read/search prompting denial, and audit warning when `gateway.tools.allow` re-enables denied tools. Added `GatewayToolsConfig` type to gateway config. 4 new files created, 5 files modified. Green baseline: build 0 errors, lint 0 warnings, 787 test files / 6035 tests passed (0 failures).
 
-- Session 05: ACP Fixes and Security Validation
+---
+
+## Phase 16 Completion Summary
+
+| Metric | Value |
+|--------|-------|
+| Sessions completed | 5/5 |
+| Total items triaged | 60 |
+| Items closed | 52 (86.7%) |
+| Items skipped (N/A) | 8 (13.3%) |
+| Total tasks completed | 102 |
+| Total new tests added | ~220+ |
+| Final test count | 6035 passed, 0 failed |
+| Build status | Clean (0 errors) |
+| Lint status | Clean (0 warnings) |
 
 ---
 
@@ -135,16 +154,16 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 ## Success Criteria
 
 Phase complete when:
-- [ ] All 5 sessions completed
-- [ ] All applicable SSRF bypass vectors closed (IPv6-mapped, gateway URL, tool overrides)
-- [ ] Path traversal variants blocked (apply_patch, symlink, archive extraction, media roots)
-- [ ] Input sanitization hardened (Unicode homoglyphs, base64 limits, regex safety, webhook bounds)
-- [ ] Auth gaps closed (OAuth CSRF, rate-limiting, token validation, approval binding)
-- [ ] Credential redaction complete; no secrets in error responses, logs, or config snapshots
-- [ ] ACP permission bypasses closed
-- [ ] Full test suite passes (`pnpm test` -- 0 failures)
-- [ ] Build clean (`pnpm build` -- 0 errors)
-- [ ] Lint clean (`pnpm lint` -- 0 errors)
+- [x] All 5 sessions completed
+- [x] All applicable SSRF bypass vectors closed (IPv6-mapped, gateway URL, tool overrides)
+- [x] Path traversal variants blocked (apply_patch, symlink, archive extraction, media roots)
+- [x] Input sanitization hardened (Unicode homoglyphs, base64 limits, regex safety, webhook bounds)
+- [x] Auth gaps closed (OAuth CSRF, rate-limiting, token validation, approval binding)
+- [x] Credential redaction complete; no secrets in error responses, logs, or config snapshots
+- [x] ACP permission bypasses closed
+- [x] Full test suite passes (`pnpm test` -- 0 failures)
+- [x] Build clean (`pnpm build` -- 0 errors)
+- [x] Lint clean (`pnpm lint` -- 0 errors)
 
 ---
 

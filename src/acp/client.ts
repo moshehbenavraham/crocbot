@@ -12,6 +12,8 @@ import {
 
 import { ensurecrocbotCliOnPath } from "../infra/path-env.js";
 
+import { classifyToolSafety, parseToolNameFromTitle } from "./tool-safety.js";
+
 export type AcpClientOptions = {
   cwd?: string;
   serverCommand?: string;
@@ -106,16 +108,38 @@ export async function createAcpClient(opts: AcpClientOptions = {}): Promise<AcpC
         printSessionUpdate(params);
       },
       requestPermission: async (params: RequestPermissionRequest) => {
-        console.log("\n[permission requested]", params.toolCall?.title ?? "tool");
+        const toolCall = params.toolCall;
+        const title = toolCall?.title ?? "tool";
+        const toolName =
+          parseToolNameFromTitle(typeof title === "string" ? title : undefined) ?? "";
+        const explicitKind = typeof toolCall?.kind === "string" ? toolCall.kind : undefined;
+
+        const safety = classifyToolSafety(toolName, explicitKind);
         const options = params.options ?? [];
-        const allowOnce = options.find((option) => option.kind === "allow_once");
-        const fallback = options[0];
-        return {
-          outcome: {
-            outcome: "selected",
-            optionId: allowOnce?.optionId ?? fallback?.optionId ?? "allow",
-          },
-        };
+        const allowOnce = options.find((o) => o.kind === "allow_once");
+        const rejectOnce = options.find((o) => o.kind === "reject_once");
+
+        // Dangerous tools on the HTTP deny list are always rejected.
+        if (safety.isDangerous) {
+          console.log(`\n[permission denied] ${title} (dangerous: ${safety.toolName})`);
+          const denyId = rejectOnce?.optionId ?? options[0]?.optionId ?? "reject";
+          return { outcome: { outcome: "selected" as const, optionId: denyId } };
+        }
+
+        // Safe-kind (read/search) tools are auto-approved.
+        if (safety.autoApprove) {
+          console.log(`\n[permission auto-approved] ${title} (${safety.toolKind ?? "unknown"})`);
+          const allowId = allowOnce?.optionId ?? options[0]?.optionId ?? "allow";
+          return { outcome: { outcome: "selected" as const, optionId: allowId } };
+        }
+
+        // Non-read/search tools require explicit approval -- log and deny
+        // in headless mode since we cannot prompt interactively over ACP.
+        console.log(
+          `\n[permission denied] ${title} (non-safe kind: ${safety.toolKind ?? "unknown"})`,
+        );
+        const fallbackId = rejectOnce?.optionId ?? options[0]?.optionId ?? "reject";
+        return { outcome: { outcome: "selected" as const, optionId: fallbackId } };
       },
     }),
     stream,

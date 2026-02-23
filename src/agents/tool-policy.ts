@@ -57,6 +57,41 @@ export const TOOL_GROUPS: Record<string, string[]> = {
   ],
 };
 
+/**
+ * Tools that must never be auto-approved via the HTTP gateway.
+ * These tools have dangerous side effects (RCE, session injection, gateway
+ * reconfiguration, filesystem mutation) and require explicit admin override.
+ */
+export const DEFAULT_GATEWAY_HTTP_TOOL_DENY = [
+  "exec",
+  "process",
+  "write",
+  "edit",
+  "apply_patch",
+  "browser",
+  "sessions_spawn",
+  "sessions_send",
+  "gateway",
+] as const;
+
+const GATEWAY_HTTP_DENY_SET = new Set<string>(DEFAULT_GATEWAY_HTTP_TOOL_DENY);
+
+/** Returns true when a tool name is on the gateway HTTP deny list. */
+export function isDangerousHttpTool(name: string): boolean {
+  return GATEWAY_HTTP_DENY_SET.has(normalizeToolName(name));
+}
+
+/** Safe tool kinds that may be auto-approved without prompting. */
+const READ_SEARCH_KINDS = new Set<string>(["read", "search"]);
+
+/** Returns true when a tool kind is read-only or search-only. */
+export function isReadSearchOnly(kind: string | undefined | null): boolean {
+  if (!kind) {
+    return false;
+  }
+  return READ_SEARCH_KINDS.has(kind.trim().toLowerCase());
+}
+
 const OWNER_ONLY_TOOL_NAMES = new Set<string>(["whatsapp_login"]);
 
 const TOOL_PROFILES: Record<ToolProfileId, ToolProfilePolicy> = {

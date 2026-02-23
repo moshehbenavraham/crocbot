@@ -10,6 +10,7 @@ import {
 import {
   buildPluginToolGroups,
   collectExplicitAllowlist,
+  DEFAULT_GATEWAY_HTTP_TOOL_DENY,
   expandPolicyWithPluginGroups,
   normalizeToolName,
   resolveToolProfilePolicy,
@@ -253,7 +254,29 @@ export async function handleToolsInvokeHttpRequest(
     ? filterToolsByPolicy(groupFiltered, subagentPolicyExpanded)
     : groupFiltered;
 
-  const tool = subagentFiltered.find((t) => t.name === toolName);
+  // Gateway HTTP-specific deny list -- applies to ALL sessions via HTTP.
+  // Admin can re-enable tools with gateway.tools.allow; extra tools can be
+  // denied with gateway.tools.deny.
+  const gatewayToolsCfg = cfg.gateway?.tools;
+  const gatewayAllowSet = new Set(
+    (Array.isArray(gatewayToolsCfg?.allow) ? gatewayToolsCfg.allow : [])
+      .map((v: unknown) => (typeof v === "string" ? normalizeToolName(v) : ""))
+      .filter(Boolean),
+  );
+  const defaultGatewayDeny: string[] = DEFAULT_GATEWAY_HTTP_TOOL_DENY.filter(
+    (name) => !gatewayAllowSet.has(name),
+  );
+  const gatewayDenyNames = defaultGatewayDeny.concat(
+    (Array.isArray(gatewayToolsCfg?.deny) ? gatewayToolsCfg.deny : [])
+      .map((v: unknown) => (typeof v === "string" ? normalizeToolName(v) : ""))
+      .filter(Boolean),
+  );
+  const gatewayDenySet = new Set(gatewayDenyNames);
+  const gatewayFiltered = subagentFiltered.filter(
+    (t) => !gatewayDenySet.has(normalizeToolName(t.name)),
+  );
+
+  const tool = gatewayFiltered.find((t) => t.name === toolName);
   if (!tool) {
     sendJson(res, 404, {
       ok: false,
