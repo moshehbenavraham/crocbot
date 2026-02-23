@@ -71,4 +71,70 @@ describe("applyPatch", () => {
       expect(contents).toBe("line1\nline2\n");
     });
   });
+
+  it("blocks ../ path traversal in add", async () => {
+    await withTempDir(async (dir) => {
+      const patch = `*** Begin Patch
+*** Add File: ../../../etc/evil.txt
++pwned
+*** End Patch`;
+      await expect(applyPatch(patch, { cwd: dir })).rejects.toThrow("escapes sandbox");
+    });
+  });
+
+  it("blocks ../ path traversal in delete", async () => {
+    await withTempDir(async (dir) => {
+      const patch = `*** Begin Patch
+*** Delete File: ../../../etc/passwd
+*** End Patch`;
+      await expect(applyPatch(patch, { cwd: dir })).rejects.toThrow("escapes sandbox");
+    });
+  });
+
+  it("blocks ../ path traversal in update", async () => {
+    await withTempDir(async (dir) => {
+      const patch = `*** Begin Patch
+*** Update File: ../../../etc/passwd
+@@
+-root
++hacked
+*** End Patch`;
+      await expect(applyPatch(patch, { cwd: dir })).rejects.toThrow("escapes sandbox");
+    });
+  });
+
+  it("blocks absolute path outside workspace", async () => {
+    await withTempDir(async (dir) => {
+      const patch = `*** Begin Patch
+*** Add File: /etc/evil.txt
++pwned
+*** End Patch`;
+      await expect(applyPatch(patch, { cwd: dir })).rejects.toThrow("escapes sandbox");
+    });
+  });
+
+  it("blocks delete of symlink target", async () => {
+    await withTempDir(async (dir) => {
+      const target = path.join(dir, "link");
+      await fs.symlink("/tmp/harmless", target);
+
+      const patch = `*** Begin Patch
+*** Delete File: link
+*** End Patch`;
+      await expect(applyPatch(patch, { cwd: dir })).rejects.toThrow(/[Ss]ymlink/);
+    });
+  });
+
+  it("allows valid paths within workspace", async () => {
+    await withTempDir(async (dir) => {
+      const patch = `*** Begin Patch
+*** Add File: subdir/new-file.txt
++content
+*** End Patch`;
+      const result = await applyPatch(patch, { cwd: dir });
+      expect(result.summary.added).toContain("subdir/new-file.txt");
+      const content = await fs.readFile(path.join(dir, "subdir", "new-file.txt"), "utf8");
+      expect(content).toBe("content\n");
+    });
+  });
 });

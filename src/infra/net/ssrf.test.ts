@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   type LookupFn,
   SsrFBlockedError,
+  isPrivateIpAddress,
   normalizeHostnameSet,
   resolvePinnedHostnameWithPolicy,
 } from "./ssrf.js";
@@ -191,6 +192,104 @@ describe("resolvePinnedHostnameWithPolicy", () => {
     it("LookupFn type is importable and assignable", () => {
       const fn: LookupFn = vi.fn(async () => [{ address: "1.2.3.4", family: 4 }]);
       expect(typeof fn).toBe("function");
+    });
+  });
+});
+
+describe("isPrivateIpAddress - IPv6-mapped IPv4", () => {
+  describe("compressed form (::ffff:)", () => {
+    it("blocks ::ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("::ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks ::ffff:10.0.0.1", () => {
+      expect(isPrivateIpAddress("::ffff:10.0.0.1")).toBe(true);
+    });
+
+    it("blocks ::ffff:169.254.169.254 (metadata)", () => {
+      expect(isPrivateIpAddress("::ffff:169.254.169.254")).toBe(true);
+    });
+
+    it("allows ::ffff:8.8.8.8 (public)", () => {
+      expect(isPrivateIpAddress("::ffff:8.8.8.8")).toBe(false);
+    });
+  });
+
+  describe("full-form (0:0:0:0:0:ffff:)", () => {
+    it("blocks 0:0:0:0:0:ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0000:0000:0000:0000:0000:ffff:127.0.0.1 (max padding)", () => {
+      expect(isPrivateIpAddress("0000:0000:0000:0000:0000:ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0:0:0:ffff:10.0.0.1", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:10.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0:0:0:ffff:192.168.1.1", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:192.168.1.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0:0:0:ffff:169.254.169.254 (metadata)", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:169.254.169.254")).toBe(true);
+    });
+
+    it("allows 0:0:0:0:0:ffff:8.8.8.8 (public)", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:8.8.8.8")).toBe(false);
+    });
+
+    it("blocks full-form hex-encoded IPv4: 0:0:0:0:0:ffff:7f00:1", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:ffff:7f00:1")).toBe(true);
+    });
+  });
+
+  describe("mixed-case hex", () => {
+    it("blocks 0:0:0:0:0:FFFF:127.0.0.1 (uppercase)", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:FFFF:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks ::FFFF:127.0.0.1 (uppercase compressed)", () => {
+      expect(isPrivateIpAddress("::FFFF:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0:0:0:Ffff:10.0.0.1 (mixed case)", () => {
+      expect(isPrivateIpAddress("0:0:0:0:0:Ffff:10.0.0.1")).toBe(true);
+    });
+  });
+
+  describe("partial compression", () => {
+    it("blocks 0::ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("0::ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0::ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("0:0::ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0::ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("0:0:0::ffff:127.0.0.1")).toBe(true);
+    });
+
+    it("blocks 0:0:0:0::ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("0:0:0:0::ffff:127.0.0.1")).toBe(true);
+    });
+  });
+
+  describe("bracket notation", () => {
+    it("blocks [::ffff:127.0.0.1]", () => {
+      expect(isPrivateIpAddress("[::ffff:127.0.0.1]")).toBe(true);
+    });
+
+    it("blocks [0:0:0:0:0:ffff:127.0.0.1]", () => {
+      expect(isPrivateIpAddress("[0:0:0:0:0:ffff:127.0.0.1]")).toBe(true);
+    });
+  });
+
+  describe("variable zero-padding", () => {
+    it("blocks 00:000:0:0000:0:ffff:127.0.0.1", () => {
+      expect(isPrivateIpAddress("00:000:0:0000:0:ffff:127.0.0.1")).toBe(true);
     });
   });
 });

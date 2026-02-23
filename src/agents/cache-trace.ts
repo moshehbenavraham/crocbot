@@ -6,6 +6,7 @@ import type { AgentMessage, StreamFn } from "@mariozechner/pi-agent-core";
 
 import type { crocbotConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
+import { constrainOutputPath } from "../infra/path-output.js";
 import { parseBooleanValue } from "../utils/boolean.js";
 import { resolveUserPath } from "../utils.js";
 
@@ -83,10 +84,12 @@ function resolveCacheTraceConfig(params: CacheTraceInit): CacheTraceConfig {
   const config = params.cfg?.diagnostics?.cacheTrace;
   const envEnabled = parseBooleanValue(env.CROCBOT_CACHE_TRACE);
   const enabled = envEnabled ?? config?.enabled ?? false;
+  const stateDir = resolveStateDir(env);
+  const logsDir = path.join(stateDir, "logs");
   const fileOverride = config?.filePath?.trim() || env.CROCBOT_CACHE_TRACE_FILE?.trim();
   const filePath = fileOverride
-    ? resolveUserPath(fileOverride)
-    : path.join(resolveStateDir(env), "logs", "cache-trace.jsonl");
+    ? constrainOutputPath({ filePath: resolveUserPath(fileOverride), allowedDir: logsDir })
+    : path.join(logsDir, "cache-trace.jsonl");
 
   const includeMessages =
     parseBooleanValue(env.CROCBOT_CACHE_TRACE_MESSAGES) ?? config?.includeMessages;

@@ -25,6 +25,9 @@ export type SsrFPolicy = {
 const PRIVATE_IPV6_PREFIXES = ["fe80:", "fec0:", "fc", "fd"];
 const BLOCKED_HOSTNAMES = new Set(["localhost", "metadata.google.internal"]);
 
+// Full-form IPv6-mapped IPv4: five zero groups (1-4 hex digits each) + ffff group
+const FULL_FORM_V4MAPPED_RE = /^0{1,4}:0{1,4}:0{1,4}:0{1,4}:0{1,4}:ffff:(.+)$/;
+
 function normalizeHostname(hostname: string): string {
   const normalized = hostname.trim().toLowerCase().replace(/\.$/, "");
   if (normalized.startsWith("[") && normalized.endsWith("]")) {
@@ -83,6 +86,66 @@ function parseIpv4FromMappedIpv6(mapped: string): number[] | null {
   return [(value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff];
 }
 
+function expandIpv6DoubleColon(addr: string): string | null {
+  const dblIdx = addr.indexOf("::");
+  if (dblIdx < 0) {
+    return null;
+  }
+  if (addr.indexOf("::", dblIdx + 2) >= 0) {
+    return null; // multiple :: is invalid
+  }
+  const left = addr.slice(0, dblIdx);
+  const right = addr.slice(dblIdx + 2);
+  const hasIpv4 = right.includes(".");
+  let rightHex: string;
+  let ipv4Part = "";
+  if (hasIpv4) {
+    const lastColon = right.lastIndexOf(":");
+    if (lastColon >= 0) {
+      rightHex = right.slice(0, lastColon);
+      ipv4Part = right.slice(lastColon + 1);
+    } else {
+      rightHex = "";
+      ipv4Part = right;
+    }
+  } else {
+    rightHex = right;
+  }
+  const leftGroups = left ? left.split(":") : [];
+  const rightGroups = rightHex ? rightHex.split(":") : [];
+  const targetGroups = hasIpv4 ? 6 : 8;
+  const needed = targetGroups - leftGroups.length - rightGroups.length;
+  if (needed < 0) {
+    return null;
+  }
+  const allGroups = [...leftGroups, ...(Array(needed).fill("0") as string[]), ...rightGroups];
+  const result = allGroups.join(":");
+  return hasIpv4 ? `${result}:${ipv4Part}` : result;
+}
+
+function extractV4MappedSuffix(normalized: string): string | null {
+  // Compressed form: ::ffff:x.x.x.x or ::ffff:XXXX:XXXX
+  if (normalized.startsWith("::ffff:")) {
+    return normalized.slice("::ffff:".length);
+  }
+  // Full form: 0:0:0:0:0:ffff:x (with variable zero-padding per group)
+  const match = FULL_FORM_V4MAPPED_RE.exec(normalized);
+  if (match) {
+    return match[1] ?? null;
+  }
+  // Partially compressed forms: 0::ffff:x, 0:0::ffff:x, etc.
+  if (normalized.includes("::")) {
+    const expanded = expandIpv6DoubleColon(normalized);
+    if (expanded) {
+      const expandedMatch = FULL_FORM_V4MAPPED_RE.exec(expanded);
+      if (expandedMatch) {
+        return expandedMatch[1] ?? null;
+      }
+    }
+  }
+  return null;
+}
+
 function isPrivateIpv4(parts: number[]): boolean {
   const [octet1, octet2] = parts;
   if (octet1 === 0) {
@@ -118,9 +181,9 @@ export function isPrivateIpAddress(address: string): boolean {
     return false;
   }
 
-  if (normalized.startsWith("::ffff:")) {
-    const mapped = normalized.slice("::ffff:".length);
-    const ipv4 = parseIpv4FromMappedIpv6(mapped);
+  const v4Suffix = extractV4MappedSuffix(normalized);
+  if (v4Suffix) {
+    const ipv4 = parseIpv4FromMappedIpv6(v4Suffix);
     if (ipv4) {
       return isPrivateIpv4(ipv4);
     }

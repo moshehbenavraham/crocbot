@@ -1,3 +1,4 @@
+import { validateGatewayUrl } from "../../agents/tools/gateway.js";
 import { getChannelPlugin, normalizeChannelId } from "../../channels/plugins/index.js";
 import type { crocbotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
@@ -93,6 +94,9 @@ export type MessagePollResult = {
 };
 
 function resolveGatewayOptions(opts?: MessageGatewayOptions) {
+  if (opts?.url) {
+    validateGatewayUrl(opts.url);
+  }
   return {
     url: opts?.url,
     token: opts?.token,

@@ -19,10 +19,13 @@ import {
   toAIFriendlyError,
 } from "./pw-tools-core.shared.js";
 
+const DOWNLOAD_DIR = "/tmp/crocbot/downloads";
+
 function buildTempDownloadPath(fileName: string): string {
   const id = crypto.randomUUID();
-  const safeName = fileName.trim() ? fileName.trim() : "download.bin";
-  return path.join("/tmp/crocbot/downloads", `${id}-${safeName}`);
+  // Use basename to strip any directory components from the suggested filename
+  const safeName = path.basename(fileName.trim()) || "download.bin";
+  return path.join(DOWNLOAD_DIR, `${id}-${safeName}`);
 }
 
 function createPageDownloadWaiter(page: Page, timeoutMs: number) {

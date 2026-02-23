@@ -302,3 +302,37 @@ describe("SSRF integration: IPv6-mapped IPv4 and protocol validation", () => {
     ).rejects.toThrow();
   });
 });
+
+describe("isPrivateIpAddress - full-form IPv6 bypass prevention", () => {
+  it("blocks full-form IPv6-mapped loopback", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:ffff:127.0.0.1")).toBe(true);
+  });
+
+  it("blocks full-form IPv6-mapped private 10.x", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:ffff:10.0.0.1")).toBe(true);
+  });
+
+  it("blocks full-form IPv6-mapped metadata IP", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:ffff:169.254.169.254")).toBe(true);
+  });
+
+  it("blocks padded full-form", () => {
+    expect(isPrivateIpAddress("0000:0000:0000:0000:0000:ffff:127.0.0.1")).toBe(true);
+  });
+
+  it("blocks uppercase FFFF variant", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:FFFF:127.0.0.1")).toBe(true);
+  });
+
+  it("blocks partial compression 0::ffff:127.0.0.1", () => {
+    expect(isPrivateIpAddress("0::ffff:127.0.0.1")).toBe(true);
+  });
+
+  it("allows full-form IPv6-mapped public IP", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:ffff:8.8.8.8")).toBe(false);
+  });
+
+  it("blocks full-form hex-encoded loopback", () => {
+    expect(isPrivateIpAddress("0:0:0:0:0:ffff:7f00:1")).toBe(true);
+  });
+});

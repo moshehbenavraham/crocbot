@@ -49,6 +49,17 @@ export async function assertSandboxPath(params: { filePath: string; cwd: string;
   return resolved;
 }
 
+export async function resolveContainedPath(params: {
+  filePath: string;
+  root: string;
+  cwd?: string;
+}): Promise<{ resolved: string; relative: string }> {
+  const cwd = params.cwd ?? params.root;
+  const result = resolveSandboxPath({ filePath: params.filePath, cwd, root: params.root });
+  await assertNoSymlink(result.relative, path.resolve(params.root));
+  return result;
+}
+
 async function assertNoSymlink(relative: string, root: string) {
   if (!relative) {
     return;

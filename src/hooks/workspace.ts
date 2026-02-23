@@ -131,6 +131,11 @@ function loadHooksFromDir(params: { dir: string; source: HookSource; pluginId?: 
     if (packageHooks.length > 0) {
       for (const hookPath of packageHooks) {
         const resolvedHookDir = path.resolve(hookDir, hookPath);
+        // Block path escape: resolved hook dir must stay within the package dir
+        if (!resolvedHookDir.startsWith(hookDir + path.sep) && resolvedHookDir !== hookDir) {
+          console.warn(`[hooks] Hook path escapes package directory: ${hookPath} in ${hookDir}`);
+          continue;
+        }
         const hook = loadHookFromDir({
           hookDir: resolvedHookDir,
           source,
