@@ -547,6 +547,18 @@ export async function runEmbeddedPiAgent(
               });
               if (compactResult.compacted) {
                 autoCompactionCount += 1;
+                // Update token accounting to reflect post-compaction context size.
+                // This prevents the overflow retry logic from seeing stale pre-compaction
+                // token counts, which would cause false overflow re-triggers.
+                if (compactResult.result?.tokensAfter != null) {
+                  usageAccumulator.total = compactResult.result.tokensAfter;
+                  usageAccumulator.lastCacheRead = 0;
+                  usageAccumulator.lastCacheWrite = 0;
+                  usageAccumulator.lastInput = compactResult.result.tokensAfter;
+                  log.debug(
+                    `post-compaction token accounting updated: tokensAfter=${compactResult.result.tokensAfter}`,
+                  );
+                }
                 log.info(`auto-compaction succeeded for ${provider}/${modelId}; retrying prompt`);
                 continue;
               }
@@ -693,6 +705,17 @@ export async function runEmbeddedPiAgent(
             continue;
           }
 
+          // Classify empty-chunk stream failures (no error message, error stop reason)
+          // as timeout errors. These typically indicate a dropped connection or provider hang.
+          const isEmptyChunkFailure =
+            !aborted &&
+            !promptError &&
+            lastAssistant?.stopReason === "error" &&
+            !lastAssistant.errorMessage?.trim();
+          if (isEmptyChunkFailure) {
+            log.warn(`empty-chunk stream failure classified as timeout for ${provider}/${modelId}`);
+          }
+
           const authFailure = isAuthAssistantError(lastAssistant);
           const rateLimitFailure = isRateLimitAssistantError(lastAssistant);
           const failoverFailure = isFailoverAssistantError(lastAssistant);
@@ -719,8 +742,9 @@ export async function runEmbeddedPiAgent(
             );
           }
 
-          // Treat timeout as potential rate limit (Antigravity hangs on rate limit)
-          const shouldRotate = (!aborted && failoverFailure) || timedOut;
+          // Treat timeout and empty-chunk failures as potential rate limit
+          // (Antigravity hangs on rate limit, producing empty chunks)
+          const shouldRotate = (!aborted && failoverFailure) || timedOut || isEmptyChunkFailure;
 
           if (shouldRotate) {
             // Record rate limit hit in the sliding window rate limiter

@@ -37,4 +37,25 @@ describe("sanitizeUserFacingText", () => {
     const text = "Hello there!\n\nDifferent line.";
     expect(sanitizeUserFacingText(text)).toBe(text);
   });
+
+  it("strips leading empty lines from non-error text", () => {
+    const text = "\n\nHello world";
+    expect(sanitizeUserFacingText(text)).toBe("Hello world");
+  });
+
+  it("strips leading whitespace from non-error text", () => {
+    const text = "   Hello world";
+    expect(sanitizeUserFacingText(text)).toBe("Hello world");
+  });
+
+  it("preserves non-whitespace content after stripping", () => {
+    const text = "\n  Hello\n  World";
+    const result = sanitizeUserFacingText(text);
+    expect(result).toContain("Hello");
+    expect(result).toContain("World");
+  });
+
+  it("returns empty-ish text as-is when all whitespace", () => {
+    expect(sanitizeUserFacingText("")).toBe("");
+  });
 });

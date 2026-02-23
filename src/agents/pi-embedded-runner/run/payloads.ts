@@ -9,6 +9,7 @@ import {
   formatRawAssistantErrorForUi,
   getApiErrorPayloadFingerprint,
   isRawApiErrorPayload,
+  isRecoverableToolError,
   normalizeTextForComparison,
 } from "../../pi-embedded-helpers.js";
 import { createSubsystemLogger } from "../../../logging/subsystem.js";
@@ -208,23 +209,11 @@ export function buildEmbeddedRunPayloads(params: {
     const lastAssistantWasToolUse = params.lastAssistant?.stopReason === "toolUse";
     const hasUserFacingReply =
       replyItems.length > 0 && !lastAssistantHasToolCalls && !lastAssistantWasToolUse;
-    // Check if this is a recoverable/internal tool error that shouldn't be shown to users
-    // when there's already a user-facing reply (the model should have retried).
-    const errorLower = (params.lastToolError.error ?? "").toLowerCase();
-    const isRecoverableError =
-      errorLower.includes("required") ||
-      errorLower.includes("missing") ||
-      errorLower.includes("invalid") ||
-      errorLower.includes("must be") ||
-      errorLower.includes("must have") ||
-      errorLower.includes("needs") ||
-      errorLower.includes("requires");
-
     // Show tool errors only when:
     // 1. There's no user-facing reply AND the error is not recoverable
     // Recoverable errors (validation, missing params) are already in the model's context
     // and shouldn't be surfaced to users since the model should retry.
-    if (!hasUserFacingReply && !isRecoverableError) {
+    if (!hasUserFacingReply && !isRecoverableToolError(params.lastToolError.error)) {
       const toolSummary = formatToolAggregate(
         params.lastToolError.toolName,
         params.lastToolError.meta ? [params.lastToolError.meta] : undefined,

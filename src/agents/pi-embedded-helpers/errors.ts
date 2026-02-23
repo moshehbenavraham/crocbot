@@ -216,6 +216,17 @@ function stripFinalTagsFromText(text: string): string {
   return text.replace(FINAL_TAG_RE, "");
 }
 
+/**
+ * Strip leading empty lines and leading whitespace from text.
+ * Preserves internal structure and trailing content.
+ */
+function stripLeadingWhitespace(text: string): string {
+  if (!text) {
+    return text;
+  }
+  return text.replace(/^[\s]+/, "");
+}
+
 function collapseConsecutiveDuplicateBlocks(text: string): string {
   const trimmed = text.trim();
   if (!trimmed) {
@@ -543,7 +554,7 @@ export function sanitizeUserFacingText(text: string): string {
     return formatRawAssistantErrorForUi(trimmed);
   }
 
-  return collapseConsecutiveDuplicateBlocks(stripped);
+  return stripLeadingWhitespace(collapseConsecutiveDuplicateBlocks(stripped));
 }
 
 export function isRateLimitAssistantError(msg: AssistantMessage | undefined): boolean {
@@ -722,4 +733,27 @@ export function isFailoverAssistantError(msg: AssistantMessage | undefined): boo
     return false;
   }
   return isFailoverErrorMessage(msg.errorMessage ?? "");
+}
+
+const RECOVERABLE_TOOL_ERROR_HINTS = [
+  "required",
+  "missing",
+  "invalid",
+  "must be",
+  "must have",
+  "needs",
+  "requires",
+] as const;
+
+/**
+ * Returns true if a tool error message indicates a recoverable/internal error
+ * that the model should retry (validation, missing params, etc.).
+ * These should not be surfaced to users when a user-facing reply exists.
+ */
+export function isRecoverableToolError(errorMessage?: string): boolean {
+  if (!errorMessage) {
+    return false;
+  }
+  const lower = errorMessage.toLowerCase();
+  return RECOVERABLE_TOOL_ERROR_HINTS.some((hint) => lower.includes(hint));
 }

@@ -308,6 +308,66 @@ describe("overflow compaction in run loop", () => {
     expect(result.meta.error).toBeUndefined();
   });
 
+  it("uses compactEmbeddedPiSessionDirect (not queued variant) for overflow compaction", async () => {
+    const overflowError = new Error("request_too_large: Request size exceeds model context window");
+
+    mockedRunEmbeddedAttempt
+      .mockResolvedValueOnce(makeAttemptResult({ promptError: overflowError }))
+      .mockResolvedValueOnce(makeAttemptResult({ promptError: null }));
+
+    mockedCompactDirect.mockResolvedValueOnce({
+      ok: true,
+      compacted: true,
+      result: {
+        summary: "Compacted",
+        firstKeptEntryId: "entry-5",
+        tokensBefore: 150000,
+        tokensAfter: 50000,
+      },
+    });
+
+    await runEmbeddedPiAgent(baseParams);
+
+    // Verify the direct (non-lane-queued) variant is used to prevent deadlocks
+    expect(mockedCompactDirect).toHaveBeenCalledTimes(1);
+    // The compactEmbeddedPiSession (queued) should NOT have been imported/called
+    expect(mockedCompactDirect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sessionId: baseParams.sessionId,
+        sessionKey: baseParams.sessionKey,
+        sessionFile: baseParams.sessionFile,
+      }),
+    );
+  });
+
+  it("updates token accounting after successful compaction", async () => {
+    const overflowError = new Error("request_too_large: Request size exceeds model context window");
+
+    mockedRunEmbeddedAttempt
+      .mockResolvedValueOnce(makeAttemptResult({ promptError: overflowError }))
+      .mockResolvedValueOnce(makeAttemptResult({ promptError: null }));
+
+    mockedCompactDirect.mockResolvedValueOnce({
+      ok: true,
+      compacted: true,
+      result: {
+        summary: "Compacted",
+        firstKeptEntryId: "entry-5",
+        tokensBefore: 150000,
+        tokensAfter: 50000,
+      },
+    });
+
+    await runEmbeddedPiAgent(baseParams);
+
+    expect(mockedCompactDirect).toHaveBeenCalledTimes(1);
+    // Second attempt succeeds, so no error
+    expect(mockedRunEmbeddedAttempt).toHaveBeenCalledTimes(2);
+    expect(log.debug).toHaveBeenCalledWith(
+      expect.stringContaining("post-compaction token accounting updated: tokensAfter=50000"),
+    );
+  });
+
   it("does not attempt compaction for compaction_failure errors", async () => {
     const compactionFailureError = new Error(
       "request_too_large: summarization failed - Request size exceeds model context window",

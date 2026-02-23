@@ -8,6 +8,8 @@ import {
   SettingsManager,
 } from "@mariozechner/pi-coding-agent";
 
+import { TimeoutError, withTimeout } from "../../shared/with-timeout.js";
+
 import { createModelRouter } from "../model-router.js";
 import type { TaskType } from "../task-classifier.js";
 
@@ -104,6 +106,8 @@ export type CompactEmbeddedPiSessionParams = {
   enqueue?: typeof enqueueCommand;
   extraSystemPrompt?: string;
   ownerNumbers?: string[];
+  /** Timeout in ms for the session.compact() call. Defaults to 120000 (120s). */
+  compactionTimeoutMs?: number;
 };
 
 /**
@@ -439,7 +443,23 @@ export async function compactEmbeddedPiSessionDirect(
         if (limited.length > 0) {
           session.agent.replaceMessages(limited);
         }
-        const result = await session.compact(params.customInstructions);
+        const compactionTimeout = params.compactionTimeoutMs ?? 120_000;
+        let result: Awaited<ReturnType<typeof session.compact>>;
+        try {
+          result = await withTimeout(session.compact(params.customInstructions), compactionTimeout);
+        } catch (err) {
+          if (err instanceof TimeoutError) {
+            log.warn(
+              `session.compact() timed out after ${compactionTimeout}ms for session ${params.sessionId}`,
+            );
+            return {
+              ok: false,
+              compacted: false,
+              reason: `Compaction timed out after ${compactionTimeout}ms`,
+            };
+          }
+          throw err;
+        }
         // Estimate tokens after compaction by summing token estimates for remaining messages
         let tokensAfter: number | undefined;
         try {

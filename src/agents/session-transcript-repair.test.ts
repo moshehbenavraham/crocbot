@@ -164,7 +164,7 @@ describe("tool-call block field validation", () => {
     expect(Array.isArray(assistant.content) ? assistant.content.length : 0).toBe(1);
   });
 
-  it("skips tool calls with oversized id", () => {
+  it("truncates tool calls with oversized id", () => {
     const longId = "x".repeat(200);
     const input: AgentMessage[] = [
       {
@@ -176,8 +176,9 @@ describe("tool-call block field validation", () => {
 
     const out = sanitizeToolUseResultPairing(input);
     const results = out.filter((m) => m.role === "toolResult");
-    // No synthetic result for oversized ID - it gets truncated or skipped
-    expect(results.length).toBe(0);
+    // Oversized ID is truncated to 128 chars and a synthetic result is inserted
+    expect(results.length).toBe(1);
+    expect(results[0].toolCallId).toBe("x".repeat(128));
   });
 
   it("sanitizes tool names with invalid characters", () => {

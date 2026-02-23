@@ -492,12 +492,18 @@ export async function runEmbeddedAttempt(
       // Force a stable streamFn reference so vitest can reliably mock @mariozechner/pi-ai.
       activeSession.agent.streamFn = streamSimple;
 
+      // Force store=true for OpenAI Responses API to enable response persistence.
+      const isResponsesApi = params.model.api === "openai-responses";
+      const mergedStreamParams = isResponsesApi
+        ? { store: true, ...params.streamParams }
+        : params.streamParams;
+
       applyExtraParamsToAgent(
         activeSession.agent,
         params.config,
         params.provider,
         params.modelId,
-        params.streamParams,
+        mergedStreamParams,
       );
 
       if (cacheTrace) {

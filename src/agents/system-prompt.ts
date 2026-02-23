@@ -529,7 +529,8 @@ export function buildAgentSystemPrompt(params: {
   const contextFiles = params.contextFiles ?? [];
   if (contextFiles.length > 0) {
     const hasSoulFile = contextFiles.some((file) => {
-      const normalizedPath = file.path.trim().replace(/\\/g, "/");
+      const filePath = file.path ?? "";
+      const normalizedPath = filePath.trim().replace(/\\/g, "/");
       const baseName = normalizedPath.split("/").pop() ?? normalizedPath;
       return baseName.toLowerCase() === "soul.md";
     });
@@ -541,7 +542,7 @@ export function buildAgentSystemPrompt(params: {
     }
     lines.push("");
     for (const file of contextFiles) {
-      lines.push(`## ${file.path}`, "", file.content, "");
+      lines.push(`## ${file.path ?? "(unknown)"}`, "", file.content, "");
     }
   }
 

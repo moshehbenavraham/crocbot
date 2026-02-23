@@ -31,6 +31,18 @@ function isValidToolCallId(id: unknown): boolean {
   return typeof id === "string" && id.length > 0 && id.length <= MAX_TOOL_CALL_ID_LENGTH;
 }
 
+/**
+ * Sanitize a tool call ID by replacing invalid characters with underscores
+ * and truncating to the max length. Returns null if the result is empty.
+ */
+function sanitizeToolCallIdForRepair(id: unknown): string | null {
+  if (typeof id !== "string" || !id) {
+    return null;
+  }
+  const sanitized = id.replace(/[^A-Za-z0-9_\-.:]/g, "_").slice(0, MAX_TOOL_CALL_ID_LENGTH);
+  return sanitized.length > 0 ? sanitized : null;
+}
+
 function isValidToolName(name: unknown): boolean {
   if (typeof name !== "string") {
     return true;
@@ -59,12 +71,16 @@ function extractToolCallsFromAssistant(
       continue;
     }
     const rec = block as { type?: unknown; id?: unknown; name?: unknown };
-    if (!isValidToolCallId(rec.id)) {
-      continue;
-    }
 
     if (rec.type === "toolCall" || rec.type === "toolUse" || rec.type === "functionCall") {
-      const id = (rec.id as string).slice(0, MAX_TOOL_CALL_ID_LENGTH);
+      // Sanitize tool call IDs to prevent policy evaluation failures.
+      // Use valid IDs directly; sanitize invalid ones rather than skipping.
+      const id = isValidToolCallId(rec.id)
+        ? (rec.id as string).slice(0, MAX_TOOL_CALL_ID_LENGTH)
+        : sanitizeToolCallIdForRepair(rec.id);
+      if (!id) {
+        continue;
+      }
       const rawName = typeof rec.name === "string" ? rec.name : undefined;
       const name =
         rawName && isValidToolName(rawName)

@@ -34,4 +34,12 @@ export function describeUnknownError(error: unknown): string {
   }
 }
 
+/**
+ * Returns the path string or a safe default when the path is undefined/null.
+ * Prevents crashes when context file entries have missing paths.
+ */
+export function safeContextFilePath(path: string | undefined | null): string {
+  return path ?? "(unknown)";
+}
+
 export type { ReasoningLevel, ThinkLevel };

@@ -18,6 +18,8 @@ export async function persistSessionUsageUpdate(params: {
   modelUsed?: string;
   providerUsed?: string;
   contextTokensUsed?: number;
+  /** Override totalTokens directly (e.g., after compaction). Takes precedence over derived value. */
+  totalTokensOverride?: number;
   systemPromptReport?: SessionSystemPromptReport;
   cliSessionId?: string;
   logLabel?: string;
@@ -41,10 +43,12 @@ export async function persistSessionUsageUpdate(params: {
             inputTokens: input,
             outputTokens: output,
             totalTokens:
+              params.totalTokensOverride ??
               deriveSessionTotalTokens({
                 usage: params.usage,
                 contextTokens: resolvedContextTokens,
-              }) ?? input,
+              }) ??
+              input,
             modelProvider: params.providerUsed ?? entry.modelProvider,
             model: params.modelUsed ?? entry.model,
             contextTokens: resolvedContextTokens,
