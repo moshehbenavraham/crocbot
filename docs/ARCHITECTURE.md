@@ -70,10 +70,11 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Location**: `src/media/`
 
 ### Security Layer
-- **Purpose**: SSRF protection, path traversal validation, exec allowlisting
-- **Tech**: DNS pinning, IP range blocking, AbortSignal timeouts
-- **Location**: `src/infra/net/` (ssrf.ts, fetch-guard.ts), `src/infra/exec-approvals.ts`
-- **Key modules**: `ssrf.ts` (private IP/hostname blocking, redirect validation), `fetch-guard.ts` (guarded fetch wrapper), `exec-approvals.ts` (shell token blocking, allowlist enforcement)
+- **Purpose**: SSRF protection, path traversal validation, exec allowlisting, input validation, auth hardening
+- **Tech**: DNS pinning, IP range blocking, AbortSignal timeouts, timing-safe comparison
+- **Location**: `src/infra/net/` (ssrf.ts, fetch-guard.ts), `src/infra/exec-approvals.ts`, `src/security/`, `src/gateway/`
+- **Key modules**: `ssrf.ts` (private IP/hostname blocking, IPv6-mapped bypass prevention, redirect validation), `fetch-guard.ts` (guarded fetch wrapper), `exec-approvals.ts` (shell expansion blocking, heredoc handling, allowlist enforcement), `security-headers.ts` (CSP, X-Frame-Options, nosniff, path traversal filtering), `auth-rate-limit.ts` (sliding-window per-IP auth rate limiting with lockout), `secret-equal.ts` (timing-safe token comparison via crypto.timingSafeEqual), `path-output.ts` (output path containment), `http-body.ts` (bounded HTTP body reading), `base64.ts` (oversized base64 rejection)
+- **Security domains**: Network/SSRF, filesystem containment, input sanitization, authentication, execution hardening, data leak prevention, ACP tool safety
 
 ### Secrets Masking (`src/infra/secrets/`)
 - **Purpose**: Prevent credential leakage across all output boundaries

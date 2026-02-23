@@ -16,6 +16,9 @@ import { loggingState } from "./state.js";
 export const DEFAULT_LOG_DIR = "/tmp/crocbot";
 export const DEFAULT_LOG_FILE = path.join(DEFAULT_LOG_DIR, "crocbot.log"); // legacy single-file path
 
+// Project-root logs/ directory for AI-friendly error capture.
+const PROJECT_LOGS_DIR = path.resolve(import.meta.dirname ?? __dirname, "../../logs");
+
 const LOG_PREFIX = "crocbot";
 const LOG_SUFFIX = ".log";
 const MAX_LOG_AGE_MS = 24 * 60 * 60 * 1000; // 24h
@@ -52,6 +55,29 @@ function attachExternalTransport(logger: TsLogger<LogObj>, transport: LogTranspo
       // never block on logging failures
     }
   });
+}
+
+function writeLastError(logObj: LogObj): void {
+  try {
+    fs.mkdirSync(PROJECT_LOGS_DIR, { recursive: true });
+    const timestamp = logObj.date?.toISOString() ?? new Date().toISOString();
+    const safeTs = timestamp.replace(/[:.]/g, "-");
+    const file = path.join(PROJECT_LOGS_DIR, `last_error_${safeTs}.json`);
+    const entry = {
+      timestamp,
+      level: (logObj._logLevelName as string) ?? "error",
+      msg: typeof logObj[0] === "string" ? logObj[0] : JSON.stringify(logObj[0] ?? ""),
+      error: {
+        type: logObj.errorType ?? logObj.name ?? "Error",
+        message: logObj.errorMessage ?? logObj[0] ?? "",
+        stack: logObj.stack ?? "",
+      },
+      context: logObj.meta ?? {},
+    };
+    fs.writeFileSync(file, JSON.stringify(entry, null, 2) + "\n", "utf8");
+  } catch {
+    // never block on error capture failures
+  }
 }
 
 function resolveSettings(): ResolvedSettings {
@@ -128,6 +154,12 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
       maskingTransport(entry);
       const line = JSON.stringify(entry);
       fs.appendFileSync(settings.file, `${line}\n`, { encoding: "utf8" });
+
+      // Capture error/fatal to logs/last_error_<timestamp>.json for AI-friendly debugging.
+      const levelName = (logObj._logLevelName as string | undefined) ?? "";
+      if (levelName === "ERROR" || levelName === "FATAL") {
+        writeLastError(logObj);
+      }
     } catch {
       // never block on logging failures
     }

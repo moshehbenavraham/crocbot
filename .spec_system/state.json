@@ -2,7 +2,7 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 16,
+  "current_phase": 17,
   "current_session": null,
   "phases": {
     "16": {
@@ -15,8 +15,8 @@
     "17": {
       "name": "Core Runtime Stability",
       "description": "Fix gateway session management, agent runtime deadlocks and token drift, session/process lock races, and bound memory growth vectors.",
-      "status": "pending",
-      "sessions_completed": 0,
+      "status": "active",
+      "sessions_completed": 1,
       "session_count": 5
     },
     "18": {
@@ -53,7 +53,8 @@
     "phase16-session02-network-ssrf-and-filesystem-hardening",
     "phase16-session03-input-sanitization-and-auth-hardening",
     "phase16-session04-execution-hardening-and-data-leak-prevention",
-    "phase16-session05-acp-fixes-and-security-validation"
+    "phase16-session05-acp-fixes-and-security-validation",
+    "phase17-session01-research-and-triage"
   ],
   "next_session_history": [
     {
@@ -79,6 +80,11 @@
     {
       "date": "2026-02-23",
       "session": "phase16-session05-acp-fixes-and-security-validation",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-23",
+      "session": "phase17-session01-research-and-triage",
       "status": "completed"
     }
   ]

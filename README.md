@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.142**
+> **v0.1.160**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -246,9 +246,13 @@ Docs: [Telegram](https://aiwithapex.mintlify.app/channels/telegram) · [Groups](
 Crocbot connects to real messaging surfaces — treat inbound DMs as **untrusted input**.
 
 - **DM pairing** (`dmPolicy="pairing"`) — unknown senders must pair before the bot responds
-- **Exec allowlisting** — shell commands are gated by an allowlist
-- **SSRF protection** — private IP/hostname blocking on all outbound fetches
+- **Exec allowlisting** — shell commands are gated by an allowlist; shell expansion blocked in safe binaries
+- **SSRF protection** — private IP/hostname blocking on all outbound fetches, including IPv6-mapped bypass prevention
 - **Secrets masking** — credentials never appear in logs, LLM context, or Telegram output
+- **Security headers** — CSP, X-Frame-Options, nosniff, path traversal and null byte filtering on HTTP endpoints
+- **Auth rate limiting** — sliding-window per-IP rate limiting with lockout on auth endpoints
+- **Input validation** — oversized base64 rejection, bounded HTTP body reading, Unicode homoglyph detection
+- **ACP tool safety** — dangerous tool deny list, safe-kind inference, auto-approval only for read/search operations
 - **Sandbox mode** — run non-main sessions (groups) in per-session Docker sandboxes
 - **`crocbot doctor`** — audit tool that surfaces risky or misconfigured policies
 

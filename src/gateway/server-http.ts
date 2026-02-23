@@ -37,6 +37,7 @@ import { getMetrics, getMetricsContentType } from "../metrics/index.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import type { RateLimiter } from "./rate-limit.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
+import { applySecurityHeaders, filterRequest } from "./security-headers.js";
 import { handleSetupHttpRequest } from "./setup-http.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
@@ -249,6 +250,18 @@ export function createGatewayHttpServer(opts: {
   async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     // Don't interfere with WebSocket upgrades; ws handles the 'upgrade' event.
     if (String(req.headers.upgrade ?? "").toLowerCase() === "websocket") {
+      return;
+    }
+
+    // Security headers on every response
+    applySecurityHeaders(res);
+
+    // WAF: reject malformed/malicious requests early
+    const filterResult = filterRequest(req);
+    if (filterResult.blocked) {
+      res.statusCode = filterResult.status ?? 400;
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.end(filterResult.message ?? "Bad Request");
       return;
     }
 
