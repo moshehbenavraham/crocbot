@@ -95,7 +95,7 @@ export const TelegramAccountSchemaBase = z
     commands: ProviderCommandsSchema,
     customCommands: z.array(TelegramCustomCommandSchema).optional(),
     configWrites: z.boolean().optional(),
-    dmPolicy: DmPolicySchema.optional().default("pairing"),
+    dmPolicy: DmPolicySchema.optional(),
     botToken: z.string().optional(),
     tokenFile: z.string().optional(),
     replyToMode: ReplyToModeSchema.optional(),
@@ -174,7 +174,7 @@ export const TelegramConfigSchema = TelegramAccountSchemaBase.extend({
 export const SlackDmSchema = z
   .object({
     enabled: z.boolean().optional(),
-    policy: DmPolicySchema.optional().default("pairing"),
+    policy: DmPolicySchema.optional(),
     allowFrom: z.array(z.union([z.string(), z.number()])).optional(),
     groupEnabled: z.boolean().optional(),
     groupChannels: z.array(z.union([z.string(), z.number()])).optional(),

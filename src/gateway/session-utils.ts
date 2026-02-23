@@ -35,6 +35,7 @@ import type {
 
 export {
   archiveFileOnDisk,
+  archiveSessionTranscripts,
   capArrayByJsonBytes,
   readFirstUserMessageFromTranscript,
   readLastMessagePreviewFromTranscript,
@@ -51,6 +52,50 @@ export type {
   SessionsPreviewEntry,
   SessionsPreviewResult,
 } from "./session-utils.types.js";
+
+/**
+ * Normalize a session key to lowercase to prevent ghost sessions
+ * from case-sensitive filesystem key mismatches.
+ */
+export function normalizeSessionKey(key: string): string {
+  return key.toLowerCase();
+}
+
+/**
+ * Find all keys in a session store whose lowercased form matches the target.
+ * Used to detect legacy mixed-case key variants that need migration.
+ */
+export function findStoreKeysIgnoreCase(
+  store: Record<string, unknown>,
+  targetKey: string,
+): string[] {
+  const lowered = targetKey.toLowerCase();
+  return Object.keys(store).filter((k) => k.toLowerCase() === lowered);
+}
+
+/**
+ * Remove legacy (non-canonical) key variants from a session store.
+ * Deletes any candidate key or case-insensitive match that differs
+ * from the canonical key.
+ */
+export function pruneLegacyStoreKeys(params: {
+  store: Record<string, unknown>;
+  canonicalKey: string;
+  candidates: string[];
+}): void {
+  const { store, canonicalKey, candidates } = params;
+  for (const candidate of candidates) {
+    if (candidate !== canonicalKey && store[candidate] !== undefined) {
+      delete store[candidate];
+    }
+  }
+  const matches = findStoreKeysIgnoreCase(store, canonicalKey);
+  for (const match of matches) {
+    if (match !== canonicalKey) {
+      delete store[match];
+    }
+  }
+}
 
 const DERIVED_TITLE_MAX_LEN = 60;
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -187,8 +232,17 @@ export function loadSessionEntry(sessionKey: string) {
   const agentId = resolveSessionStoreAgentId(cfg, canonicalKey);
   const storePath = resolveStorePath(sessionCfg?.store, { agentId });
   const store = loadSessionStore(storePath);
-  const entry = store[canonicalKey];
-  return { cfg, storePath, store, entry, canonicalKey };
+  let entry = store[canonicalKey];
+  let legacyKey: string | undefined;
+  if (!entry) {
+    const matches = findStoreKeysIgnoreCase(store, canonicalKey);
+    const match = matches.find((k) => k !== canonicalKey);
+    if (match) {
+      entry = store[match];
+      legacyKey = match;
+    }
+  }
+  return { cfg, storePath, store, entry, canonicalKey, legacyKey };
 }
 
 export function classifySessionKey(key: string, entry?: SessionEntry): GatewaySessionRow["kind"] {
@@ -332,13 +386,14 @@ export function listAgentsForGateway(cfg: crocbotConfig): {
 }
 
 function canonicalizeSessionKeyForAgent(agentId: string, key: string): string {
-  if (key === "global" || key === "unknown") {
-    return key;
+  const lowered = key.toLowerCase();
+  if (lowered === "global" || lowered === "unknown") {
+    return lowered;
   }
-  if (key.startsWith("agent:")) {
-    return key;
+  if (lowered.startsWith("agent:")) {
+    return lowered;
   }
-  return `agent:${normalizeAgentId(agentId)}:${key}`;
+  return `agent:${normalizeAgentId(agentId)}:${lowered}`;
 }
 
 function resolveDefaultStoreAgentId(cfg: crocbotConfig): string {
@@ -350,8 +405,9 @@ export function resolveSessionStoreKey(params: { cfg: crocbotConfig; sessionKey:
   if (!raw) {
     return raw;
   }
-  if (raw === "global" || raw === "unknown") {
-    return raw;
+  const lowered = raw.toLowerCase();
+  if (lowered === "global" || lowered === "unknown") {
+    return lowered;
   }
 
   const parsed = parseAgentSessionKey(raw);
@@ -360,20 +416,20 @@ export function resolveSessionStoreKey(params: { cfg: crocbotConfig; sessionKey:
     const canonical = canonicalizeMainSessionAlias({
       cfg: params.cfg,
       agentId,
-      sessionKey: raw,
+      sessionKey: lowered,
     });
-    if (canonical !== raw) {
+    if (canonical !== lowered) {
       return canonical;
     }
-    return raw;
+    return lowered;
   }
 
   const rawMainKey = normalizeMainKey(params.cfg.session?.mainKey);
-  if (raw === "main" || raw === rawMainKey) {
+  if (lowered === "main" || lowered === rawMainKey) {
     return resolveMainSessionKey(params.cfg);
   }
   const agentId = resolveDefaultStoreAgentId(params.cfg);
-  return canonicalizeSessionKeyForAgent(agentId, raw);
+  return canonicalizeSessionKeyForAgent(agentId, lowered);
 }
 
 function resolveSessionStoreAgentId(cfg: crocbotConfig, canonicalKey: string): string {
@@ -392,13 +448,14 @@ function canonicalizeSpawnedByForAgent(agentId: string, spawnedBy?: string): str
   if (!raw) {
     return undefined;
   }
-  if (raw === "global" || raw === "unknown") {
-    return raw;
+  const lowered = raw.toLowerCase();
+  if (lowered === "global" || lowered === "unknown") {
+    return lowered;
   }
-  if (raw.startsWith("agent:")) {
-    return raw;
+  if (lowered.startsWith("agent:")) {
+    return lowered;
   }
-  return `agent:${normalizeAgentId(agentId)}:${raw}`;
+  return `agent:${normalizeAgentId(agentId)}:${lowered}`;
 }
 
 export function resolveGatewaySessionStoreTarget(params: { cfg: crocbotConfig; key: string }): {

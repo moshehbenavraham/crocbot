@@ -253,7 +253,9 @@ export const configHandlers: GatewayRequestHandlers = {
       );
       return;
     }
-    const merged = applyMergePatch(snapshot.config, parsedRes.parsed);
+    const merged = applyMergePatch(snapshot.config, parsedRes.parsed, {
+      mergeObjectArraysById: true,
+    });
     const migrated = applyLegacyMigrations(merged);
     const resolved = migrated.next ?? merged;
     const validated = validateConfigObjectWithPlugins(resolved);

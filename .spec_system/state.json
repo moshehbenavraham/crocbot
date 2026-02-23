@@ -16,7 +16,7 @@
       "name": "Core Runtime Stability",
       "description": "Fix gateway session management, agent runtime deadlocks and token drift, session/process lock races, and bound memory growth vectors.",
       "status": "active",
-      "sessions_completed": 1,
+      "sessions_completed": 2,
       "session_count": 5
     },
     "18": {
@@ -54,7 +54,8 @@
     "phase16-session03-input-sanitization-and-auth-hardening",
     "phase16-session04-execution-hardening-and-data-leak-prevention",
     "phase16-session05-acp-fixes-and-security-validation",
-    "phase17-session01-research-and-triage"
+    "phase17-session01-research-and-triage",
+    "phase17-session02-gateway-session-and-routing-fixes"
   ],
   "next_session_history": [
     {
@@ -85,6 +86,11 @@
     {
       "date": "2026-02-23",
       "session": "phase17-session01-research-and-triage",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-23",
+      "session": "phase17-session02-gateway-session-and-routing-fixes",
       "status": "completed"
     }
   ]

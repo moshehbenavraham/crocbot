@@ -8,6 +8,9 @@ import {
   classifySessionKey,
   deriveSessionTitle,
   listSessionsFromStore,
+  normalizeSessionKey,
+  findStoreKeysIgnoreCase,
+  pruneLegacyStoreKeys,
   parseGroupKey,
   resolveGatewaySessionStoreTarget,
   resolveSessionStoreKey,
@@ -330,5 +333,77 @@ describe("listSessionsFromStore search", () => {
       opts: { search: "  personal  " },
     });
     expect(result.sessions.length).toBe(1);
+  });
+});
+
+describe("normalizeSessionKey", () => {
+  test("lowercases mixed-case keys", () => {
+    expect(normalizeSessionKey("TeleGram:Group:123")).toBe("telegram:group:123");
+  });
+
+  test("returns empty string for empty input", () => {
+    expect(normalizeSessionKey("")).toBe("");
+  });
+
+  test("preserves already-lowercase keys", () => {
+    expect(normalizeSessionKey("telegram:group:abc")).toBe("telegram:group:abc");
+  });
+
+  test("handles embedded colons", () => {
+    expect(normalizeSessionKey("agent:Main:Telegram:Channel:Test")).toBe(
+      "agent:main:telegram:channel:test",
+    );
+  });
+
+  test("handles unicode characters (lowercases ASCII portion)", () => {
+    expect(normalizeSessionKey("Telegram:Group:Caf\u00e9")).toBe("telegram:group:caf\u00e9");
+  });
+
+  test("handles single-segment key", () => {
+    expect(normalizeSessionKey("MAIN")).toBe("main");
+  });
+});
+
+describe("findStoreKeysIgnoreCase", () => {
+  test("finds keys matching case-insensitively", () => {
+    const store: Record<string, unknown> = {
+      "Telegram:Group:123": { id: 1 },
+      "telegram:group:456": { id: 2 },
+      other: { id: 3 },
+    };
+    const matches = findStoreKeysIgnoreCase(store, "telegram:group:123");
+    expect(matches).toEqual(["Telegram:Group:123"]);
+  });
+
+  test("returns empty array when no match", () => {
+    const store: Record<string, unknown> = { foo: 1 };
+    expect(findStoreKeysIgnoreCase(store, "bar")).toEqual([]);
+  });
+});
+
+describe("pruneLegacyStoreKeys", () => {
+  test("removes non-canonical case variants", () => {
+    const store: Record<string, unknown> = {
+      "telegram:group:123": { id: 1 },
+      "Telegram:Group:123": { id: 2 },
+    };
+    pruneLegacyStoreKeys({
+      store,
+      canonicalKey: "telegram:group:123",
+      candidates: ["Telegram:Group:123"],
+    });
+    expect(store).toEqual({ "telegram:group:123": { id: 1 } });
+  });
+
+  test("does not remove canonical key", () => {
+    const store: Record<string, unknown> = {
+      "telegram:group:123": { id: 1 },
+    };
+    pruneLegacyStoreKeys({
+      store,
+      canonicalKey: "telegram:group:123",
+      candidates: ["telegram:group:123"],
+    });
+    expect(store).toEqual({ "telegram:group:123": { id: 1 } });
   });
 });

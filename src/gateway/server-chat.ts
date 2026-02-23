@@ -306,6 +306,10 @@ export function createAgentEventHandler({
     }
 
     if (lifecyclePhase === "end" || lifecyclePhase === "error") {
+      agentRunSeq.delete(evt.runId);
+      if (clientRunId !== evt.runId) {
+        agentRunSeq.delete(clientRunId);
+      }
       clearAgentRunContext(evt.runId);
     }
   };

@@ -2,7 +2,7 @@
 
 **Status**: In Progress
 **Sessions**: 5
-**Completed**: 1/5 (20%)
+**Completed**: 2/5 (40%)
 
 ---
 
@@ -20,7 +20,7 @@
 | Session | Name | Status | Validated |
 |---------|------|--------|-----------|
 | 01 | Research and Triage | Complete | 2026-02-23 |
-| 02 | Gateway Session and Routing Fixes | Pending | - |
+| 02 | Gateway Session and Routing Fixes | Complete | 2026-02-23 |
 | 03 | Agent Compaction, Deadlock, and Token Fixes | Pending | - |
 | 04 | Session Management and Process Fixes | Pending | - |
 | 05 | Memory Bounding and Validation | Pending | - |

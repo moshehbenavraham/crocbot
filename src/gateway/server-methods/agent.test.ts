@@ -31,9 +31,13 @@ vi.mock("../../commands/agent.js", () => ({
   agentCommand: mocks.agentCommand,
 }));
 
-vi.mock("../../config/config.js", () => ({
-  loadConfig: () => ({}),
-}));
+vi.mock("../../config/config.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../config/config.js")>();
+  return {
+    ...actual,
+    loadConfig: () => ({}),
+  };
+});
 
 vi.mock("../../agents/agent-scope.js", () => ({
   listAgentIds: () => ["main"],
@@ -46,6 +50,12 @@ vi.mock("../../infra/agent-events.js", () => ({
 
 vi.mock("../../sessions/send-policy.js", () => ({
   resolveSendPolicy: () => "allow",
+}));
+
+vi.mock("./sessions.js", () => ({
+  sessionsHandlers: {
+    reset: vi.fn(),
+  },
 }));
 
 vi.mock("../../utils/delivery-context.js", async () => {

@@ -105,6 +105,20 @@ export function startGatewayMaintenanceTimers(params: {
       );
     }
 
+    // Cap agentRunSeq to prevent unbounded growth from orphaned entries.
+    const AGENT_RUN_SEQ_MAX = 10_000;
+    if (params.agentRunSeq.size > AGENT_RUN_SEQ_MAX) {
+      const excess = params.agentRunSeq.size - AGENT_RUN_SEQ_MAX;
+      const iter = params.agentRunSeq.keys();
+      for (let i = 0; i < excess; i++) {
+        const next = iter.next();
+        if (next.done) {
+          break;
+        }
+        params.agentRunSeq.delete(next.value);
+      }
+    }
+
     const ABORTED_RUN_TTL_MS = 60 * 60_000;
     for (const [runId, abortedAt] of params.chatRunState.abortedRuns) {
       if (now - abortedAt <= ABORTED_RUN_TTL_MS) {

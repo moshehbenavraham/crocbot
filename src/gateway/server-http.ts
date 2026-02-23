@@ -69,6 +69,11 @@ function sendJson(res: ServerResponse, status: number, body: unknown) {
 
 export type HooksRequestHandler = (req: IncomingMessage, res: ServerResponse) => Promise<boolean>;
 
+type HookAuthFailure = { count: number; windowStartedAtMs: number };
+const HOOK_AUTH_FAILURE_WINDOW_MS = 60_000;
+const HOOK_AUTH_FAILURE_LIMIT = 5;
+const HOOK_AUTH_FAILURE_TRACK_MAX = 1024;
+
 export function createHooksRequestHandler(
   opts: {
     getHooksConfig: () => HooksConfigResolved | null;
@@ -78,6 +83,53 @@ export function createHooksRequestHandler(
   } & HookDispatchers,
 ): HooksRequestHandler {
   const { getHooksConfig, bindHost, port, logHooks, dispatchAgentHook, dispatchWakeHook } = opts;
+  const hookAuthFailures = new Map<string, HookAuthFailure>();
+
+  const recordHookAuthFailure = (
+    clientKey: string,
+    nowMs: number,
+  ): { throttled: boolean; retryAfterSeconds?: number } => {
+    if (!hookAuthFailures.has(clientKey) && hookAuthFailures.size >= HOOK_AUTH_FAILURE_TRACK_MAX) {
+      // Prune expired entries instead of clearing all state.
+      for (const [key, entry] of hookAuthFailures) {
+        if (nowMs - entry.windowStartedAtMs >= HOOK_AUTH_FAILURE_WINDOW_MS) {
+          hookAuthFailures.delete(key);
+        }
+      }
+      // If still at capacity after pruning, drop the oldest half.
+      if (hookAuthFailures.size >= HOOK_AUTH_FAILURE_TRACK_MAX) {
+        let toRemove = Math.floor(hookAuthFailures.size / 2);
+        for (const key of hookAuthFailures.keys()) {
+          if (toRemove <= 0) {
+            break;
+          }
+          hookAuthFailures.delete(key);
+          toRemove--;
+        }
+      }
+    }
+    const current = hookAuthFailures.get(clientKey);
+    const expired = !current || nowMs - current.windowStartedAtMs >= HOOK_AUTH_FAILURE_WINDOW_MS;
+    const next: HookAuthFailure = expired
+      ? { count: 1, windowStartedAtMs: nowMs }
+      : { count: current.count + 1, windowStartedAtMs: current.windowStartedAtMs };
+    // Delete-before-set refreshes Map insertion order so recently-active
+    // clients are not evicted before dormant ones during oldest-half eviction.
+    if (hookAuthFailures.has(clientKey)) {
+      hookAuthFailures.delete(clientKey);
+    }
+    hookAuthFailures.set(clientKey, next);
+    if (next.count <= HOOK_AUTH_FAILURE_LIMIT) {
+      return { throttled: false };
+    }
+    const elapsed = nowMs - next.windowStartedAtMs;
+    const retryAfterSeconds = Math.max(
+      1,
+      Math.ceil((HOOK_AUTH_FAILURE_WINDOW_MS - elapsed) / 1000),
+    );
+    return { throttled: true, retryAfterSeconds };
+  };
+
   return async (req, res) => {
     const hooksConfig = getHooksConfig();
     if (!hooksConfig) {
@@ -91,6 +143,17 @@ export function createHooksRequestHandler(
 
     const { token } = extractHookToken(req, url);
     if (!token || token !== hooksConfig.token) {
+      const clientIp = req.socket?.remoteAddress ?? "unknown";
+      const { throttled, retryAfterSeconds } = recordHookAuthFailure(clientIp, Date.now());
+      if (throttled) {
+        res.statusCode = 429;
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        if (retryAfterSeconds) {
+          res.setHeader("Retry-After", String(retryAfterSeconds));
+        }
+        res.end("Too Many Requests");
+        return true;
+      }
       res.statusCode = 401;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end("Unauthorized");

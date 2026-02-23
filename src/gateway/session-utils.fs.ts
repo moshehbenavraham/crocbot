@@ -74,10 +74,39 @@ export function resolveSessionTranscriptCandidates(
   return candidates;
 }
 
+export type ArchiveFileReason = "bak" | "reset" | "deleted";
+
 export function archiveFileOnDisk(filePath: string, reason: string): string {
   const ts = new Date().toISOString().replaceAll(":", "-");
   const archived = `${filePath}.${reason}.${ts}`;
   fs.renameSync(filePath, archived);
+  return archived;
+}
+
+export function archiveSessionTranscripts(opts: {
+  sessionId: string;
+  storePath: string | undefined;
+  sessionFile?: string;
+  agentId?: string;
+  reason: "reset" | "deleted";
+}): string[] {
+  const candidates = resolveSessionTranscriptCandidates(
+    opts.sessionId,
+    opts.storePath,
+    opts.sessionFile,
+    opts.agentId,
+  );
+  const archived: string[] = [];
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) {
+      continue;
+    }
+    try {
+      archived.push(archiveFileOnDisk(candidate, opts.reason));
+    } catch {
+      // Best-effort: silently skip rename failures.
+    }
+  }
   return archived;
 }
 

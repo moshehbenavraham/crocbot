@@ -14,6 +14,7 @@ import {
 } from "../../config/sessions.js";
 import {
   ErrorCodes,
+  type ErrorShape as ProtocolErrorShape,
   errorShape,
   formatValidationErrors,
   validateSessionsCompactParams,
@@ -26,6 +27,7 @@ import {
 } from "../protocol/index.js";
 import {
   archiveFileOnDisk,
+  archiveSessionTranscripts,
   listSessionsFromStore,
   loadCombinedSessionStoreForGateway,
   loadSessionEntry,
@@ -39,6 +41,38 @@ import {
 import { applySessionsPatchToStore } from "../sessions-patch.js";
 import { resolveSessionKeyFromResolveParams } from "../sessions-resolve.js";
 import type { GatewayRequestHandlers } from "./types.js";
+
+/**
+ * Consolidated runtime cleanup for a session: clear queues, stop subagents,
+ * abort any embedded pi run, and wait for it to end.
+ * Returns an error shape if the active run cannot be stopped within the timeout.
+ */
+async function ensureSessionRuntimeCleanup(params: {
+  cfg: ReturnType<typeof loadConfig>;
+  key: string;
+  target: ReturnType<typeof resolveGatewaySessionStoreTarget>;
+  sessionId?: string;
+}): Promise<ProtocolErrorShape | undefined> {
+  const queueKeys = new Set<string>(params.target.storeKeys);
+  queueKeys.add(params.target.canonicalKey);
+  if (params.sessionId) {
+    queueKeys.add(params.sessionId);
+  }
+  clearSessionQueues([...queueKeys]);
+  stopSubagentsForRequester({ cfg: params.cfg, requesterSessionKey: params.target.canonicalKey });
+  if (!params.sessionId) {
+    return undefined;
+  }
+  abortEmbeddedPiRun(params.sessionId);
+  const ended = await waitForEmbeddedPiRunEnd(params.sessionId, 15_000);
+  if (ended) {
+    return undefined;
+  }
+  return errorShape(
+    ErrorCodes.UNAVAILABLE,
+    `Session ${params.key} is still active; try again in a moment.`,
+  );
+}
 
 export const sessionsHandlers: GatewayRequestHandlers = {
   "sessions.list": ({ params, respond }) => {
@@ -224,7 +258,29 @@ export const sessionsHandlers: GatewayRequestHandlers = {
 
     const cfg = loadConfig();
     const target = resolveGatewaySessionStoreTarget({ cfg, key });
+    const { entry } = loadSessionEntry(key);
+    const sessionId = entry?.sessionId;
+
+    // Abort any active runs before resetting (T007)
+    const cleanupError = await ensureSessionRuntimeCleanup({ cfg, key, target, sessionId });
+    if (cleanupError) {
+      respond(false, undefined, cleanupError);
+      return;
+    }
+
     const storePath = target.storePath;
+
+    // Archive old transcript files before creating the new session entry.
+    if (sessionId) {
+      archiveSessionTranscripts({
+        sessionId,
+        storePath,
+        sessionFile: entry?.sessionFile,
+        agentId: target.agentId,
+        reason: "reset",
+      });
+    }
+
     const next = await updateSessionStore(storePath, (store) => {
       const primaryKey = target.storeKeys[0] ?? key;
       const existingKey = target.storeKeys.find((candidate) => store[candidate]);
@@ -232,25 +288,25 @@ export const sessionsHandlers: GatewayRequestHandlers = {
         store[primaryKey] = store[existingKey];
         delete store[existingKey];
       }
-      const entry = store[primaryKey];
+      const existingEntry = store[primaryKey];
       const now = Date.now();
       const nextEntry: SessionEntry = {
         sessionId: randomUUID(),
         updatedAt: now,
         systemSent: false,
         abortedLastRun: false,
-        thinkingLevel: entry?.thinkingLevel,
-        verboseLevel: entry?.verboseLevel,
-        reasoningLevel: entry?.reasoningLevel,
-        responseUsage: entry?.responseUsage,
-        model: entry?.model,
-        contextTokens: entry?.contextTokens,
-        sendPolicy: entry?.sendPolicy,
-        label: entry?.label,
-        origin: snapshotSessionOrigin(entry),
-        lastChannel: entry?.lastChannel,
-        lastTo: entry?.lastTo,
-        skillsSnapshot: entry?.skillsSnapshot,
+        thinkingLevel: existingEntry?.thinkingLevel,
+        verboseLevel: existingEntry?.verboseLevel,
+        reasoningLevel: existingEntry?.reasoningLevel,
+        responseUsage: existingEntry?.responseUsage,
+        model: existingEntry?.model,
+        contextTokens: existingEntry?.contextTokens,
+        sendPolicy: existingEntry?.sendPolicy,
+        label: existingEntry?.label,
+        origin: snapshotSessionOrigin(existingEntry),
+        lastChannel: existingEntry?.lastChannel,
+        lastTo: existingEntry?.lastTo,
+        skillsSnapshot: existingEntry?.skillsSnapshot,
         // Reset token counts to 0 on session reset (#1523)
         inputTokens: 0,
         outputTokens: 0,
@@ -298,27 +354,11 @@ export const sessionsHandlers: GatewayRequestHandlers = {
     const { entry } = loadSessionEntry(key);
     const sessionId = entry?.sessionId;
     const existed = Boolean(entry);
-    const queueKeys = new Set<string>(target.storeKeys);
-    queueKeys.add(target.canonicalKey);
-    if (sessionId) {
-      queueKeys.add(sessionId);
-    }
-    clearSessionQueues([...queueKeys]);
-    stopSubagentsForRequester({ cfg, requesterSessionKey: target.canonicalKey });
-    if (sessionId) {
-      abortEmbeddedPiRun(sessionId);
-      const ended = await waitForEmbeddedPiRunEnd(sessionId, 15_000);
-      if (!ended) {
-        respond(
-          false,
-          undefined,
-          errorShape(
-            ErrorCodes.UNAVAILABLE,
-            `Session ${key} is still active; try again in a moment.`,
-          ),
-        );
-        return;
-      }
+
+    const cleanupError = await ensureSessionRuntimeCleanup({ cfg, key, target, sessionId });
+    if (cleanupError) {
+      respond(false, undefined, cleanupError);
+      return;
     }
     await updateSessionStore(storePath, (store) => {
       const primaryKey = target.storeKeys[0] ?? key;
@@ -332,24 +372,16 @@ export const sessionsHandlers: GatewayRequestHandlers = {
       }
     });
 
-    const archived: string[] = [];
-    if (deleteTranscript && sessionId) {
-      for (const candidate of resolveSessionTranscriptCandidates(
-        sessionId,
-        storePath,
-        entry?.sessionFile,
-        target.agentId,
-      )) {
-        if (!fs.existsSync(candidate)) {
-          continue;
-        }
-        try {
-          archived.push(archiveFileOnDisk(candidate, "deleted"));
-        } catch {
-          // Best-effort.
-        }
-      }
-    }
+    const archived =
+      deleteTranscript && sessionId
+        ? archiveSessionTranscripts({
+            sessionId,
+            storePath,
+            sessionFile: entry?.sessionFile,
+            agentId: target.agentId,
+            reason: "deleted",
+          })
+        : [];
 
     respond(true, { ok: true, key: target.canonicalKey, deleted: existed, archived }, undefined);
   },

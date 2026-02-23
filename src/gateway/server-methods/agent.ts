@@ -37,7 +37,82 @@ import { loadSessionEntry } from "../session-utils.js";
 import { formatForLog } from "../ws-log.js";
 import { resolveAssistantIdentity } from "../assistant-identity.js";
 import { waitForAgentJob } from "./agent-job.js";
-import type { GatewayRequestHandlers } from "./types.js";
+import { sessionsHandlers } from "./sessions.js";
+import type { GatewayRequestContext, GatewayRequestHandlers } from "./types.js";
+
+const RESET_COMMAND_RE = /^\/(new|reset)(?:\s+([\s\S]*))?$/i;
+
+const BARE_SESSION_RESET_PROMPT =
+  "A new session was started via /new or /reset. Greet the user in your configured persona, if one is provided. Be yourself - use your defined voice, mannerisms, and mood. Keep it to 1-3 sentences and ask what they want to do. If the runtime model differs from default_model in the system prompt, mention the default model. Do not mention internal steps, files, tools, or reasoning.";
+
+type ResetResult =
+  | { ok: true; key: string; sessionId: string }
+  | { ok: false; error: ReturnType<typeof errorShape> };
+
+async function runSessionResetFromAgent(params: {
+  key: string;
+  context: GatewayRequestContext;
+}): Promise<ResetResult> {
+  return new Promise<ResetResult>((resolve) => {
+    let settled = false;
+    const settle = (result: ResetResult) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve(result);
+    };
+
+    const resetHandlerResult = sessionsHandlers["sessions.reset"]({
+      req: {
+        type: "req",
+        id: randomUUID(),
+        method: "sessions.reset",
+        params: { key: params.key },
+      },
+      params: { key: params.key },
+      client: null,
+      isWebchatConnect: () => false,
+      respond: (ok, payload) => {
+        if (ok && payload && typeof payload === "object" && "entry" in payload) {
+          const p = payload as { key?: string; entry?: { sessionId?: string } };
+          settle({
+            ok: true,
+            key: typeof p.key === "string" ? p.key : params.key,
+            sessionId: p.entry?.sessionId ?? "",
+          });
+        } else {
+          settle({
+            ok: false,
+            error: errorShape(ErrorCodes.UNAVAILABLE, "sessions.reset failed"),
+          });
+        }
+      },
+      context: params.context,
+    });
+
+    // Handle both sync and async handlers (T010)
+    void (async () => {
+      try {
+        await resetHandlerResult;
+        if (!settled) {
+          settle({
+            ok: false,
+            error: errorShape(
+              ErrorCodes.UNAVAILABLE,
+              "sessions.reset completed without returning a response",
+            ),
+          });
+        }
+      } catch (err: unknown) {
+        settle({
+          ok: false,
+          error: errorShape(ErrorCodes.UNAVAILABLE, String(err)),
+        });
+      }
+    })();
+  });
+}
 
 export const agentHandlers: GatewayRequestHandlers = {
   agent: async ({ params, respond, context }) => {
@@ -176,7 +251,7 @@ export const agentHandlers: GatewayRequestHandlers = {
       typeof request.sessionKey === "string" && request.sessionKey.trim()
         ? request.sessionKey.trim()
         : undefined;
-    const requestedSessionKey =
+    let requestedSessionKey: string | undefined =
       requestedSessionKeyRaw ??
       resolveExplicitAgentSessionKey({
         cfg,
@@ -196,6 +271,26 @@ export const agentHandlers: GatewayRequestHandlers = {
         return;
       }
     }
+    // Route /new and /reset commands through sessions.reset (T009)
+    const resetMatch = RESET_COMMAND_RE.exec(message);
+    if (resetMatch && requestedSessionKey) {
+      const resetResult = await runSessionResetFromAgent({
+        key: requestedSessionKey,
+        context,
+      });
+      if (!resetResult.ok) {
+        respond(false, undefined, resetResult.error);
+        return;
+      }
+      requestedSessionKey = resetResult.key;
+      const followUpText = resetMatch[2]?.trim();
+      if (followUpText) {
+        message = followUpText;
+      } else {
+        message = BARE_SESSION_RESET_PROMPT;
+      }
+    }
+
     let resolvedSessionId = request.sessionId?.trim() || undefined;
     let sessionEntry: SessionEntry | undefined;
     let bestEffortDeliver = false;
