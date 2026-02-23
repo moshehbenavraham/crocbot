@@ -132,10 +132,6 @@ export function getShellPathFromLoginShell(opts: {
   if (cachedShellPath !== undefined) {
     return cachedShellPath;
   }
-  if (process.platform === "win32") {
-    cachedShellPath = null;
-    return cachedShellPath;
-  }
 
   const exec = opts.exec ?? execFileSync;
   const timeoutMs =

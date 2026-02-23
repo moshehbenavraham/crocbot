@@ -113,59 +113,36 @@ type BrowserOpenCommand = {
   argv: string[] | null;
   reason?: string;
   command?: string;
-  /**
-   * Whether the URL must be wrapped in quotes when appended to argv.
-   * Needed for Windows `cmd /c start` where `&` splits commands.
-   */
-  quoteUrl?: boolean;
 };
 
 export async function resolveBrowserOpenCommand(): Promise<BrowserOpenCommand> {
-  const platform = process.platform;
   const hasDisplay = Boolean(process.env.DISPLAY || process.env.WAYLAND_DISPLAY);
   const isSsh =
     Boolean(process.env.SSH_CLIENT) ||
     Boolean(process.env.SSH_TTY) ||
     Boolean(process.env.SSH_CONNECTION);
 
-  if (isSsh && !hasDisplay && platform !== "win32") {
+  if (isSsh && !hasDisplay) {
     return { argv: null, reason: "ssh-no-display" };
   }
 
-  if (platform === "win32") {
-    return {
-      argv: ["cmd", "/c", "start", ""],
-      command: "cmd",
-      quoteUrl: true,
-    };
+  const wsl = await isWSL();
+  if (!hasDisplay && !wsl) {
+    return { argv: null, reason: "no-display" };
   }
-
-  if (platform === "darwin") {
-    const hasOpen = await detectBinary("open");
-    return hasOpen ? { argv: ["open"], command: "open" } : { argv: null, reason: "missing-open" };
-  }
-
-  if (platform === "linux") {
-    const wsl = await isWSL();
-    if (!hasDisplay && !wsl) {
-      return { argv: null, reason: "no-display" };
+  if (wsl) {
+    const hasWslview = await detectBinary("wslview");
+    if (hasWslview) {
+      return { argv: ["wslview"], command: "wslview" };
     }
-    if (wsl) {
-      const hasWslview = await detectBinary("wslview");
-      if (hasWslview) {
-        return { argv: ["wslview"], command: "wslview" };
-      }
-      if (!hasDisplay) {
-        return { argv: null, reason: "wsl-no-wslview" };
-      }
+    if (!hasDisplay) {
+      return { argv: null, reason: "wsl-no-wslview" };
     }
-    const hasXdgOpen = await detectBinary("xdg-open");
-    return hasXdgOpen
-      ? { argv: ["xdg-open"], command: "xdg-open" }
-      : { argv: null, reason: "missing-xdg-open" };
   }
-
-  return { argv: null, reason: "unsupported-platform" };
+  const hasXdgOpen = await detectBinary("xdg-open");
+  return hasXdgOpen
+    ? { argv: ["xdg-open"], command: "xdg-open" }
+    : { argv: null, reason: "missing-xdg-open" };
 }
 
 export async function detectBrowserOpenSupport(): Promise<BrowserOpenSupport> {
@@ -184,22 +161,9 @@ export async function openUrl(url: string): Promise<boolean> {
   if (!resolved.argv) {
     return false;
   }
-  const quoteUrl = resolved.quoteUrl === true;
-  const command = [...resolved.argv];
-  if (quoteUrl) {
-    if (command.at(-1) === "") {
-      // Preserve the empty title token for `start` when using verbatim args.
-      command[command.length - 1] = '""';
-    }
-    command.push(`"${url}"`);
-  } else {
-    command.push(url);
-  }
+  const command = [...resolved.argv, url];
   try {
-    await runCommandWithTimeout(command, {
-      timeoutMs: 5_000,
-      windowsVerbatimArguments: quoteUrl,
-    });
+    await runCommandWithTimeout(command, { timeoutMs: 5_000 });
     return true;
   } catch {
     // ignore; we still print the URL for manual open
@@ -207,24 +171,9 @@ export async function openUrl(url: string): Promise<boolean> {
   }
 }
 
-export async function openUrlInBackground(url: string): Promise<boolean> {
-  if (shouldSkipBrowserOpenInTests()) {
-    return false;
-  }
-  if (process.platform !== "darwin") {
-    return false;
-  }
-  const resolved = await resolveBrowserOpenCommand();
-  if (!resolved.argv || resolved.command !== "open") {
-    return false;
-  }
-  const command = ["open", "-g", url];
-  try {
-    await runCommandWithTimeout(command, { timeoutMs: 5_000 });
-    return true;
-  } catch {
-    return false;
-  }
+export async function openUrlInBackground(_url: string): Promise<boolean> {
+  // No-op: was macOS-only (open -g). Linux has no equivalent.
+  return false;
 }
 
 export async function ensureWorkspaceAndSessions(
@@ -304,7 +253,7 @@ export async function detectBinary(name: string): Promise<boolean> {
     }
   }
 
-  const command = process.platform === "win32" ? ["where", name] : ["/usr/bin/env", "which", name];
+  const command = ["/usr/bin/env", "which", name];
   try {
     const result = await runCommandWithTimeout(command, { timeoutMs: 2000 });
     return result.code === 0 && result.stdout.trim().length > 0;

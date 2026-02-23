@@ -286,10 +286,6 @@ export function resolveHomeDir(): string | undefined {
   if (envHome) {
     return envHome;
   }
-  const envProfile = process.env.USERPROFILE?.trim();
-  if (envProfile) {
-    return envProfile;
-  }
   try {
     const home = os.homedir();
     return home?.trim() ? home : undefined;

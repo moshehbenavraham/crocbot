@@ -3,10 +3,7 @@ import { resolveGatewayService } from "./service.js";
 import {
   NODE_SERVICE_KIND,
   NODE_SERVICE_MARKER,
-  NODE_WINDOWS_TASK_SCRIPT_NAME,
-  resolveNodeLaunchAgentLabel,
   resolveNodeSystemdServiceName,
-  resolveNodeWindowsTaskName,
 } from "./constants.js";
 
 function withNodeServiceEnv(
@@ -14,10 +11,7 @@ function withNodeServiceEnv(
 ): Record<string, string | undefined> {
   return {
     ...env,
-    CROCBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
     CROCBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    CROCBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    CROCBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
     CROCBOT_LOG_PREFIX: "node",
     CROCBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
     CROCBOT_SERVICE_KIND: NODE_SERVICE_KIND,
@@ -30,10 +24,7 @@ function withNodeInstallEnv(args: GatewayServiceInstallArgs): GatewayServiceInst
     env: withNodeServiceEnv(args.env),
     environment: {
       ...args.environment,
-      CROCBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
       CROCBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-      CROCBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-      CROCBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
       CROCBOT_LOG_PREFIX: "node",
       CROCBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
       CROCBOT_SERVICE_KIND: NODE_SERVICE_KIND,

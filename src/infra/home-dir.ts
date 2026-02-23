@@ -18,8 +18,7 @@ function resolveRawHomeDir(env: NodeJS.ProcessEnv, homedir: () => string): strin
   const explicitHome = normalize(env.CROCBOT_HOME);
   if (explicitHome) {
     if (explicitHome === "~" || explicitHome.startsWith("~/") || explicitHome.startsWith("~\\")) {
-      const fallbackHome =
-        normalize(env.HOME) ?? normalize(env.USERPROFILE) ?? normalizeSafe(homedir);
+      const fallbackHome = normalize(env.HOME) ?? normalizeSafe(homedir);
       if (fallbackHome) {
         return explicitHome.replace(/^~(?=$|[\\/])/, fallbackHome);
       }
@@ -31,11 +30,6 @@ function resolveRawHomeDir(env: NodeJS.ProcessEnv, homedir: () => string): strin
   const envHome = normalize(env.HOME);
   if (envHome) {
     return envHome;
-  }
-
-  const userProfile = normalize(env.USERPROFILE);
-  if (userProfile) {
-    return userProfile;
   }
 
   return normalizeSafe(homedir);

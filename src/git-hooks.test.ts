@@ -97,10 +97,8 @@ describe("setupGitHooks", () => {
     expect(result).toEqual({ ok: true });
     expect(runGit.mock.calls.some(([args]) => args[0] === "config")).toBe(true);
 
-    if (process.platform !== "win32") {
-      const mode = fs.statSync(hookPath).mode & 0o777;
-      expect(mode & 0o100).toBeTruthy();
-    }
+    const mode = fs.statSync(hookPath).mode & 0o777;
+    expect(mode & 0o100).toBeTruthy();
 
     fs.rmSync(repoRoot, { recursive: true, force: true });
   });

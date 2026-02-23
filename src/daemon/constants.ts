@@ -1,18 +1,11 @@
 // Default service labels (for backward compatibility and when no profile specified)
-export const GATEWAY_LAUNCH_AGENT_LABEL = "com.crocbot.gateway";
 export const GATEWAY_SYSTEMD_SERVICE_NAME = "crocbot-gateway";
-export const GATEWAY_WINDOWS_TASK_NAME = "crocbot Gateway";
 export const GATEWAY_SERVICE_MARKER = "crocbot";
 export const GATEWAY_SERVICE_KIND = "gateway";
-export const NODE_LAUNCH_AGENT_LABEL = "com.crocbot.node";
 export const NODE_SYSTEMD_SERVICE_NAME = "crocbot-node";
-export const NODE_WINDOWS_TASK_NAME = "crocbot Node";
 export const NODE_SERVICE_MARKER = "crocbot";
 export const NODE_SERVICE_KIND = "node";
-export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
-export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS = ["com.crocbot.gateway.legacy"];
 export const LEGACY_GATEWAY_SYSTEMD_SERVICE_NAMES: string[] = [];
-export const LEGACY_GATEWAY_WINDOWS_TASK_NAMES: string[] = [];
 
 export function normalizeGatewayProfile(profile?: string): string | null {
   const trimmed = profile?.trim();
@@ -27,28 +20,12 @@ export function resolveGatewayProfileSuffix(profile?: string): string {
   return normalized ? `-${normalized}` : "";
 }
 
-export function resolveGatewayLaunchAgentLabel(profile?: string): string {
-  const normalized = normalizeGatewayProfile(profile);
-  if (!normalized) {
-    return GATEWAY_LAUNCH_AGENT_LABEL;
-  }
-  return `com.crocbot.${normalized}`;
-}
-
 export function resolveGatewaySystemdServiceName(profile?: string): string {
   const suffix = resolveGatewayProfileSuffix(profile);
   if (!suffix) {
     return GATEWAY_SYSTEMD_SERVICE_NAME;
   }
   return `crocbot-gateway${suffix}`;
-}
-
-export function resolveGatewayWindowsTaskName(profile?: string): string {
-  const normalized = normalizeGatewayProfile(profile);
-  if (!normalized) {
-    return GATEWAY_WINDOWS_TASK_NAME;
-  }
-  return `crocbot Gateway (${normalized})`;
 }
 
 export function formatGatewayServiceDescription(params?: {
@@ -70,16 +47,8 @@ export function formatGatewayServiceDescription(params?: {
   return `crocbot Gateway (${parts.join(", ")})`;
 }
 
-export function resolveNodeLaunchAgentLabel(): string {
-  return NODE_LAUNCH_AGENT_LABEL;
-}
-
 export function resolveNodeSystemdServiceName(): string {
   return NODE_SYSTEMD_SERVICE_NAME;
-}
-
-export function resolveNodeWindowsTaskName(): string {
-  return NODE_WINDOWS_TASK_NAME;
 }
 
 export function formatNodeServiceDescription(params?: { version?: string }): string {

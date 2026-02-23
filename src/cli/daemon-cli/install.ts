@@ -122,13 +122,13 @@ export async function runDaemonInstall(opts: DaemonInstallOptions) {
     }
 
     // Persist to config file so the gateway reads it at runtime
-    // (launchd does not inherit shell env vars, and CLI tools also
+    // (systemd services don't inherit shell env vars, and CLI tools also
     // read gateway.auth.token from config for gateway calls).
     try {
       const snapshot = await readConfigFileSnapshot();
       if (snapshot.exists && !snapshot.valid) {
         // Config file exists but is corrupt/unparseable — don't risk overwriting.
-        // Token is still embedded in the plist EnvironmentVariables.
+        // Token is still embedded in the service EnvironmentVariables.
         const msg = "Warning: config file exists but is invalid; skipping token persistence.";
         if (json) {
           warnings.push(msg);

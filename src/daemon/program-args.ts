@@ -10,12 +10,12 @@ type GatewayRuntimePreference = "auto" | "node" | "bun";
 
 function isNodeRuntime(execPath: string): boolean {
   const base = path.basename(execPath).toLowerCase();
-  return base === "node" || base === "node.exe";
+  return base === "node";
 }
 
 function isBunRuntime(execPath: string): boolean {
   const base = path.basename(execPath).toLowerCase();
-  return base === "bun" || base === "bun.exe";
+  return base === "bun";
 }
 
 async function resolveCliEntrypointPathForService(): Promise<string> {
@@ -30,7 +30,7 @@ async function resolveCliEntrypointPathForService(): Promise<string> {
   if (looksLikeDist) {
     await fs.access(resolvedPath);
     // Prefer the original (possibly symlinked) path over the resolved realpath.
-    // This keeps LaunchAgent/systemd paths stable across package version updates,
+    // This keeps systemd service paths stable across package version updates,
     // since symlinks like node_modules/crocbot -> .pnpm/crocbot@X.Y.Z/...
     // are automatically updated by pnpm, while the resolved path contains
     // version-specific directories that break after updates.
@@ -149,7 +149,7 @@ async function resolveNodePath(): Promise<string> {
 
 async function resolveBinaryPath(binary: string): Promise<string> {
   const { execSync } = await import("node:child_process");
-  const cmd = process.platform === "win32" ? "where" : "which";
+  const cmd = "which";
   try {
     const output = execSync(`${cmd} ${binary}`, { encoding: "utf8" }).trim();
     const resolved = output.split(/\r?\n/)[0]?.trim();

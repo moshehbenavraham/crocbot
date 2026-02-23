@@ -24,12 +24,6 @@ import {
   type ExecAllowlistEntry,
   type ExecCommandSegment,
 } from "../infra/exec-approvals.js";
-import {
-  requestExecHostViaSocket,
-  type ExecHostRequest,
-  type ExecHostResponse,
-  type ExecHostRunResult,
-} from "../infra/exec-host.js";
 import { getMachineDisplayName } from "../infra/machine-name.js";
 import { loadOrCreateDeviceIdentity } from "../infra/device-identity.js";
 import { loadConfig } from "../config/config.js";
@@ -150,10 +144,6 @@ const OUTPUT_CAP = 200_000;
 const OUTPUT_EVENT_TAIL = 20_000;
 const DEFAULT_NODE_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
 const BROWSER_PROXY_MAX_FILE_BYTES = 10 * 1024 * 1024;
-
-const execHostEnforced = process.env.CROCBOT_NODE_EXEC_HOST?.trim().toLowerCase() === "app";
-const execHostFallbackAllowed =
-  process.env.CROCBOT_NODE_EXEC_FALLBACK?.trim().toLowerCase() !== "0";
 
 const blockedEnvKeys = new Set([
   "NODE_OPTIONS",
@@ -417,7 +407,7 @@ async function runCommand(
       cwd,
       env,
       stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
+      detached: true,
     });
 
     const onChunk = (chunk: Buffer, target: "stdout" | "stderr") => {
@@ -483,12 +473,7 @@ async function runCommand(
 }
 
 function resolveEnvPath(env?: Record<string, string>): string[] {
-  const raw =
-    env?.PATH ??
-    (env as Record<string, string>)?.Path ??
-    process.env.PATH ??
-    process.env.Path ??
-    DEFAULT_NODE_PATH;
+  const raw = env?.PATH ?? process.env.PATH ?? DEFAULT_NODE_PATH;
   return raw.split(path.delimiter).filter(Boolean);
 }
 
@@ -506,14 +491,8 @@ function resolveExecutable(bin: string, env?: Record<string, string>) {
   if (bin.includes("/") || bin.includes("\\")) {
     return null;
   }
-  const extensions =
-    process.platform === "win32"
-      ? (process.env.PATHEXT ?? process.env.PathExt ?? ".EXE;.CMD;.BAT;.COM")
-          .split(";")
-          .map((ext) => ext.toLowerCase())
-      : [""];
   for (const dir of resolveEnvPath(env)) {
-    for (const ext of extensions) {
+    for (const ext of [""]) {
       const candidate = path.join(dir, bin + ext);
       if (fs.existsSync(candidate)) {
         return candidate;
@@ -545,18 +524,6 @@ function buildExecEventPayload(payload: ExecEventPayload): ExecEventPayload {
   }
   const { text } = truncateOutput(trimmed, OUTPUT_EVENT_TAIL);
   return { ...payload, output: text };
-}
-
-async function runViaMacAppExecHost(params: {
-  approvals: ReturnType<typeof resolveExecApprovals>;
-  request: ExecHostRequest;
-}): Promise<ExecHostResponse | null> {
-  const { approvals, request } = params;
-  return await requestExecHostViaSocket({
-    socketPath: approvals.socketPath,
-    token: approvals.token,
-    request,
-  });
 }
 
 export async function runNodeHost(opts: NodeHostRunOptions): Promise<void> {
@@ -938,89 +905,6 @@ async function handleInvoke(
     allowlistSatisfied =
       security === "allowlist" && analysisOk ? allowlistEval.allowlistSatisfied : false;
     segments = analysis.segments;
-  }
-
-  const useMacAppExec = process.platform === "darwin";
-  if (useMacAppExec) {
-    const approvalDecision =
-      params.approvalDecision === "allow-once" || params.approvalDecision === "allow-always"
-        ? params.approvalDecision
-        : null;
-    const execRequest: ExecHostRequest = {
-      command: argv,
-      rawCommand: rawCommand || null,
-      cwd: params.cwd ?? null,
-      env: params.env ?? null,
-      timeoutMs: params.timeoutMs ?? null,
-      needsScreenRecording: params.needsScreenRecording ?? null,
-      agentId: agentId ?? null,
-      sessionKey: sessionKey ?? null,
-      approvalDecision,
-    };
-    const response = await runViaMacAppExecHost({ approvals, request: execRequest });
-    if (!response) {
-      if (execHostEnforced || !execHostFallbackAllowed) {
-        await sendNodeEvent(
-          client,
-          "exec.denied",
-          buildExecEventPayload({
-            sessionKey,
-            runId,
-            host: "node",
-            command: cmdText,
-            reason: "companion-unavailable",
-          }),
-        );
-        await sendInvokeResult(client, frame, {
-          ok: false,
-          error: {
-            code: "UNAVAILABLE",
-            message: "COMPANION_APP_UNAVAILABLE: macOS app exec host unreachable",
-          },
-        });
-        return;
-      }
-    } else if (!response.ok) {
-      const reason = response.error.reason ?? "approval-required";
-      await sendNodeEvent(
-        client,
-        "exec.denied",
-        buildExecEventPayload({
-          sessionKey,
-          runId,
-          host: "node",
-          command: cmdText,
-          reason,
-        }),
-      );
-      await sendInvokeResult(client, frame, {
-        ok: false,
-        error: { code: "UNAVAILABLE", message: response.error.message },
-      });
-      return;
-    } else {
-      const result: ExecHostRunResult = response.payload;
-      const combined = [result.stdout, result.stderr, result.error].filter(Boolean).join("\n");
-      await sendNodeEvent(
-        client,
-        "exec.finished",
-        buildExecEventPayload({
-          sessionKey,
-          runId,
-          host: "node",
-          command: cmdText,
-          exitCode: result.exitCode,
-          timedOut: result.timedOut,
-          success: result.success,
-          output: combined,
-        }),
-      );
-      await sendInvokeResult(client, frame, {
-        ok: true,
-        payloadJSON: JSON.stringify(result),
-      });
-      return;
-    }
   }
 
   if (security === "deny") {

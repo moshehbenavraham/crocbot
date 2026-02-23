@@ -29,8 +29,6 @@ import {
   formatPermissionRemediation,
   inspectPathPermissions,
 } from "./audit-fs.js";
-import type { ExecFn } from "./windows-acl.js";
-
 export type SecurityAuditSeverity = "info" | "warn" | "critical";
 
 export type SecurityAuditFinding = {
@@ -65,7 +63,6 @@ export type SecurityAuditReport = {
 export type SecurityAuditOptions = {
   config: crocbotConfig;
   env?: NodeJS.ProcessEnv;
-  platform?: NodeJS.Platform;
   deep?: boolean;
   includeFilesystem?: boolean;
   includeChannelSecurity?: boolean;
@@ -79,8 +76,6 @@ export type SecurityAuditOptions = {
   plugins?: ReturnType<typeof listChannelPlugins>;
   /** Dependency injection for tests. */
   probeGatewayFn?: typeof probeGateway;
-  /** Dependency injection for tests (Windows ACL checks). */
-  execIcacls?: ExecFn;
 };
 
 function countBySeverity(findings: SecurityAuditFinding[]): SecurityAuditSummary {
@@ -128,15 +123,11 @@ async function collectFilesystemFindings(params: {
   stateDir: string;
   configPath: string;
   env?: NodeJS.ProcessEnv;
-  platform?: NodeJS.Platform;
-  execIcacls?: ExecFn;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
 
   const stateDirPerms = await inspectPathPermissions(params.stateDir, {
     env: params.env,
-    platform: params.platform,
-    exec: params.execIcacls,
   });
   if (stateDirPerms.ok) {
     if (stateDirPerms.isSymlink) {
@@ -155,10 +146,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; other users can write into your crocbot state.`,
         remediation: formatPermissionRemediation({
           targetPath: params.stateDir,
-          perms: stateDirPerms,
-          isDir: true,
           posixMode: 0o700,
-          env: params.env,
         }),
       });
     } else if (stateDirPerms.groupWritable) {
@@ -169,10 +157,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; group users can write into your crocbot state.`,
         remediation: formatPermissionRemediation({
           targetPath: params.stateDir,
-          perms: stateDirPerms,
-          isDir: true,
           posixMode: 0o700,
-          env: params.env,
         }),
       });
     } else if (stateDirPerms.groupReadable || stateDirPerms.worldReadable) {
@@ -183,10 +168,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; consider restricting to 700.`,
         remediation: formatPermissionRemediation({
           targetPath: params.stateDir,
-          perms: stateDirPerms,
-          isDir: true,
           posixMode: 0o700,
-          env: params.env,
         }),
       });
     }
@@ -194,8 +176,6 @@ async function collectFilesystemFindings(params: {
 
   const configPerms = await inspectPathPermissions(params.configPath, {
     env: params.env,
-    platform: params.platform,
-    exec: params.execIcacls,
   });
   if (configPerms.ok) {
     if (configPerms.isSymlink) {
@@ -214,10 +194,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.configPath, configPerms)}; another user could change gateway/auth/tool policies.`,
         remediation: formatPermissionRemediation({
           targetPath: params.configPath,
-          perms: configPerms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     } else if (configPerms.worldReadable) {
@@ -228,10 +205,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.configPath, configPerms)}; config can contain tokens and private settings.`,
         remediation: formatPermissionRemediation({
           targetPath: params.configPath,
-          perms: configPerms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     } else if (configPerms.groupReadable) {
@@ -242,10 +216,7 @@ async function collectFilesystemFindings(params: {
         detail: `${formatPermissionDetail(params.configPath, configPerms)}; config can contain tokens and private settings.`,
         remediation: formatPermissionRemediation({
           targetPath: params.configPath,
-          perms: configPerms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     }
@@ -911,8 +882,6 @@ export async function runSecurityAudit(opts: SecurityAuditOptions): Promise<Secu
   const findings: SecurityAuditFinding[] = [];
   const cfg = opts.config;
   const env = opts.env ?? process.env;
-  const platform = opts.platform ?? process.platform;
-  const execIcacls = opts.execIcacls;
   const stateDir = opts.stateDir ?? resolveStateDir(env);
   const configPath = opts.configPath ?? resolveConfigPath(env, stateDir);
 
@@ -940,18 +909,12 @@ export async function runSecurityAudit(opts: SecurityAuditOptions): Promise<Secu
         stateDir,
         configPath,
         env,
-        platform,
-        execIcacls,
       })),
     );
     if (configSnapshot) {
-      findings.push(
-        ...(await collectIncludeFilePermFindings({ configSnapshot, env, platform, execIcacls })),
-      );
+      findings.push(...(await collectIncludeFilePermFindings({ configSnapshot, env })));
     }
-    findings.push(
-      ...(await collectStateDeepFilesystemFindings({ cfg, env, stateDir, platform, execIcacls })),
-    );
+    findings.push(...(await collectStateDeepFilesystemFindings({ cfg, env, stateDir })));
     findings.push(...(await collectPluginsTrustFindings({ cfg, stateDir })));
   }
 

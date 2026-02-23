@@ -295,7 +295,7 @@ describe("browser control server", () => {
     return (await res.json()) as T;
   };
 
-  const slowTimeoutMs = process.platform === "win32" ? 40_000 : 20_000;
+  const slowTimeoutMs = 20_000;
 
   it(
     "agent contract: form + layout act commands",

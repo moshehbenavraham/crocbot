@@ -5,9 +5,8 @@ import { defineConfig } from "vitest/config";
 
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
 const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
-const isWindows = process.platform === "win32";
 const localWorkers = Math.max(4, Math.min(16, os.cpus().length));
-const ciWorkers = isWindows ? 2 : 3;
+const ciWorkers = 3;
 
 export default defineConfig({
   resolve: {
@@ -17,7 +16,7 @@ export default defineConfig({
   },
   test: {
     testTimeout: 120_000,
-    hookTimeout: isWindows ? 180_000 : 120_000,
+    hookTimeout: 120_000,
     pool: "forks",
     maxWorkers: isCI ? ciWorkers : localWorkers,
     include: [
@@ -28,11 +27,8 @@ export default defineConfig({
     setupFiles: ["test/setup.ts"],
     exclude: [
       "dist/**",
-      "apps/macos/**",
-      "apps/macos/.build/**",
       "**/node_modules/**",
       "**/vendor/**",
-      "dist/crocbot.app/**",
       "**/*.live.test.ts",
       "**/*.e2e.test.ts",
     ],
@@ -56,7 +52,6 @@ export default defineConfig({
         "src/commands/**",
         "src/daemon/**",
         "src/hooks/**",
-        "src/macos/**",
 
         // Some agent integrations are intentionally validated via manual/e2e runs.
         "src/agents/model-scan.ts",

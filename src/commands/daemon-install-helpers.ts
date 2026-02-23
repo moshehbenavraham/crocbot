@@ -1,4 +1,3 @@
-import { resolveGatewayLaunchAgentLabel } from "../daemon/constants.js";
 import { resolveGatewayProgramArguments } from "../daemon/program-args.js";
 import {
   renderSystemNodeWarning,
@@ -60,10 +59,6 @@ export async function buildGatewayInstallPlan(params: {
     env: params.env,
     port: params.port,
     token: params.token,
-    launchdLabel:
-      process.platform === "darwin"
-        ? resolveGatewayLaunchAgentLabel(params.env.CROCBOT_PROFILE)
-        : undefined,
   });
 
   // Merge config env vars into the service environment (vars + inline env keys).
@@ -76,8 +71,6 @@ export async function buildGatewayInstallPlan(params: {
   return { programArguments, workingDirectory, environment };
 }
 
-export function gatewayInstallErrorHint(platform = process.platform): string {
-  return platform === "win32"
-    ? "Tip: rerun from an elevated PowerShell (Start → type PowerShell → right-click → Run as administrator) or skip service install."
-    : `Tip: rerun \`${formatCliCommand("crocbot gateway install")}\` after fixing the error.`;
+export function gatewayInstallErrorHint(): string {
+  return `Tip: rerun \`${formatCliCommand("crocbot gateway install")}\` after fixing the error.`;
 }

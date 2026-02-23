@@ -106,7 +106,7 @@ vi.mock("../auto-reply/reply.js", () => {
 
 describe("telegram inbound media", () => {
   // Parallel vitest shards can make this suite slower than the standalone run.
-  const INBOUND_MEDIA_TEST_TIMEOUT_MS = process.platform === "win32" ? 60_000 : 45_000;
+  const INBOUND_MEDIA_TEST_TIMEOUT_MS = 45_000;
 
   it(
     "downloads media via file_path (no file.download)",
@@ -273,7 +273,7 @@ describe("telegram media groups", () => {
     vi.useRealTimers();
   });
 
-  const MEDIA_GROUP_TEST_TIMEOUT_MS = process.platform === "win32" ? 45_000 : 20_000;
+  const MEDIA_GROUP_TEST_TIMEOUT_MS = 20_000;
   const MEDIA_GROUP_FLUSH_MS = MEDIA_GROUP_TIMEOUT_MS + 25;
 
   it(
@@ -416,7 +416,7 @@ describe("telegram media groups", () => {
 });
 
 describe("telegram stickers", () => {
-  const STICKER_TEST_TIMEOUT_MS = process.platform === "win32" ? 30_000 : 20_000;
+  const STICKER_TEST_TIMEOUT_MS = 20_000;
 
   beforeEach(() => {
     cacheStickerSpy.mockReset();
@@ -708,7 +708,7 @@ describe("telegram text fragments", () => {
     vi.useRealTimers();
   });
 
-  const TEXT_FRAGMENT_TEST_TIMEOUT_MS = process.platform === "win32" ? 45_000 : 20_000;
+  const TEXT_FRAGMENT_TEST_TIMEOUT_MS = 20_000;
   const TEXT_FRAGMENT_FLUSH_MS = 1600;
 
   it(

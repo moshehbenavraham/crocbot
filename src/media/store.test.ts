@@ -13,7 +13,7 @@ describe("media store", () => {
   const envSnapshot: Record<string, string | undefined> = {};
 
   const snapshotEnv = () => {
-    for (const key of ["HOME", "USERPROFILE", "HOMEDRIVE", "HOMEPATH", "CROCBOT_STATE_DIR"]) {
+    for (const key of ["HOME", "CROCBOT_STATE_DIR"]) {
       envSnapshot[key] = process.env[key];
     }
   };
@@ -32,15 +32,7 @@ describe("media store", () => {
     snapshotEnv();
     home = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-test-home-"));
     process.env.HOME = home;
-    process.env.USERPROFILE = home;
     process.env.CROCBOT_STATE_DIR = path.join(home, ".crocbot");
-    if (process.platform === "win32") {
-      const match = home.match(/^([A-Za-z]:)(.*)$/);
-      if (match) {
-        process.env.HOMEDRIVE = match[1];
-        process.env.HOMEPATH = match[2] || "\\";
-      }
-    }
     await fs.mkdir(path.join(home, ".crocbot"), { recursive: true });
     store = await import("./store.js");
   });

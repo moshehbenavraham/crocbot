@@ -25,7 +25,6 @@ describe("ensurecrocbotCliOnPath", () => {
           execPath: cliPath,
           cwd: tmp,
           homeDir: tmp,
-          platform: "darwin",
         });
         const updated = process.env.PATH ?? "";
         expect(updated.split(path.delimiter)[0]).toBe(appBinDir);
@@ -52,7 +51,6 @@ describe("ensurecrocbotCliOnPath", () => {
         execPath: "/tmp/does-not-matter",
         cwd: "/tmp",
         homeDir: "/tmp",
-        platform: "darwin",
       });
       expect(process.env.PATH).toBe("/bin");
     } finally {
@@ -94,7 +92,6 @@ describe("ensurecrocbotCliOnPath", () => {
         execPath: appCli,
         cwd: tmp,
         homeDir: tmp,
-        platform: "darwin",
       });
 
       const updated = process.env.PATH ?? "";
@@ -147,7 +144,6 @@ describe("ensurecrocbotCliOnPath", () => {
         execPath: path.join(execDir, "node"),
         cwd: tmp,
         homeDir: tmp,
-        platform: "linux",
       });
 
       const updated = process.env.PATH ?? "";

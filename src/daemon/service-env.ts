@@ -4,18 +4,13 @@ import { VERSION } from "../version.js";
 import {
   GATEWAY_SERVICE_KIND,
   GATEWAY_SERVICE_MARKER,
-  resolveGatewayLaunchAgentLabel,
   resolveGatewaySystemdServiceName,
   NODE_SERVICE_KIND,
   NODE_SERVICE_MARKER,
-  NODE_WINDOWS_TASK_SCRIPT_NAME,
-  resolveNodeLaunchAgentLabel,
   resolveNodeSystemdServiceName,
-  resolveNodeWindowsTaskName,
 } from "./constants.js";
 
 export type MinimalServicePathOptions = {
-  platform?: NodeJS.Platform;
   extraDirs?: string[];
   home?: string;
   env?: Record<string, string | undefined>;
@@ -25,14 +20,8 @@ type BuildServicePathOptions = MinimalServicePathOptions & {
   env?: Record<string, string | undefined>;
 };
 
-function resolveSystemPathDirs(platform: NodeJS.Platform): string[] {
-  if (platform === "darwin") {
-    return ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
-  }
-  if (platform === "linux") {
-    return ["/usr/local/bin", "/usr/bin", "/bin"];
-  }
-  return [];
+function resolveSystemPathDirs(): string[] {
+  return ["/usr/local/bin", "/usr/bin", "/bin"];
 }
 
 /**
@@ -87,18 +76,10 @@ export function resolveLinuxUserBinDirs(
 }
 
 export function getMinimalServicePathParts(options: MinimalServicePathOptions = {}): string[] {
-  const platform = options.platform ?? process.platform;
-  if (platform === "win32") {
-    return [];
-  }
-
   const parts: string[] = [];
   const extraDirs = options.extraDirs ?? [];
-  const systemDirs = resolveSystemPathDirs(platform);
-
-  // Add Linux user bin directories (npm global, nvm, fnm, volta, etc.)
-  const linuxUserDirs =
-    platform === "linux" ? resolveLinuxUserBinDirs(options.home, options.env) : [];
+  const systemDirs = resolveSystemPathDirs();
+  const linuxUserDirs = resolveLinuxUserBinDirs(options.home, options.env);
 
   const add = (dir: string) => {
     if (!dir) {
@@ -134,11 +115,6 @@ export function getMinimalServicePathPartsFromEnv(options: BuildServicePathOptio
 
 export function buildMinimalServicePath(options: BuildServicePathOptions = {}): string {
   const env = options.env ?? process.env;
-  const platform = options.platform ?? process.platform;
-  if (platform === "win32") {
-    return env.PATH ?? "";
-  }
-
   return getMinimalServicePathPartsFromEnv({ ...options, env }).join(path.posix.delimiter);
 }
 
@@ -146,13 +122,9 @@ export function buildServiceEnvironment(params: {
   env: Record<string, string | undefined>;
   port: number;
   token?: string;
-  launchdLabel?: string;
 }): Record<string, string | undefined> {
-  const { env, port, token, launchdLabel } = params;
+  const { env, port, token } = params;
   const profile = env.CROCBOT_PROFILE;
-  const resolvedLaunchdLabel =
-    launchdLabel ||
-    (process.platform === "darwin" ? resolveGatewayLaunchAgentLabel(profile) : undefined);
   const systemdUnit = `${resolveGatewaySystemdServiceName(profile)}.service`;
   return {
     HOME: env.HOME,
@@ -162,7 +134,6 @@ export function buildServiceEnvironment(params: {
     CROCBOT_CONFIG_PATH: env.CROCBOT_CONFIG_PATH,
     CROCBOT_GATEWAY_PORT: String(port),
     CROCBOT_GATEWAY_TOKEN: token,
-    CROCBOT_LAUNCHD_LABEL: resolvedLaunchdLabel,
     CROCBOT_SYSTEMD_UNIT: systemdUnit,
     CROCBOT_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
     CROCBOT_SERVICE_KIND: GATEWAY_SERVICE_KIND,
@@ -179,10 +150,7 @@ export function buildNodeServiceEnvironment(params: {
     PATH: buildMinimalServicePath({ env }),
     CROCBOT_STATE_DIR: env.CROCBOT_STATE_DIR,
     CROCBOT_CONFIG_PATH: env.CROCBOT_CONFIG_PATH,
-    CROCBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
     CROCBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    CROCBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    CROCBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
     CROCBOT_LOG_PREFIX: "node",
     CROCBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
     CROCBOT_SERVICE_KIND: NODE_SERVICE_KIND,

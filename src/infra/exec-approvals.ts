@@ -406,9 +406,7 @@ function isExecutableFile(filePath: string): boolean {
     if (!stat.isFile()) {
       return false;
     }
-    if (process.platform !== "win32") {
-      fs.accessSync(filePath, fs.constants.X_OK);
-    }
+    fs.accessSync(filePath, fs.constants.X_OK);
     return true;
   } catch {
     return false;
@@ -442,29 +440,12 @@ function resolveExecutablePath(rawExecutable: string, cwd?: string, env?: NodeJS
     const candidate = path.resolve(base, expanded);
     return isExecutableFile(candidate) ? candidate : undefined;
   }
-  const envPath = env?.PATH ?? env?.Path ?? process.env.PATH ?? process.env.Path ?? "";
+  const envPath = env?.PATH ?? process.env.PATH ?? "";
   const entries = envPath.split(path.delimiter).filter(Boolean);
-  const hasExtension = process.platform === "win32" && path.extname(expanded).length > 0;
-  const extensions =
-    process.platform === "win32"
-      ? hasExtension
-        ? [""]
-        : (
-            env?.PATHEXT ??
-            env?.Pathext ??
-            process.env.PATHEXT ??
-            process.env.Pathext ??
-            ".EXE;.CMD;.BAT;.COM"
-          )
-            .split(";")
-            .map((ext) => ext.toLowerCase())
-      : [""];
   for (const entry of entries) {
-    for (const ext of extensions) {
-      const candidate = path.join(entry, expanded + ext);
-      if (isExecutableFile(candidate)) {
-        return candidate;
-      }
+    const candidate = path.join(entry, expanded);
+    if (isExecutableFile(candidate)) {
+      return candidate;
     }
   }
   return undefined;
@@ -499,19 +480,7 @@ export function resolveCommandResolutionFromArgv(
 }
 
 function normalizeMatchTarget(value: string): string {
-  if (process.platform === "win32") {
-    const stripped = value.replace(/^\\\\[?.]\\/, "");
-    return stripped.replace(/\\/g, "/").toLowerCase();
-  }
   return value.replace(/\\\\/g, "/").toLowerCase();
-}
-
-function tryRealpath(value: string): string | null {
-  try {
-    return fs.realpathSync(value);
-  } catch {
-    return null;
-  }
 }
 
 function globToRegExp(pattern: string): RegExp {
@@ -548,15 +517,9 @@ function matchesPattern(pattern: string, target: string): boolean {
     return false;
   }
   const expanded = trimmed.startsWith("~") ? expandHome(trimmed) : trimmed;
-  const hasWildcard = /[*?]/.test(expanded);
   let normalizedPattern = expanded;
-  let normalizedTarget = target;
-  if (process.platform === "win32" && !hasWildcard) {
-    normalizedPattern = tryRealpath(expanded) ?? expanded;
-    normalizedTarget = tryRealpath(target) ?? target;
-  }
+  const normalizedTarget = normalizeMatchTarget(target);
   normalizedPattern = normalizeMatchTarget(normalizedPattern);
-  normalizedTarget = normalizeMatchTarget(normalizedTarget);
   const regex = globToRegExp(normalizedPattern);
   return regex.test(normalizedTarget);
 }
@@ -911,7 +874,7 @@ function isPathLikeToken(value: string): boolean {
   if (trimmed.startsWith("/")) {
     return true;
   }
-  return /^[A-Za-z]:[\\/]/.test(trimmed);
+  return false;
 }
 
 function defaultFileExists(filePath: string): boolean {
@@ -954,9 +917,7 @@ export function isSafeBinUsage(params: {
   if (!execName) {
     return false;
   }
-  const matchesSafeBin =
-    params.safeBins.has(execName) ||
-    (process.platform === "win32" && params.safeBins.has(path.parse(execName).name));
+  const matchesSafeBin = params.safeBins.has(execName);
   if (!matchesSafeBin) {
     return false;
   }

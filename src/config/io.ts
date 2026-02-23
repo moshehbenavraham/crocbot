@@ -520,7 +520,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
       await deps.fs.promises.rename(tmp, configPath);
     } catch (err) {
       const code = (err as { code?: string }).code;
-      // Windows doesn't reliably support atomic replace via rename when dest exists.
+      // Fallback for filesystems that don't support atomic replace via rename.
       if (code === "EPERM" || code === "EEXIST") {
         await deps.fs.promises.copyFile(tmp, configPath);
         await deps.fs.promises.chmod(configPath, 0o600).catch(() => {

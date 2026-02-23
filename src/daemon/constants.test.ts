@@ -1,62 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   formatGatewayServiceDescription,
-  GATEWAY_LAUNCH_AGENT_LABEL,
   GATEWAY_SYSTEMD_SERVICE_NAME,
-  GATEWAY_WINDOWS_TASK_NAME,
-  resolveGatewayLaunchAgentLabel,
   resolveGatewayProfileSuffix,
   resolveGatewaySystemdServiceName,
-  resolveGatewayWindowsTaskName,
 } from "./constants.js";
-
-describe("resolveGatewayLaunchAgentLabel", () => {
-  it("returns default label when no profile is set", () => {
-    const result = resolveGatewayLaunchAgentLabel();
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-    expect(result).toBe("com.crocbot.gateway");
-  });
-
-  it("returns default label when profile is undefined", () => {
-    const result = resolveGatewayLaunchAgentLabel(undefined);
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-  });
-
-  it("returns default label when profile is 'default'", () => {
-    const result = resolveGatewayLaunchAgentLabel("default");
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-  });
-
-  it("returns default label when profile is 'Default' (case-insensitive)", () => {
-    const result = resolveGatewayLaunchAgentLabel("Default");
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-  });
-
-  it("returns profile-specific label when profile is set", () => {
-    const result = resolveGatewayLaunchAgentLabel("dev");
-    expect(result).toBe("com.crocbot.dev");
-  });
-
-  it("returns profile-specific label for custom profile", () => {
-    const result = resolveGatewayLaunchAgentLabel("work");
-    expect(result).toBe("com.crocbot.work");
-  });
-
-  it("trims whitespace from profile", () => {
-    const result = resolveGatewayLaunchAgentLabel("  staging  ");
-    expect(result).toBe("com.crocbot.staging");
-  });
-
-  it("returns default label for empty string profile", () => {
-    const result = resolveGatewayLaunchAgentLabel("");
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-  });
-
-  it("returns default label for whitespace-only profile", () => {
-    const result = resolveGatewayLaunchAgentLabel("   ");
-    expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-  });
-});
 
 describe("resolveGatewaySystemdServiceName", () => {
   it("returns default service name when no profile is set", () => {
@@ -103,54 +51,6 @@ describe("resolveGatewaySystemdServiceName", () => {
   it("returns default service name for whitespace-only profile", () => {
     const result = resolveGatewaySystemdServiceName("   ");
     expect(result).toBe(GATEWAY_SYSTEMD_SERVICE_NAME);
-  });
-});
-
-describe("resolveGatewayWindowsTaskName", () => {
-  it("returns default task name when no profile is set", () => {
-    const result = resolveGatewayWindowsTaskName();
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-    expect(result).toBe("crocbot Gateway");
-  });
-
-  it("returns default task name when profile is undefined", () => {
-    const result = resolveGatewayWindowsTaskName(undefined);
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-  });
-
-  it("returns default task name when profile is 'default'", () => {
-    const result = resolveGatewayWindowsTaskName("default");
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-  });
-
-  it("returns default task name when profile is 'DeFaUlT' (case-insensitive)", () => {
-    const result = resolveGatewayWindowsTaskName("DeFaUlT");
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-  });
-
-  it("returns profile-specific task name when profile is set", () => {
-    const result = resolveGatewayWindowsTaskName("dev");
-    expect(result).toBe("crocbot Gateway (dev)");
-  });
-
-  it("returns profile-specific task name for custom profile", () => {
-    const result = resolveGatewayWindowsTaskName("work");
-    expect(result).toBe("crocbot Gateway (work)");
-  });
-
-  it("trims whitespace from profile", () => {
-    const result = resolveGatewayWindowsTaskName("  ci  ");
-    expect(result).toBe("crocbot Gateway (ci)");
-  });
-
-  it("returns default task name for empty string profile", () => {
-    const result = resolveGatewayWindowsTaskName("");
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-  });
-
-  it("returns default task name for whitespace-only profile", () => {
-    const result = resolveGatewayWindowsTaskName("   ");
-    expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
   });
 });
 

@@ -232,9 +232,8 @@ describe("buildGatewayInstallPlan", () => {
 });
 
 describe("gatewayInstallErrorHint", () => {
-  it("returns platform-specific hints", () => {
-    expect(gatewayInstallErrorHint("win32")).toContain("Run as administrator");
-    expect(gatewayInstallErrorHint("linux")).toMatch(
+  it("returns reinstall hint", () => {
+    expect(gatewayInstallErrorHint()).toMatch(
       /(?:crocbot|crocbot)( --profile isolated)? gateway install/,
     );
   });

@@ -21,7 +21,7 @@ describe("runCliAgent resume cleanup", () => {
   it("kills stale resume processes for codex sessions", async () => {
     runExecMock
       .mockResolvedValueOnce({
-        stdout: "  1 S /bin/launchd\n",
+        stdout: "  1 S /lib/systemd/systemd\n",
         stderr: "",
       }) // cleanupSuspendedCliProcesses (ps)
       .mockResolvedValueOnce({ stdout: "", stderr: "" }); // cleanupResumeProcesses (pkill)
@@ -44,11 +44,6 @@ describe("runCliAgent resume cleanup", () => {
       runId: "run-1",
       cliSessionId: "thread-123",
     });
-
-    if (process.platform === "win32") {
-      expect(runExecMock).not.toHaveBeenCalled();
-      return;
-    }
 
     expect(runExecMock).toHaveBeenCalledTimes(2);
     const pkillCall = runExecMock.mock.calls[1] ?? [];
@@ -74,11 +69,6 @@ describe("cleanupSuspendedCliProcesses", () => {
       0,
     );
 
-    if (process.platform === "win32") {
-      expect(runExecMock).not.toHaveBeenCalled();
-      return;
-    }
-
     expect(runExecMock).not.toHaveBeenCalled();
   });
 
@@ -100,11 +90,6 @@ describe("cleanupSuspendedCliProcesses", () => {
       } as CliBackendConfig,
       0,
     );
-
-    if (process.platform === "win32") {
-      expect(runExecMock).not.toHaveBeenCalled();
-      return;
-    }
 
     expect(runExecMock).toHaveBeenCalledTimes(2);
     const killCall = runExecMock.mock.calls[1] ?? [];
@@ -130,11 +115,6 @@ describe("cleanupSuspendedCliProcesses", () => {
       } as CliBackendConfig,
       1,
     );
-
-    if (process.platform === "win32") {
-      expect(runExecMock).not.toHaveBeenCalled();
-      return;
-    }
 
     expect(runExecMock).toHaveBeenCalledTimes(2);
     const killCall = runExecMock.mock.calls[1] ?? [];

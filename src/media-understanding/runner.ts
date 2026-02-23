@@ -107,20 +107,7 @@ function hasPathSeparator(value: string): boolean {
 }
 
 function candidateBinaryNames(name: string): string[] {
-  if (process.platform !== "win32") {
-    return [name];
-  }
-  const ext = path.extname(name);
-  if (ext) {
-    return [name];
-  }
-  const pathext = (process.env.PATHEXT ?? ".EXE;.CMD;.BAT;.COM")
-    .split(";")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item) => (item.startsWith(".") ? item : `.${item}`));
-  const unique = Array.from(new Set(pathext));
-  return [name, ...unique.map((item) => `${name}${item}`)];
+  return [name];
 }
 
 async function isExecutable(filePath: string): Promise<boolean> {
@@ -128,9 +115,6 @@ async function isExecutable(filePath: string): Promise<boolean> {
     const stat = await fs.stat(filePath);
     if (!stat.isFile()) {
       return false;
-    }
-    if (process.platform === "win32") {
-      return true;
     }
     await fs.access(filePath, fsConstants.X_OK);
     return true;

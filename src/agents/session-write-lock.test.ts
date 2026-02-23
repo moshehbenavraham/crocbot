@@ -11,11 +11,6 @@ afterAll(() => {
 
 describe("acquireSessionWriteLock", () => {
   it("reuses locks across symlinked session paths", async () => {
-    if (process.platform === "win32") {
-      expect(true).toBe(true);
-      return;
-    }
-
     const root = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-lock-"));
     try {
       const realDir = path.join(root, "real");

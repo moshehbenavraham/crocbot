@@ -18,24 +18,18 @@ function parsePossiblyNoisyJsonObject(stdout: string): Record<string, unknown> {
 }
 
 /**
- * Locate Tailscale binary using multiple strategies:
- * 1. PATH lookup (via which command)
- * 2. Known macOS app path
- * 3. find /Applications for Tailscale.app
- * 4. locate database (if available)
+ * Locate Tailscale binary via PATH lookup.
  *
  * @returns Path to Tailscale binary or null if not found
  */
 export async function findTailscaleBinary(): Promise<string | null> {
-  // Helper to check if a binary exists and is executable
-  const checkBinary = async (path: string): Promise<boolean> => {
-    if (!path || !existsSync(path)) {
+  const checkBinary = async (binPath: string): Promise<boolean> => {
+    if (!binPath || !existsSync(binPath)) {
       return false;
     }
     try {
-      // Use Promise.race with runExec to implement timeout
       await Promise.race([
-        runExec(path, ["--version"], { timeoutMs: 3000 }),
+        runExec(binPath, ["--version"], { timeoutMs: 3000 }),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
       ]);
       return true;
@@ -44,7 +38,6 @@ export async function findTailscaleBinary(): Promise<string | null> {
     }
   };
 
-  // Strategy 1: which command
   try {
     const { stdout } = await runExec("which", ["tailscale"]);
     const fromPath = stdout.trim();
@@ -52,52 +45,7 @@ export async function findTailscaleBinary(): Promise<string | null> {
       return fromPath;
     }
   } catch {
-    // which failed, continue
-  }
-
-  // Strategy 2: Known macOS app path
-  const macAppPath = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
-  if (await checkBinary(macAppPath)) {
-    return macAppPath;
-  }
-
-  // Strategy 3: find command in /Applications
-  try {
-    const { stdout } = await runExec(
-      "find",
-      [
-        "/Applications",
-        "-maxdepth",
-        "3",
-        "-name",
-        "Tailscale",
-        "-path",
-        "*/Tailscale.app/Contents/MacOS/Tailscale",
-      ],
-      { timeoutMs: 5000 },
-    );
-    const found = stdout.trim().split("\n")[0];
-    if (found && (await checkBinary(found))) {
-      return found;
-    }
-  } catch {
-    // find failed, continue
-  }
-
-  // Strategy 4: locate command
-  try {
-    const { stdout } = await runExec("locate", ["Tailscale.app"]);
-    const candidates = stdout
-      .trim()
-      .split("\n")
-      .filter((line) => line.includes("/Tailscale.app/Contents/MacOS/Tailscale"));
-    for (const candidate of candidates) {
-      if (await checkBinary(candidate)) {
-        return candidate;
-      }
-    }
-  } catch {
-    // locate failed, continue
+    // which failed
   }
 
   return null;
@@ -105,9 +53,7 @@ export async function findTailscaleBinary(): Promise<string | null> {
 
 export async function getTailnetHostname(exec: typeof runExec = runExec, detectedBinary?: string) {
   // Derive tailnet hostname (or IP fallback) from tailscale status JSON.
-  const candidates = detectedBinary
-    ? [detectedBinary]
-    : ["tailscale", "/Applications/Tailscale.app/Contents/MacOS/Tailscale"];
+  const candidates = detectedBinary ? [detectedBinary] : ["tailscale"];
   let lastError: unknown;
 
   for (const candidate of candidates) {
@@ -310,11 +256,6 @@ export async function ensureFunnel(
       runtime.error(
         info(
           "Enable in admin console: https://login.tailscale.com/admin (see https://tailscale.com/kb/1223/funnel)",
-        ),
-      );
-      runtime.error(
-        info(
-          "macOS user-space tailscaled docs: https://github.com/tailscale/tailscale/wiki/Tailscaled-on-macOS",
         ),
       );
       const proceed = await prompt("Attempt local setup with user-space tailscaled?", true);

@@ -9,17 +9,6 @@ import { createLobsterTool } from "./lobster-tool.js";
 
 async function writeFakeLobsterScript(scriptBody: string, prefix = "crocbot-lobster-plugin-") {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
-  const isWindows = process.platform === "win32";
-
-  if (isWindows) {
-    const scriptPath = path.join(dir, "lobster.js");
-    const cmdPath = path.join(dir, "lobster.cmd");
-    await fs.writeFile(scriptPath, scriptBody, { encoding: "utf8" });
-    const cmd = `@echo off\r\n"${process.execPath}" "${scriptPath}" %*\r\n`;
-    await fs.writeFile(cmdPath, cmd, { encoding: "utf8" });
-    return { dir, binPath: cmdPath };
-  }
-
   const binPath = path.join(dir, "lobster");
   const file = `#!/usr/bin/env node\n${scriptBody}\n`;
   await fs.writeFile(binPath, file, { encoding: "utf8", mode: 0o755 });

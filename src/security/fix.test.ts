@@ -6,13 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { fixSecurityFootguns } from "./fix.js";
 
-const isWindows = process.platform === "win32";
-
 const expectPerms = (actual: number, expected: number) => {
-  if (isWindows) {
-    expect([expected, 0o666, 0o777]).toContain(actual);
-    return;
-  }
   expect(actual).toBe(expected);
 };
 

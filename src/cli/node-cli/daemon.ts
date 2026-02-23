@@ -3,12 +3,7 @@ import {
   DEFAULT_NODE_DAEMON_RUNTIME,
   isNodeDaemonRuntime,
 } from "../../commands/node-daemon-runtime.js";
-import {
-  resolveNodeLaunchAgentLabel,
-  resolveNodeSystemdServiceName,
-  resolveNodeWindowsTaskName,
-} from "../../daemon/constants.js";
-import { resolveGatewayLogPaths } from "../../daemon/launchd.js";
+import { resolveNodeSystemdServiceName } from "../../daemon/constants.js";
 import { resolveNodeService } from "../../daemon/node-service.js";
 import type { GatewayServiceRuntime } from "../../daemon/service-runtime.js";
 import { isSystemdUserServiceAvailable } from "../../daemon/systemd.js";
@@ -48,38 +43,12 @@ type NodeDaemonStatusOptions = {
 
 function renderNodeServiceStartHints(): string[] {
   const base = [formatCliCommand("crocbot node install"), formatCliCommand("crocbot node start")];
-  switch (process.platform) {
-    case "darwin":
-      return [
-        ...base,
-        `launchctl bootstrap gui/$UID ~/Library/LaunchAgents/${resolveNodeLaunchAgentLabel()}.plist`,
-      ];
-    case "linux":
-      return [...base, `systemctl --user start ${resolveNodeSystemdServiceName()}.service`];
-    case "win32":
-      return [...base, `schtasks /Run /TN "${resolveNodeWindowsTaskName()}"`];
-    default:
-      return base;
-  }
+  return [...base, `systemctl --user start ${resolveNodeSystemdServiceName()}.service`];
 }
 
-function buildNodeRuntimeHints(env: NodeJS.ProcessEnv = process.env): string[] {
-  if (process.platform === "darwin") {
-    const logs = resolveGatewayLogPaths(env);
-    return [
-      `Launchd stdout (if installed): ${logs.stdoutPath}`,
-      `Launchd stderr (if installed): ${logs.stderrPath}`,
-    ];
-  }
-  if (process.platform === "linux") {
-    const unit = resolveNodeSystemdServiceName();
-    return [`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`];
-  }
-  if (process.platform === "win32") {
-    const task = resolveNodeWindowsTaskName();
-    return [`Logs: schtasks /Query /TN "${task}" /V /FO LIST`];
-  }
-  return [];
+function buildNodeRuntimeHints(): string[] {
+  const unit = resolveNodeSystemdServiceName();
+  return [`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`];
 }
 
 function resolveNodeDefaults(
@@ -322,11 +291,9 @@ export async function runNodeDaemonStart(opts: NodeDaemonLifecycleOptions = {}) 
   }
   if (!loaded) {
     let hints = renderNodeServiceStartHints();
-    if (process.platform === "linux") {
-      const systemdAvailable = await isSystemdUserServiceAvailable().catch(() => false);
-      if (!systemdAvailable) {
-        hints = [...hints, ...renderSystemdUnavailableHints({ wsl: await isWSL() })];
-      }
+    const systemdAvailable = await isSystemdUserServiceAvailable().catch(() => false);
+    if (!systemdAvailable) {
+      hints = [...hints, ...renderSystemdUnavailableHints({ wsl: await isWSL() })];
     }
     emit({
       ok: true,
@@ -404,11 +371,9 @@ export async function runNodeDaemonRestart(opts: NodeDaemonLifecycleOptions = {}
   }
   if (!loaded) {
     let hints = renderNodeServiceStartHints();
-    if (process.platform === "linux") {
-      const systemdAvailable = await isSystemdUserServiceAvailable().catch(() => false);
-      if (!systemdAvailable) {
-        hints = [...hints, ...renderSystemdUnavailableHints({ wsl: await isWSL() })];
-      }
+    const systemdAvailable = await isSystemdUserServiceAvailable().catch(() => false);
+    if (!systemdAvailable) {
+      hints = [...hints, ...renderSystemdUnavailableHints({ wsl: await isWSL() })];
     }
     emit({
       ok: true,
@@ -582,18 +547,9 @@ export async function runNodeDaemonStatus(opts: NodeDaemonStatusOptions = {}) {
     return;
   }
 
-  const baseEnv = {
-    ...(process.env as Record<string, string | undefined>),
-    ...(command?.environment ?? undefined),
-  };
-  const hintEnv = {
-    ...baseEnv,
-    CROCBOT_LOG_PREFIX: baseEnv.CROCBOT_LOG_PREFIX ?? "node",
-  } as NodeJS.ProcessEnv;
-
   if (runtime?.missingUnit) {
     defaultRuntime.error(errorText("Service unit not found."));
-    for (const hint of buildNodeRuntimeHints(hintEnv)) {
+    for (const hint of buildNodeRuntimeHints()) {
       defaultRuntime.error(errorText(hint));
     }
     return;
@@ -601,7 +557,7 @@ export async function runNodeDaemonStatus(opts: NodeDaemonStatusOptions = {}) {
 
   if (runtime?.status === "stopped") {
     defaultRuntime.error(errorText("Service is loaded but not running."));
-    for (const hint of buildNodeRuntimeHints(hintEnv)) {
+    for (const hint of buildNodeRuntimeHints()) {
       defaultRuntime.error(errorText(hint));
     }
   }

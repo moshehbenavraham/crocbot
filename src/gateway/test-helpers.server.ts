@@ -40,7 +40,6 @@ import {
 const serverModulePromise = import("./server.js");
 
 let previousHome: string | undefined;
-let previousUserProfile: string | undefined;
 let previousStateDir: string | undefined;
 let previousConfigPath: string | undefined;
 let previousSkipBrowserControl: string | undefined;
@@ -78,14 +77,12 @@ export async function writeSessionStore(params: {
 
 async function setupGatewayTestHome() {
   previousHome = process.env.HOME;
-  previousUserProfile = process.env.USERPROFILE;
   previousStateDir = process.env.CROCBOT_STATE_DIR;
   previousConfigPath = process.env.CROCBOT_CONFIG_PATH;
   previousSkipBrowserControl = process.env.CROCBOT_SKIP_BROWSER_CONTROL_SERVER;
   previousSkipGmailWatcher = process.env.CROCBOT_SKIP_GMAIL_WATCHER;
   tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-gateway-home-"));
   process.env.HOME = tempHome;
-  process.env.USERPROFILE = tempHome;
   process.env.CROCBOT_STATE_DIR = path.join(tempHome, ".crocbot");
   delete process.env.CROCBOT_CONFIG_PATH;
 }
@@ -149,11 +146,6 @@ async function cleanupGatewayTestHome(options: { restoreEnv: boolean }) {
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
-    }
-    if (previousUserProfile === undefined) {
-      delete process.env.USERPROFILE;
-    } else {
-      process.env.USERPROFILE = previousUserProfile;
     }
     if (previousStateDir === undefined) {
       delete process.env.CROCBOT_STATE_DIR;

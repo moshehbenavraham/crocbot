@@ -22,10 +22,7 @@ import {
 } from "./exec-approvals.js";
 
 function makePathEnv(binDir: string): NodeJS.ProcessEnv {
-  if (process.platform !== "win32") {
-    return { PATH: binDir };
-  }
-  return { PATH: binDir, PATHEXT: ".EXE;.CMD;.BAT;.COM" };
+  return { PATH: binDir };
 }
 
 function makeTempDir() {
@@ -83,7 +80,7 @@ describe("exec approvals command resolution", () => {
     const dir = makeTempDir();
     const binDir = path.join(dir, "bin");
     fs.mkdirSync(binDir, { recursive: true });
-    const exeName = process.platform === "win32" ? "rg.exe" : "rg";
+    const exeName = "rg";
     const exe = path.join(binDir, exeName);
     fs.writeFileSync(exe, "");
     fs.chmodSync(exe, 0o755);
@@ -194,7 +191,7 @@ describe("exec approvals safe bins", () => {
     const dir = makeTempDir();
     const binDir = path.join(dir, "bin");
     fs.mkdirSync(binDir, { recursive: true });
-    const exeName = process.platform === "win32" ? "jq.exe" : "jq";
+    const exeName = "jq";
     const exe = path.join(binDir, exeName);
     fs.writeFileSync(exe, "");
     fs.chmodSync(exe, 0o755);
@@ -218,7 +215,7 @@ describe("exec approvals safe bins", () => {
     const dir = makeTempDir();
     const binDir = path.join(dir, "bin");
     fs.mkdirSync(binDir, { recursive: true });
-    const exeName = process.platform === "win32" ? "jq.exe" : "jq";
+    const exeName = "jq";
     const exe = path.join(binDir, exeName);
     fs.writeFileSync(exe, "");
     fs.chmodSync(exe, 0o755);

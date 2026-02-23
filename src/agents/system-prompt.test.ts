@@ -289,8 +289,8 @@ describe("buildAgentSystemPrompt", () => {
       runtimeInfo: {
         agentId: "work",
         host: "host",
-        os: "macOS",
-        arch: "arm64",
+        os: "Linux",
+        arch: "x64",
         node: "v20",
         model: "anthropic/claude",
       },
@@ -316,8 +316,8 @@ describe("buildAgentSystemPrompt", () => {
         agentId: "work",
         host: "host",
         repoRoot: "/repo",
-        os: "macOS",
-        arch: "arm64",
+        os: "Linux",
+        arch: "x64",
         node: "v20",
         model: "anthropic/claude",
         defaultModel: "anthropic/claude-opus-4-5",
@@ -330,7 +330,7 @@ describe("buildAgentSystemPrompt", () => {
     expect(line).toContain("agent=work");
     expect(line).toContain("host=host");
     expect(line).toContain("repo=/repo");
-    expect(line).toContain("os=macOS (arm64)");
+    expect(line).toContain("os=Linux (x64)");
     expect(line).toContain("node=v20");
     expect(line).toContain("model=anthropic/claude");
     expect(line).toContain("default_model=anthropic/claude-opus-4-5");

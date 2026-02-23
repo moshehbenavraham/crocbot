@@ -40,7 +40,7 @@ vi.mock("../daemon/program-args.js", () => ({
 
 vi.mock("../daemon/service.js", () => ({
   resolveGatewayService: () => ({
-    label: "LaunchAgent",
+    label: "systemd",
     loadedText: "loaded",
     notLoadedText: "not loaded",
     install: serviceInstall,

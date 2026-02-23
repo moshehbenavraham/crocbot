@@ -123,115 +123,6 @@ async function readUnixListeners(
   return { listeners: [], detail: undefined, errors };
 }
 
-function parseNetstatListeners(output: string, port: number): PortListener[] {
-  const listeners: PortListener[] = [];
-  const portToken = `:${port}`;
-  for (const rawLine of output.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) {
-      continue;
-    }
-    if (!line.toLowerCase().includes("listen")) {
-      continue;
-    }
-    if (!line.includes(portToken)) {
-      continue;
-    }
-    const parts = line.split(/\s+/);
-    if (parts.length < 4) {
-      continue;
-    }
-    const pidRaw = parts.at(-1);
-    const pid = pidRaw ? Number.parseInt(pidRaw, 10) : NaN;
-    const localAddr = parts[1];
-    const listener: PortListener = {};
-    if (Number.isFinite(pid)) {
-      listener.pid = pid;
-    }
-    if (localAddr?.includes(portToken)) {
-      listener.address = localAddr;
-    }
-    listeners.push(listener);
-  }
-  return listeners;
-}
-
-async function resolveWindowsImageName(pid: number): Promise<string | undefined> {
-  const res = await runCommandSafe(["tasklist", "/FI", `PID eq ${pid}`, "/FO", "LIST"]);
-  if (res.code !== 0) {
-    return undefined;
-  }
-  for (const rawLine of res.stdout.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line.toLowerCase().startsWith("image name:")) {
-      continue;
-    }
-    const value = line.slice("image name:".length).trim();
-    return value || undefined;
-  }
-  return undefined;
-}
-
-async function resolveWindowsCommandLine(pid: number): Promise<string | undefined> {
-  const res = await runCommandSafe([
-    "wmic",
-    "process",
-    "where",
-    `ProcessId=${pid}`,
-    "get",
-    "CommandLine",
-    "/value",
-  ]);
-  if (res.code !== 0) {
-    return undefined;
-  }
-  for (const rawLine of res.stdout.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line.toLowerCase().startsWith("commandline=")) {
-      continue;
-    }
-    const value = line.slice("commandline=".length).trim();
-    return value || undefined;
-  }
-  return undefined;
-}
-
-async function readWindowsListeners(
-  port: number,
-): Promise<{ listeners: PortListener[]; detail?: string; errors: string[] }> {
-  const errors: string[] = [];
-  const res = await runCommandSafe(["netstat", "-ano", "-p", "tcp"]);
-  if (res.code !== 0) {
-    if (res.error) {
-      errors.push(res.error);
-    }
-    const detail = [res.stderr.trim(), res.stdout.trim()].filter(Boolean).join("\n");
-    if (detail) {
-      errors.push(detail);
-    }
-    return { listeners: [], errors };
-  }
-  const listeners = parseNetstatListeners(res.stdout, port);
-  await Promise.all(
-    listeners.map(async (listener) => {
-      if (!listener.pid) {
-        return;
-      }
-      const [imageName, commandLine] = await Promise.all([
-        resolveWindowsImageName(listener.pid),
-        resolveWindowsCommandLine(listener.pid),
-      ]);
-      if (imageName) {
-        listener.command = imageName;
-      }
-      if (commandLine) {
-        listener.commandLine = commandLine;
-      }
-    }),
-  );
-  return { listeners, detail: res.stdout.trim() || undefined, errors };
-}
-
 async function tryListenOnHost(port: number, host: string): Promise<PortUsageStatus | "skip"> {
   try {
     await new Promise<void>((resolve, reject) => {
@@ -272,8 +163,7 @@ async function checkPortInUse(port: number): Promise<PortUsageStatus> {
 
 export async function inspectPortUsage(port: number): Promise<PortUsage> {
   const errors: string[] = [];
-  const result =
-    process.platform === "win32" ? await readWindowsListeners(port) : await readUnixListeners(port);
+  const result = await readUnixListeners(port);
   errors.push(...result.errors);
   let listeners = result.listeners;
   let status: PortUsageStatus = listeners.length > 0 ? "busy" : "unknown";

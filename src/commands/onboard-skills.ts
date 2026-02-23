@@ -58,7 +58,6 @@ export async function setupSkills(
   const blocked = report.skills.filter((s) => s.blockedByAllowlist);
 
   const needsBrewPrompt =
-    process.platform !== "win32" &&
     report.skills.some((skill) => skill.install.some((option) => option.kind === "brew")) &&
     !(await detectBinary("brew"));
 

@@ -9,10 +9,7 @@ import { createSubsystemLogger } from "../logging/subsystem.js";
 import { CONFIG_DIR } from "../utils.js";
 import { getHeadersWithAuth, normalizeCdpWsUrl } from "./cdp.js";
 import { appendCdpPath } from "./cdp.helpers.js";
-import {
-  type BrowserExecutable,
-  resolveBrowserExecutableForPlatform,
-} from "./chrome.executables.js";
+import { type BrowserExecutable, resolveBrowserExecutable } from "./chrome.executables.js";
 import {
   decorateCrocProfile,
   ensureProfileCleanExit,
@@ -24,12 +21,7 @@ import { DEFAULT_CROC_BROWSER_COLOR, DEFAULT_CROC_BROWSER_PROFILE_NAME } from ".
 const log = createSubsystemLogger("browser").child("chrome");
 
 export type { BrowserExecutable } from "./chrome.executables.js";
-export {
-  findChromeExecutableLinux,
-  findChromeExecutableMac,
-  findChromeExecutableWindows,
-  resolveBrowserExecutableForPlatform,
-} from "./chrome.executables.js";
+export { findChromeExecutableLinux, resolveBrowserExecutable } from "./chrome.executables.js";
 export {
   decorateCrocProfile,
   ensureProfileCleanExit,
@@ -53,8 +45,8 @@ export type RunningChrome = {
   proc: ChildProcessWithoutNullStreams;
 };
 
-function resolveBrowserExecutable(resolved: ResolvedBrowserConfig): BrowserExecutable | null {
-  return resolveBrowserExecutableForPlatform(resolved, process.platform);
+function resolveExecutable(resolved: ResolvedBrowserConfig): BrowserExecutable | null {
+  return resolveBrowserExecutable(resolved);
 }
 
 export function resolveCrocUserDataDir(profileName = DEFAULT_CROC_BROWSER_PROFILE_NAME) {
@@ -167,11 +159,9 @@ export async function launchCrocChrome(
   }
   await ensurePortAvailable(profile.cdpPort);
 
-  const exe = resolveBrowserExecutable(resolved);
+  const exe = resolveExecutable(resolved);
   if (!exe) {
-    throw new Error(
-      "No supported browser found (Chrome/Brave/Edge/Chromium on macOS, Linux, or Windows).",
-    );
+    throw new Error("No supported browser found (Chrome/Brave/Edge/Chromium on Linux).");
   }
 
   const userDataDir = resolveCrocUserDataDir(profile.name);
@@ -208,9 +198,7 @@ export async function launchCrocChrome(
       args.push("--no-sandbox");
       args.push("--disable-setuid-sandbox");
     }
-    if (process.platform === "linux") {
-      args.push("--disable-dev-shm-usage");
-    }
+    args.push("--disable-dev-shm-usage");
 
     // Always open a blank tab to ensure a target exists.
     args.push("about:blank");

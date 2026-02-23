@@ -60,16 +60,6 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     await handleReset("full", resolveUserPath(workspaceDefault), runtime);
   }
 
-  if (process.platform === "win32") {
-    runtime.log(
-      [
-        "Windows detected.",
-        "WSL2 is strongly recommended; native Windows is untested and more problematic.",
-        "Guide: https://aiwithapex.mintlify.app/windows",
-      ].join("\n"),
-    );
-  }
-
   if (normalizedOpts.nonInteractive) {
     await runNonInteractiveOnboarding(normalizedOpts, runtime);
     return;

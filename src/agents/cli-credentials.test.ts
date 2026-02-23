@@ -20,45 +20,19 @@ describe("cli credentials", () => {
     resetCliCredentialCachesForTest();
   });
 
-  it("updates the Claude Code keychain item in place", async () => {
-    const commands: string[] = [];
-
-    execSyncMock.mockImplementation((command: unknown) => {
-      const cmd = String(command);
-      commands.push(cmd);
-
-      if (cmd.includes("find-generic-password")) {
-        return JSON.stringify({
-          claudeAiOauth: {
-            accessToken: "old-access",
-            refreshToken: "old-refresh",
-            expiresAt: Date.now() + 60_000,
-          },
-        });
-      }
-
-      return "";
-    });
-
+  it("keychain write is a no-op on Linux", async () => {
     const { writeClaudeCliKeychainCredentials } = await import("./cli-credentials.js");
 
-    const ok = writeClaudeCliKeychainCredentials(
-      {
-        access: "new-access",
-        refresh: "new-refresh",
-        expires: Date.now() + 60_000,
-      },
-      { execSync: execSyncMock },
-    );
+    const ok = writeClaudeCliKeychainCredentials({
+      access: "new-access",
+      refresh: "new-refresh",
+      expires: Date.now() + 60_000,
+    });
 
-    expect(ok).toBe(true);
-    expect(commands.some((cmd) => cmd.includes("delete-generic-password"))).toBe(false);
-
-    const updateCommand = commands.find((cmd) => cmd.includes("add-generic-password"));
-    expect(updateCommand).toContain("-U");
+    expect(ok).toBe(false);
   });
 
-  it("falls back to the file store when the keychain update fails", async () => {
+  it("writes credentials to the file store", async () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-"));
     const credPath = path.join(tempDir, ".claude", ".credentials.json");
 
@@ -79,8 +53,6 @@ describe("cli credentials", () => {
       "utf8",
     );
 
-    const writeKeychain = vi.fn(() => false);
-
     const { writeClaudeCliCredentials } = await import("./cli-credentials.js");
 
     const ok = writeClaudeCliCredentials(
@@ -90,14 +62,11 @@ describe("cli credentials", () => {
         expires: Date.now() + 120_000,
       },
       {
-        platform: "darwin",
         homeDir: tempDir,
-        writeKeychain,
       },
     );
 
     expect(ok).toBe(true);
-    expect(writeKeychain).toHaveBeenCalledTimes(1);
 
     const updated = JSON.parse(fs.readFileSync(credPath, "utf8")) as {
       claudeAiOauth?: {
@@ -113,7 +82,11 @@ describe("cli credentials", () => {
   });
 
   it("caches Claude Code CLI credentials within the TTL window", async () => {
-    execSyncMock.mockImplementation(() =>
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-cache-"));
+    const credPath = path.join(tempDir, ".claude", ".credentials.json");
+    fs.mkdirSync(path.dirname(credPath), { recursive: true, mode: 0o700 });
+    fs.writeFileSync(
+      credPath,
       JSON.stringify({
         claudeAiOauth: {
           accessToken: "cached-access",
@@ -121,6 +94,7 @@ describe("cli credentials", () => {
           expiresAt: Date.now() + 60_000,
         },
       }),
+      "utf8",
     );
 
     vi.setSystemTime(new Date("2025-01-01T00:00:00Z"));
@@ -128,32 +102,32 @@ describe("cli credentials", () => {
     const { readClaudeCliCredentialsCached } = await import("./cli-credentials.js");
 
     const first = readClaudeCliCredentialsCached({
-      allowKeychainPrompt: true,
       ttlMs: 15 * 60 * 1000,
-      platform: "darwin",
-      execSync: execSyncMock,
+      homeDir: tempDir,
     });
     const second = readClaudeCliCredentialsCached({
-      allowKeychainPrompt: false,
       ttlMs: 15 * 60 * 1000,
-      platform: "darwin",
-      execSync: execSyncMock,
+      homeDir: tempDir,
     });
 
     expect(first).toBeTruthy();
     expect(second).toEqual(first);
-    expect(execSyncMock).toHaveBeenCalledTimes(1);
   });
 
   it("refreshes Claude Code CLI credentials after the TTL window", async () => {
-    execSyncMock.mockImplementation(() =>
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-refresh-"));
+    const credPath = path.join(tempDir, ".claude", ".credentials.json");
+    fs.mkdirSync(path.dirname(credPath), { recursive: true, mode: 0o700 });
+    fs.writeFileSync(
+      credPath,
       JSON.stringify({
         claudeAiOauth: {
-          accessToken: `token-${Date.now()}`,
+          accessToken: "token-first",
           refreshToken: "refresh",
           expiresAt: Date.now() + 60_000,
         },
       }),
+      "utf8",
     );
 
     vi.setSystemTime(new Date("2025-01-01T00:00:00Z"));
@@ -161,61 +135,43 @@ describe("cli credentials", () => {
     const { readClaudeCliCredentialsCached } = await import("./cli-credentials.js");
 
     const first = readClaudeCliCredentialsCached({
-      allowKeychainPrompt: true,
       ttlMs: 15 * 60 * 1000,
-      platform: "darwin",
-      execSync: execSyncMock,
+      homeDir: tempDir,
     });
 
     vi.advanceTimersByTime(15 * 60 * 1000 + 1);
 
+    // Update the file to simulate changed credentials
+    fs.writeFileSync(
+      credPath,
+      JSON.stringify({
+        claudeAiOauth: {
+          accessToken: "token-second",
+          refreshToken: "refresh",
+          expiresAt: Date.now() + 60_000,
+        },
+      }),
+      "utf8",
+    );
+
     const second = readClaudeCliCredentialsCached({
-      allowKeychainPrompt: true,
       ttlMs: 15 * 60 * 1000,
-      platform: "darwin",
-      execSync: execSyncMock,
+      homeDir: tempDir,
     });
 
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
-    expect(execSyncMock).toHaveBeenCalledTimes(2);
   });
 
-  it("reads Codex credentials from keychain when available", async () => {
-    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-codex-"));
-    process.env.CODEX_HOME = tempHome;
-
-    const accountHash = "cli|";
-
-    execSyncMock.mockImplementation((command: unknown) => {
-      const cmd = String(command);
-      expect(cmd).toContain("Codex Auth");
-      expect(cmd).toContain(accountHash);
-      return JSON.stringify({
-        tokens: {
-          access_token: "keychain-access",
-          refresh_token: "keychain-refresh",
-        },
-        last_refresh: "2026-01-01T00:00:00Z",
-      });
-    });
-
+  it("returns null for Codex keychain credentials on Linux", async () => {
     const { readCodexCliCredentials } = await import("./cli-credentials.js");
-    const creds = readCodexCliCredentials({ platform: "darwin", execSync: execSyncMock });
-
-    expect(creds).toMatchObject({
-      access: "keychain-access",
-      refresh: "keychain-refresh",
-      provider: "openai-codex",
-    });
+    const creds = readCodexCliCredentials({ platform: "linux" });
+    expect(creds).toBeNull();
   });
 
-  it("falls back to Codex auth.json when keychain is unavailable", async () => {
+  it("reads Codex credentials from auth.json file", async () => {
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "crocbot-codex-"));
     process.env.CODEX_HOME = tempHome;
-    execSyncMock.mockImplementation(() => {
-      throw new Error("not found");
-    });
 
     const authPath = path.join(tempHome, "auth.json");
     fs.mkdirSync(tempHome, { recursive: true, mode: 0o700 });
@@ -231,7 +187,7 @@ describe("cli credentials", () => {
     );
 
     const { readCodexCliCredentials } = await import("./cli-credentials.js");
-    const creds = readCodexCliCredentials({ execSync: execSyncMock });
+    const creds = readCodexCliCredentials();
 
     expect(creds).toMatchObject({
       access: "file-access",

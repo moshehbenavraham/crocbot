@@ -2,11 +2,8 @@ import path from "node:path";
 
 import { resolveGatewayProfileSuffix } from "./constants.js";
 
-const windowsAbsolutePath = /^[a-zA-Z]:[\\/]/;
-const windowsUncPath = /^\\\\/;
-
 export function resolveHomeDir(env: Record<string, string | undefined>): string {
-  const home = env.HOME?.trim() || env.USERPROFILE?.trim();
+  const home = env.HOME?.trim();
   if (!home) {
     throw new Error("Missing HOME");
   }
@@ -25,9 +22,6 @@ export function resolveUserPathWithHome(input: string, home?: string): string {
     const expanded = trimmed.replace(/^~(?=$|[\\/])/, home);
     return path.resolve(expanded);
   }
-  if (windowsAbsolutePath.test(trimmed) || windowsUncPath.test(trimmed)) {
-    return trimmed;
-  }
   return path.resolve(trimmed);
 }
 
@@ -40,4 +34,19 @@ export function resolveGatewayStateDir(env: Record<string, string | undefined>):
   const home = resolveHomeDir(env);
   const suffix = resolveGatewayProfileSuffix(env.CROCBOT_PROFILE);
   return path.join(home, `.crocbot${suffix}`);
+}
+
+export function resolveGatewayLogPaths(env: Record<string, string | undefined>): {
+  logDir: string;
+  stdoutPath: string;
+  stderrPath: string;
+} {
+  const stateDir = resolveGatewayStateDir(env);
+  const logDir = path.join(stateDir, "logs");
+  const prefix = env.CROCBOT_LOG_PREFIX?.trim() || "gateway";
+  return {
+    logDir,
+    stdoutPath: path.join(logDir, `${prefix}.log`),
+    stderrPath: path.join(logDir, `${prefix}.err.log`),
+  };
 }

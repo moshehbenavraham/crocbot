@@ -1,9 +1,4 @@
-import {
-  resolveGatewayLaunchAgentLabel,
-  resolveGatewaySystemdServiceName,
-  resolveGatewayWindowsTaskName,
-} from "../daemon/constants.js";
-import { resolveGatewayLogPaths } from "../daemon/launchd.js";
+import { resolveGatewaySystemdServiceName } from "../daemon/constants.js";
 import {
   isSystemdUnavailableDetail,
   renderSystemdUnavailableHints,
@@ -14,7 +9,6 @@ import type { GatewayServiceRuntime } from "../daemon/service-runtime.js";
 import { getResolvedLoggerSettings } from "../logging.js";
 
 type RuntimeHintOptions = {
-  platform?: NodeJS.Platform;
   env?: Record<string, string | undefined>;
 };
 
@@ -61,7 +55,6 @@ export function buildGatewayRuntimeHints(
   if (!runtime) {
     return hints;
   }
-  const platform = options.platform ?? process.platform;
   const env = options.env ?? process.env;
   const fileLog = (() => {
     try {
@@ -70,19 +63,12 @@ export function buildGatewayRuntimeHints(
       return null;
     }
   })();
-  if (platform === "linux" && isSystemdUnavailableDetail(runtime.detail)) {
+  if (isSystemdUnavailableDetail(runtime.detail)) {
     hints.push(...renderSystemdUnavailableHints({ wsl: isWSLEnv() }));
     if (fileLog) {
       hints.push(`File logs: ${fileLog}`);
     }
     return hints;
-  }
-  if (runtime.cachedLabel && platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(env.CROCBOT_PROFILE);
-    hints.push(
-      `LaunchAgent label cached but plist missing. Clear with: launchctl bootout gui/$UID/${label}`,
-    );
-    hints.push(`Then reinstall: ${formatCliCommand("crocbot gateway install", env)}`);
   }
   if (runtime.missingUnit) {
     hints.push(`Service not installed. Run: ${formatCliCommand("crocbot gateway install", env)}`);
@@ -96,17 +82,8 @@ export function buildGatewayRuntimeHints(
     if (fileLog) {
       hints.push(`File logs: ${fileLog}`);
     }
-    if (platform === "darwin") {
-      const logs = resolveGatewayLogPaths(env);
-      hints.push(`Launchd stdout (if installed): ${logs.stdoutPath}`);
-      hints.push(`Launchd stderr (if installed): ${logs.stderrPath}`);
-    } else if (platform === "linux") {
-      const unit = resolveGatewaySystemdServiceName(env.CROCBOT_PROFILE);
-      hints.push(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`);
-    } else if (platform === "win32") {
-      const task = resolveGatewayWindowsTaskName(env.CROCBOT_PROFILE);
-      hints.push(`Logs: schtasks /Query /TN "${task}" /V /FO LIST`);
-    }
+    const unit = resolveGatewaySystemdServiceName(env.CROCBOT_PROFILE);
+    hints.push(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`);
   }
   return hints;
 }

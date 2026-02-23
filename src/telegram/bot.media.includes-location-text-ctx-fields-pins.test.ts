@@ -94,7 +94,7 @@ vi.mock("../auto-reply/reply.js", () => {
 });
 
 describe("telegram inbound media", () => {
-  const _INBOUND_MEDIA_TEST_TIMEOUT_MS = process.platform === "win32" ? 30_000 : 20_000;
+  const _INBOUND_MEDIA_TEST_TIMEOUT_MS = 20_000;
   it(
     "includes location text and ctx fields for pins",
     async () => {

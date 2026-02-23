@@ -101,8 +101,7 @@ function countJsonlLines(filePath: string): number {
 
 function findOtherStateDirs(stateDir: string): string[] {
   const resolvedState = path.resolve(stateDir);
-  const roots =
-    process.platform === "darwin" ? ["/Users"] : process.platform === "linux" ? ["/home"] : [];
+  const roots = ["/home"];
   const found: string[] = [];
   for (const root of roots) {
     let entries: fs.Dirent[] = [];
@@ -198,7 +197,7 @@ export async function noteStateIntegrity(
       }
     }
   }
-  if (stateDirExists && process.platform !== "win32") {
+  if (stateDirExists) {
     try {
       const stat = fs.statSync(stateDir);
       if ((stat.mode & 0o077) !== 0) {
@@ -219,7 +218,7 @@ export async function noteStateIntegrity(
     }
   }
 
-  if (configPath && existsFile(configPath) && process.platform !== "win32") {
+  if (configPath && existsFile(configPath)) {
     try {
       const stat = fs.statSync(configPath);
       if ((stat.mode & 0o077) !== 0) {

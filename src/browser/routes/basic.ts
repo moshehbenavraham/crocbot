@@ -1,4 +1,4 @@
-import { resolveBrowserExecutableForPlatform } from "../chrome.executables.js";
+import { resolveBrowserExecutable } from "../chrome.executables.js";
 import { createBrowserProfilesService } from "../profiles-service.js";
 import type { BrowserRouteContext } from "../server-context.js";
 import { getProfileContext, jsonError, toStringOrEmpty } from "./utils.js";
@@ -41,7 +41,7 @@ export function registerBrowserBasicRoutes(app: BrowserRouteRegistrar, ctx: Brow
     let detectError: string | null = null;
 
     try {
-      const detected = resolveBrowserExecutableForPlatform(current.resolved, process.platform);
+      const detected = resolveBrowserExecutable(current.resolved);
       if (detected) {
         detectedBrowser = detected.kind;
         detectedExecutablePath = detected.path;

@@ -893,6 +893,7 @@
           "concepts/architecture",
           "concepts/agent",
           "concepts/agent-loop",
+          "concepts/agent-orchestration",
           "concepts/system-prompt",
           "concepts/context",
           "concepts/token-use",
@@ -900,6 +901,7 @@
           "concepts/agent-workspace",
           "features/projects",
           "features/knowledge-import",
+          "features/slack-read-only",
           "concepts/memory",
           "concepts/multi-agent",
           "concepts/compaction",
@@ -1034,6 +1036,7 @@
           "plugins/index",
           "plugins/manifest",
           "plugins/agent-tools",
+          "plugins/extensions-catalog",
           "tools/exec",
           "tools/exec-approvals",
           "tools/web",
@@ -1055,7 +1058,8 @@
           "tools/skills",
           "tools/skills-config",
           "tools/creating-skills",
-          "tools/clawdhub"
+          "tools/clawdhub",
+          "tools/web-search-reference"
         ]
       },
       {
@@ -1067,7 +1071,8 @@
           "nodes/audio",
           "nodes/media-understanding",
           "nodes/location-command",
-          "nodes/voicewake"
+          "nodes/voicewake",
+          "nodes/voice-call"
         ]
       },
       {
@@ -1085,6 +1090,9 @@
         "pages": [
           "reference/contributing",
           "reference/security-policy",
+          "security/security-reference",
+          "security/public-release-audit",
+          "security/codeql-remediation",
           "reference/development",
           "reference/testing",
           "reference/scripts",

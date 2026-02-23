@@ -64,7 +64,7 @@ test("background exec still times out after tool signal abort", async () => {
   abortController.abort();
 
   let finished = getFinishedSession(sessionId);
-  const deadline = Date.now() + (process.platform === "win32" ? 10_000 : 2_000);
+  const deadline = Date.now() + 2_000;
   while (!finished && Date.now() < deadline) {
     await sleep(20);
     finished = getFinishedSession(sessionId);
@@ -127,7 +127,7 @@ test("yielded background exec still times out", async () => {
   const sessionId = (result.details as { sessionId: string }).sessionId;
 
   let finished = getFinishedSession(sessionId);
-  const deadline = Date.now() + (process.platform === "win32" ? 10_000 : 2_000);
+  const deadline = Date.now() + 2_000;
   while (!finished && Date.now() < deadline) {
     await sleep(20);
     finished = getFinishedSession(sessionId);

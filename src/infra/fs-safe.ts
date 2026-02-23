@@ -54,7 +54,7 @@ export async function openFileWithinRoot(params: {
     throw new SafeOpenError("invalid-path", "path escapes root");
   }
 
-  const supportsNoFollow = process.platform !== "win32" && "O_NOFOLLOW" in fsConstants;
+  const supportsNoFollow = "O_NOFOLLOW" in fsConstants;
   const flags = fsConstants.O_RDONLY | (supportsNoFollow ? fsConstants.O_NOFOLLOW : 0);
 
   let handle: FileHandle;

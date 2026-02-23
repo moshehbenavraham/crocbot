@@ -69,13 +69,8 @@ describe("buildWorkspaceSkillStatus", () => {
     const skill = report.skills.find((entry) => entry.name === "os-skill");
 
     expect(skill).toBeDefined();
-    if (process.platform === "darwin") {
-      expect(skill?.eligible).toBe(true);
-      expect(skill?.missing.os).toEqual([]);
-    } else {
-      expect(skill?.eligible).toBe(false);
-      expect(skill?.missing.os).toEqual(["darwin"]);
-    }
+    expect(skill?.eligible).toBe(false);
+    expect(skill?.missing.os).toEqual(["darwin"]);
   });
   it("marks bundled skills blocked by allowlist", async () => {
     const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-"));
@@ -128,14 +123,6 @@ describe("buildWorkspaceSkillStatus", () => {
     const skill = report.skills.find((entry) => entry.name === "install-skill");
 
     expect(skill).toBeDefined();
-    if (process.platform === "darwin") {
-      expect(skill?.install.map((opt) => opt.id)).toEqual(["mac"]);
-    } else if (process.platform === "linux") {
-      expect(skill?.install.map((opt) => opt.id)).toEqual(["linux"]);
-    } else if (process.platform === "win32") {
-      expect(skill?.install.map((opt) => opt.id)).toEqual(["win"]);
-    } else {
-      expect(skill?.install).toEqual([]);
-    }
+    expect(skill?.install.map((opt) => opt.id)).toEqual(["linux"]);
   });
 });

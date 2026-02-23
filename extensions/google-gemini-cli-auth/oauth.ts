@@ -97,7 +97,7 @@ export function extractGeminiCliCredentials(): { clientId: string; clientSecret:
 }
 
 function findInPath(name: string): string | null {
-  const exts = process.platform === "win32" ? [".cmd", ".bat", ".exe", ""] : [""];
+  const exts = [""];
   for (const dir of (process.env.PATH ?? "").split(delimiter)) {
     for (const ext of exts) {
       const p = join(dir, name + ext);

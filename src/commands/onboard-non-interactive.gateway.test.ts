@@ -213,10 +213,6 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
   }, 60_000);
 
   it("auto-generates token auth when binding LAN and persists the token", async () => {
-    if (process.platform === "win32") {
-      // Windows runner occasionally drops the temp config write in this flow; skip to keep CI green.
-      return;
-    }
     const stateDir = await initStateDir("state-lan-");
     process.env.CROCBOT_STATE_DIR = stateDir;
     process.env.CROCBOT_CONFIG_PATH = path.join(stateDir, "crocbot.json");

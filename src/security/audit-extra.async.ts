@@ -7,7 +7,6 @@ import JSON5 from "json5";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { crocbotConfig, ConfigFileSnapshot } from "../config/config.js";
-import type { ExecFn } from "./windows-acl.js";
 import { resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { resolveNativeSkillsEnabled } from "../config/commands.js";
 import { createConfigIO } from "../config/config.js";
@@ -205,8 +204,6 @@ export async function collectPluginsTrustFindings(params: {
 export async function collectIncludeFilePermFindings(params: {
   configSnapshot: ConfigFileSnapshot;
   env?: NodeJS.ProcessEnv;
-  platform?: NodeJS.Platform;
-  execIcacls?: ExecFn;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
   if (!params.configSnapshot.exists) {
@@ -226,8 +223,6 @@ export async function collectIncludeFilePermFindings(params: {
     // eslint-disable-next-line no-await-in-loop
     const perms = await inspectPathPermissions(p, {
       env: params.env,
-      platform: params.platform,
-      exec: params.execIcacls,
     });
     if (!perms.ok) {
       continue;
@@ -240,10 +235,7 @@ export async function collectIncludeFilePermFindings(params: {
         detail: `${formatPermissionDetail(p, perms)}; another user could influence your effective config.`,
         remediation: formatPermissionRemediation({
           targetPath: p,
-          perms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     } else if (perms.worldReadable) {
@@ -254,10 +246,7 @@ export async function collectIncludeFilePermFindings(params: {
         detail: `${formatPermissionDetail(p, perms)}; include files can contain tokens and private settings.`,
         remediation: formatPermissionRemediation({
           targetPath: p,
-          perms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     } else if (perms.groupReadable) {
@@ -268,10 +257,7 @@ export async function collectIncludeFilePermFindings(params: {
         detail: `${formatPermissionDetail(p, perms)}; include files can contain tokens and private settings.`,
         remediation: formatPermissionRemediation({
           targetPath: p,
-          perms,
-          isDir: false,
           posixMode: 0o600,
-          env: params.env,
         }),
       });
     }
@@ -284,16 +270,12 @@ export async function collectStateDeepFilesystemFindings(params: {
   cfg: crocbotConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
-  platform?: NodeJS.Platform;
-  execIcacls?: ExecFn;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
   const oauthDir = resolveOAuthDir(params.env, params.stateDir);
 
   const oauthPerms = await inspectPathPermissions(oauthDir, {
     env: params.env,
-    platform: params.platform,
-    exec: params.execIcacls,
   });
   if (oauthPerms.ok && oauthPerms.isDir) {
     if (oauthPerms.worldWritable || oauthPerms.groupWritable) {
@@ -304,10 +286,7 @@ export async function collectStateDeepFilesystemFindings(params: {
         detail: `${formatPermissionDetail(oauthDir, oauthPerms)}; another user could drop/modify credential files.`,
         remediation: formatPermissionRemediation({
           targetPath: oauthDir,
-          perms: oauthPerms,
-          isDir: true,
           posixMode: 0o700,
-          env: params.env,
         }),
       });
     } else if (oauthPerms.groupReadable || oauthPerms.worldReadable) {
@@ -318,10 +297,7 @@ export async function collectStateDeepFilesystemFindings(params: {
         detail: `${formatPermissionDetail(oauthDir, oauthPerms)}; credentials and allowlists can be sensitive.`,
         remediation: formatPermissionRemediation({
           targetPath: oauthDir,
-          perms: oauthPerms,
-          isDir: true,
           posixMode: 0o700,
-          env: params.env,
         }),
       });
     }
@@ -353,10 +329,7 @@ export async function collectStateDeepFilesystemFindings(params: {
           detail: `${formatPermissionDetail(authPath, authPerms)}; another user could inject credentials.`,
           remediation: formatPermissionRemediation({
             targetPath: authPath,
-            perms: authPerms,
-            isDir: false,
             posixMode: 0o600,
-            env: params.env,
           }),
         });
       } else if (authPerms.worldReadable || authPerms.groupReadable) {
@@ -367,10 +340,7 @@ export async function collectStateDeepFilesystemFindings(params: {
           detail: `${formatPermissionDetail(authPath, authPerms)}; auth-profiles.json contains API keys and OAuth tokens.`,
           remediation: formatPermissionRemediation({
             targetPath: authPath,
-            perms: authPerms,
-            isDir: false,
             posixMode: 0o600,
-            env: params.env,
           }),
         });
       }
@@ -392,10 +362,7 @@ export async function collectStateDeepFilesystemFindings(params: {
           detail: `${formatPermissionDetail(storePath, storePerms)}; routing and transcript metadata can be sensitive.`,
           remediation: formatPermissionRemediation({
             targetPath: storePath,
-            perms: storePerms,
-            isDir: false,
             posixMode: 0o600,
-            env: params.env,
           }),
         });
       }
@@ -422,10 +389,7 @@ export async function collectStateDeepFilesystemFindings(params: {
             detail: `${formatPermissionDetail(logPath, logPerms)}; logs can contain private messages and tool output.`,
             remediation: formatPermissionRemediation({
               targetPath: logPath,
-              perms: logPerms,
-              isDir: false,
               posixMode: 0o600,
-              env: params.env,
             }),
           });
         }

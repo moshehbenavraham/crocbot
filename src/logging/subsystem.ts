@@ -208,10 +208,7 @@ function formatConsoleLine(opts: {
 
 function writeConsoleLine(level: LogLevel, line: string) {
   clearActiveProgressLine();
-  const sanitized =
-    process.platform === "win32" && process.env.GITHUB_ACTIONS === "true"
-      ? line.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "?").replace(/[\uD800-\uDFFF]/g, "?")
-      : line;
+  const sanitized = line;
   const sink = loggingState.rawConsole ?? console;
   if (loggingState.forceConsoleToStderr || level === "error" || level === "fatal") {
     (sink.error ?? console.error)(sanitized);

@@ -1,37 +1,7 @@
-import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-function resolvePowerShellPath(): string {
-  const systemRoot = process.env.SystemRoot || process.env.WINDIR;
-  if (systemRoot) {
-    const candidate = path.join(
-      systemRoot,
-      "System32",
-      "WindowsPowerShell",
-      "v1.0",
-      "powershell.exe",
-    );
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-  }
-  return "powershell.exe";
-}
-
 export function getShellConfig(): { shell: string; args: string[] } {
-  if (process.platform === "win32") {
-    // Use PowerShell instead of cmd.exe on Windows.
-    // Problem: Many Windows system utilities (ipconfig, systeminfo, etc.) write
-    // directly to the console via WriteConsole API, bypassing stdout pipes.
-    // When Node.js spawns cmd.exe with piped stdio, these utilities produce no output.
-    // PowerShell properly captures and redirects their output to stdout.
-    return {
-      shell: resolvePowerShellPath(),
-      args: ["-NoProfile", "-NonInteractive", "-Command"],
-    };
-  }
-
   const envShell = process.env.SHELL?.trim();
   const shellName = envShell ? path.basename(envShell) : "";
   // Fish rejects common bashisms used by tools, so prefer bash when detected.
@@ -91,18 +61,6 @@ export function sanitizeBinaryOutput(text: string): string {
 }
 
 export function killProcessTree(pid: number): void {
-  if (process.platform === "win32") {
-    try {
-      spawn("taskkill", ["/F", "/T", "/PID", String(pid)], {
-        stdio: "ignore",
-        detached: true,
-      });
-    } catch {
-      // ignore errors if taskkill fails
-    }
-    return;
-  }
-
   try {
     process.kill(-pid, "SIGKILL");
   } catch {

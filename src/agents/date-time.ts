@@ -1,5 +1,3 @@
-import { execSync } from "node:child_process";
-
 export type TimeFormatPreference = "auto" | "12" | "24";
 export type ResolvedTimeFormat = "12" | "24";
 
@@ -94,40 +92,6 @@ export function withNormalizedTimestamp<T extends Record<string, unknown>>(
 }
 
 function detectSystemTimeFormat(): boolean {
-  if (process.platform === "darwin") {
-    try {
-      const result = execSync("defaults read -g AppleICUForce24HourTime 2>/dev/null", {
-        encoding: "utf8",
-        timeout: 500,
-      }).trim();
-      if (result === "1") {
-        return true;
-      }
-      if (result === "0") {
-        return false;
-      }
-    } catch {
-      // Not set, fall through
-    }
-  }
-
-  if (process.platform === "win32") {
-    try {
-      const result = execSync(
-        'powershell -Command "(Get-Culture).DateTimeFormat.ShortTimePattern"',
-        { encoding: "utf8", timeout: 1000 },
-      ).trim();
-      if (result.startsWith("H")) {
-        return true;
-      }
-      if (result.startsWith("h")) {
-        return false;
-      }
-    } catch {
-      // Fall through
-    }
-  }
-
   try {
     const sample = new Date(2000, 0, 1, 13, 0);
     const formatted = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).format(sample);

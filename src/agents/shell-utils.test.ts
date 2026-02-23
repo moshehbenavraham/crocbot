@@ -5,8 +5,6 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { getShellConfig } from "./shell-utils.js";
 
-const isWin = process.platform === "win32";
-
 describe("getShellConfig", () => {
   const originalShell = process.env.SHELL;
   const originalPath = process.env.PATH;
@@ -24,9 +22,7 @@ describe("getShellConfig", () => {
   };
 
   beforeEach(() => {
-    if (!isWin) {
-      process.env.SHELL = "/usr/bin/fish";
-    }
+    process.env.SHELL = "/usr/bin/fish";
   });
 
   afterEach(() => {
@@ -44,14 +40,6 @@ describe("getShellConfig", () => {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   });
-
-  if (isWin) {
-    it("uses PowerShell on Windows", () => {
-      const { shell } = getShellConfig();
-      expect(shell.toLowerCase()).toContain("powershell");
-    });
-    return;
-  }
 
   it("prefers bash when fish is default and bash is on PATH", () => {
     const binDir = createTempBin(["bash"]);

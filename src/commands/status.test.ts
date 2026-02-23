@@ -209,10 +209,10 @@ vi.mock("../infra/crocbot-root.js", () => ({
 }));
 vi.mock("../infra/os-summary.js", () => ({
   resolveOsSummary: () => ({
-    platform: "darwin",
-    arch: "arm64",
-    release: "23.0.0",
-    label: "macos 14.0 (arm64)",
+    platform: "linux",
+    arch: "x64",
+    release: "6.6.0",
+    label: "linux 6.6.0 (x64)",
   }),
 }));
 vi.mock("../infra/update-check.js", () => ({
@@ -248,27 +248,27 @@ vi.mock("../config/config.js", async (importOriginal) => {
 });
 vi.mock("../daemon/service.js", () => ({
   resolveGatewayService: () => ({
-    label: "LaunchAgent",
+    label: "systemd",
     loadedText: "loaded",
     notLoadedText: "not loaded",
     isLoaded: async () => true,
     readRuntime: async () => ({ status: "running", pid: 1234 }),
     readCommand: async () => ({
       programArguments: ["node", "dist/entry.js", "gateway"],
-      sourcePath: "/tmp/Library/LaunchAgents/com.crocbot.gateway.plist",
+      sourcePath: "/etc/systemd/user/crocbot-gateway.service",
     }),
   }),
 }));
 vi.mock("../daemon/node-service.js", () => ({
   resolveNodeService: () => ({
-    label: "LaunchAgent",
+    label: "systemd",
     loadedText: "loaded",
     notLoadedText: "not loaded",
     isLoaded: async () => true,
     readRuntime: async () => ({ status: "running", pid: 4321 }),
     readCommand: async () => ({
       programArguments: ["node", "dist/entry.js", "node-host"],
-      sourcePath: "/tmp/Library/LaunchAgents/com.crocbot.node.plist",
+      sourcePath: "/etc/systemd/user/crocbot-node.service",
     }),
   }),
 }));
@@ -302,8 +302,8 @@ describe("statusCommand", () => {
     expect(payload.sessions.recent[0].flags).toContain("verbose:on");
     expect(payload.securityAudit.summary.critical).toBe(1);
     expect(payload.securityAudit.summary.warn).toBe(1);
-    expect(payload.gatewayService.label).toBe("LaunchAgent");
-    expect(payload.nodeService.label).toBe("LaunchAgent");
+    expect(payload.gatewayService.label).toBe("systemd");
+    expect(payload.nodeService.label).toBe("systemd");
   });
 
   it("prints formatted lines otherwise", async () => {
@@ -315,14 +315,14 @@ describe("statusCommand", () => {
     expect(logs.some((l) => l.includes("Security audit"))).toBe(true);
     expect(logs.some((l) => l.includes("Summary:"))).toBe(true);
     expect(logs.some((l) => l.includes("CRITICAL"))).toBe(true);
-    expect(logs.some((l) => l.includes("macos 14.0 (arm64)"))).toBe(true);
+    expect(logs.some((l) => l.includes("linux 6.6.0 (x64)"))).toBe(true);
     expect(logs.some((l) => l.includes("Memory"))).toBe(true);
     expect(logs.some((l) => l.includes("Channels"))).toBe(true);
     expect(logs.some((l) => l.includes("WhatsApp"))).toBe(true);
     expect(logs.some((l) => l.includes("Sessions"))).toBe(true);
     expect(logs.some((l) => l.includes("+1000"))).toBe(true);
     expect(logs.some((l) => l.includes("50%"))).toBe(true);
-    expect(logs.some((l) => l.includes("LaunchAgent"))).toBe(true);
+    expect(logs.some((l) => l.includes("systemd"))).toBe(true);
     expect(logs.some((l) => l.includes("FAQ:"))).toBe(true);
     expect(logs.some((l) => l.includes("Troubleshooting:"))).toBe(true);
     expect(logs.some((l) => l.includes("Next steps:"))).toBe(true);

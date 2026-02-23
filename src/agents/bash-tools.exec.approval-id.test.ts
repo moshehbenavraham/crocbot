@@ -8,23 +8,17 @@ vi.mock("./tools/gateway.js", () => ({
 }));
 
 vi.mock("./tools/nodes-utils.js", () => ({
-  listNodes: vi.fn(async () => [
-    { nodeId: "node-1", commands: ["system.run"], platform: "darwin" },
-  ]),
+  listNodes: vi.fn(async () => [{ nodeId: "node-1", commands: ["system.run"], platform: "linux" }]),
   resolveNodeIdFromList: vi.fn((nodes: Array<{ nodeId: string }>) => nodes[0]?.nodeId),
 }));
 
 describe("exec approvals", () => {
   let previousHome: string | undefined;
-  let previousUserProfile: string | undefined;
 
   beforeEach(async () => {
     previousHome = process.env.HOME;
-    previousUserProfile = process.env.USERPROFILE;
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-test-"));
     process.env.HOME = tempDir;
-    // Windows uses USERPROFILE for os.homedir()
-    process.env.USERPROFILE = tempDir;
   });
 
   afterEach(() => {
@@ -33,11 +27,6 @@ describe("exec approvals", () => {
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
-    }
-    if (previousUserProfile === undefined) {
-      delete process.env.USERPROFILE;
-    } else {
-      process.env.USERPROFILE = previousUserProfile;
     }
   });
 
@@ -83,12 +72,10 @@ describe("exec approvals", () => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "crocbot-test-bin-"));
     const binDir = path.join(tempDir, "bin");
     await fs.mkdir(binDir, { recursive: true });
-    const exeName = process.platform === "win32" ? "tool.cmd" : "tool";
+    const exeName = "tool";
     const exePath = path.join(binDir, exeName);
     await fs.writeFile(exePath, "");
-    if (process.platform !== "win32") {
-      await fs.chmod(exePath, 0o755);
-    }
+    await fs.chmod(exePath, 0o755);
     const approvalsFile = {
       version: 1,
       defaults: { security: "allowlist", ask: "on-miss", askFallback: "deny" },

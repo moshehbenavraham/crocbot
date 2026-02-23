@@ -6,9 +6,8 @@ describe("auditGatewayServiceConfig", () => {
   it("flags bun runtime", async () => {
     const audit = await auditGatewayServiceConfig({
       env: { HOME: "/tmp" },
-      platform: "darwin",
       command: {
-        programArguments: ["/opt/homebrew/bin/bun", "gateway"],
+        programArguments: ["/usr/local/bin/bun", "gateway"],
         environment: { PATH: "/usr/bin:/bin" },
       },
     });
@@ -20,11 +19,10 @@ describe("auditGatewayServiceConfig", () => {
   it("flags version-managed node paths", async () => {
     const audit = await auditGatewayServiceConfig({
       env: { HOME: "/tmp" },
-      platform: "darwin",
       command: {
-        programArguments: ["/Users/test/.nvm/versions/node/v22.0.0/bin/node", "gateway"],
+        programArguments: ["/home/test/.nvm/versions/node/v22.0.0/bin/node", "gateway"],
         environment: {
-          PATH: "/usr/bin:/bin:/Users/test/.nvm/versions/node/v22.0.0/bin",
+          PATH: "/usr/bin:/bin:/home/test/.nvm/versions/node/v22.0.0/bin",
         },
       },
     });
@@ -41,12 +39,11 @@ describe("auditGatewayServiceConfig", () => {
     ).toBe(true);
   });
 
-  it("accepts Linux minimal PATH with user directories", async () => {
+  it("accepts minimal PATH with user directories", async () => {
     const env = { HOME: "/home/testuser", PNPM_HOME: "/opt/pnpm" };
-    const minimalPath = buildMinimalServicePath({ platform: "linux", env });
+    const minimalPath = buildMinimalServicePath({ env });
     const audit = await auditGatewayServiceConfig({
       env,
-      platform: "linux",
       command: {
         programArguments: ["/usr/bin/node", "gateway"],
         environment: { PATH: minimalPath },

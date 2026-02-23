@@ -2,8 +2,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ExecApprovalsResolved } from "../infra/exec-approvals.js";
 import { sanitizeBinaryOutput } from "./shell-utils.js";
 
-const isWin = process.platform === "win32";
-
 vi.mock("../infra/shell-env.js", async (importOriginal) => {
   const mod = await importOriginal<typeof import("../infra/shell-env.js")>();
   return {
@@ -61,9 +59,6 @@ describe("exec PATH login shell merge", () => {
   });
 
   it("merges login-shell PATH for host=gateway", async () => {
-    if (isWin) {
-      return;
-    }
     process.env.PATH = "/usr/bin";
 
     const { createExecTool } = await import("./bash-tools.exec.js");
@@ -81,9 +76,6 @@ describe("exec PATH login shell merge", () => {
   });
 
   it("skips login-shell PATH when env.PATH is provided", async () => {
-    if (isWin) {
-      return;
-    }
     process.env.PATH = "/usr/bin";
 
     const { createExecTool } = await import("./bash-tools.exec.js");

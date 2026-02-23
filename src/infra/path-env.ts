@@ -9,7 +9,6 @@ type EnsurecrocbotPathOpts = {
   execPath?: string;
   cwd?: string;
   homeDir?: string;
-  platform?: NodeJS.Platform;
   pathEnv?: string;
 };
 
@@ -52,11 +51,10 @@ function candidateBinDirs(opts: EnsurecrocbotPathOpts): string[] {
   const execPath = opts.execPath ?? process.execPath;
   const cwd = opts.cwd ?? process.cwd();
   const homeDir = opts.homeDir ?? os.homedir();
-  const platform = opts.platform ?? process.platform;
 
   const candidates: string[] = [];
 
-  // Bundled macOS app: `crocbot` lives next to the executable (process.execPath).
+  // Bundled app: `crocbot` lives next to the executable (process.execPath).
   try {
     const execDir = path.dirname(execPath);
     const siblingcrocbot = path.join(execDir, "crocbot");
@@ -68,7 +66,7 @@ function candidateBinDirs(opts: EnsurecrocbotPathOpts): string[] {
   }
 
   // Project-local installs (best effort): if a `node_modules/.bin/crocbot` exists near cwd,
-  // include it. This helps when running under launchd or other minimal PATH environments.
+  // include it. This helps when running under systemd or other minimal PATH environments.
   const localBinDir = path.join(cwd, "node_modules", ".bin");
   if (isExecutable(path.join(localBinDir, "crocbot"))) {
     candidates.push(localBinDir);
@@ -82,10 +80,6 @@ function candidateBinDirs(opts: EnsurecrocbotPathOpts): string[] {
 
   candidates.push(...resolveBrewPathDirs({ homeDir }));
 
-  // Common global install locations (macOS first).
-  if (platform === "darwin") {
-    candidates.push(path.join(homeDir, "Library", "pnpm"));
-  }
   if (process.env.XDG_BIN_HOME) {
     candidates.push(process.env.XDG_BIN_HOME);
   }
@@ -100,7 +94,7 @@ function candidateBinDirs(opts: EnsurecrocbotPathOpts): string[] {
 
 /**
  * Best-effort PATH bootstrap so skills that require the `crocbot` CLI can run
- * under launchd/minimal environments (and inside the macOS app bundle).
+ * under systemd/minimal environments.
  */
 export function ensurecrocbotCliOnPath(opts: EnsurecrocbotPathOpts = {}) {
   if (isTruthyEnvValue(process.env.CROCBOT_PATH_BOOTSTRAPPED)) {

@@ -9,9 +9,8 @@ import {
 } from "./service-env.js";
 
 describe("getMinimalServicePathParts - Linux user directories", () => {
-  it("includes user bin directories when HOME is set on Linux", () => {
+  it("includes user bin directories when HOME is set", () => {
     const result = getMinimalServicePathParts({
-      platform: "linux",
       home: "/home/testuser",
     });
 
@@ -27,9 +26,8 @@ describe("getMinimalServicePathParts - Linux user directories", () => {
     expect(result).toContain("/home/testuser/.bun/bin");
   });
 
-  it("excludes user bin directories when HOME is undefined on Linux", () => {
+  it("excludes user bin directories when HOME is undefined", () => {
     const result = getMinimalServicePathParts({
-      platform: "linux",
       home: undefined,
     });
 
@@ -42,9 +40,8 @@ describe("getMinimalServicePathParts - Linux user directories", () => {
     expect(result.some((p) => p.includes(".nvm"))).toBe(false);
   });
 
-  it("places user directories before system directories on Linux", () => {
+  it("places user directories before system directories", () => {
     const result = getMinimalServicePathParts({
-      platform: "linux",
       home: "/home/testuser",
     });
 
@@ -56,9 +53,8 @@ describe("getMinimalServicePathParts - Linux user directories", () => {
     expect(userDirIndex).toBeLessThan(systemDirIndex);
   });
 
-  it("places extraDirs before user directories on Linux", () => {
+  it("places extraDirs before user directories", () => {
     const result = getMinimalServicePathParts({
-      platform: "linux",
       home: "/home/testuser",
       extraDirs: ["/custom/bin"],
     });
@@ -71,9 +67,8 @@ describe("getMinimalServicePathParts - Linux user directories", () => {
     expect(extraDirIndex).toBeLessThan(userDirIndex);
   });
 
-  it("includes env-configured bin roots when HOME is set on Linux", () => {
+  it("includes env-configured bin roots when HOME is set", () => {
     const result = getMinimalServicePathPartsFromEnv({
-      platform: "linux",
       env: {
         HOME: "/home/testuser",
         PNPM_HOME: "/opt/pnpm",
@@ -94,62 +89,16 @@ describe("getMinimalServicePathParts - Linux user directories", () => {
     expect(result).toContain("/opt/nvm/current/bin");
     expect(result).toContain("/opt/fnm/current/bin");
   });
-
-  it("does not include Linux user directories on macOS", () => {
-    const result = getMinimalServicePathParts({
-      platform: "darwin",
-      home: "/Users/testuser",
-    });
-
-    // Should not include Linux-specific user dirs even with HOME set
-    expect(result.some((p) => p.includes(".npm-global"))).toBe(false);
-    expect(result.some((p) => p.includes(".nvm"))).toBe(false);
-
-    // Should only include macOS system directories
-    expect(result).toContain("/opt/homebrew/bin");
-    expect(result).toContain("/usr/local/bin");
-  });
-
-  it("does not include Linux user directories on Windows", () => {
-    const result = getMinimalServicePathParts({
-      platform: "win32",
-      home: "C:\\Users\\testuser",
-    });
-
-    // Windows returns empty array (uses existing PATH)
-    expect(result).toEqual([]);
-  });
 });
 
 describe("buildMinimalServicePath", () => {
-  const splitPath = (value: string, platform: NodeJS.Platform) =>
-    value.split(platform === "win32" ? path.win32.delimiter : path.posix.delimiter);
+  const splitPath = (value: string) => value.split(path.posix.delimiter);
 
-  it("includes Homebrew + system dirs on macOS", () => {
+  it("includes user directories when HOME is set in env", () => {
     const result = buildMinimalServicePath({
-      platform: "darwin",
-    });
-    const parts = splitPath(result, "darwin");
-    expect(parts).toContain("/opt/homebrew/bin");
-    expect(parts).toContain("/usr/local/bin");
-    expect(parts).toContain("/usr/bin");
-    expect(parts).toContain("/bin");
-  });
-
-  it("returns PATH as-is on Windows", () => {
-    const result = buildMinimalServicePath({
-      env: { PATH: "C:\\\\Windows\\\\System32" },
-      platform: "win32",
-    });
-    expect(result).toBe("C:\\\\Windows\\\\System32");
-  });
-
-  it("includes Linux user directories when HOME is set in env", () => {
-    const result = buildMinimalServicePath({
-      platform: "linux",
       env: { HOME: "/home/alice" },
     });
-    const parts = splitPath(result, "linux");
+    const parts = splitPath(result);
 
     // Verify user directories are included
     expect(parts).toContain("/home/alice/.local/bin");
@@ -162,12 +111,11 @@ describe("buildMinimalServicePath", () => {
     expect(parts).toContain("/bin");
   });
 
-  it("excludes Linux user directories when HOME is not in env", () => {
+  it("excludes user directories when HOME is not in env", () => {
     const result = buildMinimalServicePath({
-      platform: "linux",
       env: {},
     });
-    const parts = splitPath(result, "linux");
+    const parts = splitPath(result);
 
     // Should only have system directories
     expect(parts).toEqual(["/usr/local/bin", "/usr/bin", "/bin"]);
@@ -176,12 +124,11 @@ describe("buildMinimalServicePath", () => {
     expect(parts.some((p) => p.includes("home"))).toBe(false);
   });
 
-  it("ensures user directories come before system directories on Linux", () => {
+  it("ensures user directories come before system directories", () => {
     const result = buildMinimalServicePath({
-      platform: "linux",
       env: { HOME: "/home/bob" },
     });
-    const parts = splitPath(result, "linux");
+    const parts = splitPath(result);
 
     const firstUserDirIdx = parts.indexOf("/home/bob/.local/bin");
     const firstSystemDirIdx = parts.indexOf("/usr/local/bin");
@@ -191,20 +138,18 @@ describe("buildMinimalServicePath", () => {
 
   it("includes extra directories when provided", () => {
     const result = buildMinimalServicePath({
-      platform: "linux",
       extraDirs: ["/custom/tools"],
       env: {},
     });
-    expect(splitPath(result, "linux")).toContain("/custom/tools");
+    expect(splitPath(result)).toContain("/custom/tools");
   });
 
   it("deduplicates directories", () => {
     const result = buildMinimalServicePath({
-      platform: "linux",
       extraDirs: ["/usr/bin"],
       env: {},
     });
-    const parts = splitPath(result, "linux");
+    const parts = splitPath(result);
     const unique = [...new Set(parts)];
     expect(parts.length).toBe(unique.length);
   });
@@ -218,20 +163,13 @@ describe("buildServiceEnvironment", () => {
       token: "secret",
     });
     expect(env.HOME).toBe("/home/user");
-    if (process.platform === "win32") {
-      expect(env.PATH).toBe("");
-    } else {
-      expect(env.PATH).toContain("/usr/bin");
-    }
+    expect(env.PATH).toContain("/usr/bin");
     expect(env.CROCBOT_GATEWAY_PORT).toBe("18789");
     expect(env.CROCBOT_GATEWAY_TOKEN).toBe("secret");
     expect(env.CROCBOT_SERVICE_MARKER).toBe("crocbot");
     expect(env.CROCBOT_SERVICE_KIND).toBe("gateway");
     expect(typeof env.CROCBOT_SERVICE_VERSION).toBe("string");
     expect(env.CROCBOT_SYSTEMD_UNIT).toBe("crocbot-gateway.service");
-    if (process.platform === "darwin") {
-      expect(env.CROCBOT_LAUNCHD_LABEL).toBe("com.crocbot.gateway");
-    }
   });
 
   it("uses profile-specific unit and label", () => {
@@ -240,9 +178,6 @@ describe("buildServiceEnvironment", () => {
       port: 18789,
     });
     expect(env.CROCBOT_SYSTEMD_UNIT).toBe("crocbot-gateway-work.service");
-    if (process.platform === "darwin") {
-      expect(env.CROCBOT_LAUNCHD_LABEL).toBe("com.crocbot.work");
-    }
   });
 });
 

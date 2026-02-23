@@ -7,9 +7,7 @@ vi.mock("../process/exec.js", () => ({
   runCommandWithTimeout: (...args: unknown[]) => runCommandWithTimeoutMock(...args),
 }));
 
-const describeUnix = process.platform === "win32" ? describe.skip : describe;
-
-describeUnix("inspectPortUsage", () => {
+describe("inspectPortUsage", () => {
   beforeEach(() => {
     runCommandWithTimeoutMock.mockReset();
   });

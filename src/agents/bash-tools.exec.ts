@@ -407,9 +407,8 @@ async function runExecProcess(opts: {
       options: {
         cwd: opts.workdir,
         env: process.env,
-        detached: process.platform !== "win32",
+        detached: true,
         stdio: ["pipe", "pipe", "pipe"],
-        windowsHide: true,
       },
       fallbacks: [
         {
@@ -456,8 +455,7 @@ async function runExecProcess(opts: {
         },
         end: () => {
           try {
-            const eof = process.platform === "win32" ? "\x1a" : "\x04";
-            pty?.write(eof);
+            pty?.write("\x04");
           } catch {
             // ignore EOF errors
           }
@@ -473,9 +471,8 @@ async function runExecProcess(opts: {
         options: {
           cwd: opts.workdir,
           env: opts.env,
-          detached: process.platform !== "win32",
+          detached: true,
           stdio: ["pipe", "pipe", "pipe"],
-          windowsHide: true,
         },
         fallbacks: [
           {
@@ -500,9 +497,8 @@ async function runExecProcess(opts: {
       options: {
         cwd: opts.workdir,
         env: opts.env,
-        detached: process.platform !== "win32",
+        detached: true,
         stdio: ["pipe", "pipe", "pipe"],
-        windowsHide: true,
       },
       fallbacks: [
         {
