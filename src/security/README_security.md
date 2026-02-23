@@ -4,16 +4,16 @@ Security validation, auditing, and hardening utilities.
 
 ## Key Files
 
-| File                      | Purpose                                                    |
-| ------------------------- | ---------------------------------------------------------- |
-| `audit.ts`                | Security audit runner                                      |
-| `audit-extra.sync.ts`     | Extended audit checks (config redaction, webhook safety)   |
-| `filesystem.ts`           | Filesystem access validation                               |
-| `external-content.ts`     | External content sanitization (Unicode homoglyph blocking) |
-| `ssrf-fixes.ts`           | SSRF mitigation helpers                                    |
-| `path-traversal.ts`       | Path traversal prevention                                  |
-| `secret-equal.ts`         | Timing-safe string comparison via crypto.timingSafeEqual   |
-| `transcript-repair.ts`    | Tool-call block sanitization in transcripts                |
+| File                   | Purpose                                                    |
+| ---------------------- | ---------------------------------------------------------- |
+| `audit.ts`             | Security audit runner                                      |
+| `audit-extra.sync.ts`  | Extended audit checks (config redaction, webhook safety)   |
+| `filesystem.ts`        | Filesystem access validation                               |
+| `external-content.ts`  | External content sanitization (Unicode homoglyph blocking) |
+| `ssrf-fixes.ts`        | SSRF mitigation helpers                                    |
+| `path-traversal.ts`    | Path traversal prevention                                  |
+| `secret-equal.ts`      | Timing-safe string comparison via crypto.timingSafeEqual   |
+| `transcript-repair.ts` | Tool-call block sanitization in transcripts                |
 
 ## Purpose
 

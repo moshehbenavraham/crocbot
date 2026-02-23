@@ -16,17 +16,17 @@ gateway/
 
 ## Key Files
 
-| File                       | Purpose                                              |
-| -------------------------- | ---------------------------------------------------- |
-| `server.impl.ts`           | Main gateway server implementation                   |
-| `server-http.ts`           | HTTP endpoint handlers                               |
-| `server-tailscale.ts`      | Tailscale Serve/Funnel integration                   |
-| `server-runtime-config.ts` | Runtime configuration management                     |
-| `server-runtime-state.ts`  | Runtime state tracking                               |
-| `server-methods/agent.ts`  | Agent RPC method handlers                            |
+| File                       | Purpose                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `server.impl.ts`           | Main gateway server implementation                                                      |
+| `server-http.ts`           | HTTP endpoint handlers                                                                  |
+| `server-tailscale.ts`      | Tailscale Serve/Funnel integration                                                      |
+| `server-runtime-config.ts` | Runtime configuration management                                                        |
+| `server-runtime-state.ts`  | Runtime state tracking                                                                  |
+| `server-methods/agent.ts`  | Agent RPC method handlers                                                               |
 | `security-headers.ts`      | Security headers (CSP, X-Frame-Options, nosniff) and path traversal/null byte filtering |
-| `auth-rate-limit.ts`       | Sliding-window per-IP auth rate limiting with lockout |
-| `rate-limit.ts`            | General per-IP request rate limiting                 |
+| `auth-rate-limit.ts`       | Sliding-window per-IP auth rate limiting with lockout                                   |
+| `rate-limit.ts`            | General per-IP request rate limiting                                                    |
 
 ## Architecture
 

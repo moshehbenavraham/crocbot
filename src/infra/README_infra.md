@@ -14,24 +14,24 @@ infra/
 
 ## Key Files
 
-| File                              | Purpose                                                                        |
-| --------------------------------- | ------------------------------------------------------------------------------ |
+| File                              | Purpose                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `net/ssrf.ts`                     | SSRF protection: private IP/hostname blocking, IPv6-mapped bypass prevention, redirect validation |
-| `net/fetch-guard.ts`              | Guarded fetch wrapper with timeouts and DNS pinning                            |
-| `exec-approvals.ts`               | Shell command allowlisting, shell expansion blocking, heredoc handling          |
-| `path-output.ts`                  | Output path containment (constrainOutputPath)                                  |
-| `http-body.ts`                    | Bounded HTTP body reading with configurable limits                             |
-| `archive.ts`                      | Archive extraction with zip-slip prevention and decompression bomb limits       |
-| `provider-rate-limiter.ts`        | Sliding window RPM/TPM enforcement per provider                                |
-| `provider-rate-limiter-config.ts` | Rate limiter config types and resolution                                       |
-| `rate-limiter-instance.ts`        | Singleton rate limiter instance                                                |
-| `key-pool.ts`                     | Health-aware round-robin API key selection                                     |
-| `llm-retry.ts`                    | LLM transient error classification and retry policy                            |
-| `retry.ts`                        | Generic retry with exponential backoff and jitter                              |
-| `retry-policy.ts`                 | Retry policy types                                                             |
-| `rate-limit-middleware.ts`        | Pre-flight/post-flight wrapper for LLM call sites                              |
-| `update-check.ts`                 | Version update checking                                                        |
-| `update-runner.ts`                | Runs the update process                                                        |
+| `net/fetch-guard.ts`              | Guarded fetch wrapper with timeouts and DNS pinning                                               |
+| `exec-approvals.ts`               | Shell command allowlisting, shell expansion blocking, heredoc handling                            |
+| `path-output.ts`                  | Output path containment (constrainOutputPath)                                                     |
+| `http-body.ts`                    | Bounded HTTP body reading with configurable limits                                                |
+| `archive.ts`                      | Archive extraction with zip-slip prevention and decompression bomb limits                         |
+| `provider-rate-limiter.ts`        | Sliding window RPM/TPM enforcement per provider                                                   |
+| `provider-rate-limiter-config.ts` | Rate limiter config types and resolution                                                          |
+| `rate-limiter-instance.ts`        | Singleton rate limiter instance                                                                   |
+| `key-pool.ts`                     | Health-aware round-robin API key selection                                                        |
+| `llm-retry.ts`                    | LLM transient error classification and retry policy                                               |
+| `retry.ts`                        | Generic retry with exponential backoff and jitter                                                 |
+| `retry-policy.ts`                 | Retry policy types                                                                                |
+| `rate-limit-middleware.ts`        | Pre-flight/post-flight wrapper for LLM call sites                                                 |
+| `update-check.ts`                 | Version update checking                                                                           |
+| `update-runner.ts`                | Runs the update process                                                                           |
 
 ## Secrets Masking (`secrets/`)
 
