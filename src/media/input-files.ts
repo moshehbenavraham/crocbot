@@ -1,4 +1,5 @@
 import { logWarn } from "../logger.js";
+import { validateBase64Size } from "./base64.js";
 import {
   closeDispatcher,
   createPinnedDispatcher,
@@ -307,6 +308,12 @@ export async function extractImageContentFromSource(
     if (!limits.allowedMimes.has(mimeType)) {
       throw new Error(`Unsupported image MIME type: ${mimeType}`);
     }
+    const sizeCheck = validateBase64Size(source.data, limits.maxBytes);
+    if (!sizeCheck.ok) {
+      throw new Error(
+        `Image too large: estimated ${sizeCheck.estimatedBytes} bytes (limit: ${sizeCheck.maxBytes} bytes)`,
+      );
+    }
     const buffer = Buffer.from(source.data, "base64");
     if (buffer.byteLength > limits.maxBytes) {
       throw new Error(
@@ -349,6 +356,12 @@ export async function extractFileContentFromSource(params: {
   if (source.type === "base64") {
     if (!source.data) {
       throw new Error("input_file base64 source missing 'data' field");
+    }
+    const fileSizeCheck = validateBase64Size(source.data, limits.maxBytes);
+    if (!fileSizeCheck.ok) {
+      throw new Error(
+        `File too large: estimated ${fileSizeCheck.estimatedBytes} bytes (limit: ${fileSizeCheck.maxBytes} bytes)`,
+      );
     }
     const parsed = parseContentType(source.mediaType);
     mimeType = parsed.mimeType;

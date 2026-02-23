@@ -148,6 +148,23 @@ function resolveOptionalStringParam(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
+/**
+ * Safely convert an untrusted param to string. Rejects objects with
+ * custom toString/Symbol.toPrimitive that could inject content.
+ */
+function safeParamString(value: unknown, fallback: string = ""): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (value === undefined || value === null) {
+    return fallback;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return fallback;
+}
+
 async function moveToTrashBestEffort(pathname: string): Promise<void> {
   if (!pathname) {
     return;
@@ -198,7 +215,7 @@ export const agentsHandlers: GatewayRequestHandlers = {
     }
 
     const cfg = loadConfig();
-    const rawName = String(params.name ?? "").trim();
+    const rawName = safeParamString(params.name).trim();
     const agentId = normalizeAgentId(rawName);
     if (agentId === DEFAULT_AGENT_ID) {
       respond(
@@ -270,7 +287,7 @@ export const agentsHandlers: GatewayRequestHandlers = {
     }
 
     const cfg = loadConfig();
-    const agentId = normalizeAgentId(String(params.agentId ?? ""));
+    const agentId = normalizeAgentId(safeParamString(params.agentId));
     if (findAgentEntryIndex(listAgentEntries(cfg), agentId) < 0) {
       respond(
         false,
@@ -329,7 +346,7 @@ export const agentsHandlers: GatewayRequestHandlers = {
     }
 
     const cfg = loadConfig();
-    const agentId = normalizeAgentId(String(params.agentId ?? ""));
+    const agentId = normalizeAgentId(safeParamString(params.agentId));
     if (agentId === DEFAULT_AGENT_ID) {
       respond(
         false,
@@ -380,7 +397,7 @@ export const agentsHandlers: GatewayRequestHandlers = {
       return;
     }
     const cfg = loadConfig();
-    const agentId = resolveAgentIdOrError(String(params.agentId ?? ""), cfg);
+    const agentId = resolveAgentIdOrError(safeParamString(params.agentId), cfg);
     if (!agentId) {
       respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, "unknown agent id"));
       return;
@@ -404,12 +421,12 @@ export const agentsHandlers: GatewayRequestHandlers = {
       return;
     }
     const cfg = loadConfig();
-    const agentId = resolveAgentIdOrError(String(params.agentId ?? ""), cfg);
+    const agentId = resolveAgentIdOrError(safeParamString(params.agentId), cfg);
     if (!agentId) {
       respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, "unknown agent id"));
       return;
     }
-    const name = String(params.name ?? "").trim();
+    const name = safeParamString(params.name).trim();
     if (!ALLOWED_FILE_NAMES.has(name)) {
       respond(
         false,
@@ -466,12 +483,12 @@ export const agentsHandlers: GatewayRequestHandlers = {
       return;
     }
     const cfg = loadConfig();
-    const agentId = resolveAgentIdOrError(String(params.agentId ?? ""), cfg);
+    const agentId = resolveAgentIdOrError(safeParamString(params.agentId), cfg);
     if (!agentId) {
       respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, "unknown agent id"));
       return;
     }
-    const name = String(params.name ?? "").trim();
+    const name = safeParamString(params.name).trim();
     if (!ALLOWED_FILE_NAMES.has(name)) {
       respond(
         false,

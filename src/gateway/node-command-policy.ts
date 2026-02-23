@@ -90,6 +90,17 @@ export function resolveNodeCommandAllowlist(
   return allow;
 }
 
+/**
+ * Commands that require a valid exec approval (runId) when invoked through
+ * the gateway.  Without a resolved approval, the gateway rejects the request
+ * rather than forwarding it to the node-host.
+ */
+export const EXEC_APPROVAL_REQUIRED_COMMANDS = new Set(["system.run"]);
+
+export function requiresExecApproval(command: string): boolean {
+  return EXEC_APPROVAL_REQUIRED_COMMANDS.has(command.trim());
+}
+
 export function isNodeCommandAllowed(params: {
   command: string;
   declaredCommands?: string[];

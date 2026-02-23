@@ -68,7 +68,7 @@ describe("loginChutes", () => {
     expect(creds.email).toBe("local-user");
   });
 
-  it("supports manual flow with pasted code", async () => {
+  it("supports manual flow with pasted redirect URL", async () => {
     const fetchFn: typeof fetch = async (input) => {
       const url = String(input);
       if (url === CHUTES_TOKEN_ENDPOINT) {
@@ -90,6 +90,7 @@ describe("loginChutes", () => {
       return new Response("not found", { status: 404 });
     };
 
+    let capturedState = "";
     const creds = await loginChutes({
       app: {
         clientId: "cid_test",
@@ -97,8 +98,11 @@ describe("loginChutes", () => {
         scopes: ["openid"],
       },
       manual: true,
-      onAuth: async () => {},
-      onPrompt: async () => "code_manual",
+      onAuth: async ({ url }) => {
+        capturedState = new URL(url).searchParams.get("state") ?? "";
+      },
+      onPrompt: async () =>
+        `http://127.0.0.1:1456/oauth-callback?code=code_manual&state=${capturedState}`,
       fetchFn,
     });
 
@@ -149,7 +153,7 @@ describe("loginChutes", () => {
         expect(parsed.searchParams.get("state")).toBe("state_456");
         expect(parsed.searchParams.get("state")).not.toBe("verifier_123");
       },
-      onPrompt: async () => "code_manual",
+      onPrompt: async () => "http://127.0.0.1:1456/oauth-callback?code=code_manual&state=state_456",
       fetchFn,
     });
 

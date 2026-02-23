@@ -82,11 +82,11 @@ function ensureTranscriptFile(params: { transcriptPath: string; sessionId: strin
       cwd: process.cwd(),
     };
     const line = SecretsRegistry.getInstance().mask(JSON.stringify(header));
-    // Use 'wx' flag for atomic exclusive create — if file exists, EEXIST is thrown
+    // Use 'wx' flag for atomic exclusive create -- if file exists, EEXIST is thrown
     fs.writeFileSync(params.transcriptPath, `${line}\n`, { encoding: "utf-8", flag: "wx" });
     return { ok: true };
   } catch (err) {
-    // EEXIST means file already exists — that's fine, it was already created
+    // EEXIST means file already exists -- that's fine, it was already created
     if (err && typeof err === "object" && (err as NodeJS.ErrnoException).code === "EEXIST") {
       return { ok: true };
     }
@@ -359,7 +359,17 @@ export const chatHandlers: GatewayRequestHandlers = {
                 : undefined,
         }))
         .filter((a) => a.content) ?? [];
-    const rawMessage = p.message.trim();
+    const MAX_MESSAGE_LENGTH = 500_000;
+    const sanitizedMessage = p.message.replaceAll("\0", "");
+    if (sanitizedMessage.length > MAX_MESSAGE_LENGTH) {
+      respond(
+        false,
+        undefined,
+        errorShape(ErrorCodes.INVALID_REQUEST, "message exceeds maximum length"),
+      );
+      return;
+    }
+    const rawMessage = sanitizedMessage.trim();
     if (!rawMessage && normalizedAttachments.length === 0) {
       respond(
         false,
@@ -368,7 +378,7 @@ export const chatHandlers: GatewayRequestHandlers = {
       );
       return;
     }
-    let parsedMessage = p.message;
+    let parsedMessage = sanitizedMessage;
     let parsedImages: ChatImageContent[] = [];
     if (normalizedAttachments.length > 0) {
       try {

@@ -1,0 +1,195 @@
+/**
+ * In-memory sliding-window rate limiter for gateway authentication attempts.
+ *
+ * Tracks failed auth attempts by {scope, clientIp}. A scope lets callers keep
+ * independent counters for different credential classes (shared gateway
+ * token/password vs device-token auth) while sharing one limiter instance.
+ *
+ * Design decisions:
+ * - Pure in-memory Map; suitable for a single gateway process. The Map is
+ *   periodically pruned to avoid unbounded growth.
+ * - Loopback addresses (127.0.0.1 / ::1) are exempt by default so that local
+ *   CLI sessions are never locked out.
+ * - Side-effect-free: callers create an instance via {@link createAuthRateLimiter}
+ *   and pass it where needed.
+ */
+
+import { isLoopbackAddress, resolveGatewayClientIp } from "./net.js";
+
+// -- Scope constants ----------------------------------------------------------
+
+export const AUTH_RATE_LIMIT_SCOPE_DEFAULT = "default";
+export const AUTH_RATE_LIMIT_SCOPE_SHARED_SECRET = "shared-secret";
+export const AUTH_RATE_LIMIT_SCOPE_DEVICE_TOKEN = "device-token";
+export const AUTH_RATE_LIMIT_SCOPE_HOOK_AUTH = "hook-auth";
+
+// -- Types --------------------------------------------------------------------
+
+export interface RateLimitConfig {
+  /** Maximum failed attempts before blocking.  @default 10 */
+  maxAttempts?: number;
+  /** Sliding window duration in milliseconds.  @default 60_000 (1 min) */
+  windowMs?: number;
+  /** Lockout duration in milliseconds after the limit is exceeded.  @default 300_000 (5 min) */
+  lockoutMs?: number;
+  /** Exempt loopback (localhost) addresses from rate limiting.  @default true */
+  exemptLoopback?: boolean;
+  /** Background prune interval in ms; set <= 0 to disable.  @default 60_000 */
+  pruneIntervalMs?: number;
+}
+
+export interface RateLimitEntry {
+  attempts: number[];
+  lockedUntil?: number;
+}
+
+export interface RateLimitCheckResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfterMs: number;
+}
+
+export interface AuthRateLimiter {
+  check(ip: string | undefined, scope?: string): RateLimitCheckResult;
+  recordFailure(ip: string | undefined, scope?: string): void;
+  reset(ip: string | undefined, scope?: string): void;
+  size(): number;
+  prune(): void;
+  dispose(): void;
+}
+
+// -- Defaults -----------------------------------------------------------------
+
+const DEFAULT_MAX_ATTEMPTS = 10;
+const DEFAULT_WINDOW_MS = 60_000;
+const DEFAULT_LOCKOUT_MS = 300_000;
+const PRUNE_INTERVAL_MS = 60_000;
+
+// -- Helpers ------------------------------------------------------------------
+
+export function normalizeRateLimitClientIp(ip: string | undefined): string {
+  return resolveGatewayClientIp({ remoteAddr: ip }) ?? "unknown";
+}
+
+// -- Factory ------------------------------------------------------------------
+
+export function createAuthRateLimiter(config?: RateLimitConfig): AuthRateLimiter {
+  const maxAttempts = config?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
+  const windowMs = config?.windowMs ?? DEFAULT_WINDOW_MS;
+  const lockoutMs = config?.lockoutMs ?? DEFAULT_LOCKOUT_MS;
+  const exemptLoopback = config?.exemptLoopback ?? true;
+  const pruneIntervalMs = config?.pruneIntervalMs ?? PRUNE_INTERVAL_MS;
+
+  const entries = new Map<string, RateLimitEntry>();
+
+  const pruneTimer = pruneIntervalMs > 0 ? setInterval(() => prune(), pruneIntervalMs) : null;
+  if (pruneTimer?.unref) {
+    pruneTimer.unref();
+  }
+
+  function normalizeScope(scope: string | undefined): string {
+    return (scope ?? AUTH_RATE_LIMIT_SCOPE_DEFAULT).trim() || AUTH_RATE_LIMIT_SCOPE_DEFAULT;
+  }
+
+  function resolveKey(
+    rawIp: string | undefined,
+    rawScope: string | undefined,
+  ): { key: string; ip: string } {
+    const ip = normalizeRateLimitClientIp(rawIp);
+    const scope = normalizeScope(rawScope);
+    return { key: `${scope}:${ip}`, ip };
+  }
+
+  function isExempt(ip: string): boolean {
+    return exemptLoopback && isLoopbackAddress(ip);
+  }
+
+  function slideWindow(entry: RateLimitEntry, now: number): void {
+    const cutoff = now - windowMs;
+    entry.attempts = entry.attempts.filter((ts) => ts > cutoff);
+  }
+
+  function check(rawIp: string | undefined, rawScope?: string): RateLimitCheckResult {
+    const { key, ip } = resolveKey(rawIp, rawScope);
+    if (isExempt(ip)) {
+      return { allowed: true, remaining: maxAttempts, retryAfterMs: 0 };
+    }
+
+    const now = Date.now();
+    const entry = entries.get(key);
+
+    if (!entry) {
+      return { allowed: true, remaining: maxAttempts, retryAfterMs: 0 };
+    }
+
+    if (entry.lockedUntil && now < entry.lockedUntil) {
+      return { allowed: false, remaining: 0, retryAfterMs: entry.lockedUntil - now };
+    }
+
+    if (entry.lockedUntil && now >= entry.lockedUntil) {
+      entry.lockedUntil = undefined;
+      entry.attempts = [];
+    }
+
+    slideWindow(entry, now);
+    const remaining = Math.max(0, maxAttempts - entry.attempts.length);
+    return { allowed: remaining > 0, remaining, retryAfterMs: 0 };
+  }
+
+  function recordFailure(rawIp: string | undefined, rawScope?: string): void {
+    const { key, ip } = resolveKey(rawIp, rawScope);
+    if (isExempt(ip)) {
+      return;
+    }
+
+    const now = Date.now();
+    let entry = entries.get(key);
+
+    if (!entry) {
+      entry = { attempts: [] };
+      entries.set(key, entry);
+    }
+
+    if (entry.lockedUntil && now < entry.lockedUntil) {
+      return;
+    }
+
+    slideWindow(entry, now);
+    entry.attempts.push(now);
+
+    if (entry.attempts.length >= maxAttempts) {
+      entry.lockedUntil = now + lockoutMs;
+    }
+  }
+
+  function reset(rawIp: string | undefined, rawScope?: string): void {
+    const { key } = resolveKey(rawIp, rawScope);
+    entries.delete(key);
+  }
+
+  function prune(): void {
+    const now = Date.now();
+    for (const [key, entry] of entries) {
+      if (entry.lockedUntil && now < entry.lockedUntil) {
+        continue;
+      }
+      slideWindow(entry, now);
+      if (entry.attempts.length === 0) {
+        entries.delete(key);
+      }
+    }
+  }
+
+  function size(): number {
+    return entries.size;
+  }
+
+  function dispose(): void {
+    if (pruneTimer) {
+      clearInterval(pruneTimer);
+    }
+    entries.clear();
+  }
+
+  return { check, recordFailure, reset, size, prune, dispose };
+}

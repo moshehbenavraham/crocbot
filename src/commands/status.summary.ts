@@ -66,7 +66,8 @@ const buildFlags = (entry?: SessionEntry): string[] => {
   return flags;
 };
 
-export async function getStatusSummary(): Promise<StatusSummary> {
+export async function getStatusSummary(opts?: { admin?: boolean }): Promise<StatusSummary> {
+  const isAdmin = opts?.admin ?? true;
   const cfg = loadConfig();
   const linkContext = await resolveLinkChannelContext(cfg);
   const agentList = listAgentsForGateway(cfg);
@@ -175,6 +176,25 @@ export async function getStatusSummary(): Promise<StatusSummary> {
     .toSorted((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
   const recent = allSessions.slice(0, 10);
   const totalSessions = allSessions.length;
+
+  if (!isAdmin) {
+    return {
+      linkChannel: linkContext
+        ? {
+            id: linkContext.plugin.id,
+            label: linkContext.plugin.meta.label ?? "Channel",
+            linked: linkContext.linked,
+          }
+        : undefined,
+      heartbeat: {
+        defaultAgentId: agentList.defaultId,
+        agents: heartbeatAgents.map((a) => ({ agentId: a.agentId, enabled: a.enabled })),
+      },
+      sessions: {
+        count: totalSessions,
+      },
+    } as StatusSummary;
+  }
 
   return {
     linkChannel: linkContext

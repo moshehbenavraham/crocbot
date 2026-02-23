@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { ExecApprovalManager } from "../exec-approval-manager.js";
-import { createExecApprovalHandlers } from "./exec-approval.js";
+import {
+  createExecApprovalHandlers,
+  sanitizeNodeInvokeParams,
+  sanitizeSystemRunForForwarding,
+} from "./exec-approval.js";
 import { validateExecApprovalRequestParams } from "../protocol/index.js";
 
 const noop = () => {};
@@ -211,6 +215,53 @@ describe("exec approval handlers", () => {
     );
   });
 
+  it("rejects self-approval (same clientId)", async () => {
+    const manager = new ExecApprovalManager();
+    const handlers = createExecApprovalHandlers(manager);
+    const broadcasts: Array<{ event: string; payload: unknown }> = [];
+
+    const respond = vi.fn();
+    const context = {
+      broadcast: (event: string, payload: unknown) => {
+        broadcasts.push({ event, payload });
+      },
+    };
+
+    const sameClient = { connect: { client: { id: "agent-x", displayName: "Agent X" } } };
+
+    void handlers["exec.approval.request"]({
+      params: { command: "rm -rf /", timeoutMs: 2000 },
+      respond,
+      context: context as unknown as Parameters<
+        (typeof handlers)["exec.approval.request"]
+      >[0]["context"],
+      client: sameClient,
+      req: { id: "req-1", type: "req", method: "exec.approval.request" },
+      isWebchatConnect: noop,
+    });
+
+    const requested = broadcasts.find((e) => e.event === "exec.approval.requested");
+    const id = (requested?.payload as { id?: string })?.id ?? "";
+
+    const resolveRespond = vi.fn();
+    await handlers["exec.approval.resolve"]({
+      params: { id, decision: "allow-once" },
+      respond: resolveRespond,
+      context: context as unknown as Parameters<
+        (typeof handlers)["exec.approval.resolve"]
+      >[0]["context"],
+      client: sameClient,
+      req: { id: "req-2", type: "req", method: "exec.approval.resolve" },
+      isWebchatConnect: noop,
+    });
+
+    expect(resolveRespond).toHaveBeenCalledWith(
+      false,
+      undefined,
+      expect.objectContaining({ message: "cannot resolve own exec approval" }),
+    );
+  });
+
   it("rejects duplicate approval ids", async () => {
     const manager = new ExecApprovalManager();
     const handlers = createExecApprovalHandlers(manager);
@@ -272,5 +323,146 @@ describe("exec approval handlers", () => {
     });
 
     await requestPromise;
+  });
+});
+
+describe("ExecApprovalManager.validateDeviceBinding", () => {
+  it("accepts matching device id", () => {
+    const manager = new ExecApprovalManager();
+    const record = manager.create({ command: "echo hi" }, 5000, "binding-1");
+    record.requestedByDeviceId = "device-abc";
+    record.requestedByConnId = "conn-1";
+    void manager.waitForDecision(record, 5000);
+
+    const result = manager.validateDeviceBinding("binding-1", "device-abc", "conn-other");
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects mismatched device id", () => {
+    const manager = new ExecApprovalManager();
+    const record = manager.create({ command: "echo hi" }, 5000, "binding-2");
+    record.requestedByDeviceId = "device-abc";
+    void manager.waitForDecision(record, 5000);
+
+    const result = manager.validateDeviceBinding("binding-2", "device-xyz", null);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("APPROVAL_DEVICE_MISMATCH");
+    }
+  });
+
+  it("falls back to connId when device id is absent", () => {
+    const manager = new ExecApprovalManager();
+    const record = manager.create({ command: "echo hi" }, 5000, "binding-3");
+    record.requestedByDeviceId = null;
+    record.requestedByConnId = "conn-abc";
+    void manager.waitForDecision(record, 5000);
+
+    const ok = manager.validateDeviceBinding("binding-3", null, "conn-abc");
+    expect(ok.ok).toBe(true);
+
+    const fail = manager.validateDeviceBinding("binding-3", null, "conn-xyz");
+    expect(fail.ok).toBe(false);
+    if (!fail.ok) {
+      expect(fail.code).toBe("APPROVAL_CLIENT_MISMATCH");
+    }
+  });
+
+  it("returns error for unknown approval id", () => {
+    const manager = new ExecApprovalManager();
+    const result = manager.validateDeviceBinding("nonexistent", "d", "c");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("UNKNOWN_APPROVAL");
+    }
+  });
+});
+
+describe("sanitizeSystemRunForForwarding", () => {
+  it("strips injected fields from params", () => {
+    const manager = new ExecApprovalManager();
+    const result = sanitizeSystemRunForForwarding({
+      rawParams: {
+        command: ["echo", "hi"],
+        rawCommand: "echo hi",
+        cwd: "/tmp",
+        approved: true,
+        approvalDecision: "allow-always",
+        injected: "malicious",
+      },
+      client: null,
+      execApprovalManager: manager,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      const p: Record<string, unknown> = result.params;
+      expect(p.command).toEqual(["echo", "hi"]);
+      expect(p.rawCommand).toBe("echo hi");
+      expect(p.injected).toBeUndefined();
+      expect(p.approved).toBeUndefined();
+      expect(p.approvalDecision).toBeUndefined();
+    }
+  });
+
+  it("injects approval fields from validated record", () => {
+    const manager = new ExecApprovalManager();
+    const record = manager.create({ command: "echo hi" }, 5000, "run-1");
+    record.requestedByDeviceId = "device-a";
+    void manager.waitForDecision(record, 5000);
+    manager.resolve("run-1", "allow-once");
+
+    // Create a new approval for the test since resolving consumes the entry
+    const record2 = manager.create({ command: "echo hi" }, 5000, "run-2");
+    record2.requestedByDeviceId = "device-a";
+    record2.decision = "allow-always";
+    void manager.waitForDecision(record2, 5000);
+
+    const result = sanitizeSystemRunForForwarding({
+      rawParams: { command: ["echo", "hi"], runId: "run-2" },
+      client: { connect: { device: { id: "device-a" } } } as unknown as Parameters<
+        typeof sanitizeSystemRunForForwarding
+      >[0]["client"],
+      execApprovalManager: manager,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.approved).toBe(true);
+      expect(result.params.approvalDecision).toBe("allow-always");
+    }
+  });
+});
+
+describe("sanitizeNodeInvokeParams", () => {
+  it("passes non-system.run commands through unchanged", () => {
+    const manager = new ExecApprovalManager();
+    const params = { foo: "bar" };
+    const result = sanitizeNodeInvokeParams({
+      command: "camera.snap",
+      rawParams: params,
+      client: null,
+      execApprovalManager: manager,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params).toBe(params);
+    }
+  });
+
+  it("sanitizes system.run params", () => {
+    const manager = new ExecApprovalManager();
+    const result = sanitizeNodeInvokeParams({
+      command: "system.run",
+      rawParams: { command: ["ls"], injected: true },
+      client: null,
+      execApprovalManager: manager,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      const p: Record<string, unknown> = result.params;
+      expect(p.command).toEqual(["ls"]);
+      expect(p.injected).toBeUndefined();
+    }
   });
 });

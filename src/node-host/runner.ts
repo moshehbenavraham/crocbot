@@ -853,6 +853,23 @@ async function handleInvoke(
 
   const argv = params.command.map((item) => String(item));
   const rawCommand = typeof params.rawCommand === "string" ? params.rawCommand.trim() : "";
+
+  // Reject mismatched rawCommand vs argv to prevent shell injection.
+  // When both are provided, the first argv token must appear in rawCommand.
+  if (rawCommand && argv.length > 0) {
+    const firstArg = argv[0];
+    if (firstArg && !rawCommand.includes(firstArg)) {
+      await sendInvokeResult(client, frame, {
+        ok: false,
+        error: {
+          code: "INVALID_REQUEST",
+          message: "rawCommand does not match argv: command mismatch",
+        },
+      });
+      return;
+    }
+  }
+
   const cmdText = rawCommand || formatCommand(argv);
   const agentId = params.agentId?.trim() || undefined;
   const cfg = loadConfig();

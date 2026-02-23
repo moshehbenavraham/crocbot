@@ -3,7 +3,11 @@
 // methods now use the live NodeRegistry so connected nodes are visible.
 
 import { loadConfig } from "../../config/config.js";
-import { isNodeCommandAllowed, resolveNodeCommandAllowlist } from "../node-command-policy.js";
+import {
+  isNodeCommandAllowed,
+  requiresExecApproval,
+  resolveNodeCommandAllowlist,
+} from "../node-command-policy.js";
 import {
   ErrorCodes,
   errorShape,
@@ -14,6 +18,7 @@ import {
   validateNodeInvokeResultParams,
   validateNodeListParams,
 } from "../protocol/index.js";
+import { sanitizeNodeInvokeParams as sanitizeNodeInvokeParamsFromApproval } from "./exec-approval.js";
 import { safeParseJson } from "./nodes.helpers.js";
 import type { GatewayRequestHandlers } from "./types.js";
 
@@ -141,7 +146,7 @@ export const nodesHandlers: GatewayRequestHandlers = {
     );
   },
 
-  "node.invoke": async ({ params, respond, context }) => {
+  "node.invoke": async ({ params, respond, client, context }) => {
     if (!validateNodeInvokeParams(params)) {
       respond(
         false,
@@ -160,7 +165,7 @@ export const nodesHandlers: GatewayRequestHandlers = {
       timeoutMs?: number;
       idempotencyKey: string;
     };
-    const invokeParams = (params as { params?: unknown }).params;
+    const rawInvokeParams = (params as { params?: unknown }).params;
 
     const node = context.nodeRegistry.get(nodeId);
     if (!node) {
@@ -184,10 +189,46 @@ export const nodesHandlers: GatewayRequestHandlers = {
       return;
     }
 
+    // Sanitize params: for system.run, validate exec approval device binding
+    // and apply the defensive param allowlist.
+    const sanitized = sanitizeNodeInvokeParamsFromApproval({
+      command,
+      rawParams: rawInvokeParams,
+      client,
+      execApprovalManager: context.execApprovalManager,
+    });
+    if (!sanitized.ok) {
+      respond(
+        false,
+        undefined,
+        errorShape(ErrorCodes.INVALID_REQUEST, sanitized.message, {
+          details: sanitized.details ?? null,
+        }),
+      );
+      return;
+    }
+
+    // Block commands that require exec approval if no valid approval was
+    // provided.  The sanitizer strips client-supplied `approved` so we check
+    // the sanitized output.
+    if (requiresExecApproval(command)) {
+      const sp = sanitized.params as Record<string, unknown>;
+      if (sp.approved !== true) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, "exec approval required for this command", {
+            details: { code: "EXEC_APPROVAL_REQUIRED", command },
+          }),
+        );
+        return;
+      }
+    }
+
     const result = await context.nodeRegistry.invoke({
       nodeId,
       command,
-      params: invokeParams,
+      params: sanitized.params,
       timeoutMs,
       idempotencyKey,
     });

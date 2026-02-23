@@ -53,12 +53,23 @@ export function parseOAuthCallbackInput(
     if (!state) {
       return { error: "Missing 'state' parameter. Paste the full URL." };
     }
+    if (state !== expectedState) {
+      return { error: "OAuth state mismatch -- possible CSRF. Restart the flow." };
+    }
     return { code, state };
   } catch {
-    if (!expectedState) {
-      return { error: "Paste the full redirect URL, not just the code." };
+    // Try parsing as a query string (e.g. "code=abc&state=xyz")
+    const qs = new URLSearchParams(trimmed);
+    const qsCode = qs.get("code");
+    const qsState = qs.get("state");
+    if (qsCode && qsState) {
+      if (qsState !== expectedState) {
+        return { error: "OAuth state mismatch -- possible CSRF. Restart the flow." };
+      }
+      return { code: qsCode, state: qsState };
     }
-    return { code: trimmed, state: expectedState };
+    // Reject bare code pastes: require the full URL for CSRF safety
+    return { error: "Paste the full redirect URL, not just the code." };
   }
 }
 

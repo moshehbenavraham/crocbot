@@ -8,6 +8,11 @@ import { createServer as createHttpsServer } from "node:https";
 import type { TlsOptions } from "node:tls";
 import type { WebSocketServer } from "ws";
 import { loadConfig } from "../config/config.js";
+import {
+  DEFAULT_WEBHOOK_MAX_BODY_BYTES,
+  DEFAULT_WEBHOOK_BODY_TIMEOUT_MS,
+  readJsonBodyWithLimit,
+} from "../infra/http-body.js";
 import type { createSubsystemLogger } from "../logging/subsystem.js";
 import { authorizeGatewayConnect } from "./auth.js";
 import { sendUnauthorized } from "./http-common.js";
@@ -287,16 +292,20 @@ export function createGatewayHttpServer(opts: {
     // Alert webhook test endpoint (for testing webhook delivery)
     if (req.method === "POST" && req.url === "/alerts/webhook") {
       try {
-        const chunks: Buffer[] = [];
-        for await (const chunk of req) {
-          chunks.push(chunk as Buffer);
+        const bodyResult = await readJsonBodyWithLimit(req, {
+          maxBytes: DEFAULT_WEBHOOK_MAX_BODY_BYTES,
+          timeoutMs: DEFAULT_WEBHOOK_BODY_TIMEOUT_MS,
+        });
+        if (!bodyResult.ok) {
+          sendJson(res, bodyResult.code === "PAYLOAD_TOO_LARGE" ? 413 : 400, {
+            error: bodyResult.error,
+          });
+          return;
         }
-        const body = Buffer.concat(chunks).toString("utf8");
-        const payload = body ? JSON.parse(body) : {};
         sendJson(res, 200, {
           received: true,
           timestamp: new Date().toISOString(),
-          payload,
+          payload: bodyResult.value,
         });
       } catch {
         sendJson(res, 400, { error: "Invalid JSON payload" });

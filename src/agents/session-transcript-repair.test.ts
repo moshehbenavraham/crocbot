@@ -148,3 +148,51 @@ describe("sanitizeToolCallInputs", () => {
     expect(types).toEqual(["text", "toolUse"]);
   });
 });
+
+describe("tool-call block field validation", () => {
+  it("skips tool calls with empty id", () => {
+    const input: AgentMessage[] = [
+      {
+        role: "assistant",
+        content: [{ type: "toolCall", id: "", name: "read", arguments: {} }],
+      },
+      { role: "user", content: "hello" },
+    ];
+
+    const out = sanitizeToolUseResultPairing(input);
+    const assistant = out[0] as Extract<AgentMessage, { role: "assistant" }>;
+    expect(Array.isArray(assistant.content) ? assistant.content.length : 0).toBe(1);
+  });
+
+  it("skips tool calls with oversized id", () => {
+    const longId = "x".repeat(200);
+    const input: AgentMessage[] = [
+      {
+        role: "assistant",
+        content: [{ type: "toolCall", id: longId, name: "read", arguments: {} }],
+      },
+      { role: "user", content: "hello" },
+    ];
+
+    const out = sanitizeToolUseResultPairing(input);
+    const results = out.filter((m) => m.role === "toolResult");
+    // No synthetic result for oversized ID - it gets truncated or skipped
+    expect(results.length).toBe(0);
+  });
+
+  it("sanitizes tool names with invalid characters", () => {
+    const input: AgentMessage[] = [
+      {
+        role: "assistant",
+        content: [{ type: "toolCall", id: "call_1", name: "read<script>", arguments: {} }],
+      },
+    ];
+
+    const out = sanitizeToolUseResultPairing(input);
+    const results = out.filter((m) => m.role === "toolResult") as Array<{
+      toolName?: string;
+    }>;
+    expect(results.length).toBe(1);
+    expect(results[0]?.toolName).not.toContain("<");
+  });
+});

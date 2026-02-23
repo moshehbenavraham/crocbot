@@ -1,3 +1,4 @@
+import { validateBase64Size } from "../media/base64.js";
 import { detectMime } from "../media/mime.js";
 
 export type ChatAttachment = {
@@ -95,6 +96,13 @@ export async function parseMessageWithAttachments(
     if (b64.length % 4 !== 0 || /[^A-Za-z0-9+/=]/.test(b64)) {
       throw new Error(`attachment ${label}: invalid base64 content`);
     }
+    // Reject oversized base64 before allocating memory for decode
+    const sizeEstimate = validateBase64Size(b64, maxBytes);
+    if (!sizeEstimate.ok) {
+      throw new Error(
+        `attachment ${label}: exceeds size limit (estimated ${sizeEstimate.estimatedBytes} > ${sizeEstimate.maxBytes} bytes)`,
+      );
+    }
     try {
       sizeBytes = Buffer.from(b64, "base64").byteLength;
     } catch {
@@ -166,6 +174,13 @@ export function buildMessageWithAttachments(
     // Basic base64 sanity: length multiple of 4 and charset check.
     if (b64.length % 4 !== 0 || /[^A-Za-z0-9+/=]/.test(b64)) {
       throw new Error(`attachment ${label}: invalid base64 content`);
+    }
+    // Reject oversized base64 before allocating memory for decode
+    const sizeGuard = validateBase64Size(b64, maxBytes);
+    if (!sizeGuard.ok) {
+      throw new Error(
+        `attachment ${label}: exceeds size limit (estimated ${sizeGuard.estimatedBytes} > ${sizeGuard.maxBytes} bytes)`,
+      );
     }
     try {
       sizeBytes = Buffer.from(b64, "base64").byteLength;

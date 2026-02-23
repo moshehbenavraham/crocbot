@@ -4,7 +4,7 @@
 **Sessions**: 5 (initial estimate)
 **Estimated Duration**: 10-20 days
 
-**Progress**: 2/5 sessions (40%)
+**Progress**: 3/5 sessions (60%)
 
 ---
 
@@ -32,7 +32,7 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 |---------|------|--------|-------|------------|------------|-----------|
 | 01 | Security Triage and Applicability Audit | Complete | 60 triaged | 20 | ~1 | 2026-02-23 |
 | 02 | Network, SSRF, and Filesystem Hardening | Complete | 14 (5A+9Ad) | 20 | ~1 | 2026-02-23 |
-| 03 | Input Sanitization and Auth Hardening | Not Started | 16 (8A+8Ad) | 18-24 | 4-5 | - |
+| 03 | Input Sanitization and Auth Hardening | Complete | 16 (8A+8Ad) | 20 | ~1 | 2026-02-23 |
 | 04 | Execution Hardening and Data Leak Prevention | Not Started | 17 (5A+12Ad) | 20-26 | 5-6 | - |
 | 05 | ACP Fixes and Security Validation | Not Started | 5 (0A+5Ad) | 15-20 | 3-4 | - |
 
@@ -56,9 +56,18 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 
 ---
 
+### Session 03: Input Sanitization and Auth Hardening
+- **Completed**: 2026-02-23
+- **Duration**: ~53 minutes
+- **Tasks**: 20/20
+- **Result**: Closed 16 security items (8 Apply + 8 Adapt). Input sanitization: chat.send injection prevention, transcript sanitization, Unicode homoglyph detection, base64 size validation, bounded HTTP body reading, rawCommand/argv consistency. Auth hardening: OAuth CSRF protection, timing-safe token comparison, auth rate-limiting with brute-force lockout, exec approval device binding, system.run param allowlisting, node.invoke bypass prevention. 4 new infrastructure modules created. 113 security-focused tests added.
+
+---
+
 ## Upcoming Sessions
 
-- Session 03: Input Sanitization and Auth Hardening
+- Session 04: Execution Hardening and Data Leak Prevention
+- Session 05: ACP Fixes and Security Validation
 
 ---
 

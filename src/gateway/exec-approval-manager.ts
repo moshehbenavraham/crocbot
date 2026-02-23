@@ -18,6 +18,12 @@ export type ExecApprovalRecord = {
   request: ExecApprovalRequestPayload;
   createdAtMs: number;
   expiresAtMs: number;
+  /** Connection ID of the requester (per-connection, changes on reconnect). */
+  requestedByConnId?: string | null;
+  /** Stable device ID of the requester (survives reconnects). */
+  requestedByDeviceId?: string | null;
+  /** Client ID of the requester. */
+  requestedByClientId?: string | null;
   resolvedAtMs?: number;
   decision?: ExecApprovalDecision;
   resolvedBy?: string | null;
@@ -79,5 +85,44 @@ export class ExecApprovalManager {
   getSnapshot(recordId: string): ExecApprovalRecord | null {
     const entry = this.pending.get(recordId);
     return entry?.record ?? null;
+  }
+
+  /**
+   * Validate that the given client identity matches the device/connection that
+   * originally requested the approval.  Prefer stable device ID over connId
+   * (connId changes on reconnect; device ID survives reconnects and per-call
+   * clients like callGateway).
+   */
+  validateDeviceBinding(
+    recordId: string,
+    clientDeviceId: string | null,
+    clientConnId: string | null,
+  ): { ok: true; record: ExecApprovalRecord } | { ok: false; code: string; message: string } {
+    const entry = this.pending.get(recordId);
+    if (!entry) {
+      return { ok: false, code: "UNKNOWN_APPROVAL", message: "unknown approval id" };
+    }
+    const record = entry.record;
+    const snapshotDeviceId = record.requestedByDeviceId ?? null;
+
+    // Prefer binding by device identity (stable across reconnects).
+    // Fallback to connId only when device identity is not available.
+    if (snapshotDeviceId) {
+      if (snapshotDeviceId !== clientDeviceId) {
+        return {
+          ok: false,
+          code: "APPROVAL_DEVICE_MISMATCH",
+          message: "approval id not valid for this device",
+        };
+      }
+    } else if (record.requestedByConnId && record.requestedByConnId !== clientConnId) {
+      return {
+        ok: false,
+        code: "APPROVAL_CLIENT_MISMATCH",
+        message: "approval id not valid for this client",
+      };
+    }
+
+    return { ok: true, record };
   }
 }

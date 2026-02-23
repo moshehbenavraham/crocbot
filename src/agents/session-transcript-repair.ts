@@ -7,6 +7,10 @@ type ToolCallLike = {
 
 const TOOL_CALL_TYPES = new Set(["toolCall", "toolUse", "functionCall"]);
 
+const MAX_TOOL_CALL_ID_LENGTH = 128;
+const MAX_TOOL_NAME_LENGTH = 64;
+const TOOL_NAME_PATTERN = /^[A-Za-z0-9_\-.]+$/;
+
 type ToolCallBlock = {
   type?: unknown;
   id?: unknown;
@@ -21,6 +25,17 @@ function isToolCallBlock(block: unknown): block is ToolCallBlock {
   }
   const type = (block as { type?: unknown }).type;
   return typeof type === "string" && TOOL_CALL_TYPES.has(type);
+}
+
+function isValidToolCallId(id: unknown): boolean {
+  return typeof id === "string" && id.length > 0 && id.length <= MAX_TOOL_CALL_ID_LENGTH;
+}
+
+function isValidToolName(name: unknown): boolean {
+  if (typeof name !== "string") {
+    return true;
+  }
+  return name.length <= MAX_TOOL_NAME_LENGTH && TOOL_NAME_PATTERN.test(name);
 }
 
 function hasToolCallInput(block: ToolCallBlock): boolean {
@@ -44,15 +59,20 @@ function extractToolCallsFromAssistant(
       continue;
     }
     const rec = block as { type?: unknown; id?: unknown; name?: unknown };
-    if (typeof rec.id !== "string" || !rec.id) {
+    if (!isValidToolCallId(rec.id)) {
       continue;
     }
 
     if (rec.type === "toolCall" || rec.type === "toolUse" || rec.type === "functionCall") {
-      toolCalls.push({
-        id: rec.id,
-        name: typeof rec.name === "string" ? rec.name : undefined,
-      });
+      const id = (rec.id as string).slice(0, MAX_TOOL_CALL_ID_LENGTH);
+      const rawName = typeof rec.name === "string" ? rec.name : undefined;
+      const name =
+        rawName && isValidToolName(rawName)
+          ? rawName
+          : rawName
+            ? rawName.slice(0, MAX_TOOL_NAME_LENGTH).replace(/[^A-Za-z0-9_\-.]/g, "_")
+            : undefined;
+      toolCalls.push({ id, name });
     }
   }
   return toolCalls;

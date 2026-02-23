@@ -69,6 +69,24 @@ export function randomToken(): string {
   return crypto.randomBytes(24).toString("hex");
 }
 
+const REJECTED_TOKEN_LITERALS = new Set(["undefined", "null", "true", "false", "nan", "infinity"]);
+
+/**
+ * Validate a user-provided token/password string. Rejects literal stringified
+ * JavaScript primitives (e.g. "undefined", "null") that result from broken
+ * config serialization or accidental `String(undefined)` coercion.
+ */
+export function isValidTokenInput(value: unknown): boolean {
+  if (typeof value !== "string") {
+    return false;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return false;
+  }
+  return !REJECTED_TOKEN_LITERALS.has(trimmed.toLowerCase());
+}
+
 export function printWizardHeader(runtime: RuntimeEnv) {
   const header = [
     "                                                        ",

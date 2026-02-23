@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-import { readJsonBody } from "./hooks.js";
+import { readJsonBodyWithLimit } from "../infra/http-body.js";
 
 export function sendJson(res: ServerResponse, status: number, body: unknown) {
   res.statusCode = status;
@@ -50,8 +50,14 @@ export async function readJsonBodyOrError(
   res: ServerResponse,
   maxBytes: number,
 ): Promise<unknown> {
-  const body = await readJsonBody(req, maxBytes);
+  const body = await readJsonBodyWithLimit(req, { maxBytes });
   if (!body.ok) {
+    if (body.code === "PAYLOAD_TOO_LARGE") {
+      res.statusCode = 413;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify({ error: { message: body.error, type: "payload_too_large" } }));
+      return undefined;
+    }
     sendInvalidRequest(res, body.error);
     return undefined;
   }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { authorizeGatewayConnect } from "./auth.js";
+import { createAuthRateLimiter } from "./auth-rate-limit.js";
 
 describe("gateway auth", () => {
   it("does not throw when req is missing socket", async () => {
@@ -98,5 +99,118 @@ describe("gateway auth", () => {
     expect(res.ok).toBe(true);
     expect(res.method).toBe("tailscale");
     expect(res.user).toBe("peter");
+  });
+
+  it("uses timing-safe comparison (secretEqual) for tokens", async () => {
+    const ok = await authorizeGatewayConnect({
+      auth: { mode: "token", token: "abc123", allowTailscale: false },
+      connectAuth: { token: "abc123" },
+    });
+    expect(ok.ok).toBe(true);
+
+    const bad = await authorizeGatewayConnect({
+      auth: { mode: "token", token: "abc123", allowTailscale: false },
+      connectAuth: { token: "abc124" },
+    });
+    expect(bad.ok).toBe(false);
+    expect(bad.reason).toBe("token_mismatch");
+  });
+});
+
+describe("gateway auth rate limiting", () => {
+  it("blocks auth after max failed attempts", async () => {
+    const limiter = createAuthRateLimiter({
+      maxAttempts: 3,
+      windowMs: 60_000,
+      lockoutMs: 300_000,
+      exemptLoopback: false,
+      pruneIntervalMs: 0,
+    });
+
+    const auth = { mode: "token" as const, token: "secret", allowTailscale: false };
+    const clientIp = "192.168.1.100";
+
+    for (let i = 0; i < 3; i++) {
+      const res = await authorizeGatewayConnect({
+        auth,
+        connectAuth: { token: "wrong" },
+        rateLimiter: limiter,
+        clientIp,
+      });
+      expect(res.ok).toBe(false);
+      expect(res.reason).toBe("token_mismatch");
+    }
+
+    const blocked = await authorizeGatewayConnect({
+      auth,
+      connectAuth: { token: "secret" },
+      rateLimiter: limiter,
+      clientIp,
+    });
+    expect(blocked.ok).toBe(false);
+    expect(blocked.reason).toBe("rate_limited");
+    expect(blocked.rateLimited).toBe(true);
+    expect(typeof blocked.retryAfterMs).toBe("number");
+
+    limiter.dispose();
+  });
+
+  it("resets rate limit counter on successful auth", async () => {
+    const limiter = createAuthRateLimiter({
+      maxAttempts: 3,
+      windowMs: 60_000,
+      lockoutMs: 300_000,
+      exemptLoopback: false,
+      pruneIntervalMs: 0,
+    });
+
+    const auth = { mode: "token" as const, token: "secret", allowTailscale: false };
+    const clientIp = "192.168.1.101";
+
+    // Record 2 failures (under limit)
+    for (let i = 0; i < 2; i++) {
+      await authorizeGatewayConnect({
+        auth,
+        connectAuth: { token: "wrong" },
+        rateLimiter: limiter,
+        clientIp,
+      });
+    }
+
+    // Succeed -- should reset counter
+    const ok = await authorizeGatewayConnect({
+      auth,
+      connectAuth: { token: "secret" },
+      rateLimiter: limiter,
+      clientIp,
+    });
+    expect(ok.ok).toBe(true);
+
+    // 2 more failures should NOT trigger lockout (counter was reset)
+    for (let i = 0; i < 2; i++) {
+      const res = await authorizeGatewayConnect({
+        auth,
+        connectAuth: { token: "wrong" },
+        rateLimiter: limiter,
+        clientIp,
+      });
+      expect(res.ok).toBe(false);
+      expect(res.reason).toBe("token_mismatch");
+    }
+
+    limiter.dispose();
+  });
+
+  it("does not rate limit when no limiter is provided", async () => {
+    const auth = { mode: "token" as const, token: "secret", allowTailscale: false };
+
+    for (let i = 0; i < 20; i++) {
+      const res = await authorizeGatewayConnect({
+        auth,
+        connectAuth: { token: "wrong" },
+      });
+      expect(res.ok).toBe(false);
+      expect(res.reason).toBe("token_mismatch");
+    }
   });
 });

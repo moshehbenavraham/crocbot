@@ -1,4 +1,4 @@
-import { randomToken } from "../commands/onboard-helpers.js";
+import { isValidTokenInput, randomToken } from "../commands/onboard-helpers.js";
 import type { GatewayAuthChoice } from "../commands/onboard-types.js";
 import type { crocbotConfig } from "../config/config.js";
 import type { GatewayBindMode, GatewayTailscaleMode } from "../config/types.gateway.js";
@@ -189,7 +189,7 @@ export async function configureGatewayForOnboarding(
         placeholder: "Needed for multi-machine or non-loopback access",
         initialValue: quickstartGateway.token ?? "",
       });
-      gatewayToken = String(tokenInput).trim() || randomToken();
+      gatewayToken = isValidTokenInput(tokenInput) ? String(tokenInput).trim() : randomToken();
     }
   }
 
@@ -208,7 +208,7 @@ export async function configureGatewayForOnboarding(
         auth: {
           ...nextConfig.gateway?.auth,
           mode: "password",
-          password: String(password).trim(),
+          password: isValidTokenInput(password) ? String(password).trim() : randomToken(),
         },
       },
     };
