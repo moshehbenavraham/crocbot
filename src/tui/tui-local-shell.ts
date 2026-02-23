@@ -111,9 +111,15 @@ export function createLocalShellRunner(deps: LocalShellDeps) {
       let stderr = "";
       child.stdout.on("data", (buf) => {
         stdout += buf.toString("utf8");
+        if (stdout.length > maxChars) {
+          stdout = stdout.slice(-maxChars);
+        }
       });
       child.stderr.on("data", (buf) => {
         stderr += buf.toString("utf8");
+        if (stderr.length > maxChars) {
+          stderr = stderr.slice(-maxChars);
+        }
       });
 
       child.on("close", (code, signal) => {

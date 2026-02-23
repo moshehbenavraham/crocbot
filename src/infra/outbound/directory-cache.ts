@@ -19,11 +19,19 @@ export function buildDirectoryCacheKey(key: DirectoryCacheKey): string {
   return `${key.channel}:${key.accountId ?? "default"}:${key.kind}:${key.source}:${signature}`;
 }
 
+const DEFAULT_MAX_ENTRIES = 200;
+
 export class DirectoryCache<T> {
   private readonly cache = new Map<string, CacheEntry<T>>();
   private lastConfigRef: crocbotConfig | null = null;
+  private readonly maxSize: number;
 
-  constructor(private readonly ttlMs: number) {}
+  constructor(
+    private readonly ttlMs: number,
+    maxSize?: number,
+  ) {
+    this.maxSize = typeof maxSize === "number" && maxSize > 0 ? maxSize : DEFAULT_MAX_ENTRIES;
+  }
 
   get(key: string, cfg: crocbotConfig): T | undefined {
     this.resetIfConfigChanged(cfg);
@@ -35,11 +43,24 @@ export class DirectoryCache<T> {
       this.cache.delete(key);
       return undefined;
     }
+    // Move to end for LRU ordering
+    this.cache.delete(key);
+    this.cache.set(key, entry);
     return entry.value;
   }
 
   set(key: string, value: T, cfg: crocbotConfig): void {
     this.resetIfConfigChanged(cfg);
+    // Delete first so re-inserts move to end (LRU ordering)
+    this.cache.delete(key);
+    // Evict oldest entries (first in insertion order) when at capacity
+    while (this.cache.size >= this.maxSize) {
+      const oldest = this.cache.keys().next();
+      if (oldest.done) {
+        break;
+      }
+      this.cache.delete(oldest.value);
+    }
     this.cache.set(key, { value, fetchedAt: Date.now() });
   }
 

@@ -41,8 +41,16 @@ function schedule(coalesceMs: number) {
         pendingReason = reason ?? "retry";
         schedule(DEFAULT_RETRY_MS);
       }
-    } catch {
-      // Error is already logged by the heartbeat runner; schedule a retry.
+    } catch (err) {
+      // Log context for wake handler errors and schedule a retry.
+      // Heartbeat runner wraps runOnce per-agent, so this catches
+      // unexpected errors in the handler itself (e.g. config resolution).
+      try {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[heartbeat-wake] handler error: ${msg}`);
+      } catch {
+        // Prevent logging errors from killing the scheduler
+      }
       pendingReason = reason ?? "retry";
       schedule(DEFAULT_RETRY_MS);
     } finally {

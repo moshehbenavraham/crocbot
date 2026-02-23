@@ -968,22 +968,32 @@ export function startHeartbeatRunner(opts: {
         continue;
       }
 
-      const res = await runOnce({
-        cfg: state.cfg,
-        agentId: agent.agentId,
-        heartbeat: agent.heartbeat,
-        reason,
-        deps: { runtime: state.runtime },
-      });
-      if (res.status === "skipped" && res.reason === "requests-in-flight") {
-        return res;
-      }
-      if (res.status !== "skipped" || res.reason !== "disabled") {
+      try {
+        const res = await runOnce({
+          cfg: state.cfg,
+          agentId: agent.agentId,
+          heartbeat: agent.heartbeat,
+          reason,
+          deps: { runtime: state.runtime },
+        });
+        if (res.status === "skipped" && res.reason === "requests-in-flight") {
+          scheduleNext();
+          return res;
+        }
+        if (res.status !== "skipped" || res.reason !== "disabled") {
+          agent.lastRunMs = now;
+          agent.nextDueMs = now + agent.intervalMs;
+        }
+        if (res.status === "ran") {
+          ran = true;
+        }
+      } catch (err) {
+        log.error(
+          `heartbeat runOnce failed for agent ${agent.agentId}: ${formatErrorMessage(err)}`,
+        );
+        // Advance timing so the failed agent is retried next interval
         agent.lastRunMs = now;
         agent.nextDueMs = now + agent.intervalMs;
-      }
-      if (res.status === "ran") {
-        ran = true;
       }
     }
 

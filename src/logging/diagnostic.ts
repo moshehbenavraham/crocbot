@@ -18,6 +18,7 @@ type SessionRef = {
   sessionKey?: string;
 };
 
+const MAX_SESSION_STATES = 500;
 const sessionStates = new Map<string, SessionState>();
 
 const webhookStats = {
@@ -48,6 +49,20 @@ function getSessionState(ref: SessionRef): SessionState {
       existing.sessionKey = ref.sessionKey;
     }
     return existing;
+  }
+  // Evict oldest-by-lastActivity entry when at cap
+  if (sessionStates.size >= MAX_SESSION_STATES) {
+    let oldestKey: string | undefined;
+    let oldestActivity = Infinity;
+    for (const [k, s] of sessionStates) {
+      if (s.lastActivity < oldestActivity) {
+        oldestActivity = s.lastActivity;
+        oldestKey = k;
+      }
+    }
+    if (oldestKey) {
+      sessionStates.delete(oldestKey);
+    }
   }
   const created: SessionState = {
     sessionId: ref.sessionId,

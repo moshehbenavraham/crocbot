@@ -97,7 +97,11 @@ function scheduleAnnounceDrain(key: string) {
             if (!next) {
               break;
             }
-            await queue.send(next);
+            try {
+              await queue.send(next);
+            } catch (err) {
+              defaultRuntime.error?.(`announce queue send failed for ${key}: ${String(err)}`);
+            }
             continue;
           }
           const isCrossChannel = hasCrossChannelItems(queue.items, (item) => {
@@ -115,7 +119,11 @@ function scheduleAnnounceDrain(key: string) {
             if (!next) {
               break;
             }
-            await queue.send(next);
+            try {
+              await queue.send(next);
+            } catch (err) {
+              defaultRuntime.error?.(`announce queue send failed for ${key}: ${String(err)}`);
+            }
             continue;
           }
           const items = queue.items.splice(0, queue.items.length);
@@ -130,7 +138,11 @@ function scheduleAnnounceDrain(key: string) {
           if (!last) {
             break;
           }
-          await queue.send({ ...last, prompt });
+          try {
+            await queue.send({ ...last, prompt });
+          } catch (err) {
+            defaultRuntime.error?.(`announce queue collect send failed for ${key}: ${String(err)}`);
+          }
           continue;
         }
 
@@ -140,7 +152,11 @@ function scheduleAnnounceDrain(key: string) {
           if (!next) {
             break;
           }
-          await queue.send({ ...next, prompt: summaryPrompt });
+          try {
+            await queue.send({ ...next, prompt: summaryPrompt });
+          } catch (err) {
+            defaultRuntime.error?.(`announce queue summary send failed for ${key}: ${String(err)}`);
+          }
           continue;
         }
 
@@ -148,7 +164,11 @@ function scheduleAnnounceDrain(key: string) {
         if (!next) {
           break;
         }
-        await queue.send(next);
+        try {
+          await queue.send(next);
+        } catch (err) {
+          defaultRuntime.error?.(`announce queue send failed for ${key}: ${String(err)}`);
+        }
       }
     } catch (err) {
       defaultRuntime.error?.(`announce queue drain failed for ${key}: ${String(err)}`);

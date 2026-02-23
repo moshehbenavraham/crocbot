@@ -25,7 +25,7 @@ export function scheduleFollowupDrain(
         await waitForQueueDebounce(queue);
         if (queue.mode === "collect") {
           // Once the batch is mixed, never collect again within this drain.
-          // Prevents “collect after shift” collapsing different targets.
+          // Prevents "collect after shift" collapsing different targets.
           //
           // Debug: `pnpm test src/auto-reply/reply/queue.collect-routing.test.ts`
           if (forceIndividualCollect) {
@@ -33,7 +33,11 @@ export function scheduleFollowupDrain(
             if (!next) {
               break;
             }
-            await runFollowup(next);
+            try {
+              await runFollowup(next);
+            } catch (err) {
+              defaultRuntime.error?.(`followup queue drain item failed for ${key}: ${String(err)}`);
+            }
             continue;
           }
 
@@ -62,7 +66,11 @@ export function scheduleFollowupDrain(
             if (!next) {
               break;
             }
-            await runFollowup(next);
+            try {
+              await runFollowup(next);
+            } catch (err) {
+              defaultRuntime.error?.(`followup queue drain item failed for ${key}: ${String(err)}`);
+            }
             continue;
           }
 
@@ -89,15 +97,21 @@ export function scheduleFollowupDrain(
             summary,
             renderItem: (item, idx) => `---\nQueued #${idx + 1}\n${item.prompt}`.trim(),
           });
-          await runFollowup({
-            prompt,
-            run,
-            enqueuedAt: Date.now(),
-            originatingChannel,
-            originatingTo,
-            originatingAccountId,
-            originatingThreadId,
-          });
+          try {
+            await runFollowup({
+              prompt,
+              run,
+              enqueuedAt: Date.now(),
+              originatingChannel,
+              originatingTo,
+              originatingAccountId,
+              originatingThreadId,
+            });
+          } catch (err) {
+            defaultRuntime.error?.(
+              `followup queue drain collect failed for ${key}: ${String(err)}`,
+            );
+          }
           continue;
         }
 
@@ -107,11 +121,17 @@ export function scheduleFollowupDrain(
           if (!run) {
             break;
           }
-          await runFollowup({
-            prompt: summaryPrompt,
-            run,
-            enqueuedAt: Date.now(),
-          });
+          try {
+            await runFollowup({
+              prompt: summaryPrompt,
+              run,
+              enqueuedAt: Date.now(),
+            });
+          } catch (err) {
+            defaultRuntime.error?.(
+              `followup queue drain summary failed for ${key}: ${String(err)}`,
+            );
+          }
           continue;
         }
 
@@ -119,7 +139,11 @@ export function scheduleFollowupDrain(
         if (!next) {
           break;
         }
-        await runFollowup(next);
+        try {
+          await runFollowup(next);
+        } catch (err) {
+          defaultRuntime.error?.(`followup queue drain item failed for ${key}: ${String(err)}`);
+        }
       }
     } catch (err) {
       defaultRuntime.error?.(`followup queue drain failed for ${key}: ${String(err)}`);
