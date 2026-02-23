@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Security hardening (Phase 16)**: Ported ~65 upstream security patches across 7 domains. SSRF: IPv6-mapped bypass prevention (`::ffff:127.0.0.1`), gateway URL validation, archive extraction hardening. Filesystem: path traversal in apply_patch, symlink escape, workspace containment, zip-slip prevention. Input: oversized base64 rejection, bounded HTTP body reading, Unicode homoglyph detection, ReDoS-safe regex. Auth: timing-safe token comparison (`crypto.timingSafeEqual`), sliding-window per-IP rate limiting with lockout, OAuth CSRF prevention, device binding. Execution: shell expansion blocking in safeBins, heredoc handling, PID ownership scoping. Data leak: config snapshot redaction, header sanitization, tool transcript wrapping. ACP: tool safety classification, dangerous tool deny list, safe-kind inference. 291 new tests (final: 6035 tests).
+
+- **Runtime stability (Phase 17)**: Ported ~57 upstream fixes for gateway, agent, session, and memory subsystems. Gateway: session reset aborts active runs, config merge by ID, session key normalization, WebSocket max payload 5 MB, bounded agent run sequence map, expired hook auth state pruning. Agent: compaction deadlock prevention via `withTimeout` (30s default), token accounting after compaction, exec override preservation, tool call ID sanitization. Session: AsyncMutex replacing proper-lockfile, transcript path resolution for multi-agent, CLI lifecycle hardening (proper exit, stdin closing for non-pty). Memory bounding: diagnostic session state capped, directory cache LRU, shell output buffer truncation, abort map bounding. Heartbeat: wake handler race prevention, runOnce error recovery. Queue: stale item drain prevention, send failure retention. 42+ new tests (final: 6085+ tests).
+
 ### Added
 
 - **Security hardening (Phase 06)**: Ported three upstream security measures -- SSRF guards with DNS pinning on all outbound fetch sites (webhook alerts, skill downloads, media fetches), Telegram download timeouts with AbortSignal enforcement (30s metadata, 60s downloads), and path traversal validation via assertMediaPath on all media storage operations. Integration test suite validates private IP blocking (RFC 1918, link-local, loopback, IPv6-mapped), redirect chain SSRF prevention, protocol validation, null byte safety, and Unicode path edge cases. Security bypass audit completed with no critical findings.

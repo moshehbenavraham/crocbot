@@ -46,6 +46,7 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Purpose**: Central control plane for sessions, Telegram, tools, and events
 - **Tech**: Node.js, WebSocket, Express
 - **Location**: `src/gateway/`
+- **Stability**: Session reset aborts active runs, config merge by ID (preserves array ordering), session key normalization (case-insensitive), WebSocket max payload 5 MB, bounded agent run sequence map, expired hook auth state pruning
 
 ### CLI
 - **Purpose**: Command-line interface for gateway management and agent invocation
@@ -63,6 +64,7 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Tech**: TypeScript, RPC mode
 - **Location**: `src/agents/`
 - **Key modules**: `session-transcript-repair.ts` (JSONL repair, tool call sanitization), `session-file-repair.ts` (crash-resilient file recovery)
+- **Stability**: Compaction deadlock prevention via `withTimeout` (30s default), token accounting fix after compaction (`totalTokens` update), exec override preservation across compaction, tool call ID sanitization for transcript integrity
 
 ### Media Pipeline
 - **Purpose**: Image/audio/video processing, transcription, size caps
@@ -81,6 +83,12 @@ Crocbot is a personal AI assistant with a Gateway control plane and Telegram int
 - **Tech**: Custom Aho-Corasick masker, SecretsRegistry singleton, value-based + pattern-based defense-in-depth
 - **Key modules**: `registry.ts` (singleton, auto-discovery from env/config), `masker.ts` (Aho-Corasick for 10+ patterns, sequential fallback), `stream-masker.ts` (cross-chunk boundary detection), `logging-transport.ts` (tslog masking transport), `llm-masking.ts` (context wrapper), `tool-result-masking.ts` (agent tool output), `error-masking.ts` (error messages)
 - **Boundaries**: (1) Logging, (2) Config snapshots, (3) LLM context, (4) Streaming output, (5) Tool results, (6) Telegram send, (7) Error formatting
+
+### Runtime Infrastructure (`src/infra/`)
+- **Purpose**: Cross-cutting runtime utilities for concurrency, timeouts, and memory safety
+- **Key modules**: `async-mutex.ts` (Promise-chain mutex replacing proper-lockfile for session locking), `with-timeout.ts` (generic `withTimeout<T>` wrapper with configurable deadline and cleanup)
+- **Memory bounding**: Diagnostic session state capped, directory cache bounded with LRU eviction, shell output buffers truncated at configurable limit, abort controller maps bounded, agent run sequence tracking bounded
+- **Heartbeat hardening**: Wake handler race prevention, `runOnce` error recovery (scheduler survives thrown errors), heartbeat exempt from empty-event skip
 
 ### Logging & Observability
 - **Purpose**: Structured logging, metrics, error alerting

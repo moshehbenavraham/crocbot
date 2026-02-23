@@ -2,8 +2,8 @@
   "version": "2.0",
   "project_name": "crocbot",
   "description": "Cold-blooded patience, chrome-laced synapses - nature's apex predator, now jacked into the grid.",
-  "current_phase": 17,
-  "current_session": null,
+  "current_phase": 18,
+  "current_session": "phase18-session01-research-and-triage",
   "phases": {
     "16": {
       "name": "Critical Security Hardening II",
@@ -15,14 +15,14 @@
     "17": {
       "name": "Core Runtime Stability",
       "description": "Fix gateway session management, agent runtime deadlocks and token drift, session/process lock races, and bound memory growth vectors.",
-      "status": "active",
-      "sessions_completed": 4,
+      "status": "complete",
+      "sessions_completed": 5,
       "session_count": 5
     },
     "18": {
       "name": "Telegram and Messaging Pipeline",
       "description": "Fix Telegram webhook retry storms, command menu issues, auto-reply threading, and outbound delivery crash recovery.",
-      "status": "pending",
+      "status": "in_progress",
       "sessions_completed": 0,
       "session_count": 4
     },
@@ -57,7 +57,8 @@
     "phase17-session01-research-and-triage",
     "phase17-session02-gateway-session-and-routing-fixes",
     "phase17-session03-agent-compaction-deadlock-and-token-fixes",
-    "phase17-session04-session-management-and-process-fixes"
+    "phase17-session04-session-management-and-process-fixes",
+    "phase17-session05-memory-bounding-and-validation"
   ],
   "next_session_history": [
     {
@@ -104,6 +105,16 @@
       "date": "2026-02-23",
       "session": "phase17-session04-session-management-and-process-fixes",
       "status": "completed"
+    },
+    {
+      "date": "2026-02-23",
+      "session": "phase17-session05-memory-bounding-and-validation",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-23",
+      "session": "phase18-session01-research-and-triage",
+      "status": "tasks_created"
     }
   ]
 }

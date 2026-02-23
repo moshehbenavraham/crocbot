@@ -30,6 +30,15 @@ agents/
 - **Reasoning Support** — native `reasoning_delta` stream parsing for o1/o3, DeepSeek-R1, Claude extended thinking; tag-based fallback; trace storage and budget tracking
 - **Project Scoping** — project-scoped workspaces with isolated memory, sessions, and prompts (`project-scope.ts`, `types.projects.ts`)
 
+## Runtime Stability (Phase 17)
+
+- **Compaction deadlock prevention**: `withTimeout` wrapper (30s default) on `session.compact()` prevents indefinite hangs; stabilized overflow compaction retries
+- **Token accounting**: `totalTokens` updated after compaction to prevent drift; exec overrides preserved across compaction
+- **Tool call sanitization**: Tool call IDs sanitized for transcript integrity; undefined context file paths guarded
+- **Session locking**: AsyncMutex (Promise-chain mutex in `src/infra/async-mutex.ts`) replaces file-based proper-lockfile for session locking
+- **Transcript paths**: Multi-agent transcript path resolution fixed; absolute `sessionFile` paths normalized
+- **CLI lifecycle**: Proper exit after commands; stdin closed for non-pty runs; pending promises rejected on lane clear
+
 ## Memory Consolidation
 
 The agent integrates with the memory consolidation system via two pathways:

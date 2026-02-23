@@ -1,0 +1,3 @@
+# Keep the logs/ directory in git but ignore all contents
+*
+!.gitignore

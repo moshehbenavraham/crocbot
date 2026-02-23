@@ -1,6 +1,6 @@
 # 🐊 Crocbot — Personal AI Assistant
 
-> **v0.1.160**
+> **v0.1.164**
 
 <p align="center">
   <strong>Cold-blooded patience, chrome-laced synapses.</strong>
@@ -253,6 +253,7 @@ Crocbot connects to real messaging surfaces — treat inbound DMs as **untrusted
 - **Auth rate limiting** — sliding-window per-IP rate limiting with lockout on auth endpoints
 - **Input validation** — oversized base64 rejection, bounded HTTP body reading, Unicode homoglyph detection
 - **ACP tool safety** — dangerous tool deny list, safe-kind inference, auto-approval only for read/search operations
+- **Runtime stability** — compaction deadlock prevention with safety timeouts, AsyncMutex session locking, bounded memory growth (diagnostic state, directory cache, shell buffers, abort maps), heartbeat hardening
 - **Sandbox mode** — run non-main sessions (groups) in per-session Docker sandboxes
 - **`crocbot doctor`** — audit tool that surfaces risky or misconfigured policies
 

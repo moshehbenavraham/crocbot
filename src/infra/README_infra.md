@@ -30,6 +30,8 @@ infra/
 | `retry.ts`                        | Generic retry with exponential backoff and jitter                                                 |
 | `retry-policy.ts`                 | Retry policy types                                                                                |
 | `rate-limit-middleware.ts`        | Pre-flight/post-flight wrapper for LLM call sites                                                 |
+| `with-timeout.ts`                 | Generic `withTimeout<T>` wrapper with configurable deadline and cleanup callback                   |
+| `async-mutex.ts`                  | Promise-chain mutex for session locking (replaces proper-lockfile)                                |
 | `update-check.ts`                 | Version update checking                                                                           |
 | `update-runner.ts`                | Runs the update process                                                                           |
 

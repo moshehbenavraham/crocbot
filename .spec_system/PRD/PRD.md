@@ -110,7 +110,7 @@ This PRD delivers via phases. Each phase is implemented via multiple 2-4 hour se
 | Phase | Name | Sessions | Status |
 |-------|------|----------|--------|
 | 16 | Critical Security Hardening II | 5 | Complete |
-| 17 | Core Runtime Stability | 5 | In Progress (4/5) |
+| 17 | Core Runtime Stability | 5 | Complete |
 | 18 | Telegram and Messaging Pipeline | 4 | Pending |
 | 19 | Cron, Memory, and Config | 5 | Pending |
 | 20 | Plugins, Media, CLI, and Infrastructure | 5 | Pending |
@@ -210,7 +210,7 @@ Use `diff` between `.001_ORIGINAL/src/` and `src/` to identify exact changes nee
 | 02 | Gateway Session and Routing Fixes | Complete (2026-02-23) |
 | 03 | Agent Compaction, Deadlock, and Token Fixes | Complete (2026-02-23) |
 | 04 | Session Management and Process Fixes | Complete (2026-02-23) |
-| 05 | Memory Bounding and Validation | Pending |
+| 05 | Memory Bounding and Validation | Complete (2026-02-23) |
 
 ---
 

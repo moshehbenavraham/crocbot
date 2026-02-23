@@ -28,6 +28,16 @@ gateway/
 | `auth-rate-limit.ts`       | Sliding-window per-IP auth rate limiting with lockout                                   |
 | `rate-limit.ts`            | General per-IP request rate limiting                                                    |
 
+## Stability (Phase 17)
+
+- Session reset aborts active agent runs before proceeding
+- Config merge uses array-by-id merging (preserves ordering)
+- Session keys normalized to lowercase (prevents ghost sessions from case mismatches)
+- WebSocket max payload increased to 5 MB
+- Agent run sequence map bounded (prevents unbounded memory growth)
+- Expired hook auth state pruned automatically
+- Deferred restart until all replies sent
+
 ## Architecture
 
 ```
