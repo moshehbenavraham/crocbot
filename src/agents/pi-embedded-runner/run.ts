@@ -123,7 +123,7 @@ const mergeUsageIntoAccumulator = (
     (usage.input ?? 0) + (usage.output ?? 0) + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0);
   // Track the most recent API call's cache fields for accurate context-size reporting.
   // Accumulated cache totals inflate context size when there are multiple tool-call round-trips,
-  // since each call reports cacheRead ≈ current_context_size.
+  // since each call reports cacheRead ~= current_context_size.
   target.lastCacheRead = usage.cacheRead ?? 0;
   target.lastCacheWrite = usage.cacheWrite ?? 0;
   target.lastInput = usage.input ?? 0;
@@ -141,8 +141,8 @@ const toNormalizedUsage = (usage: UsageAccumulator) => {
   }
   // Use the LAST API call's cache fields for context-size calculation.
   // The accumulated cacheRead/cacheWrite inflate context size because each tool-call
-  // round-trip reports cacheRead ≈ current_context_size, and summing N calls gives
-  // N × context_size which gets clamped to contextWindow (e.g. 200k).
+  // round-trip reports cacheRead ~= current_context_size, and summing N calls gives
+  // N * context_size which gets clamped to contextWindow (e.g. 200k).
   //
   // We use lastInput/lastCacheRead/lastCacheWrite (from the most recent API call) for
   // cache-related fields, but keep accumulated output (total generated text this turn).
@@ -828,7 +828,7 @@ export async function runEmbeddedPiAgent(
             compactionCount: autoCompactionCount > 0 ? autoCompactionCount : undefined,
           };
 
-          const payloads = buildEmbeddedRunPayloads({
+          let payloads = buildEmbeddedRunPayloads({
             assistantTexts: attempt.assistantTexts,
             toolMetas: attempt.toolMetas,
             lastAssistant: attempt.lastAssistant,
@@ -840,6 +840,21 @@ export async function runEmbeddedPiAgent(
             toolResultFormat: resolvedToolResultFormat,
             inlineToolResultsAllowed: false,
           });
+
+          // Suppress NO_REPLY when the message tool already sent text to the user.
+          if (attempt.didSendViaMessagingTool && payloads.length > 0) {
+            const allSilent = payloads.every(
+              (p) => typeof p.text === "string" && /^\s*NO_REPLY\b/.test(p.text),
+            );
+            if (allSilent) {
+              payloads = [];
+            }
+          }
+
+          // On timed-out empty runs, return a timeout reply instead of silence.
+          if (timedOut && payloads.length === 0 && !attempt.didSendViaMessagingTool) {
+            payloads = [{ text: "The request timed out. Please try again." }];
+          }
 
           log.debug(
             `embedded run done: runId=${params.runId} sessionId=${params.sessionId} durationMs=${Date.now() - started} aborted=${aborted}`,

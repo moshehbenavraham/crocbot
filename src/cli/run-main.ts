@@ -67,6 +67,10 @@ export async function runCli(argv: string[] = process.argv) {
   }
 
   await program.parseAsync(parseArgv);
+
+  // Ensure the process exits after command completion to prevent hanging
+  // on dangling handles (timers, sockets, etc.) from lazy-loaded modules.
+  process.exit(0);
 }
 
 export function isCliMainModule(): boolean {

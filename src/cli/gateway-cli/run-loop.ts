@@ -126,6 +126,12 @@ export async function runGatewayLoop(params: {
   process.on("SIGINT", onSigint);
   process.on("SIGUSR1", onSigusr1);
 
+  // Close stdin when not running in a TTY (Docker, headless, piped input).
+  // An open stdin keeps the process alive even after the server shuts down.
+  if (!process.stdin.isTTY && typeof process.stdin.unref === "function") {
+    process.stdin.unref();
+  }
+
   try {
     // Keep process alive; SIGUSR1 triggers an in-process restart (no supervisor required).
     // SIGTERM/SIGINT still exit after a graceful shutdown.

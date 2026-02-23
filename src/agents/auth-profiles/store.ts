@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import type { OAuthCredentials } from "@mariozechner/pi-ai";
-import lockfile from "proper-lockfile";
 import { resolveOAuthPath } from "../../config/paths.js";
 import { loadJsonFile, saveJsonFile } from "../../infra/json-file.js";
-import { AUTH_STORE_LOCK_OPTIONS, AUTH_STORE_VERSION, log } from "./constants.js";
+import { AUTH_STORE_VERSION, log } from "./constants.js";
+import { createMutex } from "./mutex.js";
 import { syncExternalCliCredentials } from "./external-cli-sync.js";
-import { ensureAuthStoreFile, resolveAuthStorePath, resolveLegacyAuthStorePath } from "./paths.js";
+import { resolveAuthStorePath, resolveLegacyAuthStorePath } from "./paths.js";
 import type { AuthProfileCredential, AuthProfileStore, ProfileUsageStats } from "./types.js";
 
 type LegacyAuthStore = Record<string, AuthProfileCredential>;
@@ -18,16 +18,14 @@ function _syncAuthProfileStore(target: AuthProfileStore, source: AuthProfileStor
   target.usageStats = source.usageStats;
 }
 
+const storeMutex = createMutex();
+
 export async function updateAuthProfileStoreWithLock(params: {
   agentDir?: string;
   updater: (store: AuthProfileStore) => boolean;
 }): Promise<AuthProfileStore | null> {
-  const authPath = resolveAuthStorePath(params.agentDir);
-  ensureAuthStoreFile(authPath);
-
-  let release: (() => Promise<void>) | undefined;
+  const release = await storeMutex.acquire();
   try {
-    release = await lockfile.lock(authPath, AUTH_STORE_LOCK_OPTIONS);
     const store = ensureAuthProfileStore(params.agentDir);
     const shouldSave = params.updater(store);
     if (shouldSave) {
@@ -37,13 +35,7 @@ export async function updateAuthProfileStoreWithLock(params: {
   } catch {
     return null;
   } finally {
-    if (release) {
-      try {
-        await release();
-      } catch {
-        // ignore unlock errors
-      }
-    }
+    release();
   }
 }
 

@@ -131,17 +131,17 @@ export function normalizeToolParams(params: unknown): Record<string, unknown> | 
   }
   const record = params as Record<string, unknown>;
   const normalized = { ...record };
-  // file_path → path (read, write, edit)
+  // file_path -> path (read, write, edit)
   if ("file_path" in normalized && !("path" in normalized)) {
     normalized.path = normalized.file_path;
     delete normalized.file_path;
   }
-  // old_string → oldText (edit)
+  // old_string -> oldText (edit)
   if ("old_string" in normalized && !("oldText" in normalized)) {
     normalized.oldText = normalized.old_string;
     delete normalized.old_string;
   }
-  // new_string → newText (edit)
+  // new_string -> newText (edit)
   if ("new_string" in normalized && !("newText" in normalized)) {
     normalized.newText = normalized.new_string;
     delete normalized.new_string;
@@ -260,7 +260,7 @@ function wrapSandboxPathGuard(tool: AnyAgentTool, root: string): AnyAgentTool {
       const record =
         normalized ??
         (args && typeof args === "object" ? (args as Record<string, unknown>) : undefined);
-      const filePath = record?.path;
+      const filePath = record?.path ?? record?.file_path;
       if (typeof filePath === "string" && filePath.trim()) {
         await assertSandboxPath({ filePath, cwd: root, root });
       }

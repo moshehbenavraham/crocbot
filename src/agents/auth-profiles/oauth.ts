@@ -1,12 +1,11 @@
 import { getOAuthApiKey, type OAuthCredentials } from "@mariozechner/pi-ai";
-import lockfile from "proper-lockfile";
 
 import type { crocbotConfig } from "../../config/config.js";
 import { refreshChutesTokens } from "../chutes-oauth.js";
 import { refreshQwenPortalCredentials } from "../../providers/qwen-portal-oauth.js";
-import { AUTH_STORE_LOCK_OPTIONS, log } from "./constants.js";
+import { log } from "./constants.js";
+import { createMutex } from "./mutex.js";
 import { formatAuthDoctorHint } from "./doctor.js";
-import { ensureAuthStoreFile, resolveAuthStorePath } from "./paths.js";
 import { suggestOAuthProfileIdForLegacyDefault } from "./repair.js";
 import { ensureAuthProfileStore, saveAuthProfileStore } from "./store.js";
 import type { AuthProfileStore } from "./types.js";
@@ -21,19 +20,14 @@ function buildOAuthApiKey(provider: string, credentials: OAuthCredentials): stri
     : credentials.access;
 }
 
+const oauthMutex = createMutex();
+
 async function refreshOAuthTokenWithLock(params: {
   profileId: string;
   agentDir?: string;
 }): Promise<{ apiKey: string; newCredentials: OAuthCredentials } | null> {
-  const authPath = resolveAuthStorePath(params.agentDir);
-  ensureAuthStoreFile(authPath);
-
-  let release: (() => Promise<void>) | undefined;
+  const release = await oauthMutex.acquire();
   try {
-    release = await lockfile.lock(authPath, {
-      ...AUTH_STORE_LOCK_OPTIONS,
-    });
-
     const store = ensureAuthProfileStore(params.agentDir);
     const cred = store.profiles[params.profileId];
     if (!cred || cred.type !== "oauth") {
@@ -77,13 +71,7 @@ async function refreshOAuthTokenWithLock(params: {
 
     return result;
   } finally {
-    if (release) {
-      try {
-        await release();
-      } catch {
-        // ignore unlock errors
-      }
-    }
+    release();
   }
 }
 

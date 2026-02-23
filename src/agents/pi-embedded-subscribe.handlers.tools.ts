@@ -3,6 +3,7 @@ import type { AgentEvent } from "@mariozechner/pi-agent-core";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import { SecretsRegistry } from "../infra/secrets/registry.js";
 import { unmaskForExecution } from "../infra/secrets/unmask-exec.js";
+import { splitMediaFromOutput } from "../media/parse.js";
 import { normalizeTextForComparison } from "./pi-embedded-helpers.js";
 import { isMessagingTool, isMessagingToolSendAction } from "./pi-embedded-messaging.js";
 import type { EmbeddedPiSubscribeContext } from "./pi-embedded-subscribe.handlers.types.js";
@@ -35,8 +36,8 @@ function extendExecMeta(toolName: string, args: unknown, meta?: string): string 
   if (flags.length === 0) {
     return meta;
   }
-  const suffix = flags.join(" · ");
-  return meta ? `${meta} · ${suffix}` : suffix;
+  const suffix = flags.join(" | ");
+  return meta ? `${meta} | ${suffix}` : suffix;
 }
 
 export async function handleToolExecutionStart(
@@ -236,6 +237,20 @@ export function handleToolExecutionEnd(
     const outputText = extractToolResultText(sanitizedResult);
     if (outputText) {
       ctx.emitToolOutput(toolName, meta, outputText);
+    }
+  } else if (ctx.params.onToolResult) {
+    // When verbose output is suppressed, still deliver media attachments
+    // (images, files) so users receive media regardless of verbose level.
+    const outputText = extractToolResultText(sanitizedResult);
+    if (outputText) {
+      const { mediaUrls } = splitMediaFromOutput(outputText);
+      if (mediaUrls && mediaUrls.length > 0) {
+        try {
+          void ctx.params.onToolResult({ text: "", mediaUrls });
+        } catch {
+          // ignore delivery failures
+        }
+      }
     }
   }
 }

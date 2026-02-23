@@ -85,7 +85,12 @@ export function resolveSessionFilePath(
   opts?: { agentId?: string },
 ): string {
   const candidate = entry?.sessionFile?.trim();
-  return candidate ? candidate : resolveSessionTranscriptPath(sessionId, opts?.agentId);
+  if (!candidate) {
+    return resolveSessionTranscriptPath(sessionId, opts?.agentId);
+  }
+  // Normalize relative sessionFile paths to absolute to prevent resolution
+  // issues when the working directory changes during agent runs.
+  return path.isAbsolute(candidate) ? candidate : path.resolve(candidate);
 }
 
 export function resolveStorePath(store?: string, opts?: { agentId?: string }) {

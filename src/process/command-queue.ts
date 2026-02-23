@@ -162,7 +162,10 @@ export function clearCommandLane(lane: string = CommandLane.Main) {
     return 0;
   }
   const removed = state.queue.length;
-  state.queue.length = 0;
+  const pending = state.queue.splice(0);
+  for (const entry of pending) {
+    entry.reject(new Error(`Lane "${cleaned}" cleared; pending task rejected`));
+  }
   return removed;
 }
 
@@ -183,7 +186,7 @@ export function getActiveTaskCount(): number {
  * Polls at a short interval; resolves when no tasks are active or
  * when `timeoutMs` elapses (whichever comes first).
  *
- * New tasks enqueued after this call are ignored — only tasks that are
+ * New tasks enqueued after this call are ignored -- only tasks that are
  * already executing are waited on.
  */
 export function waitForActiveTasks(timeoutMs: number): Promise<{ drained: boolean }> {
