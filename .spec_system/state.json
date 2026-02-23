@@ -9,7 +9,7 @@
       "name": "Critical Security Hardening II",
       "description": "Audit and port ~65 upstream security patches covering SSRF bypasses, path traversal, input sanitization, auth hardening, execution safety, data leak prevention, and ACP policy fixes.",
       "status": "in_progress",
-      "sessions_completed": 3,
+      "sessions_completed": 4,
       "session_count": 5
     },
     "17": {
@@ -51,7 +51,8 @@
   "completed_sessions": [
     "phase16-session01-security-triage-and-applicability-audit",
     "phase16-session02-network-ssrf-and-filesystem-hardening",
-    "phase16-session03-input-sanitization-and-auth-hardening"
+    "phase16-session03-input-sanitization-and-auth-hardening",
+    "phase16-session04-execution-hardening-and-data-leak-prevention"
   ],
   "next_session_history": [
     {
@@ -67,6 +68,11 @@
     {
       "date": "2026-02-23",
       "session": "phase16-session03-input-sanitization-and-auth-hardening",
+      "status": "completed"
+    },
+    {
+      "date": "2026-02-23",
+      "session": "phase16-session04-execution-hardening-and-data-leak-prevention",
       "status": "completed"
     }
   ]

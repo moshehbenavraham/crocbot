@@ -29,12 +29,20 @@ function isDirectory(dirPath: string): boolean {
   }
 }
 
-function mergePath(params: { existing: string; prepend: string[] }): string {
+function isAbsolutePathSegment(segment: string): boolean {
+  return path.isAbsolute(segment);
+}
+
+export function mergePath(params: { existing: string; prepend: string[] }): string {
   const partsExisting = params.existing
     .split(path.delimiter)
     .map((part) => part.trim())
-    .filter(Boolean);
-  const partsPrepend = params.prepend.map((part) => part.trim()).filter(Boolean);
+    .filter(Boolean)
+    .filter(isAbsolutePathSegment);
+  const partsPrepend = params.prepend
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .filter(isAbsolutePathSegment);
 
   const seen = new Set<string>();
   const merged: string[] = [];

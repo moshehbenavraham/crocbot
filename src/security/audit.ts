@@ -19,6 +19,7 @@ import {
   collectSecretsInConfigFindings,
   collectStateDeepFilesystemFindings,
   collectSyncedFolderFindings,
+  collectWebhookSafetyFindings,
   readConfigSnapshotForAudit,
 } from "./audit-extra.js";
 import { readChannelAllowFromStore } from "../pairing/pairing-store.js";
@@ -893,6 +894,7 @@ export async function runSecurityAudit(opts: SecurityAuditOptions): Promise<Secu
   findings.push(...collectLoggingFindings(cfg));
   findings.push(...collectElevatedFindings(cfg));
   findings.push(...collectHooksHardeningFindings(cfg));
+  findings.push(...collectWebhookSafetyFindings(cfg));
   findings.push(...collectSecretsInConfigFindings(cfg));
   findings.push(...collectModelHygieneFindings(cfg));
   findings.push(...collectSmallModelRiskFindings({ cfg, env }));

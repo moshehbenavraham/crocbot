@@ -269,15 +269,25 @@ function listGroupPolicyOpen(cfg: crocbotConfig): string[] {
 export function collectAttackSurfaceSummaryFindings(cfg: crocbotConfig): SecurityAuditFinding[] {
   const group = summarizeGroupPolicy(cfg);
   const elevated = cfg.tools?.elevated?.enabled !== false;
-  const hooksEnabled = cfg.hooks?.enabled === true;
   const browserEnabled = cfg.browser?.enabled ?? true;
+
+  // Distinguish webhooks (HTTP hooks) from internal (workspace) hooks
+  const webhooksEnabled = cfg.hooks?.enabled === true;
+  const webhookMappingCount = Array.isArray(cfg.hooks?.mappings) ? cfg.hooks.mappings.length : 0;
+  const presetCount = Array.isArray(cfg.hooks?.presets) ? cfg.hooks.presets.length : 0;
+  const internalHooksEnabled = cfg.hooks?.internal?.enabled === true;
+  const internalHandlerCount = Array.isArray(cfg.hooks?.internal?.handlers)
+    ? cfg.hooks.internal.handlers.length
+    : 0;
 
   const detail =
     `groups: open=${group.open}, allowlist=${group.allowlist}` +
     `\n` +
     `tools.elevated: ${elevated ? "enabled" : "disabled"}` +
     `\n` +
-    `hooks: ${hooksEnabled ? "enabled" : "disabled"}` +
+    `webhooks (HTTP): ${webhooksEnabled ? "enabled" : "disabled"}, ${webhookMappingCount} mapping(s), ${presetCount} preset(s)` +
+    `\n` +
+    `internal hooks: ${internalHooksEnabled ? "enabled" : "disabled"}, ${internalHandlerCount} handler(s)` +
     `\n` +
     `browser control: ${browserEnabled ? "enabled" : "disabled"}`;
 
@@ -386,6 +396,76 @@ export function collectHooksHardeningFindings(cfg: crocbotConfig): SecurityAudit
       });
     }
   }
+  return findings;
+}
+
+export function collectWebhookSafetyFindings(cfg: crocbotConfig): SecurityAuditFinding[] {
+  const findings: SecurityAuditFinding[] = [];
+  const webhooksEnabled = cfg.hooks?.enabled === true;
+  if (!webhooksEnabled) {
+    return findings;
+  }
+
+  const mappings = cfg.hooks?.mappings;
+  if (Array.isArray(mappings)) {
+    // Check for mappings that disable external content safety wrapping
+    const unsafeMappings = mappings.filter(
+      (m) => m && typeof m === "object" && m.allowUnsafeExternalContent === true,
+    );
+    if (unsafeMappings.length > 0) {
+      const ids = unsafeMappings
+        .map((m) => {
+          const id = (m as Record<string, unknown>).id;
+          return typeof id === "string" ? id : "(unnamed)";
+        })
+        .join(", ");
+      findings.push({
+        checkId: "webhooks.unsafe_external_content",
+        severity: "critical",
+        title: "Webhook mapping(s) disable external content safety",
+        detail:
+          `${unsafeMappings.length} webhook mapping(s) have allowUnsafeExternalContent=true (${ids}). ` +
+          "Untrusted webhook payloads will bypass external content wrapping, increasing prompt injection risk.",
+        remediation:
+          "Remove allowUnsafeExternalContent or set it to false on all webhook mappings.",
+      });
+    }
+
+    // Check for webhook mappings with broad agent routing
+    const allowedAgentIds = cfg.hooks?.allowedAgentIds;
+    const hasWildcard = Array.isArray(allowedAgentIds) && allowedAgentIds.some((id) => id === "*");
+    const hasNoRestriction = !Array.isArray(allowedAgentIds) || allowedAgentIds.length === 0;
+    const agentRoutedMappings = mappings.filter(
+      (m) => m && typeof m === "object" && typeof m.agentId === "string" && m.agentId.trim(),
+    );
+    if (agentRoutedMappings.length > 0 && (hasWildcard || hasNoRestriction)) {
+      findings.push({
+        checkId: "webhooks.unrestricted_agent_routing",
+        severity: "warn",
+        title: "Webhook agent routing is unrestricted",
+        detail:
+          `${agentRoutedMappings.length} webhook mapping(s) specify agentId but hooks.allowedAgentIds is ` +
+          (hasWildcard ? 'set to ["*"]' : "not configured") +
+          ". Any agent id from webhook payloads will be accepted.",
+        remediation:
+          "Set hooks.allowedAgentIds to an explicit list of agent ids that webhooks are allowed to target.",
+      });
+    }
+  }
+
+  // Check for Gmail hooks with unsafe content
+  const gmailHooks = cfg.hooks?.gmail;
+  if (gmailHooks && gmailHooks.allowUnsafeExternalContent === true) {
+    findings.push({
+      checkId: "webhooks.gmail.unsafe_external_content",
+      severity: "warn",
+      title: "Gmail hooks disable external content safety",
+      detail:
+        "hooks.gmail.allowUnsafeExternalContent=true bypasses external content wrapping for all Gmail hook payloads.",
+      remediation: "Remove allowUnsafeExternalContent from hooks.gmail configuration.",
+    });
+  }
+
   return findings;
 }
 

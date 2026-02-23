@@ -16,6 +16,7 @@ export {
   collectSecretsInConfigFindings,
   collectSmallModelRiskFindings,
   collectSyncedFolderFindings,
+  collectWebhookSafetyFindings,
   type SecurityAuditFinding,
 } from "./audit-extra.sync.js";
 

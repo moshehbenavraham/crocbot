@@ -4,7 +4,7 @@
 **Sessions**: 5 (initial estimate)
 **Estimated Duration**: 10-20 days
 
-**Progress**: 3/5 sessions (60%)
+**Progress**: 4/5 sessions (80%)
 
 ---
 
@@ -33,7 +33,7 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 | 01 | Security Triage and Applicability Audit | Complete | 60 triaged | 20 | ~1 | 2026-02-23 |
 | 02 | Network, SSRF, and Filesystem Hardening | Complete | 14 (5A+9Ad) | 20 | ~1 | 2026-02-23 |
 | 03 | Input Sanitization and Auth Hardening | Complete | 16 (8A+8Ad) | 20 | ~1 | 2026-02-23 |
-| 04 | Execution Hardening and Data Leak Prevention | Not Started | 17 (5A+12Ad) | 20-26 | 5-6 | - |
+| 04 | Execution Hardening and Data Leak Prevention | Complete | 17 (5A+12Ad) | 22 | ~2 | 2026-02-23 |
 | 05 | ACP Fixes and Security Validation | Not Started | 5 (0A+5Ad) | 15-20 | 3-4 | - |
 
 ---
@@ -64,9 +64,16 @@ Audit and port ~65 upstream security patches covering SSRF bypasses, path traver
 
 ---
 
+### Session 04: Execution Hardening and Data Leak Prevention
+- **Completed**: 2026-02-23
+- **Duration**: ~2 hours
+- **Tasks**: 22/22
+- **Result**: Closed 17 security items (5 Apply + 12 Adapt). Execution hardening: shell expansion blocking in safeBins, CLI cleanup PID scoping, --ignore-scripts on npm installs, PATH segment validation, heredoc operator allowlisting. Data leak prevention: credential redaction across all 5 masking boundaries, error response sanitization, WebSocket log header scrubbing, web tool transcript security markers, config snapshot redaction, audit webhook/hook distinction. Fixed 2 pre-existing flaky tests (pi-embedded-runner.test.ts microtask persistence race, chutes-oauth.test.ts TOCTOU port race). 29 deliverable files, all tests passing (5984/5984).
+
+---
+
 ## Upcoming Sessions
 
-- Session 04: Execution Hardening and Data Leak Prevention
 - Session 05: ACP Fixes and Security Validation
 
 ---

@@ -369,6 +369,12 @@ describe("runEmbeddedPiAgent", () => {
       enqueue: immediateEnqueue,
     });
 
+    // Drain microtask queue so the SDK's fire-and-forget persistence
+    // (Agent.emit -> async _handleAgentEvent -> appendFileSync) completes
+    // before the second run reads the session file. Under heavy parallel
+    // load the continuation can lag behind Agent.prompt() resolution.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     await runEmbeddedPiAgent({
       sessionId: "session:test",
       sessionKey: testSessionKey,

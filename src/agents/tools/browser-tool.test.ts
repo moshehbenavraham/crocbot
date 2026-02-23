@@ -280,7 +280,7 @@ describe("browser tool snapshot labels", () => {
     expect(toolCommonMocks.imageResultFromFile).toHaveBeenCalledWith(
       expect.objectContaining({
         path: "/tmp/snap.png",
-        extraText: "label text",
+        extraText: expect.stringContaining("label text"),
       }),
     );
     expect(result).toEqual(imageResult);

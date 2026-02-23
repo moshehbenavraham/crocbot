@@ -155,7 +155,8 @@ export async function loginChutes(params: {
       message: "Paste the redirect URL (or authorization code)",
       placeholder: `${params.app.redirectUri}?code=...&state=...`,
     });
-    const parsed = parseOAuthCallbackInput(String(input), state);
+    const inputStr = typeof input === "string" ? input : "";
+    const parsed = parseOAuthCallbackInput(inputStr, state);
     if ("error" in parsed) {
       throw new Error(parsed.error);
     }
@@ -175,7 +176,8 @@ export async function loginChutes(params: {
         message: "Paste the redirect URL (or authorization code)",
         placeholder: `${params.app.redirectUri}?code=...&state=...`,
       });
-      const parsed = parseOAuthCallbackInput(String(input), state);
+      const fallbackStr = typeof input === "string" ? input : "";
+      const parsed = parseOAuthCallbackInput(fallbackStr, state);
       if ("error" in parsed) {
         throw new Error(parsed.error);
       }

@@ -9,6 +9,7 @@ import {
 } from "../../infra/net/ssrf.js";
 import type { Dispatcher } from "undici";
 import { stringEnum } from "../schema/typebox.js";
+import { wrapToolTranscript } from "../../security/external-content.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, readNumberParam, readStringParam } from "./common.js";
 import {
@@ -538,7 +539,7 @@ async function runWebFetch(params: {
       length: truncated.text.length,
       fetchedAt: new Date().toISOString(),
       tookMs: Date.now() - start,
-      text: truncated.text,
+      text: wrapToolTranscript(truncated.text, "web_fetch"),
     };
     writeCache(FETCH_CACHE, cacheKey, payload, params.cacheTtlMs);
     return payload;

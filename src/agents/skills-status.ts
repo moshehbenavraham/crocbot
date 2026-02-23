@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import type { crocbotConfig } from "../config/config.js";
+import { looksLikeSecret } from "../config/redact.js";
 import { CONFIG_DIR } from "../utils.js";
 import {
   hasBinary,
@@ -228,8 +229,13 @@ function buildSkillStatus(
   }
 
   const configChecks: SkillStatusConfigCheck[] = requiredConfig.map((pathStr) => {
-    const value = resolveConfigPath(config, pathStr);
+    const rawValue = resolveConfigPath(config, pathStr);
     const satisfied = isConfigPathTruthy(config, pathStr);
+    // Redact config values that look like secrets to prevent leaking them in status output
+    let value: unknown = rawValue;
+    if (typeof rawValue === "string" && rawValue.length > 0) {
+      value = looksLikeSecret(rawValue) ? "[REDACTED]" : satisfied ? "[SET]" : rawValue;
+    }
     return { path: pathStr, value, satisfied };
   });
   const missingConfig = configChecks.filter((check) => !check.satisfied).map((check) => check.path);

@@ -510,3 +510,106 @@ describe("exec approvals default agent migration", () => {
     expect(resolved.file.agents?.default).toBeUndefined();
   });
 });
+
+describe("exec approvals shell expansion blocking", () => {
+  it("rejects $() command substitution", () => {
+    const res = analyzeShellCommand({ command: "echo $(whoami)" });
+    expect(res.ok).toBe(false);
+  });
+
+  it("rejects ${} parameter expansion", () => {
+    const res = analyzeShellCommand({ command: "echo ${HOME}" });
+    expect(res.ok).toBe(false);
+  });
+
+  it("rejects $(()) arithmetic expansion", () => {
+    const res = analyzeShellCommand({ command: "echo $((1+2))" });
+    expect(res.ok).toBe(false);
+  });
+
+  it("allows $ followed by space (not expansion)", () => {
+    const res = analyzeShellCommand({ command: "echo price is $5" });
+    expect(res.ok).toBe(true);
+  });
+
+  it("rejects backticks", () => {
+    const res = analyzeShellCommand({ command: "echo `whoami`" });
+    expect(res.ok).toBe(false);
+  });
+});
+
+describe("exec approvals heredoc allowlisting", () => {
+  it("allows heredoc << operator in command", () => {
+    // Newlines are disallowed in pipelines, so test just the << prefix
+    const res = analyzeShellCommand({ command: "cat <<EOF" });
+    expect(res.ok).toBe(true);
+  });
+
+  it("rejects single < (input redirect)", () => {
+    const res = analyzeShellCommand({ command: "cat < /etc/passwd" });
+    expect(res.ok).toBe(false);
+  });
+
+  it("rejects > (output redirect)", () => {
+    const res = analyzeShellCommand({ command: "echo ok > /tmp/out" });
+    expect(res.ok).toBe(false);
+  });
+});
+
+describe("exec approvals safeBins shell expansion in args", () => {
+  it("rejects safe bin args containing $()", () => {
+    const ok = isSafeBinUsage({
+      argv: ["jq", "$(cat /etc/passwd)"],
+      resolution: {
+        rawExecutable: "jq",
+        resolvedPath: "/usr/bin/jq",
+        executableName: "jq",
+      },
+      safeBins: normalizeSafeBins(["jq"]),
+      cwd: "/tmp",
+    });
+    expect(ok).toBe(false);
+  });
+
+  it("rejects safe bin args containing ${}", () => {
+    const ok = isSafeBinUsage({
+      argv: ["jq", "${SECRET}"],
+      resolution: {
+        rawExecutable: "jq",
+        resolvedPath: "/usr/bin/jq",
+        executableName: "jq",
+      },
+      safeBins: normalizeSafeBins(["jq"]),
+      cwd: "/tmp",
+    });
+    expect(ok).toBe(false);
+  });
+
+  it("rejects safe bin args containing backticks", () => {
+    const ok = isSafeBinUsage({
+      argv: ["jq", "`whoami`"],
+      resolution: {
+        rawExecutable: "jq",
+        resolvedPath: "/usr/bin/jq",
+        executableName: "jq",
+      },
+      safeBins: normalizeSafeBins(["jq"]),
+      cwd: "/tmp",
+    });
+    expect(ok).toBe(false);
+  });
+
+  it("allows safe bin args without shell expansion", () => {
+    const ok = isSafeBinUsage({
+      argv: ["jq", ".data.name"],
+      resolution: {
+        rawExecutable: "jq",
+        resolvedPath: "/usr/bin/jq",
+        executableName: "jq",
+      },
+      safeBins: normalizeSafeBins(["jq"]),
+      cwd: "/tmp",
+    });
+    expect(ok).toBe(true);
+  });
+});

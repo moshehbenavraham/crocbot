@@ -5,7 +5,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import { note } from "../terminal/note.js";
 import { buildGatewayAuthConfig } from "./configure.gateway-auth.js";
 import { confirm, select, text } from "./configure.shared.js";
-import { guardCancel, randomToken } from "./onboard-helpers.js";
+import { guardCancel, isValidTokenInput, randomToken } from "./onboard-helpers.js";
 
 type GatewayAuthChoice = "token" | "password";
 
@@ -184,7 +184,7 @@ export async function promptGatewayConfig(
       }),
       runtime,
     );
-    gatewayToken = String(tokenInput).trim() || randomToken();
+    gatewayToken = isValidTokenInput(tokenInput) ? String(tokenInput).trim() : randomToken();
   }
 
   if (authMode === "password") {
@@ -195,7 +195,7 @@ export async function promptGatewayConfig(
       }),
       runtime,
     );
-    gatewayPassword = String(password).trim();
+    gatewayPassword = isValidTokenInput(password) ? String(password).trim() : "";
   }
 
   const authConfig = buildGatewayAuthConfig({

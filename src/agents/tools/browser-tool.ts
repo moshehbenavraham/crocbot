@@ -21,6 +21,7 @@ import {
 import crypto from "node:crypto";
 
 import { resolveBrowserConfig } from "../../browser/config.js";
+import { wrapToolTranscript } from "../../security/external-content.js";
 import { DEFAULT_AI_SNAPSHOT_MAX_CHARS } from "../../browser/constants.js";
 import { loadConfig } from "../../config/config.js";
 import { saveMediaBuffer } from "../../media/store.js";
@@ -500,16 +501,17 @@ export function createBrowserTool(opts?: {
                 profile,
               });
           if (snapshot.format === "ai") {
+            const wrappedSnapshot = wrapToolTranscript(snapshot.snapshot, "browser_tool");
             if (labels && snapshot.imagePath) {
               return await imageResultFromFile({
                 label: "browser:snapshot",
                 path: snapshot.imagePath,
-                extraText: snapshot.snapshot,
+                extraText: wrappedSnapshot,
                 details: snapshot,
               });
             }
             return {
-              content: [{ type: "text", text: snapshot.snapshot }],
+              content: [{ type: "text", text: wrappedSnapshot }],
               details: snapshot,
             };
           }

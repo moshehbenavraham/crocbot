@@ -6,6 +6,7 @@ import {
   getHookType,
   isExternalHookSession,
   wrapExternalContent,
+  wrapToolTranscript,
   wrapWebContent,
 } from "./external-content.js";
 
@@ -231,6 +232,35 @@ describe("external-content security", () => {
 
     it("returns unknown for non-hook sessions", () => {
       expect(getHookType("cron:daily")).toBe("unknown");
+    });
+  });
+
+  describe("wrapToolTranscript", () => {
+    it("wraps web_fetch content with security markers", () => {
+      const result = wrapToolTranscript("fetched content", "web_fetch");
+      expect(result).toMatch(/<<<EXTERNAL_UNTRUSTED_CONTENT/);
+      expect(result).toContain("Source: Web Fetch");
+      expect(result).toContain("fetched content");
+    });
+
+    it("wraps web_search content with security markers", () => {
+      const result = wrapToolTranscript("search results", "web_search");
+      expect(result).toMatch(/<<<EXTERNAL_UNTRUSTED_CONTENT/);
+      expect(result).toContain("Source: Web Search");
+    });
+
+    it("wraps browser_tool content with security markers", () => {
+      const result = wrapToolTranscript("browser snapshot", "browser_tool");
+      expect(result).toMatch(/<<<EXTERNAL_UNTRUSTED_CONTENT/);
+      expect(result).toContain("Source: Browser Tool");
+    });
+  });
+
+  describe("wrapWebContent browser_tool source", () => {
+    it("wraps browser_tool content", () => {
+      const result = wrapWebContent("browser content", "browser_tool");
+      expect(result).toMatch(/<<<EXTERNAL_UNTRUSTED_CONTENT/);
+      expect(result).toContain("Source: Browser Tool");
     });
   });
 

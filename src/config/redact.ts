@@ -55,6 +55,11 @@ const SENSITIVE_KEY_EXACT: Set<string> = new Set([
   "proxy",
   "sshIdentity",
   "tlsFingerprint",
+  "clientSecret",
+  "encryptionKey",
+  "signingKey",
+  "cookieSecret",
+  "sessionSecret",
 ]);
 
 /**
@@ -188,6 +193,7 @@ export function redactConfigSnapshot<
     raw?: string | null;
     parsed?: unknown;
     config?: Record<string, unknown>;
+    resolved?: unknown;
   },
 >(snapshot: T): T {
   const result = { ...snapshot };
@@ -207,8 +213,18 @@ export function redactConfigSnapshot<
     result.config = redactConfigObject(result.config);
   }
 
+  // Redact resolved config values (runtime-resolved fields may contain secrets)
+  if (result.resolved && typeof result.resolved === "object" && !Array.isArray(result.resolved)) {
+    result.resolved = redactConfigObject(result.resolved as Record<string, unknown>);
+  }
+
   return result;
 }
+
+/**
+ * Exported for use by status output redaction.
+ */
+export { looksLikeSecret };
 
 /**
  * List of sensitive key patterns for documentation/testing.

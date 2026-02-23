@@ -17,6 +17,31 @@ import { buildAgentSystemPrompt } from "../system-prompt.js";
 
 const CLI_RUN_QUEUE = new Map<string, Promise<unknown>>();
 
+// -- PID ownership tracking ---------------------------------------------------
+// Tracks PIDs of child processes spawned by this gateway instance.
+// Only owned PIDs should be sent signals during cleanup.
+const ownedPids = new Set<number>();
+
+export function registerOwnedPid(pid: number): void {
+  if (Number.isFinite(pid) && pid > 0) {
+    ownedPids.add(pid);
+  }
+}
+
+export function unregisterOwnedPid(pid: number): void {
+  ownedPids.delete(pid);
+}
+
+export function isOwnedPid(pid: number): boolean {
+  return ownedPids.has(pid);
+}
+
+export function getOwnedPids(): ReadonlySet<number> {
+  return ownedPids;
+}
+
+// -----------------------------------------------------------------------------
+
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -37,6 +62,12 @@ export async function cleanupResumeProcesses(
     return;
   }
 
+  // Only signal PIDs that we own (spawned by this process)
+  const owned = Array.from(ownedPids);
+  if (owned.length === 0) {
+    return;
+  }
+
   const resumeTokens = resumeArgs.map((arg) => arg.replaceAll("{sessionId}", sessionId));
   const pattern = [commandToken, ...resumeTokens]
     .filter(Boolean)
@@ -46,10 +77,36 @@ export async function cleanupResumeProcesses(
     return;
   }
 
+  const matcher = new RegExp(pattern);
   try {
-    await runExec("pkill", ["-f", pattern]);
+    const { stdout } = await runExec("ps", ["-ax", "-o", "pid=,command="]);
+    for (const line of stdout.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const match = /^(\d+)\s+(.*)$/.exec(trimmed);
+      if (!match) {
+        continue;
+      }
+      const pid = Number(match[1]);
+      const cmd = match[2] ?? "";
+      if (!Number.isFinite(pid) || pid <= 0) {
+        continue;
+      }
+      if (!isOwnedPid(pid)) {
+        continue;
+      }
+      if (matcher.test(cmd)) {
+        try {
+          process.kill(pid, "SIGTERM");
+        } catch {
+          // PID may have already exited
+        }
+      }
+    }
   } catch {
-    // ignore missing pkill or no matches
+    // ignore errors - best effort cleanup
   }
 }
 
@@ -126,7 +183,10 @@ export async function cleanupSuspendedCliProcesses(
       const pid = Number(match[1]);
       const stat = match[2] ?? "";
       const command = match[3] ?? "";
-      if (!Number.isFinite(pid)) {
+      if (!Number.isFinite(pid) || pid <= 0) {
+        continue;
+      }
+      if (!isOwnedPid(pid)) {
         continue;
       }
       if (!stat.includes("T")) {
@@ -140,7 +200,16 @@ export async function cleanupSuspendedCliProcesses(
 
     if (suspended.length > threshold) {
       // Verified locally: stopped (T) processes ignore SIGTERM, so use SIGKILL.
-      await runExec("kill", ["-9", ...suspended.map((pid) => String(pid))]);
+      for (const pid of suspended) {
+        if (!Number.isFinite(pid) || pid <= 0) {
+          continue;
+        }
+        try {
+          process.kill(pid, "SIGKILL");
+        } catch {
+          // PID may have already exited
+        }
+      }
     }
   } catch {
     // ignore errors - best effort cleanup

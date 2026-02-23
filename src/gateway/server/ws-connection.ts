@@ -60,11 +60,20 @@ export function attachGatewayWsConnectionHandler(params: {
       ?.remoteAddress;
     const headerValue = (value: string | string[] | undefined) =>
       Array.isArray(value) ? value[0] : value;
-    const requestHost = headerValue(upgradeReq.headers.host);
-    const requestOrigin = headerValue(upgradeReq.headers.origin);
-    const requestUserAgent = headerValue(upgradeReq.headers["user-agent"]);
-    const forwardedFor = headerValue(upgradeReq.headers["x-forwarded-for"]);
-    const realIp = headerValue(upgradeReq.headers["x-real-ip"]);
+    // Sanitize header values: strip control characters and newlines to prevent log injection
+    const sanitizeHeader = (value: string | undefined): string | undefined => {
+      if (!value) {
+        return value;
+      }
+      // eslint-disable-next-line no-control-regex
+      return value.replace(/[\x00-\x1f\x7f]/g, "");
+    };
+    // Note: authorization, cookie, and token headers are intentionally NOT extracted or logged
+    const requestHost = sanitizeHeader(headerValue(upgradeReq.headers.host));
+    const requestOrigin = sanitizeHeader(headerValue(upgradeReq.headers.origin));
+    const requestUserAgent = sanitizeHeader(headerValue(upgradeReq.headers["user-agent"]));
+    const forwardedFor = sanitizeHeader(headerValue(upgradeReq.headers["x-forwarded-for"]));
+    const realIp = sanitizeHeader(headerValue(upgradeReq.headers["x-real-ip"]));
 
     logWs("in", "open", { connId, remoteAddr });
     let handshakeState: "pending" | "connected" | "failed" = "pending";

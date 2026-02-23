@@ -259,4 +259,39 @@ describe("getSensitiveExactKeys", () => {
     expect(keys).toContain("password");
     expect(keys).toContain("secret");
   });
+
+  it("includes phase16 session04 additions", () => {
+    const keys = getSensitiveExactKeys();
+    expect(keys).toContain("clientSecret");
+    expect(keys).toContain("encryptionKey");
+    expect(keys).toContain("signingKey");
+    expect(keys).toContain("cookieSecret");
+    expect(keys).toContain("sessionSecret");
+  });
+});
+
+describe("redactConfigSnapshot resolved field", () => {
+  it("redacts the resolved field", () => {
+    const input = {
+      raw: '{"token":"abc"}',
+      parsed: { token: "abc" },
+      config: { token: "abc" },
+      resolved: { token: "abc", name: "test" },
+    };
+    const result = redactConfigSnapshot(input);
+    const resolved = result.resolved as Record<string, unknown>;
+    expect(resolved.token).toBe("[REDACTED]");
+    expect(resolved.name).toBe("test");
+  });
+
+  it("preserves null resolved field", () => {
+    const input = {
+      raw: "",
+      parsed: {},
+      config: {},
+      resolved: null,
+    };
+    const result = redactConfigSnapshot(input);
+    expect(result.resolved).toBeNull();
+  });
 });

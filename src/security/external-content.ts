@@ -83,6 +83,7 @@ export type ExternalContentSource =
   | "webhook"
   | "api"
   | "browser"
+  | "browser_tool"
   | "channel_metadata"
   | "web_search"
   | "web_fetch"
@@ -93,6 +94,7 @@ const EXTERNAL_SOURCE_LABELS: Record<ExternalContentSource, string> = {
   webhook: "Webhook",
   api: "API",
   browser: "Browser",
+  browser_tool: "Browser Tool",
   channel_metadata: "Channel metadata",
   web_search: "Web Search",
   web_fetch: "Web Fetch",
@@ -319,13 +321,20 @@ export function getHookType(sessionKey: string): ExternalContentSource {
   return "unknown";
 }
 
+export type WebToolSource = "web_search" | "web_fetch" | "browser_tool";
+
 /**
- * Wraps web search/fetch content with security markers.
+ * Wraps web search/fetch/browser content with security markers.
  */
-export function wrapWebContent(
-  content: string,
-  source: "web_search" | "web_fetch" = "web_search",
-): string {
-  const includeWarning = source === "web_fetch";
+export function wrapWebContent(content: string, source: WebToolSource = "web_search"): string {
+  const includeWarning = source === "web_fetch" || source === "browser_tool";
   return wrapExternalContent(content, { source, includeWarning });
+}
+
+/**
+ * Convenience wrapper for tool results containing untrusted web content.
+ * Returns the wrapped content ready to be used as a tool result string.
+ */
+export function wrapToolTranscript(content: string, source: WebToolSource): string {
+  return wrapWebContent(content, source);
 }

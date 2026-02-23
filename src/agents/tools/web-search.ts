@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox";
 
 import type { crocbotConfig } from "../../config/config.js";
 import { formatCliCommand } from "../../cli/command-format.js";
+import { wrapToolTranscript } from "../../security/external-content.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, readNumberParam, readStringParam } from "./common.js";
 import {
@@ -390,7 +391,7 @@ async function runWebSearch(params: {
       provider: params.provider,
       model: params.perplexityModel ?? DEFAULT_PERPLEXITY_MODEL,
       tookMs: Date.now() - start,
-      content,
+      content: wrapToolTranscript(content, "web_search"),
       citations,
     };
     writeCache(SEARCH_CACHE, cacheKey, payload, params.cacheTtlMs);
@@ -436,7 +437,7 @@ async function runWebSearch(params: {
   const mapped = results.map((entry) => ({
     title: entry.title ?? "",
     url: entry.url ?? "",
-    description: entry.description ?? "",
+    description: wrapToolTranscript(entry.description ?? "", "web_search"),
     published: entry.age ?? undefined,
     siteName: resolveSiteName(entry.url ?? ""),
   }));

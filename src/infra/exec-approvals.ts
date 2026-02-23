@@ -586,7 +586,7 @@ export type ExecCommandAnalysis = {
   chains?: ExecCommandSegment[][]; // Segments grouped by chain operator (&&, ||, ;)
 };
 
-const DISALLOWED_PIPELINE_TOKENS = new Set([">", "<", "`", "\n", "\r", "(", ")"]);
+const DISALLOWED_PIPELINE_TOKENS = new Set([">", "`", "\n", "\r", "(", ")"]);
 
 type IteratorAction = "split" | "skip" | "include" | { reject: string };
 
@@ -680,6 +680,7 @@ function iterateQuoteAware(
 
 function splitShellPipeline(command: string): { ok: boolean; reason?: string; segments: string[] } {
   let emptySegment = false;
+  let expectHeredocSecondAngle = false;
   const result = iterateQuoteAware(command, (ch, next) => {
     if (ch === "|" && next === "|") {
       return { reject: "unsupported shell token: ||" };
@@ -697,8 +698,27 @@ function splitShellPipeline(command: string): { ok: boolean; reason?: string; se
     if (DISALLOWED_PIPELINE_TOKENS.has(ch)) {
       return { reject: `unsupported shell token: ${ch}` };
     }
+    if (expectHeredocSecondAngle) {
+      expectHeredocSecondAngle = false;
+      if (ch === "<") {
+        emptySegment = false;
+        return "include"; // second < of heredoc <<
+      }
+      return { reject: "unsupported shell token: <" };
+    }
+    if (ch === "<") {
+      if (next === "<") {
+        expectHeredocSecondAngle = true;
+        emptySegment = false;
+        return "include"; // first < of heredoc <<
+      }
+      return { reject: "unsupported shell token: <" };
+    }
     if (ch === "$" && next === "(") {
       return { reject: "unsupported shell token: $()" };
+    }
+    if (ch === "$" && next === "{") {
+      return { reject: "unsupported shell token: ${}" };
     }
     emptySegment = false;
     return "include";
@@ -860,6 +880,23 @@ export function analyzeArgvCommand(params: {
   };
 }
 
+/**
+ * Returns true if a token contains shell expansion patterns that could allow
+ * command injection via safeBins arguments.
+ */
+function containsShellExpansion(value: string): boolean {
+  if (value.includes("$(")) {
+    return true;
+  }
+  if (value.includes("${")) {
+    return true;
+  }
+  if (value.includes("`")) {
+    return true;
+  }
+  return false;
+}
+
 function isPathLikeToken(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -931,6 +968,10 @@ export function isSafeBinUsage(params: {
     const token = argv[i];
     if (!token) {
       continue;
+    }
+    // Reject any argument containing shell expansion patterns
+    if (containsShellExpansion(token)) {
+      return false;
     }
     if (token === "-") {
       continue;

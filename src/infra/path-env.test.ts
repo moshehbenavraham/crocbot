@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ensurecrocbotCliOnPath } from "./path-env.js";
+import { ensurecrocbotCliOnPath, mergePath } from "./path-env.js";
 
 describe("ensurecrocbotCliOnPath", () => {
   it("prepends the bundled app bin dir when a sibling crocbot exists", async () => {
@@ -174,5 +174,59 @@ describe("ensurecrocbotCliOnPath", () => {
       }
       await fs.rm(tmp, { recursive: true, force: true });
     }
+  });
+});
+
+describe("mergePath hardening", () => {
+  it("rejects relative PATH segments", () => {
+    const result = mergePath({
+      existing: "/usr/bin:relative/path:/usr/local/bin",
+      prepend: [],
+    });
+    const parts = result.split(path.delimiter);
+    expect(parts).not.toContain("relative/path");
+    expect(parts).toContain("/usr/bin");
+    expect(parts).toContain("/usr/local/bin");
+  });
+
+  it("rejects empty PATH segments", () => {
+    const result = mergePath({
+      existing: "/usr/bin::/usr/local/bin",
+      prepend: [],
+    });
+    const parts = result.split(path.delimiter);
+    expect(parts.length).toBe(2);
+    expect(parts).toContain("/usr/bin");
+    expect(parts).toContain("/usr/local/bin");
+  });
+
+  it("rejects relative segments in prepend", () => {
+    const result = mergePath({
+      existing: "/usr/bin",
+      prepend: ["./node_modules/.bin", "/opt/bin"],
+    });
+    const parts = result.split(path.delimiter);
+    expect(parts).not.toContain("./node_modules/.bin");
+    expect(parts).toContain("/opt/bin");
+  });
+
+  it("deduplicates PATH entries", () => {
+    const result = mergePath({
+      existing: "/usr/bin:/usr/local/bin",
+      prepend: ["/usr/bin"],
+    });
+    const parts = result.split(path.delimiter);
+    const binCount = parts.filter((p) => p === "/usr/bin").length;
+    expect(binCount).toBe(1);
+  });
+
+  it("prepend entries appear before existing entries", () => {
+    const result = mergePath({
+      existing: "/usr/bin",
+      prepend: ["/opt/bin"],
+    });
+    const parts = result.split(path.delimiter);
+    expect(parts[0]).toBe("/opt/bin");
+    expect(parts[1]).toBe("/usr/bin");
   });
 });
