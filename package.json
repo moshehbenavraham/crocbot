@@ -155,7 +155,7 @@
     "detect-libc": "^2.1.2",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "file-type": "^21.3.0",
+    "file-type": "^21.3.2",
     "grammy": "^1.40.0",
     "jiti": "^2.6.1",
     "json5": "^2.2.3",
@@ -173,9 +173,9 @@
     "sqlite-vec": "0.1.7-alpha.2",
     "tar": "7.5.8",
     "tslog": "^4.10.2",
-    "undici": "^7.21.0",
-    "ws": "^8.19.0",
-    "yaml": "^2.8.2",
+    "undici": "^7.24.0",
+    "ws": "^8.21.0",
+    "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
   "optionalDependencies": {
@@ -202,7 +202,7 @@
     "tsdown": "^0.20.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.0",
     "wireit": "^0.14.12"
   },
   "overrides": {
