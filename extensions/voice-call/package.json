@@ -5,7 +5,7 @@
   "description": "crocbot voice-call plugin",
   "dependencies": {
     "@sinclair/typebox": "0.34.47",
-    "ws": "^8.19.0",
+    "ws": "^8.21.0",
     "zod": "^4.3.6"
   },
   "crocbot": {
