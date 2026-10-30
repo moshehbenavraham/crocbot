@@ -12,12 +12,12 @@ type ModelEntry = { id: string; contextWindow?: number };
 const MODEL_CACHE = new Map<string, number>();
 const loadPromise = (async () => {
   try {
-    const { AuthStorage, ModelRegistry } = await import("@mariozechner/pi-coding-agent");
+    const { AuthStorage, ModelRegistry } = await import("@earendil-works/pi-coding-agent");
     const cfg = loadConfig();
     await ensurecrocbotModelsJson(cfg);
     const agentDir = resolvecrocbotAgentDir();
-    const authStorage = new AuthStorage(path.join(agentDir, "auth.json"));
-    const modelRegistry = new ModelRegistry(authStorage, path.join(agentDir, "models.json"));
+    const authStorage = AuthStorage.create(path.join(agentDir, "auth.json"));
+    const modelRegistry = ModelRegistry.create(authStorage, path.join(agentDir, "models.json"));
     const models = modelRegistry.getAll() as ModelEntry[];
     for (const m of models) {
       if (!m?.id) {

@@ -31,7 +31,7 @@ updates:
       # Held for dedicated migration PRs (split out of the tar/undici security PR)
       - dependency-name: vitest
         update-types: ["version-update:semver-major"]
-      - dependency-name: "@mariozechner/pi-coding-agent"
+      - dependency-name: "@earendil-works/pi-coding-agent"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
       # sharp 0.35 breaks image-ops typings and pulls libvips LGPL-3.0-or-later (fails Dependency Review)
       - dependency-name: sharp

@@ -6,7 +6,7 @@ import {
   estimateTokens,
   SessionManager,
   SettingsManager,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 
 import { TimeoutError, withTimeout } from "../../shared/with-timeout.js";
 
@@ -395,7 +395,7 @@ export async function compactEmbeddedPiSessionDirect(
         model,
       });
 
-      const { builtInTools, customTools } = splitSdkTools({
+      const { customTools } = splitSdkTools({
         tools,
         sandboxEnabled: !!sandbox?.enabled,
       });
@@ -408,7 +408,8 @@ export async function compactEmbeddedPiSessionDirect(
         modelRegistry,
         model,
         thinkingLevel: mapThinkingLevel(params.thinkLevel),
-        tools: builtInTools,
+        // pi >=0.74: `tools` is a name allowlist; disable built-ins, keep customTools.
+        noTools: "builtin",
         customTools,
         sessionManager,
         settingsManager,
@@ -441,7 +442,7 @@ export async function compactEmbeddedPiSessionDirect(
           ? sanitizeToolUseResultPairing(truncated)
           : truncated;
         if (limited.length > 0) {
-          session.agent.replaceMessages(limited);
+          session.agent.state.messages = limited;
         }
         const compactionTimeout = params.compactionTimeoutMs ?? 120_000;
         let result: Awaited<ReturnType<typeof session.compact>>;

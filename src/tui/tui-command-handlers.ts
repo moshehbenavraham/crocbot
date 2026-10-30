@@ -1,4 +1,4 @@
-import type { Component, TUI } from "@mariozechner/pi-tui";
+import type { Component, TUI } from "@earendil-works/pi-tui";
 import {
   formatThinkingLevels,
   normalizeUsageDisplay,

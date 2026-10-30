@@ -11,7 +11,7 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { completeSimple, type TextContent } from "@mariozechner/pi-ai";
+import { completeSimple, type TextContent } from "@earendil-works/pi-ai";
 import { EdgeTTS } from "node-edge-tts";
 
 import type { ReplyPayload } from "../auto-reply/types.js";

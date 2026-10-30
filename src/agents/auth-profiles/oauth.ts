@@ -1,4 +1,4 @@
-import { getOAuthApiKey, type OAuthCredentials } from "@mariozechner/pi-ai";
+import { getOAuthApiKey, type OAuthCredentials } from "@earendil-works/pi-ai/oauth";
 
 import type { crocbotConfig } from "../../config/config.js";
 import { refreshChutesTokens } from "../chutes-oauth.js";

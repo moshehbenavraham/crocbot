@@ -1,10 +1,14 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
-import type { ImageContent } from "@mariozechner/pi-ai";
-import { streamSimple } from "@mariozechner/pi-ai";
-import { createAgentSession, SessionManager, SettingsManager } from "@mariozechner/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import type { ImageContent } from "@earendil-works/pi-ai";
+import { streamSimple } from "@earendil-works/pi-ai";
+import {
+  createAgentSession,
+  SessionManager,
+  SettingsManager,
+} from "@earendil-works/pi-coding-agent";
 
 import { resolveHeartbeatPrompt } from "../../../auto-reply/heartbeat.js";
 import {
@@ -436,7 +440,7 @@ export async function runEmbeddedAttempt(
         model: params.model,
       });
 
-      const { builtInTools, customTools } = splitSdkTools({
+      const { customTools } = splitSdkTools({
         tools,
         sandboxEnabled: !!sandbox?.enabled,
       });
@@ -458,7 +462,8 @@ export async function runEmbeddedAttempt(
         modelRegistry: params.modelRegistry,
         model: params.model,
         thinkingLevel: mapThinkingLevel(params.thinkLevel),
-        tools: builtInTools,
+        // pi >=0.74: `tools` is a name allowlist; disable built-ins, keep customTools.
+        noTools: "builtin",
         customTools: allCustomTools,
         sessionManager,
         settingsManager,
@@ -489,7 +494,7 @@ export async function runEmbeddedAttempt(
         workspaceDir: params.workspaceDir,
       });
 
-      // Force a stable streamFn reference so vitest can reliably mock @mariozechner/pi-ai.
+      // Force a stable streamFn reference so vitest can reliably mock @earendil-works/pi-ai.
       activeSession.agent.streamFn = streamSimple;
 
       // Force store=true for OpenAI Responses API to enable response persistence.
@@ -550,7 +555,7 @@ export async function runEmbeddedAttempt(
           : truncated;
         cacheTrace?.recordStage("session:limited", { messages: limited });
         if (limited.length > 0) {
-          activeSession.agent.replaceMessages(limited);
+          activeSession.agent.state.messages = limited;
         }
       } catch (err) {
         sessionManager.flushPendingToolResults?.();
@@ -747,7 +752,7 @@ export async function runEmbeddedAttempt(
           const sanitizedOrphan = transcriptPolicy.normalizeAntigravityThinkingBlocks
             ? sanitizeAntigravityThinkingBlocks(sessionContext.messages)
             : sessionContext.messages;
-          activeSession.agent.replaceMessages(sanitizedOrphan);
+          activeSession.agent.state.messages = sanitizedOrphan;
           log.warn(
             `Removed orphaned user message to prevent consecutive user turns. ` +
               `runId=${params.runId} sessionId=${params.sessionId}`,
@@ -778,7 +783,7 @@ export async function runEmbeddedAttempt(
           );
           if (didMutate) {
             // Persist message mutations (e.g., injected history images) so we don't re-scan/reload.
-            activeSession.agent.replaceMessages(activeSession.messages);
+            activeSession.agent.state.messages = activeSession.messages;
           }
 
           cacheTrace?.recordStage("prompt:images", {

@@ -262,7 +262,7 @@ function buildSkillStatus(
   return {
     name: entry.skill.name,
     description: entry.skill.description,
-    source: entry.skill.source,
+    source: entry.skill.sourceInfo.source,
     filePath: entry.skill.filePath,
     baseDir: entry.skill.baseDir,
     skillKey,

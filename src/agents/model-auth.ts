@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { type Api, getEnvApiKey, type Model } from "@mariozechner/pi-ai";
+import { type Api, getEnvApiKey, type Model } from "@earendil-works/pi-ai";
 import type { crocbotConfig } from "../config/config.js";
 import type { ModelProviderAuthMode, ModelProviderConfig } from "../config/types.js";
 import { getShellEnvAppliedKeys } from "../infra/shell-env.js";

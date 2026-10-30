@@ -21,11 +21,11 @@ type DiscoveredModel = {
   input?: Array<"text" | "image">;
 };
 
-type PiSdkModule = typeof import("@mariozechner/pi-coding-agent");
+type PiSdkModule = typeof import("@earendil-works/pi-coding-agent");
 
 let modelCatalogPromise: Promise<ModelCatalogEntry[]> | null = null;
 let hasLoggedModelCatalogError = false;
-const defaultImportPiSdk = () => import("@mariozechner/pi-coding-agent");
+const defaultImportPiSdk = () => import("@earendil-works/pi-coding-agent");
 let importPiSdk = defaultImportPiSdk;
 
 export function resetModelCatalogCacheForTest() {
@@ -71,8 +71,11 @@ export async function loadModelCatalog(params?: {
       const agentDir = resolvecrocbotAgentDir();
       // discoverAuthStorage/discoverModels were removed in pi-coding-agent 0.50+.
       // Use the class constructors (AuthStorage/ModelRegistry) directly.
-      const authStorage = new piSdk.AuthStorage(path.join(agentDir, "auth.json"));
-      const registry = new piSdk.ModelRegistry(authStorage, path.join(agentDir, "models.json")) as
+      const authStorage = piSdk.AuthStorage.create(path.join(agentDir, "auth.json"));
+      const registry = piSdk.ModelRegistry.create(
+        authStorage,
+        path.join(agentDir, "models.json"),
+      ) as
         | {
             getAll: () => Array<DiscoveredModel>;
           }

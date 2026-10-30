@@ -6,7 +6,7 @@ import {
   type Model,
   type OpenAICompletionsOptions,
   type Tool,
-} from "@mariozechner/pi-ai";
+} from "@earendil-works/pi-ai";
 import { Type } from "@sinclair/typebox";
 
 const OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models";

@@ -13,7 +13,7 @@
  * tool execution time.
  */
 
-import type { StreamFn } from "@mariozechner/pi-agent-core";
+import type { StreamFn } from "@earendil-works/pi-agent-core";
 
 import { maskStringsDeep } from "./logging-transport.js";
 import { SecretsRegistry } from "./registry.js";

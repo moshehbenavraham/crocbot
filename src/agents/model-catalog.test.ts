@@ -7,7 +7,7 @@ import {
   resetModelCatalogCacheForTest,
 } from "./model-catalog.js";
 
-type PiSdkModule = typeof import("@mariozechner/pi-coding-agent");
+type PiSdkModule = typeof import("@earendil-works/pi-coding-agent");
 
 vi.mock("./models-config.js", () => ({
   ensurecrocbotModelsJson: vi.fn().mockResolvedValue({ agentDir: "/tmp", wrote: false }),

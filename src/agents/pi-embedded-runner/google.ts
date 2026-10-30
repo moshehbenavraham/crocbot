@@ -1,8 +1,7 @@
 import { EventEmitter } from "node:events";
 
-import type { AgentMessage, AgentTool } from "@mariozechner/pi-agent-core";
-import type { TSchema } from "@sinclair/typebox";
-import type { SessionManager } from "@mariozechner/pi-coding-agent";
+import type { AgentMessage, AgentTool } from "@earendil-works/pi-agent-core";
+import type { SessionManager } from "@earendil-works/pi-coding-agent";
 
 import { registerUnhandledRejectionHandler } from "../../infra/unhandled-rejections.js";
 import {
@@ -18,6 +17,9 @@ import { describeUnknownError } from "./utils.js";
 import { cleanToolSchemaForGemini } from "../pi-tools.schema.js";
 import type { TranscriptPolicy } from "../transcript-policy.js";
 import { resolveTranscriptPolicy } from "../transcript-policy.js";
+
+// pi >=0.74 types tool schemas with `typebox` 1.x; derive it from AgentTool.
+type TSchema = AgentTool["parameters"];
 
 const GOOGLE_TURN_ORDERING_CUSTOM_TYPE = "google-turn-ordering-bootstrap";
 const GOOGLE_SCHEMA_UNSUPPORTED_KEYWORDS = new Set([

@@ -1,4 +1,4 @@
-import type { AssistantMessageEvent } from "@mariozechner/pi-ai";
+import type { AssistantMessageEvent } from "@earendil-works/pi-ai";
 
 // ---------------------------------------------------------------------------
 // ReasoningPhase -- lifecycle phase of a reasoning chunk

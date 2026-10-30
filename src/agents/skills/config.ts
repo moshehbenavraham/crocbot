@@ -58,7 +58,7 @@ function normalizeAllowlist(input: unknown): string[] | undefined {
 }
 
 function isBundledSkill(entry: SkillEntry): boolean {
-  return entry.skill.source === "crocbot-bundled";
+  return entry.skill.sourceInfo.source === "crocbot-bundled";
 }
 
 export function resolveBundledAllowlist(config?: crocbotConfig): string[] | undefined {

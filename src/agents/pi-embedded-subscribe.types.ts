@@ -1,4 +1,4 @@
-import type { AgentSession } from "@mariozechner/pi-coding-agent";
+import type { AgentSession } from "@earendil-works/pi-coding-agent";
 
 import type { ReasoningLevel, VerboseLevel } from "../auto-reply/thinking.js";
 import type { BlockReplyChunking } from "./pi-embedded-block-chunker.js";

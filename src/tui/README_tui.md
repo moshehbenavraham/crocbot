@@ -33,4 +33,4 @@ pnpm tui:dev       # Launch in dev profile
 ## Related
 
 - Terminal utilities: `src/terminal/`
-- Pi TUI dependency: `@mariozechner/pi-tui`
+- Pi TUI dependency: `@earendil-works/pi-tui`

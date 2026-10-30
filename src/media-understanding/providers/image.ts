@@ -1,5 +1,5 @@
-import type { Api, Context, Model } from "@mariozechner/pi-ai";
-import { complete } from "@mariozechner/pi-ai";
+import type { Api, Context, Model } from "@earendil-works/pi-ai";
+import { complete } from "@earendil-works/pi-ai";
 import { discoverAuthStorage, discoverModels } from "../../agents/pi-model-discovery.js";
 
 import { getApiKeyForModel, requireApiKey } from "../../agents/model-auth.js";

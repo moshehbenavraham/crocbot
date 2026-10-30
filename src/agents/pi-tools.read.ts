@@ -1,5 +1,5 @@
-import type { AgentToolResult } from "@mariozechner/pi-agent-core";
-import { createEditTool, createReadTool, createWriteTool } from "@mariozechner/pi-coding-agent";
+import type { AgentToolResult } from "@earendil-works/pi-agent-core";
+import { createEditTool, createReadTool, createWriteTool } from "@earendil-works/pi-coding-agent";
 
 import { detectMime } from "../media/mime.js";
 import type { AnyAgentTool } from "./pi-tools.types.js";

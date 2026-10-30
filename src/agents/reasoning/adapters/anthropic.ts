@@ -1,4 +1,4 @@
-import type { AssistantMessageEvent } from "@mariozechner/pi-ai";
+import type { AssistantMessageEvent } from "@earendil-works/pi-ai";
 
 import { createReasoningChunk } from "../types.js";
 import type { ReasoningChunk, ReasoningStreamAdapter } from "../types.js";
