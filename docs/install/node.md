@@ -9,7 +9,7 @@ read_when:
 
 # Node.js + npm (PATH sanity)
 
-crocbot’s runtime baseline is **Node 22+**.
+crocbot’s runtime baseline is **Node 22.19+**.
 
 If you can run `npm install -g crocbot@latest` but later see `crocbot: command not found`, it’s almost always a **PATH** issue: the directory where npm puts global binaries isn’t on your shell’s PATH.
 

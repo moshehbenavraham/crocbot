@@ -255,7 +255,7 @@ Next models to deepen fidelity:
 | Issue | Priority | Resolution |
 |-------|----------|------------|
 | CVE-2026-25253 (1-Click RCE) | Critical | `gatewayUrl` not accepted from query params; Control UI removed; loopback enforced |
-| CVE-2025-59466 / CVE-2026-21636 (Node.js) | Critical | Running v24.13.0, past required v22.12.0 |
+| CVE-2025-59466 / CVE-2026-21636 (Node.js) | Critical | Running v24.13.0, past required v22.19.0 |
 | Bot token in Telegram API URLs | High | Added `redactBotToken()` in `src/telegram/download.ts`; wrapped all 3 fetch sites |
 | Dockerfile: unverified binary downloads | High | Bun pinned to `BUN_VERSION=1.2.2`; gog CLI pinned to `v1.5.0` |
 | Dockerfile: build failure silenced | Medium | Changed `pnpm build \|\| true` to `pnpm build` |

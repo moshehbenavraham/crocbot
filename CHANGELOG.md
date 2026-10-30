@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- undici 7.30.0 → 7.30.1 on the direct/cheerio path (GHSA-xjj6-f33q-929c, GHSA-4w7w-5xrc-9h26, GHSA-2m5v-pch6-74hx, GHSA-qrxm-fqhp-jwvm).
+- Cache-trace redaction is broader: credential-like header-name substrings (auth, token, secret, pass, key, jwt, hmac, sig, cookie, session, credential, ...), any `Bearer` value, Basic credentials (first token with `:`, decoding to `user:pass`, or 8+ chars, or a separator right after `Basic`), `token=` params, Digest/AWS SigV4/HOBA/ApiKey/SSWS schemes, `Key` with a 16+ char token, and scheme-less `sk-…`, JWT, Stripe (`rk_live_`/`rk_test_` restricted keys included), GitHub, Slack, AWS access key id and Google API key shapes are redacted. It prefers over-redaction (trace only).
+
 ### Added
 
 - **Security hardening (Phase 06)**: Ported three upstream security measures -- SSRF guards with DNS pinning on all outbound fetch sites (webhook alerts, skill downloads, media fetches), Telegram download timeouts with AbortSignal enforcement (30s metadata, 60s downloads), and path traversal validation via assertMediaPath on all media storage operations. Integration test suite validates private IP blocking (RFC 1918, link-local, loopback, IPv6-mapped), redirect chain SSRF prevention, protocol validation, null byte safety, and Unicode path edge cases. Security bypass audit completed with no critical findings.
 
 ### Changed
 
+- **Upgrade note: Node >=22.19.0 required**: the runtime guard now matches `engines.node` (`>=22.19.0`, needed by `@earendil-works/pi-*` 0.79.10 and undici 8.12.2). On Node 22.0–22.18 crocbot now exits with code 1 and prints "crocbot requires Node >=22.19.0." (the previous guard accepted any Node >=22.0.0). Upgrade Node before updating; the daemon's system-Node check uses the same floor.
 - **Build tooling migration (Phase 05)**: Replaced tsc production builds with tsdown bundler powered by rolldown. Three entry points (index, CLI entry, plugin-sdk) now produce optimized flat output in dist/ with ~5s total build time. Unified tsconfig.json targets ES2023 with NodeNext module resolution and noEmit-only type checking. Stricter oxlint rules enabled (134 rules, type-aware) with oxfmt replacing Prettier for formatting. Zero `any` types remain in source. CI workflows, Docker multi-stage builds, and plugin-sdk .d.ts generation validated end-to-end.
 
 ## [2026.1.63] - 2026-02-05

@@ -29,7 +29,7 @@ crocbot onboard --install-daemon
 
 ## System requirements
 
-- **Node >=22**
+- **Node >=22.19.0** (upgrading from an older crocbot on Node 22.0–22.18? Upgrade Node first: crocbot now exits on startup with `crocbot requires Node >=22.19.0.`)
 - macOS, Linux, or Windows via WSL2
 - `pnpm` only if you build from source
 

@@ -207,23 +207,161 @@ function safeJsonStringify(value: unknown): string | null {
 }
 
 const REDACTED = "[REDACTED]";
-const SENSITIVE_HEADER_RE =
-  /^(authorization|proxy-authorization|cookie|set-cookie)$|api[-_]?key|subscription[-_]?key|functions[-_]?key|token|secret|signature/i;
-const CREDENTIAL_VALUE_RE = /^\s*(bearer|basic)\s/i;
+
+// Header-name redaction prefers safety over readability (trace-only, the wrapped
+// stream fn still receives the real options). Any of these substrings in the
+// lowercased name redacts the value, so compounds such as `X-Apitoken`,
+// `X-Secretkey`, `X-Passphrase` or `X-Authz` are caught. Known over-redaction:
+// `X-Session-Id`, `X-Signature-Version`, `X-Keyboard`, `X-Author`, `Monkey`, ...
+const SENSITIVE_NAME_SUBSTRING_RE =
+  /auth|token|secret|pass|key|jwt|hmac|sig|cookie|session|credential|bearer|private/;
+// Short markers only matched as whole words (`pat` must not hit `path`).
+const SENSITIVE_NAME_WORDS = new Set(["pat", "otp", "pwd", "pin"]);
+// Token count/limit headers (`X-Max-Tokens: 100`, `anthropic-ratelimit-input-tokens-
+// remaining: 1000`) are the only exemption. Every word of the name must be on this
+// allowlist (so a camelCase straddle such as `maxTokenSecret` or `X-MaxTokensIg` can
+// never slip through), with at least one `token(s)` word and one count word, and the
+// value must be a small integer. `reset`/`used` are deliberately not count words:
+// `X-Reset-Token: 482913` is a credential shape.
+const TOKEN_WORDS = new Set(["token", "tokens"]);
+const TOKEN_COUNT_WORDS = new Set(["max", "count", "remaining", "limit"]);
+const TOKEN_COUNT_NEUTRAL_WORDS = new Set([
+  "x",
+  "ratelimit",
+  "rate",
+  "anthropic",
+  "openai",
+  "input",
+  "output",
+  "prompt",
+  "completion",
+  "total",
+]);
+const SMALL_INT_RE = /^\s*\d{1,9}\s*$/;
+
+function headerNameWords(lowerName: string): string[] {
+  return lowerName.split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+function camelWords(name: string): string[] {
+  return headerNameWords(name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase());
+}
+
+/** True when the name alone marks the header as credential-bearing. */
+export function isSensitiveHeaderName(name: string): boolean {
+  const lower = name.toLowerCase();
+  if (SENSITIVE_NAME_SUBSTRING_RE.test(lower)) {
+    return true;
+  }
+  return camelWords(name).some((word) => SENSITIVE_NAME_WORDS.has(word));
+}
+
+function isTokenCountHeader(name: string, value: unknown): boolean {
+  if (typeof value !== "string" || !SMALL_INT_RE.test(value)) {
+    return false;
+  }
+  const words = camelWords(name);
+  let hasToken = false;
+  let hasCount = false;
+  for (const word of words) {
+    if (TOKEN_WORDS.has(word)) {
+      hasToken = true;
+      continue;
+    }
+    // token/tokens must be the only sensitive word (checked per word, never by
+    // stripping substrings out of the joined name).
+    if (SENSITIVE_NAME_SUBSTRING_RE.test(word) || SENSITIVE_NAME_WORDS.has(word)) {
+      return false;
+    }
+    if (TOKEN_COUNT_WORDS.has(word)) {
+      hasCount = true;
+    } else if (!TOKEN_COUNT_NEUTRAL_WORDS.has(word)) {
+      return false;
+    }
+  }
+  return hasToken && hasCount;
+}
+
+// Every regex below is linear: no nested or adjacent overlapping quantifiers, and
+// each scan is anchored at `^` or a non-alphanumeric boundary (see the ReDoS test).
+// Any non-empty Bearer credential, anywhere in the value (comma lists included).
+const BEARER_RE = /(?:^|[^a-z0-9])bearer\s+\S/i;
+// `token=...` param forms: Rails `Token token="..."`, bare `token="..."`, `access_token=`.
+const TOKEN_PARAM_RE = /(?:^|[^a-z0-9])token\s*=/i;
+// `<scheme> name=value, ...` auth-param schemes (RFC 7616 Digest, AWS SigV4, HOBA).
+const PARAM_SCHEME_RE = /^\s*(?:digest|aws4-hmac-sha256|hoba)\s+[a-z0-9_-]+\s*=/i;
+// `<scheme> <token68>` with a credential-shaped token (no spaces, >= 8 chars).
+const TOKEN68_SCHEME_RE =
+  /^\s*(?:token|negotiate|ntlm|hoba|apikey|ssws)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+// `Key <token>` only with a 16+ char credential-shaped token, so prose such as
+// `Key performance` / `Key Takeaways` stays readable.
+const KEY_SCHEME_RE = /^\s*key\s+[A-Za-z0-9\-._~+/]{16,}=*\s*$/i;
+// A Basic scheme followed directly by a separator (`Basic ;user:pw`, `Basic , b64`)
+// is malformed but still carries a credential: fail closed on the whole value.
+const BASIC_SEPARATOR_RE = /^\s*basic\s*[,;]/i;
+// Basic: decided on the first token after the scheme (see isBasicCredential).
+const BASIC_FIRST_TOKEN_RE = /^\s*basic\s+([^\s,;]+)/i;
+// Scheme-less provider keys and JWT-shaped values under neutral names.
+const SK_KEY_RE = /(?:^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8}/;
+const JWT_RE = /(?:^|[^A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\./;
+// Well-known vendor key shapes: Stripe (restricted keys are `rk_live_`/`rk_test_` + 10-99
+// alphanumerics per Stripe docs and GitHub push protection), GitHub, Slack, AWS access key ids, Google API keys.
+const VENDOR_KEY_RE =
+  /(?:^|[^A-Za-z0-9])(?:(?:sk_live_|sk_test_|ghp_|gho_|ghs_|ghu_|ghr_|github_pat_|xoxb-|xoxp-)[A-Za-z0-9_-]{8}|rk_(?:live|test)_[A-Za-z0-9]{10}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35})/;
+
+// `Basic <x>`: redact when the first token contains ':' (raw user:pass), is 8+
+// chars, or leniently base64-decodes to something containing ':' (`Basic YTpi`).
+// Prose such as `Basic plan` stays readable.
+function isBasicCredential(segment: string): boolean {
+  const first = BASIC_FIRST_TOKEN_RE.exec(segment)?.[1];
+  if (!first) {
+    return false;
+  }
+  if (first.includes(":") || first.length >= 8) {
+    return true;
+  }
+  const payload = first
+    .replace(/[^A-Za-z0-9+/=\-_]+$/, "")
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  return Buffer.from(payload, "base64").toString("latin1").includes(":");
+}
+
+export function isCredentialHeaderValue(value: string): boolean {
+  if (BEARER_RE.test(value) || TOKEN_PARAM_RE.test(value)) {
+    return true;
+  }
+  if (SK_KEY_RE.test(value) || JWT_RE.test(value) || VENDOR_KEY_RE.test(value)) {
+    return true;
+  }
+  if (BASIC_SEPARATOR_RE.test(value)) {
+    return true;
+  }
+  // Check each comma-separated credential (`Token a, Basic b`) on its own.
+  return value
+    .split(",")
+    .some(
+      (segment) =>
+        PARAM_SCHEME_RE.test(segment) ||
+        TOKEN68_SCHEME_RE.test(segment) ||
+        KEY_SCHEME_RE.test(segment) ||
+        isBasicCredential(segment),
+    );
+}
 
 function redactHeaderValue(name: string, value: unknown): unknown {
   if (value == null) {
     return value;
   }
-  if (SENSITIVE_HEADER_RE.test(name)) {
+  if (isSensitiveHeaderName(name) && !isTokenCountHeader(name, value)) {
     return Array.isArray(value) ? value.map(() => REDACTED) : REDACTED;
   }
   if (Array.isArray(value)) {
     return value.map((item) =>
-      typeof item === "string" && CREDENTIAL_VALUE_RE.test(item) ? REDACTED : item,
+      typeof item === "string" && isCredentialHeaderValue(item) ? REDACTED : item,
     );
   }
-  return typeof value === "string" && CREDENTIAL_VALUE_RE.test(value) ? REDACTED : value;
+  return typeof value === "string" && isCredentialHeaderValue(value) ? REDACTED : value;
 }
 
 function redactHeaders(headers: unknown): unknown {
@@ -238,7 +376,11 @@ function redactHeaders(headers: unknown): unknown {
         : entry,
     );
   }
-  // Fetch `Headers` (or any iterable of [name, value] pairs).
+  // Fetch `Headers`, `Map`, or any object exposing `.entries()`. A `Map` keeps the
+  // caller's casing. A fetch `Headers` cannot: the Fetch spec lowercases names on
+  // insertion, so the original casing is gone before we see it (and the lowercase
+  // form is what undici sends on the wire). We emit those names as-is rather than
+  // invent a "canonical" casing that was never sent.
   if (typeof (headers as { entries?: unknown }).entries === "function") {
     const out: Record<string, unknown> = {};
     for (const [name, value] of (headers as Headers).entries()) {
