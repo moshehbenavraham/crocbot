@@ -61,6 +61,7 @@ import { resolveDefaultModelForAgent } from "../../model-selection.js";
 
 import { isAbortError } from "../abort.js";
 import { buildEmbeddedExtensionPaths } from "../extensions.js";
+import { createModelAuthStreamFn } from "../model-auth-stream.js";
 import { applyExtraParamsToAgent } from "../extra-params.js";
 import { appendCacheTtlTimestamp, isCacheTtlEligibleProvider } from "../cache-ttl.js";
 import {
@@ -495,11 +496,9 @@ export async function runEmbeddedAttempt(
       });
 
       // Force a stable streamFn reference so vitest can reliably mock @earendil-works/pi-ai.
-      activeSession.agent.streamFn = streamSimple;
-      // pi >=0.74 resolves the provider API key inside its default streamFn, which the
-      // line above replaces; restore the lookup through the agent's getApiKey hook.
-      activeSession.agent.getApiKey = (provider) =>
-        params.modelRegistry.getApiKeyForProvider(provider);
+      // pi >=0.74 resolves the API key and request headers (model/provider headers,
+      // authHeader) inside its default streamFn; keep that behaviour around streamSimple.
+      activeSession.agent.streamFn = createModelAuthStreamFn(params.modelRegistry, streamSimple);
 
       // Force store=true for OpenAI Responses API to enable response persistence.
       const isResponsesApi = params.model.api === "openai-responses";
