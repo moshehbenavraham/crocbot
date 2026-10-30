@@ -292,15 +292,22 @@ const TOKEN_PARAM_RE = /(?:^|[^a-z0-9])token\s*=/i;
 const PARAM_SCHEME_RE = /^\s*(?:digest|aws4-hmac-sha256|hoba)\s+[a-z0-9_-]+\s*=/i;
 // `<scheme> <token68>` with a credential-shaped token (no spaces, >= 8 chars).
 const TOKEN68_SCHEME_RE =
-  /^\s*(?:token|negotiate|ntlm|hoba|apikey|key|ssws)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+  /^\s*(?:token|negotiate|ntlm|hoba|apikey|ssws)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+// `Key <token>` only with a 16+ char credential-shaped token, so prose such as
+// `Key performance` / `Key Takeaways` stays readable.
+const KEY_SCHEME_RE = /^\s*key\s+[A-Za-z0-9\-._~+/]{16,}=*\s*$/i;
+// A Basic scheme followed directly by a separator (`Basic ;user:pw`, `Basic , b64`)
+// is malformed but still carries a credential: fail closed on the whole value.
+const BASIC_SEPARATOR_RE = /^\s*basic\s*[,;]/i;
 // Basic: decided on the first token after the scheme (see isBasicCredential).
 const BASIC_FIRST_TOKEN_RE = /^\s*basic\s+([^\s,;]+)/i;
 // Scheme-less provider keys and JWT-shaped values under neutral names.
 const SK_KEY_RE = /(?:^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8}/;
 const JWT_RE = /(?:^|[^A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\./;
-// Well-known vendor key shapes: Stripe, GitHub, Slack, AWS access key ids, Google API keys.
+// Well-known vendor key shapes: Stripe (restricted keys are `rk_live_`/`rk_test_` + 10-99
+// alphanumerics per Stripe docs and GitHub push protection), GitHub, Slack, AWS access key ids, Google API keys.
 const VENDOR_KEY_RE =
-  /(?:^|[^A-Za-z0-9])(?:(?:sk_live_|sk_test_|rk_|ghp_|gho_|ghs_|ghu_|ghr_|github_pat_|xoxb-|xoxp-)[A-Za-z0-9_-]{8}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35})/;
+  /(?:^|[^A-Za-z0-9])(?:(?:sk_live_|sk_test_|ghp_|gho_|ghs_|ghu_|ghr_|github_pat_|xoxb-|xoxp-)[A-Za-z0-9_-]{8}|rk_(?:live|test)_[A-Za-z0-9]{10}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35})/;
 
 // `Basic <x>`: redact when the first token contains ':' (raw user:pass), is 8+
 // chars, or leniently base64-decodes to something containing ':' (`Basic YTpi`).
@@ -327,6 +334,9 @@ export function isCredentialHeaderValue(value: string): boolean {
   if (SK_KEY_RE.test(value) || JWT_RE.test(value) || VENDOR_KEY_RE.test(value)) {
     return true;
   }
+  if (BASIC_SEPARATOR_RE.test(value)) {
+    return true;
+  }
   // Check each comma-separated credential (`Token a, Basic b`) on its own.
   return value
     .split(",")
@@ -334,6 +344,7 @@ export function isCredentialHeaderValue(value: string): boolean {
       (segment) =>
         PARAM_SCHEME_RE.test(segment) ||
         TOKEN68_SCHEME_RE.test(segment) ||
+        KEY_SCHEME_RE.test(segment) ||
         isBasicCredential(segment),
     );
 }

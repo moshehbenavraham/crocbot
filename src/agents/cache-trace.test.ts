@@ -336,6 +336,25 @@ describe("createCacheTrace", () => {
     });
   });
 
+  // #30 review 3: a separator right after `Basic` must not hide the credential.
+  it.each([
+    "Basic ;user:SECRETVAL123",
+    "Basic ,user:SECRETVAL123",
+    "Basic ; dXNlcjpwYXNz",
+    "Basic , dXNlcjpwYXNz",
+    "Basic\t;user:pw",
+    "Basic ;;user:pw",
+    "  basic;user:pw",
+  ])("fails closed on Basic followed by a separator: %j", (value) => {
+    expect(isCredentialHeaderValue(value)).toBe(true);
+    expect(redactTraceOptions({ headers: { "X-Fwd": value } }).headers).toEqual({
+      "X-Fwd": "[REDACTED]",
+    });
+    expect(redactTraceOptions({ headers: { "X-Fwd": [value, "plain"] } }).headers).toEqual({
+      "X-Fwd": ["[REDACTED]", "plain"],
+    });
+  });
+
   it.each([
     ["raw user:pass", "Basic user:SECRETVAL123"],
     ["trailing punctuation", "Basic SECRETVAL123!"],
@@ -356,11 +375,14 @@ describe("createCacheTrace", () => {
 
   it.each([
     ["ApiKey scheme", "ApiKey SECRETVAL123"],
-    ["Key scheme", "Key SECRETVAL123"],
+    ["Key scheme with a 16+ char key", "Key SECRETVAL123abcd"],
+    ["Key scheme with a base64 key", "Key c2VjcmV0LWtleS12YWx1ZQ=="],
     ["Okta SSWS scheme", "SSWS SECRETVAL123"],
     ["Stripe live key", "sk_live_SECRETVAL123abcd"],
     ["Stripe test key", "sk_test_SECRETVAL123abcd"],
-    ["Stripe restricted key", "rk_live_SECRETVAL123"],
+    ["Stripe restricted live key", "rk_live_SECRETVAL123"],
+    ["Stripe restricted test key", "rk_test_SECRETVAL123abcd"],
+    ["Stripe restricted key in a list", "x, rk_live_SECRETVAL123"],
     ["GitHub PAT (classic)", "ghp_SECRETVAL123abcdefghijklmnopqrstuv"],
     ["GitHub OAuth token", "gho_SECRETVAL123abcdefghij"],
     ["GitHub server token", "ghs_SECRETVAL123abcdefghij"],
@@ -391,6 +413,17 @@ describe("createCacheTrace", () => {
       "desk-lamp",
       "Basic abc",
       "Key points",
+      "Key performance",
+      "Key Takeaways",
+      "Key features",
+      "Key Westbrooks",
+      "Key 12345678",
+      "ApiKey docs",
+      "SSWS",
+      "/rk_backend01",
+      "req_rk_12345678",
+      "branch rk_feature_x",
+      "rk_live_short",
       "work_item_42",
       "AKIA-docs",
     ]) {
@@ -440,6 +473,8 @@ describe("createCacheTrace", () => {
       " AKIA".repeat(n / 5),
       " AIza" + "a".repeat(34) + "!".repeat(n),
       "Key " + "a".repeat(n) + " x",
+      "Basic" + " ".repeat(n) + "x",
+      " rk_live_".repeat(n / 9),
       "Digest " + "a".repeat(n),
       " ".repeat(n) + "x",
     ];
