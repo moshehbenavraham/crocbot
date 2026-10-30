@@ -27,7 +27,7 @@ crocbot's web interface is intended for local use only. Do **not** bind it to th
 
 ### Node.js Version
 
-crocbot requires **Node.js 22.12.0 or later** (LTS). This version includes important security patches:
+crocbot requires **Node.js 22.19.0 or later** (LTS). This version includes important security patches:
 
 - CVE-2025-59466: async_hooks DoS vulnerability
 - CVE-2026-21636: Permission model bypass vulnerability
@@ -35,7 +35,7 @@ crocbot requires **Node.js 22.12.0 or later** (LTS). This version includes impor
 Verify your Node.js version:
 
 ```bash
-node --version  # Should be v22.12.0 or later
+node --version  # Should be v22.19.0 or later
 ```
 
 ### Docker Security

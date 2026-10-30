@@ -1,4 +1,4 @@
-import type { StreamFn } from "@mariozechner/pi-agent-core";
+import type { StreamFn } from "@earendil-works/pi-agent-core";
 import { describe, expect, it } from "vitest";
 
 import type { crocbotConfig } from "../config/config.js";
@@ -147,5 +147,64 @@ describe("createCacheTrace", () => {
     expect(event.options.env).toEqual({ AWS_SECRET_ACCESS_KEY: "[REDACTED]" });
     // The wrapped stream function still receives the real credentials.
     expect(seen[0]).toBe(options);
+  });
+
+  it("redacts subscription-key headers, array header values, tuple and Headers forms", async () => {
+    const lines: string[] = [];
+    const trace = createCacheTrace({
+      cfg: { diagnostics: { cacheTrace: { enabled: true } } },
+      env: {},
+      writer: {
+        filePath: "memory",
+        write: (line) => lines.push(line),
+      },
+    });
+    const streamFn = trace?.wrapStreamFn((() => undefined as never) as StreamFn);
+    const record = async (headers: unknown) => {
+      await streamFn?.(
+        { id: "m", provider: "p", api: "openai-completions" } as never,
+        { messages: [] } as never,
+        { headers } as never,
+      );
+      const line = lines.at(-1) ?? "{}";
+      expect(line).not.toContain("sk-secret-value");
+      return (JSON.parse(line) as { options: { headers: unknown } }).options.headers;
+    };
+
+    expect(
+      await record({
+        "Ocp-Apim-Subscription-Key": "sk-secret-value",
+        "x-functions-key": "sk-secret-value",
+        Authorization: ["Bearer sk-secret-value", "Basic sk-secret-value"],
+        "X-Forwarded-Auth": ["Bearer sk-secret-value", "plain"],
+        "X-Custom-Auth": "Basic sk-secret-value",
+        Accept: ["application/json", "text/plain"],
+      }),
+    ).toEqual({
+      "Ocp-Apim-Subscription-Key": "[REDACTED]",
+      "x-functions-key": "[REDACTED]",
+      Authorization: ["[REDACTED]", "[REDACTED]"],
+      "X-Forwarded-Auth": ["[REDACTED]", "plain"],
+      "X-Custom-Auth": "[REDACTED]",
+      Accept: ["application/json", "text/plain"],
+    });
+
+    expect(
+      await record([
+        ["Authorization", "Bearer sk-secret-value"],
+        ["ocp-apim-subscription-key", "sk-secret-value"],
+        ["User-Agent", "KimiCLI/0.77"],
+      ]),
+    ).toEqual([
+      ["Authorization", "[REDACTED]"],
+      ["ocp-apim-subscription-key", "[REDACTED]"],
+      ["User-Agent", "KimiCLI/0.77"],
+    ]);
+
+    expect(
+      await record(
+        new Headers({ Authorization: "Bearer sk-secret-value", "User-Agent": "KimiCLI/0.77" }),
+      ),
+    ).toEqual({ authorization: "[REDACTED]", "user-agent": "KimiCLI/0.77" });
   });
 });

@@ -7,7 +7,7 @@ import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { discoverAuthStorage, discoverModels } from "../pi-model-discovery.js";
-import { createModelAuthStreamFn } from "./model-auth-stream.js";
+import { createModelAuthStreamFn, mergeHeaders } from "./model-auth-stream.js";
 
 type Seen = http.IncomingHttpHeaders;
 
@@ -152,6 +152,58 @@ describe("createModelAuthStreamFn (outgoing request headers)", () => {
     expect(headers.authorization).toBe("Bearer test-key-runtime");
     expect(headers["x-prov"]).toBe("from-options");
     expect(headers["x-keep"]).toBe("k");
+  });
+
+  it("lets outer option headers override auth headers case-insensitively (no duplicates)", async () => {
+    const { registry } = setup({
+      "case-proxy": {
+        baseUrl: `${baseUrl}/v1`,
+        api: "openai-completions",
+        apiKey: "test-key-config",
+        authHeader: true,
+        headers: { "X-Prov": "from-config" },
+        models: [
+          {
+            id: "m1",
+            name: "m1",
+            reasoning: false,
+            input: ["text"],
+            cost: zeroCost,
+            contextWindow: 1000,
+            maxTokens: 100,
+            headers: { "User-Agent": "KimiCLI/0.77" },
+          },
+        ],
+      },
+    });
+    const headers = await send(registry, "case-proxy", {
+      headers: { authorization: "Bearer test-key-outer", "x-prov": "from-options" },
+    });
+    expect(headers.authorization).toBe("Bearer test-key-outer");
+    expect(headers["x-prov"]).toBe("from-options");
+    expect(headers["user-agent"]).toBe("KimiCLI/0.77");
+
+    let passed: Record<string, string> | undefined;
+    const capture = createModelAuthStreamFn(registry, (_model, _context, options) => {
+      passed = options?.headers;
+      return undefined as never;
+    });
+    await capture(
+      registry.find("case-proxy", "m1")!,
+      { systemPrompt: "", messages: [] },
+      { headers: { authorization: "Bearer test-key-outer", "x-prov": "from-options" } },
+    );
+    expect(passed).toEqual({
+      "User-Agent": "KimiCLI/0.77",
+      authorization: "Bearer test-key-outer",
+      "x-prov": "from-options",
+    });
+  });
+
+  it("mergeHeaders keeps the last spelling and value for a header name", () => {
+    expect(
+      mergeHeaders({ Authorization: "a", "X-A": "1" }, undefined, { AUTHORIZATION: "b" }),
+    ).toEqual({ "X-A": "1", AUTHORIZATION: "b" });
   });
 
   it("throws the registry error (like pi's default streamFn) instead of sending", async () => {
