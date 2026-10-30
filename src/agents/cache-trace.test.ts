@@ -1,3 +1,4 @@
+import type { StreamFn } from "@mariozechner/pi-agent-core";
 import { describe, expect, it } from "vitest";
 
 import type { crocbotConfig } from "../config/config.js";
@@ -89,5 +90,62 @@ describe("createCacheTrace", () => {
     });
 
     expect(trace).toBeNull();
+  });
+
+  it("redacts apiKey, auth headers and provider env from recorded stream options", async () => {
+    const lines: string[] = [];
+    const trace = createCacheTrace({
+      cfg: { diagnostics: { cacheTrace: { enabled: true } } },
+      env: {},
+      writer: {
+        filePath: "memory",
+        write: (line) => lines.push(line),
+      },
+    });
+    const seen: unknown[] = [];
+    const streamFn = trace?.wrapStreamFn(((_model, _context, options) => {
+      seen.push(options);
+      return undefined as never;
+    }) as StreamFn);
+    const options = {
+      apiKey: "sk-secret-value",
+      maxTokens: 10,
+      headers: {
+        Authorization: "Bearer sk-secret-value",
+        "x-api-key": "sk-secret-value",
+        "x-goog-api-key": "sk-secret-value",
+        "Proxy-Authorization": "Basic c2VjcmV0",
+        Cookie: "session=secret",
+        "User-Agent": "KimiCLI/0.77",
+        "anthropic-beta": "prompt-caching",
+      },
+      env: { AWS_SECRET_ACCESS_KEY: "secret-env" },
+    };
+    await streamFn?.(
+      { id: "m", provider: "p", api: "openai-completions" } as never,
+      { messages: [] } as never,
+      options as never,
+    );
+
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).not.toContain("sk-secret-value");
+    expect(lines[0]).not.toContain("c2VjcmV0");
+    expect(lines[0]).not.toContain("session=secret");
+    expect(lines[0]).not.toContain("secret-env");
+    const event = JSON.parse(lines[0] ?? "{}") as { options: Record<string, unknown> };
+    expect(event.options.apiKey).toBe("[REDACTED]");
+    expect(event.options.maxTokens).toBe(10);
+    expect(event.options.headers).toEqual({
+      Authorization: "[REDACTED]",
+      "x-api-key": "[REDACTED]",
+      "x-goog-api-key": "[REDACTED]",
+      "Proxy-Authorization": "[REDACTED]",
+      Cookie: "[REDACTED]",
+      "User-Agent": "KimiCLI/0.77",
+      "anthropic-beta": "prompt-caching",
+    });
+    expect(event.options.env).toEqual({ AWS_SECRET_ACCESS_KEY: "[REDACTED]" });
+    // The wrapped stream function still receives the real credentials.
+    expect(seen[0]).toBe(options);
   });
 });
