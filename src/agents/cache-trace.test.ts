@@ -315,6 +315,68 @@ describe("createCacheTrace", () => {
     });
   });
 
+  // #30 review 2: the count exemption must not swallow the `s` of Secret/Session/
+  // Signature in camelCase names, and reset/used are not count words.
+  it.each([
+    ["maxTokenSecret", "123456"],
+    ["maxTokenSession", "123456"],
+    ["tokenSessionLimit", "123456"],
+    ["X-MaxTokenSignature", "5"],
+    ["remainingTokenSecrets", "42"],
+    ["X-MaxTokensIg", "5"],
+    ["maxTokenKeY", "5"],
+    ["X-Max-Tokensecret", "5"],
+    ["X-Reset-Token", "482913"],
+    ["X-Token-Reset", "482913"],
+    ["X-Used-Token", "482913"],
+    ["X-Token-Limit", "1234567890"],
+  ])("redacts token-count look-alike %s", (name, value) => {
+    expect(redactTraceOptions({ headers: { [name]: value } }).headers).toEqual({
+      [name]: "[REDACTED]",
+    });
+  });
+
+  it.each([
+    ["raw user:pass", "Basic user:SECRETVAL123"],
+    ["trailing punctuation", "Basic SECRETVAL123!"],
+    ["base64 then ;param", "Basic YTpi;foo"],
+    ["trailing word", "Basic SECRETVAL123 trailing"],
+    ["base64 user:pass then word", "Basic dXNlcjpwYXNz extra"],
+    ["short base64 with trailing !", "Basic YTpi!"],
+    ["Basic later in a list", "x, Basic user:SECRETVAL123"],
+  ])("redacts Basic credential (%s) as a whole value", (_label, value) => {
+    expect(isCredentialHeaderValue(value)).toBe(true);
+    expect(redactTraceOptions({ headers: { "X-Fwd": value } }).headers).toEqual({
+      "X-Fwd": "[REDACTED]",
+    });
+    expect(redactTraceOptions({ headers: { "X-Fwd": [value, "plain"] } }).headers).toEqual({
+      "X-Fwd": ["[REDACTED]", "plain"],
+    });
+  });
+
+  it.each([
+    ["ApiKey scheme", "ApiKey SECRETVAL123"],
+    ["Key scheme", "Key SECRETVAL123"],
+    ["Okta SSWS scheme", "SSWS SECRETVAL123"],
+    ["Stripe live key", "sk_live_SECRETVAL123abcd"],
+    ["Stripe test key", "sk_test_SECRETVAL123abcd"],
+    ["Stripe restricted key", "rk_live_SECRETVAL123"],
+    ["GitHub PAT (classic)", "ghp_SECRETVAL123abcdefghijklmnopqrstuv"],
+    ["GitHub OAuth token", "gho_SECRETVAL123abcdefghij"],
+    ["GitHub server token", "ghs_SECRETVAL123abcdefghij"],
+    ["GitHub fine-grained PAT", "github_pat_11ABCDEFG0SECRETVAL123"],
+    ["Slack bot token", "xoxb-123456789012-SECRETVAL123"],
+    ["Slack user token", "xoxp-123456789012-SECRETVAL123"],
+    ["AWS access key id", "AKIASECRETVAL123ABCD"],
+    ["Google API key", "AIzaSySECRETVAL123abcdefghijklmnopqrstu"],
+    ["vendor key after a prefix", "key=ghp_SECRETVAL123abcdefghij"],
+  ])("redacts %s under any name", (_label, value) => {
+    expect(isCredentialHeaderValue(value)).toBe(true);
+    expect(redactTraceOptions({ headers: { "X-Fwd": value } }).headers).toEqual({
+      "X-Fwd": "[REDACTED]",
+    });
+  });
+
   it("keeps clearly non-credential values and token-count headers readable", () => {
     for (const value of [
       "Basic plan",
@@ -327,6 +389,10 @@ describe("createCacheTrace", () => {
       "assistants=v2",
       "token-efficient-tools-2025-02-19",
       "desk-lamp",
+      "Basic abc",
+      "Key points",
+      "work_item_42",
+      "AKIA-docs",
     ]) {
       expect(isCredentialHeaderValue(value), value).toBe(false);
     }
@@ -335,6 +401,8 @@ describe("createCacheTrace", () => {
       "X-Token-Count": "12",
       "X-Tokens-Remaining": "12",
       "X-Ratelimit-Remaining-Tokens": "1000",
+      "anthropic-ratelimit-input-tokens-remaining": "1000",
+      maxTokens: "512",
     };
     expect(redactTraceOptions({ headers: counts }).headers).toEqual(counts);
     // The count exemption never applies to non-integers or other sensitive words.
@@ -366,6 +434,12 @@ describe("createCacheTrace", () => {
       " sk-a".repeat(n / 5),
       ",".repeat(n),
       "Basic " + "A".repeat(n) + "!",
+      "Basic YTpi,".repeat(n / 11),
+      " ghp_a".repeat(n / 6),
+      "_ghp_".repeat(n / 5),
+      " AKIA".repeat(n / 5),
+      " AIza" + "a".repeat(34) + "!".repeat(n),
+      "Key " + "a".repeat(n) + " x",
       "Digest " + "a".repeat(n),
       " ".repeat(n) + "x",
     ];

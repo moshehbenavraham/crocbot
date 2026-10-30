@@ -217,16 +217,25 @@ const SENSITIVE_NAME_SUBSTRING_RE =
   /auth|token|secret|pass|key|jwt|hmac|sig|cookie|session|credential|bearer|private/;
 // Short markers only matched as whole words (`pat` must not hit `path`).
 const SENSITIVE_NAME_WORDS = new Set(["pat", "otp", "pwd", "pin"]);
-// Only `token` count/limit headers are let through, and only when no other
-// sensitive substring is present and the value is a small integer (see below).
-const TOKEN_COUNT_WORDS = new Set([
-  "max",
-  "count",
-  "remaining",
-  "limit",
-  "used",
-  "reset",
+// Token count/limit headers (`X-Max-Tokens: 100`, `anthropic-ratelimit-input-tokens-
+// remaining: 1000`) are the only exemption. Every word of the name must be on this
+// allowlist (so a camelCase straddle such as `maxTokenSecret` or `X-MaxTokensIg` can
+// never slip through), with at least one `token(s)` word and one count word, and the
+// value must be a small integer. `reset`/`used` are deliberately not count words:
+// `X-Reset-Token: 482913` is a credential shape.
+const TOKEN_WORDS = new Set(["token", "tokens"]);
+const TOKEN_COUNT_WORDS = new Set(["max", "count", "remaining", "limit"]);
+const TOKEN_COUNT_NEUTRAL_WORDS = new Set([
+  "x",
   "ratelimit",
+  "rate",
+  "anthropic",
+  "openai",
+  "input",
+  "output",
+  "prompt",
+  "completion",
+  "total",
 ]);
 const SMALL_INT_RE = /^\s*\d{1,9}\s*$/;
 
@@ -247,29 +256,34 @@ export function isSensitiveHeaderName(name: string): boolean {
   return camelWords(name).some((word) => SENSITIVE_NAME_WORDS.has(word));
 }
 
-// `X-Max-Tokens: 100`, `X-Ratelimit-Remaining-Tokens: 1000`: the name matches only
-// through `token`/`tokens`, it carries a count word, and the value is a small integer.
 function isTokenCountHeader(name: string, value: unknown): boolean {
   if (typeof value !== "string" || !SMALL_INT_RE.test(value)) {
     return false;
   }
-  const lower = name.toLowerCase();
-  const withoutToken = lower.replace(/tokens?/g, "-");
-  if (SENSITIVE_NAME_SUBSTRING_RE.test(withoutToken)) {
-    return false;
-  }
   const words = camelWords(name);
-  if (words.some((word) => SENSITIVE_NAME_WORDS.has(word))) {
-    return false;
+  let hasToken = false;
+  let hasCount = false;
+  for (const word of words) {
+    if (TOKEN_WORDS.has(word)) {
+      hasToken = true;
+      continue;
+    }
+    // token/tokens must be the only sensitive word (checked per word, never by
+    // stripping substrings out of the joined name).
+    if (SENSITIVE_NAME_SUBSTRING_RE.test(word) || SENSITIVE_NAME_WORDS.has(word)) {
+      return false;
+    }
+    if (TOKEN_COUNT_WORDS.has(word)) {
+      hasCount = true;
+    } else if (!TOKEN_COUNT_NEUTRAL_WORDS.has(word)) {
+      return false;
+    }
   }
-  return (
-    words.some((word) => TOKEN_COUNT_WORDS.has(word)) &&
-    words.some((word) => word === "token" || word === "tokens")
-  );
+  return hasToken && hasCount;
 }
 
 // Every regex below is linear: no nested or adjacent overlapping quantifiers, and
-// each scan is anchored at a non-alphanumeric boundary (see the ReDoS test).
+// each scan is anchored at `^` or a non-alphanumeric boundary (see the ReDoS test).
 // Any non-empty Bearer credential, anywhere in the value (comma lists included).
 const BEARER_RE = /(?:^|[^a-z0-9])bearer\s+\S/i;
 // `token=...` param forms: Rails `Token token="..."`, bare `token="..."`, `access_token=`.
@@ -277,19 +291,32 @@ const TOKEN_PARAM_RE = /(?:^|[^a-z0-9])token\s*=/i;
 // `<scheme> name=value, ...` auth-param schemes (RFC 7616 Digest, AWS SigV4, HOBA).
 const PARAM_SCHEME_RE = /^\s*(?:digest|aws4-hmac-sha256|hoba)\s+[a-z0-9_-]+\s*=/i;
 // `<scheme> <token68>` with a credential-shaped token (no spaces, >= 8 chars).
-const TOKEN68_SCHEME_RE = /^\s*(?:basic|token|negotiate|ntlm|hoba)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
-// Basic with a short payload: redact when it base64-decodes to `user:pass`.
-const BASIC_PAYLOAD_RE = /^\s*basic\s+([A-Za-z0-9+/\-_]+=*)\s*$/i;
+const TOKEN68_SCHEME_RE =
+  /^\s*(?:token|negotiate|ntlm|hoba|apikey|key|ssws)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+// Basic: decided on the first token after the scheme (see isBasicCredential).
+const BASIC_FIRST_TOKEN_RE = /^\s*basic\s+([^\s,;]+)/i;
 // Scheme-less provider keys and JWT-shaped values under neutral names.
-const SK_KEY_RE = /(?:^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8,}/;
+const SK_KEY_RE = /(?:^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8}/;
 const JWT_RE = /(?:^|[^A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\./;
+// Well-known vendor key shapes: Stripe, GitHub, Slack, AWS access key ids, Google API keys.
+const VENDOR_KEY_RE =
+  /(?:^|[^A-Za-z0-9])(?:(?:sk_live_|sk_test_|rk_|ghp_|gho_|ghs_|ghu_|ghr_|github_pat_|xoxb-|xoxp-)[A-Za-z0-9_-]{8}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35})/;
 
-function isBasicUserPass(segment: string): boolean {
-  const match = BASIC_PAYLOAD_RE.exec(segment);
-  if (!match?.[1]) {
+// `Basic <x>`: redact when the first token contains ':' (raw user:pass), is 8+
+// chars, or leniently base64-decodes to something containing ':' (`Basic YTpi`).
+// Prose such as `Basic plan` stays readable.
+function isBasicCredential(segment: string): boolean {
+  const first = BASIC_FIRST_TOKEN_RE.exec(segment)?.[1];
+  if (!first) {
     return false;
   }
-  const payload = match[1].replace(/-/g, "+").replace(/_/g, "/");
+  if (first.includes(":") || first.length >= 8) {
+    return true;
+  }
+  const payload = first
+    .replace(/[^A-Za-z0-9+/=\-_]+$/, "")
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
   return Buffer.from(payload, "base64").toString("latin1").includes(":");
 }
 
@@ -297,7 +324,7 @@ export function isCredentialHeaderValue(value: string): boolean {
   if (BEARER_RE.test(value) || TOKEN_PARAM_RE.test(value)) {
     return true;
   }
-  if (SK_KEY_RE.test(value) || JWT_RE.test(value)) {
+  if (SK_KEY_RE.test(value) || JWT_RE.test(value) || VENDOR_KEY_RE.test(value)) {
     return true;
   }
   // Check each comma-separated credential (`Token a, Basic b`) on its own.
@@ -307,7 +334,7 @@ export function isCredentialHeaderValue(value: string): boolean {
       (segment) =>
         PARAM_SCHEME_RE.test(segment) ||
         TOKEN68_SCHEME_RE.test(segment) ||
-        isBasicUserPass(segment),
+        isBasicCredential(segment),
     );
 }
 

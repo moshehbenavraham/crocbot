@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - undici 7.30.0 → 7.30.1 on the direct/cheerio path (GHSA-xjj6-f33q-929c, GHSA-4w7w-5xrc-9h26, GHSA-2m5v-pch6-74hx, GHSA-qrxm-fqhp-jwvm).
-- Cache-trace redaction is broader: credential-like header-name substrings (auth, token, secret, pass, key, jwt, hmac, sig, cookie, session, credential, ...), any `Bearer` value, Basic `user:pass` payloads, `token=` params, Digest/AWS SigV4/HOBA, and scheme-less `sk-…`/JWT values are redacted. It prefers over-redaction (trace only).
+- Cache-trace redaction is broader: credential-like header-name substrings (auth, token, secret, pass, key, jwt, hmac, sig, cookie, session, credential, ...), any `Bearer` value, Basic credentials (first token with `:`, decoding to `user:pass`, or 8+ chars), `token=` params, Digest/AWS SigV4/HOBA/ApiKey/Key/SSWS schemes, and scheme-less `sk-…`, JWT, Stripe, GitHub, Slack, AWS access key id and Google API key shapes are redacted. It prefers over-redaction (trace only).
 
 ### Added
 
