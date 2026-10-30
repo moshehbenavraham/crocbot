@@ -6,6 +6,7 @@ import type {
 import type { ToolDefinition } from "@earendil-works/pi-coding-agent";
 import type { ClientToolDefinition } from "./pi-embedded-runner/run/params.js";
 import { logDebug, logError } from "../logger.js";
+import { withArgCoercion } from "./tool-arg-coercion.js";
 import { normalizeToolName } from "./tool-policy.js";
 import { jsonResult } from "./tools/common.js";
 
@@ -33,6 +34,9 @@ export function toToolDefinitions(tools: AnyAgentTool[]): ToolDefinition[] {
       description: tool.description ?? "",
       // biome-ignore lint/suspicious/noExplicitAny: TypeBox schema from pi-agent-core uses a different module instance.
       parameters: tool.parameters,
+      // pi >= 0.74 no longer coerces string args for @sinclair/typebox 0.34 schemas;
+      // coerce them here (after the tool's own hook) so "3"/"true" still validate.
+      prepareArguments: withArgCoercion(tool.parameters, tool.prepareArguments?.bind(tool)),
       execute: async (
         toolCallId,
         params,
