@@ -213,7 +213,7 @@ describe("createCacheTrace", () => {
     ).toEqual({ authorization: "[REDACTED]", "user-agent": "KimiCLI/0.77" });
   });
 
-  it("redacts unknown auth-like header names and Token/Digest schemes without over-redacting", () => {
+  it("redacts unknown auth-like header names and Token/Digest schemes", () => {
     const secret = "SECRETVAL123";
     const options = {
       headers: {
@@ -221,25 +221,24 @@ describe("createCacheTrace", () => {
         "X-Auth": `Token ${secret}`,
         "X-Upstream-Authorization": `Digest username="u", realm="r", nonce="n", response="${secret}"`,
         "X-Client-Secret": secret,
-        "X-Session-Id": secret,
         "X-Db-Password": secret,
         "X-Amz-Security-Token": secret,
         "Set-Cookie": [`sid=${secret}`, `other=${secret}`],
         xApiKey: secret,
         "X-Forward": `Token ${secret}`,
-        "X-Sig": `Digest username="u", response="${secret}"`,
+        "X-Neutral": `Digest username="u", response="${secret}"`,
         "X-Aws": `AWS4-HMAC-SHA256 Credential=AKIA/x, Signature=${secret}`,
         // Must stay readable:
         "X-Max-Tokens": "100",
         "X-Plan": "Basic plan",
         "X-Mode": "bearer-less",
-        "X-Note": "Bearer token handling doc",
         "X-Kind": "Token",
         "Keep-Alive": "timeout=5",
         "anthropic-beta": "token-efficient-tools-2025-02-19",
         "X-Request-Id": "req-42",
         "X-Stainless-Retry-Count": "0",
         "OpenAI-Organization": "org-1",
+        "X-Path": "/v1/messages",
       },
     };
     const snapshot = JSON.stringify(options);
@@ -251,51 +250,132 @@ describe("createCacheTrace", () => {
       "X-Auth": "[REDACTED]",
       "X-Upstream-Authorization": "[REDACTED]",
       "X-Client-Secret": "[REDACTED]",
-      "X-Session-Id": "[REDACTED]",
       "X-Db-Password": "[REDACTED]",
       "X-Amz-Security-Token": "[REDACTED]",
       "Set-Cookie": ["[REDACTED]", "[REDACTED]"],
       xApiKey: "[REDACTED]",
       "X-Forward": "[REDACTED]",
-      "X-Sig": "[REDACTED]",
+      "X-Neutral": "[REDACTED]",
       "X-Aws": "[REDACTED]",
       "X-Max-Tokens": "100",
       "X-Plan": "Basic plan",
       "X-Mode": "bearer-less",
-      "X-Note": "Bearer token handling doc",
       "X-Kind": "Token",
       "Keep-Alive": "timeout=5",
       "anthropic-beta": "token-efficient-tools-2025-02-19",
       "X-Request-Id": "req-42",
       "X-Stainless-Retry-Count": "0",
       "OpenAI-Organization": "org-1",
+      "X-Path": "/v1/messages",
     });
   });
 
-  it("matches header-name words and credential-shaped scheme values", () => {
-    for (const name of ["X-Raw-Auth", "x_api_key", "X-Amz-Security-Token", "Cookie", "apiKey"]) {
-      expect(isSensitiveHeaderName(name), name).toBe(true);
-    }
-    for (const name of ["X-Max-Tokens", "Keep-Alive", "Content-Type", "anthropic-beta", "Accept"]) {
-      expect(isSensitiveHeaderName(name), name).toBe(false);
-    }
-    for (const value of [
-      "Bearer sk-secret-value",
-      "basic c2VjcmV0OnBhc3M=",
-      "Token abcdef123456",
-      'Digest username="u", response="abc"',
-    ]) {
-      expect(isCredentialHeaderValue(value), value).toBe(true);
-    }
+  // Regressions from the #30 review: each of these leaked through the
+  // whole-word matcher in c86f81c3e while main (or the reviewer) redacts them.
+  it.each([
+    "X-Apitoken",
+    "X-Secretkey",
+    "X-Accesskey",
+    "X-Passphrase",
+    "X-Authz",
+    "X-Pass",
+    "X-Jwt",
+    "X-Pat",
+    "X-Hmac",
+    "X-Sig",
+    "X-Bearer",
+    "X-OTP",
+    "xPat",
+  ])("redacts compound/short credential header name %s", (name) => {
+    const secret = "SECRETVAL123";
+    expect(isSensitiveHeaderName(name)).toBe(true);
+    const out = redactTraceOptions({ headers: { [name]: secret } });
+    expect(out.headers).toEqual({ [name]: "[REDACTED]" });
+  });
+
+  it.each([
+    ["Basic with a short user:pass payload", "Basic YTpi"],
+    ["Basic with a longer user:pass payload", "Basic dTpwYXNz"],
+    ["short Bearer", "Bearer short"],
+    ["Bearer with a colon", "Bearer abc:SECRETVAL123"],
+    ["Bearer then Basic comma list", "Bearer SECRETVAL123, Basic SECRETVAL123"],
+    ["Bearer later in a comma list", "Token x, Bearer SECRETVAL123"],
+    ["Basic later in a comma list", "foo, Basic YTpi"],
+    ["lowercase bearer with a tab", "bearer\tSECRETVAL123"],
+    ["Rails Token param form", 'Token token="SECRETVAL123"'],
+    ["bare token param", 'token="SECRETVAL123"'],
+    ["access_token param", "access_token=SECRETVAL123"],
+    ["HOBA", "HOBA SECRETVAL123"],
+    ["scheme-less sk- key", "sk-ant-api03-AbCdEf0123456789_xyz"],
+    ["scheme-less JWT", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.c2lnbmF0dXJl"],
+  ])("redacts credential value under a neutral name: %s", (_label, value) => {
+    expect(isCredentialHeaderValue(value)).toBe(true);
+    expect(redactTraceOptions({ headers: { "X-Fwd": value } }).headers).toEqual({
+      "X-Fwd": "[REDACTED]",
+    });
+  });
+
+  it("keeps clearly non-credential values and token-count headers readable", () => {
     for (const value of [
       "Basic plan",
-      "Bearer token handling doc",
+      "Basic usage of thing",
       "Token",
       "Digest",
       "bearer-less",
+      "Bearer",
+      "application/json",
+      "assistants=v2",
+      "token-efficient-tools-2025-02-19",
+      "desk-lamp",
     ]) {
       expect(isCredentialHeaderValue(value), value).toBe(false);
     }
+    const counts = {
+      "X-Max-Tokens": "100",
+      "X-Token-Count": "12",
+      "X-Tokens-Remaining": "12",
+      "X-Ratelimit-Remaining-Tokens": "1000",
+    };
+    expect(redactTraceOptions({ headers: counts }).headers).toEqual(counts);
+    // The count exemption never applies to non-integers or other sensitive words.
+    expect(
+      redactTraceOptions({
+        headers: {
+          "X-Max-Tokens": "SECRETVAL123",
+          "X-Auth-Token-Count": "12",
+          "X-Token": "12",
+          "X-Session-Token-Limit": "5",
+        },
+      }).headers,
+    ).toEqual({
+      "X-Max-Tokens": "[REDACTED]",
+      "X-Auth-Token-Count": "[REDACTED]",
+      "X-Token": "[REDACTED]",
+      "X-Session-Token-Limit": "[REDACTED]",
+    });
+  });
+
+  it("stays linear on adversarial header names and values (ReDoS guard)", () => {
+    const n = 1_000_000;
+    const inputs = [
+      "Bearer " + "a".repeat(n) + "!",
+      "bearer" + " ".repeat(n),
+      " token" + " ".repeat(n) + "x",
+      "eyJ".repeat(n / 3),
+      ("-eyJ" + "a".repeat(20)).repeat(n / 24),
+      " sk-a".repeat(n / 5),
+      ",".repeat(n),
+      "Basic " + "A".repeat(n) + "!",
+      "Digest " + "a".repeat(n),
+      " ".repeat(n) + "x",
+    ];
+    const start = performance.now();
+    for (const value of inputs) {
+      isCredentialHeaderValue(value);
+    }
+    isSensitiveHeaderName("aB".repeat(n / 2));
+    redactTraceOptions({ headers: { ["max-" + "token".repeat(n / 5)]: "5" } });
+    expect(performance.now() - start).toBeLessThan(2000);
   });
 
   it("keeps Map header casing; fetch Headers names are lowercase per the Fetch spec", () => {

@@ -208,63 +208,114 @@ function safeJsonStringify(value: unknown): string | null {
 
 const REDACTED = "[REDACTED]";
 
-// Header names are split into whole words (on `-`, `_`, other separators and
-// camelCase boundaries) and redacted when any word is credential-like. Whole-word
-// matching keeps counters such as `X-Max-Tokens` (word "tokens") readable while
-// still catching `X-Raw-Auth`, `X-Amz-Security-Token`, `x-goog-api-key`, etc.
-const SENSITIVE_HEADER_WORDS = new Set([
-  "auth",
-  "authorization",
-  "authentication",
-  "token",
-  "secret",
-  "secrets",
-  "key",
-  "keys",
-  "apikey",
-  "password",
-  "passwd",
-  "pwd",
-  "session",
-  "sessionid",
-  "cookie",
-  "cookies",
-  "credential",
-  "credentials",
-  "signature",
-  "accesstoken",
-  "authtoken",
-  "refreshtoken",
+// Header-name redaction prefers safety over readability (trace-only, the wrapped
+// stream fn still receives the real options). Any of these substrings in the
+// lowercased name redacts the value, so compounds such as `X-Apitoken`,
+// `X-Secretkey`, `X-Passphrase` or `X-Authz` are caught. Known over-redaction:
+// `X-Session-Id`, `X-Signature-Version`, `X-Keyboard`, `X-Author`, `Monkey`, ...
+const SENSITIVE_NAME_SUBSTRING_RE =
+  /auth|token|secret|pass|key|jwt|hmac|sig|cookie|session|credential|bearer|private/;
+// Short markers only matched as whole words (`pat` must not hit `path`).
+const SENSITIVE_NAME_WORDS = new Set(["pat", "otp", "pwd", "pin"]);
+// Only `token` count/limit headers are let through, and only when no other
+// sensitive substring is present and the value is a small integer (see below).
+const TOKEN_COUNT_WORDS = new Set([
+  "max",
+  "count",
+  "remaining",
+  "limit",
+  "used",
+  "reset",
+  "ratelimit",
 ]);
+const SMALL_INT_RE = /^\s*\d{1,9}\s*$/;
 
-function headerNameWords(name: string): string[] {
-  return name
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
+function headerNameWords(lowerName: string): string[] {
+  return lowerName.split(/[^a-z0-9]+/).filter(Boolean);
 }
 
+function camelWords(name: string): string[] {
+  return headerNameWords(name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase());
+}
+
+/** True when the name alone marks the header as credential-bearing. */
 export function isSensitiveHeaderName(name: string): boolean {
-  return headerNameWords(name).some((word) => SENSITIVE_HEADER_WORDS.has(word));
+  const lower = name.toLowerCase();
+  if (SENSITIVE_NAME_SUBSTRING_RE.test(lower)) {
+    return true;
+  }
+  return camelWords(name).some((word) => SENSITIVE_NAME_WORDS.has(word));
 }
 
-// `<scheme> <token68>`: only redacted when a single credential-like string (no
-// spaces, >= 8 chars) follows, so prose such as "Basic plan" survives.
-const TOKEN_SCHEME_VALUE_RE =
-  /^\s*(?:bearer|basic|token|negotiate|ntlm)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
-// `<scheme> name=value, ...` auth-param schemes (RFC 7616 Digest, AWS SigV4).
-const PARAM_SCHEME_VALUE_RE = /^\s*(?:digest|aws4-hmac-sha256)\s+[A-Za-z0-9_-]+\s*=/i;
+// `X-Max-Tokens: 100`, `X-Ratelimit-Remaining-Tokens: 1000`: the name matches only
+// through `token`/`tokens`, it carries a count word, and the value is a small integer.
+function isTokenCountHeader(name: string, value: unknown): boolean {
+  if (typeof value !== "string" || !SMALL_INT_RE.test(value)) {
+    return false;
+  }
+  const lower = name.toLowerCase();
+  const withoutToken = lower.replace(/tokens?/g, "-");
+  if (SENSITIVE_NAME_SUBSTRING_RE.test(withoutToken)) {
+    return false;
+  }
+  const words = camelWords(name);
+  if (words.some((word) => SENSITIVE_NAME_WORDS.has(word))) {
+    return false;
+  }
+  return (
+    words.some((word) => TOKEN_COUNT_WORDS.has(word)) &&
+    words.some((word) => word === "token" || word === "tokens")
+  );
+}
+
+// Every regex below is linear: no nested or adjacent overlapping quantifiers, and
+// each scan is anchored at a non-alphanumeric boundary (see the ReDoS test).
+// Any non-empty Bearer credential, anywhere in the value (comma lists included).
+const BEARER_RE = /(?:^|[^a-z0-9])bearer\s+\S/i;
+// `token=...` param forms: Rails `Token token="..."`, bare `token="..."`, `access_token=`.
+const TOKEN_PARAM_RE = /(?:^|[^a-z0-9])token\s*=/i;
+// `<scheme> name=value, ...` auth-param schemes (RFC 7616 Digest, AWS SigV4, HOBA).
+const PARAM_SCHEME_RE = /^\s*(?:digest|aws4-hmac-sha256|hoba)\s+[a-z0-9_-]+\s*=/i;
+// `<scheme> <token68>` with a credential-shaped token (no spaces, >= 8 chars).
+const TOKEN68_SCHEME_RE = /^\s*(?:basic|token|negotiate|ntlm|hoba)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+// Basic with a short payload: redact when it base64-decodes to `user:pass`.
+const BASIC_PAYLOAD_RE = /^\s*basic\s+([A-Za-z0-9+/\-_]+=*)\s*$/i;
+// Scheme-less provider keys and JWT-shaped values under neutral names.
+const SK_KEY_RE = /(?:^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8,}/;
+const JWT_RE = /(?:^|[^A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\./;
+
+function isBasicUserPass(segment: string): boolean {
+  const match = BASIC_PAYLOAD_RE.exec(segment);
+  if (!match?.[1]) {
+    return false;
+  }
+  const payload = match[1].replace(/-/g, "+").replace(/_/g, "/");
+  return Buffer.from(payload, "base64").toString("latin1").includes(":");
+}
 
 export function isCredentialHeaderValue(value: string): boolean {
-  return TOKEN_SCHEME_VALUE_RE.test(value) || PARAM_SCHEME_VALUE_RE.test(value);
+  if (BEARER_RE.test(value) || TOKEN_PARAM_RE.test(value)) {
+    return true;
+  }
+  if (SK_KEY_RE.test(value) || JWT_RE.test(value)) {
+    return true;
+  }
+  // Check each comma-separated credential (`Token a, Basic b`) on its own.
+  return value
+    .split(",")
+    .some(
+      (segment) =>
+        PARAM_SCHEME_RE.test(segment) ||
+        TOKEN68_SCHEME_RE.test(segment) ||
+        isBasicUserPass(segment),
+    );
 }
 
 function redactHeaderValue(name: string, value: unknown): unknown {
   if (value == null) {
     return value;
   }
-  if (isSensitiveHeaderName(name)) {
+  if (isSensitiveHeaderName(name) && !isTokenCountHeader(name, value)) {
     return Array.isArray(value) ? value.map(() => REDACTED) : REDACTED;
   }
   if (Array.isArray(value)) {
