@@ -206,6 +206,39 @@ function safeJsonStringify(value: unknown): string | null {
   }
 }
 
+const REDACTED = "[REDACTED]";
+const SENSITIVE_HEADER_RE =
+  /^(authorization|proxy-authorization|cookie|set-cookie)$|api[-_]?key|token|secret|signature/i;
+
+function redactHeaders(headers: unknown): unknown {
+  if (!headers || typeof headers !== "object" || Array.isArray(headers)) {
+    return headers;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(headers as Record<string, unknown>)) {
+    out[name] = SENSITIVE_HEADER_RE.test(name) && value != null ? REDACTED : value;
+  }
+  return out;
+}
+
+/**
+ * Strip credentials from stream options before they reach the trace file:
+ * `apiKey`, auth-bearing request headers, and provider env values.
+ */
+export function redactTraceOptions(options: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...options };
+  if (out.apiKey != null) {
+    out.apiKey = REDACTED;
+  }
+  if ("headers" in out) {
+    out.headers = redactHeaders(out.headers);
+  }
+  if (out.env && typeof out.env === "object" && !Array.isArray(out.env)) {
+    out.env = Object.fromEntries(Object.keys(out.env).map((key) => [key, REDACTED]));
+  }
+  return out;
+}
+
 export function createCacheTrace(params: CacheTraceInit): CacheTrace | null {
   const cfg = resolveCacheTraceConfig(params);
   if (!cfg.enabled) {
@@ -241,7 +274,7 @@ export function createCacheTrace(params: CacheTraceInit): CacheTrace | null {
       event.systemDigest = digest(payload.system);
     }
     if (payload.options) {
-      event.options = payload.options;
+      event.options = redactTraceOptions(payload.options);
     }
     if (payload.model) {
       event.model = payload.model;
