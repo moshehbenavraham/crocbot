@@ -207,23 +207,72 @@ function safeJsonStringify(value: unknown): string | null {
 }
 
 const REDACTED = "[REDACTED]";
-const SENSITIVE_HEADER_RE =
-  /^(authorization|proxy-authorization|cookie|set-cookie)$|api[-_]?key|subscription[-_]?key|functions[-_]?key|token|secret|signature/i;
-const CREDENTIAL_VALUE_RE = /^\s*(bearer|basic)\s/i;
+
+// Header names are split into whole words (on `-`, `_`, other separators and
+// camelCase boundaries) and redacted when any word is credential-like. Whole-word
+// matching keeps counters such as `X-Max-Tokens` (word "tokens") readable while
+// still catching `X-Raw-Auth`, `X-Amz-Security-Token`, `x-goog-api-key`, etc.
+const SENSITIVE_HEADER_WORDS = new Set([
+  "auth",
+  "authorization",
+  "authentication",
+  "token",
+  "secret",
+  "secrets",
+  "key",
+  "keys",
+  "apikey",
+  "password",
+  "passwd",
+  "pwd",
+  "session",
+  "sessionid",
+  "cookie",
+  "cookies",
+  "credential",
+  "credentials",
+  "signature",
+  "accesstoken",
+  "authtoken",
+  "refreshtoken",
+]);
+
+function headerNameWords(name: string): string[] {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+export function isSensitiveHeaderName(name: string): boolean {
+  return headerNameWords(name).some((word) => SENSITIVE_HEADER_WORDS.has(word));
+}
+
+// `<scheme> <token68>`: only redacted when a single credential-like string (no
+// spaces, >= 8 chars) follows, so prose such as "Basic plan" survives.
+const TOKEN_SCHEME_VALUE_RE =
+  /^\s*(?:bearer|basic|token|negotiate|ntlm)\s+[A-Za-z0-9\-._~+/]{8,}=*\s*$/i;
+// `<scheme> name=value, ...` auth-param schemes (RFC 7616 Digest, AWS SigV4).
+const PARAM_SCHEME_VALUE_RE = /^\s*(?:digest|aws4-hmac-sha256)\s+[A-Za-z0-9_-]+\s*=/i;
+
+export function isCredentialHeaderValue(value: string): boolean {
+  return TOKEN_SCHEME_VALUE_RE.test(value) || PARAM_SCHEME_VALUE_RE.test(value);
+}
 
 function redactHeaderValue(name: string, value: unknown): unknown {
   if (value == null) {
     return value;
   }
-  if (SENSITIVE_HEADER_RE.test(name)) {
+  if (isSensitiveHeaderName(name)) {
     return Array.isArray(value) ? value.map(() => REDACTED) : REDACTED;
   }
   if (Array.isArray(value)) {
     return value.map((item) =>
-      typeof item === "string" && CREDENTIAL_VALUE_RE.test(item) ? REDACTED : item,
+      typeof item === "string" && isCredentialHeaderValue(item) ? REDACTED : item,
     );
   }
-  return typeof value === "string" && CREDENTIAL_VALUE_RE.test(value) ? REDACTED : value;
+  return typeof value === "string" && isCredentialHeaderValue(value) ? REDACTED : value;
 }
 
 function redactHeaders(headers: unknown): unknown {
@@ -238,7 +287,11 @@ function redactHeaders(headers: unknown): unknown {
         : entry,
     );
   }
-  // Fetch `Headers` (or any iterable of [name, value] pairs).
+  // Fetch `Headers`, `Map`, or any object exposing `.entries()`. A `Map` keeps the
+  // caller's casing. A fetch `Headers` cannot: the Fetch spec lowercases names on
+  // insertion, so the original casing is gone before we see it (and the lowercase
+  // form is what undici sends on the wire). We emit those names as-is rather than
+  // invent a "canonical" casing that was never sent.
   if (typeof (headers as { entries?: unknown }).entries === "function") {
     const out: Record<string, unknown> = {};
     for (const [name, value] of (headers as Headers).entries()) {

@@ -10,7 +10,8 @@ type Semver = {
   patch: number;
 };
 
-const MIN_NODE: Semver = { major: 22, minor: 0, patch: 0 };
+// Keep in sync with package.json engines.node (pi >=0.75 and undici 8 need 22.19).
+const MIN_NODE: Semver = { major: 22, minor: 19, patch: 0 };
 
 export type RuntimeDetails = {
   kind: RuntimeKind;
@@ -89,7 +90,7 @@ export function assertSupportedRuntime(
 
   runtime.error(
     [
-      "crocbot requires Node >=22.0.0.",
+      `crocbot requires Node >=${MIN_NODE.major}.${MIN_NODE.minor}.${MIN_NODE.patch}.`,
       `Detected: ${runtimeLabel} (exec: ${execLabel}).`,
       `PATH searched: ${details.pathEnv}`,
       "Install Node: https://nodejs.org/en/download",

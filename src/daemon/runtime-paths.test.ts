@@ -30,7 +30,7 @@ describe("resolvePreferredNodePath", () => {
       throw new Error("missing");
     });
 
-    const execFile = vi.fn().mockResolvedValue({ stdout: "22.1.0\n", stderr: "" });
+    const execFile = vi.fn().mockResolvedValue({ stdout: "22.19.0\n", stderr: "" });
 
     const result = await resolvePreferredNodePath({
       env: {},
@@ -89,7 +89,7 @@ describe("resolveSystemNodeInfo", () => {
       throw new Error("missing");
     });
 
-    const execFile = vi.fn().mockResolvedValue({ stdout: "22.0.0\n", stderr: "" });
+    const execFile = vi.fn().mockResolvedValue({ stdout: "22.19.0\n", stderr: "" });
 
     const result = await resolveSystemNodeInfo({
       env: {},
@@ -98,7 +98,7 @@ describe("resolveSystemNodeInfo", () => {
 
     expect(result).toEqual({
       path: linuxNode,
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
   });
@@ -113,7 +113,7 @@ describe("resolveSystemNodeInfo", () => {
       "/home/me/.fnm/node-22/bin/node",
     );
 
-    expect(warning).toContain("below the required Node 22+");
+    expect(warning).toContain("below the required Node 22.19+");
     expect(warning).toContain(linuxNode);
   });
 });

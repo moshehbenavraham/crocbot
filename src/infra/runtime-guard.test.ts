@@ -31,11 +31,13 @@ describe("runtime-guard", () => {
   it("validates runtime thresholds", () => {
     const nodeOk: RuntimeDetails = {
       kind: "node",
-      version: "22.0.0",
+      version: "22.19.0",
       execPath: "/usr/bin/node",
       pathEnv: "/usr/bin",
     };
-    const nodeOld: RuntimeDetails = { ...nodeOk, version: "21.9.0" };
+    const nodeOld: RuntimeDetails = { ...nodeOk, version: "22.18.0" };
+    const nodeOlder: RuntimeDetails = { ...nodeOk, version: "22.12.0" };
+    const nodeNewer: RuntimeDetails = { ...nodeOk, version: "24.0.0" };
     const unknown: RuntimeDetails = {
       kind: "unknown",
       version: null,
@@ -44,6 +46,8 @@ describe("runtime-guard", () => {
     };
     expect(runtimeSatisfies(nodeOk)).toBe(true);
     expect(runtimeSatisfies(nodeOld)).toBe(false);
+    expect(runtimeSatisfies(nodeOlder)).toBe(false);
+    expect(runtimeSatisfies(nodeNewer)).toBe(true);
     expect(runtimeSatisfies(unknown)).toBe(false);
   });
 
@@ -62,7 +66,7 @@ describe("runtime-guard", () => {
       pathEnv: "/usr/bin",
     };
     expect(() => assertSupportedRuntime(runtime, details)).toThrow("exit");
-    expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("requires Node"));
+    expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("requires Node >=22.19.0"));
   });
 
   it("returns silently when runtime meets requirements", () => {
@@ -74,7 +78,7 @@ describe("runtime-guard", () => {
     const details: RuntimeDetails = {
       ...detectRuntime(),
       kind: "node",
-      version: "22.0.0",
+      version: "22.19.0",
       execPath: "/usr/bin/node",
     };
     expect(() => assertSupportedRuntime(runtime, details)).not.toThrow();

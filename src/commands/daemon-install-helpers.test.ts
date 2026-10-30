@@ -51,7 +51,7 @@ describe("buildGatewayInstallPlan", () => {
     });
     mocks.resolveSystemNodeInfo.mockResolvedValue({
       path: "/opt/node",
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
     mocks.renderSystemNodeWarning.mockReturnValue(undefined);
@@ -104,7 +104,7 @@ describe("buildGatewayInstallPlan", () => {
     });
     mocks.resolveSystemNodeInfo.mockResolvedValue({
       path: "/opt/node",
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
     mocks.buildServiceEnvironment.mockReturnValue({
@@ -142,7 +142,7 @@ describe("buildGatewayInstallPlan", () => {
     });
     mocks.resolveSystemNodeInfo.mockResolvedValue({
       path: "/opt/node",
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
     mocks.buildServiceEnvironment.mockReturnValue({ CROCBOT_PORT: "3000" });
@@ -173,7 +173,7 @@ describe("buildGatewayInstallPlan", () => {
     });
     mocks.resolveSystemNodeInfo.mockResolvedValue({
       path: "/opt/node",
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
     mocks.buildServiceEnvironment.mockReturnValue({});
@@ -204,7 +204,7 @@ describe("buildGatewayInstallPlan", () => {
     });
     mocks.resolveSystemNodeInfo.mockResolvedValue({
       path: "/opt/node",
-      version: "22.0.0",
+      version: "22.19.0",
       supported: true,
     });
     mocks.buildServiceEnvironment.mockReturnValue({

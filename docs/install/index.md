@@ -29,7 +29,7 @@ crocbot onboard --install-daemon
 
 ## System requirements
 
-- **Node >=22**
+- **Node >=22.19.0**
 - macOS, Linux, or Windows via WSL2
 - `pnpm` only if you build from source
 

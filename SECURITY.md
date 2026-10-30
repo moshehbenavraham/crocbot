@@ -44,7 +44,7 @@ crocbot is a fork of [openclaw/openclaw](https://github.com/openclaw/openclaw). 
 ### Resolved Upstream CVEs
 
 - **CVE-2026-25253** (1-Click RCE in OpenClaw): `gatewayUrl` not accepted from query params; Control UI removed entirely; loopback binding enforced with auth requirement for non-loopback.
-- **CVE-2025-59466 / CVE-2026-21636** (Node.js vulnerabilities): Running Node v24.13.0, well past the required v22.12.0.
+- **CVE-2025-59466 / CVE-2026-21636** (Node.js vulnerabilities): Running Node v24.13.0, well past the required v22.19.0.
 
 ## Security Model
 
