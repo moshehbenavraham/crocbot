@@ -37,8 +37,15 @@ describe("loadModelCatalog", () => {
       if (call === 1) {
         throw new Error("boom");
       }
-      const FakeAuthStorage = class {};
+      const FakeAuthStorage = class {
+        static create() {
+          return new FakeAuthStorage();
+        }
+      };
       const FakeModelRegistry = class {
+        static create() {
+          return new FakeModelRegistry();
+        }
         getAll() {
           return [{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }];
         }
@@ -82,8 +89,15 @@ describe("loadModelCatalog", () => {
 
     __setModelCatalogImportForTest(async () =>
       (() => {
-        const FakeAuthStorage = class {};
+        const FakeAuthStorage = class {
+          static create() {
+            return new FakeAuthStorage();
+          }
+        };
         const FakeModelRegistry = class {
+          static create() {
+            return new FakeModelRegistry();
+          }
           getAll() {
             return [
               { id: "gpt-4.1", name: "GPT-4.1", provider: "openai" },

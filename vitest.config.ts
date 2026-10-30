@@ -12,6 +12,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "crocbot/plugin-sdk": path.join(repoRoot, "src", "plugin-sdk", "index.ts"),
+      // pi-ai >=0.74 no longer exposes dist/* via package exports; the google-shared
+      // regression tests import internals directly.
+      "@earendil-works/pi-ai/dist": path.join(
+        repoRoot,
+        "node_modules",
+        "@earendil-works",
+        "pi-ai",
+        "dist",
+      ),
     },
   },
   test: {
@@ -19,11 +28,7 @@ export default defineConfig({
     hookTimeout: 120_000,
     pool: "forks",
     maxWorkers: isCI ? ciWorkers : localWorkers,
-    include: [
-      "src/**/*.test.ts",
-      "extensions/**/*.test.ts",
-      "test/format-error.test.ts",
-    ],
+    include: ["src/**/*.test.ts", "extensions/**/*.test.ts", "test/format-error.test.ts"],
     setupFiles: ["test/setup.ts"],
     exclude: [
       "dist/**",

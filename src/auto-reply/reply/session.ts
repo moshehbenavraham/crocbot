@@ -69,6 +69,13 @@ function forkSessionFromParent(params: {
     if (leafId) {
       const sessionFile = manager.createBranchedSession(leafId) ?? manager.getSessionFile();
       const sessionId = manager.getSessionId();
+      // pi >=0.74 defers writing a branched session until it has an assistant message;
+      // the forked thread needs the file (header with parentSession) on disk now.
+      const header = manager.getHeader();
+      if (sessionFile && header && !fs.existsSync(sessionFile)) {
+        const lines = [header, ...manager.getEntries()].map((entry) => JSON.stringify(entry));
+        fs.writeFileSync(sessionFile, `${lines.join("\n")}\n`);
+      }
       if (sessionFile && sessionId) {
         return { sessionId, sessionFile };
       }
