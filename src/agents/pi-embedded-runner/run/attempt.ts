@@ -496,6 +496,10 @@ export async function runEmbeddedAttempt(
 
       // Force a stable streamFn reference so vitest can reliably mock @earendil-works/pi-ai.
       activeSession.agent.streamFn = streamSimple;
+      // pi >=0.74 resolves the provider API key inside its default streamFn, which the
+      // line above replaces; restore the lookup through the agent's getApiKey hook.
+      activeSession.agent.getApiKey = (provider) =>
+        params.modelRegistry.getApiKeyForProvider(provider);
 
       // Force store=true for OpenAI Responses API to enable response persistence.
       const isResponsesApi = params.model.api === "openai-responses";

@@ -72,9 +72,16 @@ function forkSessionFromParent(params: {
       // pi >=0.74 defers writing a branched session until it has an assistant message;
       // the forked thread needs the file (header with parentSession) on disk now.
       const header = manager.getHeader();
-      if (sessionFile && header && !fs.existsSync(sessionFile)) {
+      // Create exclusively ("wx") so an existing file is never overwritten.
+      if (sessionFile && header) {
         const lines = [header, ...manager.getEntries()].map((entry) => JSON.stringify(entry));
-        fs.writeFileSync(sessionFile, `${lines.join("\n")}\n`);
+        try {
+          fs.writeFileSync(sessionFile, `${lines.join("\n")}\n`, { flag: "wx" });
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code !== "EEXIST") {
+            throw err;
+          }
+        }
       }
       if (sessionFile && sessionId) {
         return { sessionId, sessionFile };

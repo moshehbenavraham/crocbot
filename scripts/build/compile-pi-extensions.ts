@@ -7,7 +7,9 @@
  * lands at `<project-root>/pi-extensions/<name>.js`.
  *
  * This script bundles each pi-extension entry point (with internal deps
- * inlined, external @mariozechner/* deps excluded) into that location.
+ * inlined, external @earendil-works/* pi deps excluded) into that location.
+ * Each extension must stay a single file, so code splitting is disabled and
+ * any dynamic import is inlined instead of emitted as a separate chunk.
  */
 
 import fs from "node:fs";
@@ -45,13 +47,14 @@ for (const entry of entries) {
       extensions: [".ts", ".js", ".mts", ".mjs"],
       conditionNames: ["import", "node", "default"],
     },
-    external: [/^@mariozechner\//],
+    external: [/^@earendil-works\//],
   });
 
   await bundle.write({
     file: outFile,
     format: "esm",
     exports: "auto",
+    codeSplitting: false,
   });
 
   await bundle.close();
