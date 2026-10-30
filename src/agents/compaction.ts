@@ -1,6 +1,6 @@
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
-import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
-import { estimateTokens, generateSummary } from "@mariozechner/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { estimateTokens, generateSummary } from "@earendil-works/pi-coding-agent";
 
 import { DEFAULT_CONTEXT_TOKENS } from "./defaults.js";
 import { repairToolUseResultPairing } from "./session-transcript-repair.js";
@@ -161,6 +161,7 @@ async function summarizeChunks(params: {
       params.model,
       params.reserveTokens,
       params.apiKey,
+      undefined,
       params.signal,
       params.customInstructions,
       summary,

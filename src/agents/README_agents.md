@@ -22,7 +22,7 @@ agents/
 
 ## Key Concepts
 
-- **Pi Runtime** — the agent execution loop based on `@mariozechner/pi-agent-core`
+- **Pi Runtime** — the agent execution loop based on `@earendil-works/pi-agent-core`
 - **RPC Mode** — agents communicate with the gateway over JSON-RPC
 - **Tool Streaming** — tools emit results as they execute
 - **Session Repair** — crash-resilient transcript and file recovery (`session-transcript-repair.ts`, `session-file-repair.ts`)

@@ -1,13 +1,14 @@
 import fs from "node:fs/promises";
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
-import { SessionManager } from "@mariozechner/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import { SessionManager } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
 import type { crocbotConfig } from "../config/config.js";
 import { ensurecrocbotModelsJson } from "./models-config.js";
 import { applyGoogleTurnOrderingFix } from "./pi-embedded-runner.js";
 
-vi.mock("@mariozechner/pi-ai", async () => {
-  const actual = await vi.importActual<typeof import("@mariozechner/pi-ai")>("@mariozechner/pi-ai");
+vi.mock("@earendil-works/pi-ai", async () => {
+  const actual =
+    await vi.importActual<typeof import("@earendil-works/pi-ai")>("@earendil-works/pi-ai");
   return {
     ...actual,
     streamSimple: (model: { api: string; provider: string; id: string }) => {

@@ -7,8 +7,9 @@ import "./test-helpers/fast-coding-tools.js";
 import type { crocbotConfig } from "../config/config.js";
 import { ensurecrocbotModelsJson } from "./models-config.js";
 
-vi.mock("@mariozechner/pi-ai", async () => {
-  const actual = await vi.importActual<typeof import("@mariozechner/pi-ai")>("@mariozechner/pi-ai");
+vi.mock("@earendil-works/pi-ai", async () => {
+  const actual =
+    await vi.importActual<typeof import("@earendil-works/pi-ai")>("@earendil-works/pi-ai");
 
   const buildAssistantMessage = (model: { api: string; provider: string; id: string }) => ({
     role: "assistant" as const,
@@ -280,7 +281,7 @@ describe("runEmbeddedPiAgent", () => {
     "appends new user + assistant after existing transcript entries",
     { timeout: 90_000 },
     async () => {
-      const { SessionManager } = await import("@mariozechner/pi-coding-agent");
+      const { SessionManager } = await import("@earendil-works/pi-coding-agent");
       const sessionFile = nextSessionFile();
 
       const sessionManager = SessionManager.open(sessionFile);
@@ -413,7 +414,7 @@ describe("runEmbeddedPiAgent", () => {
   });
 
   it("repairs orphaned user messages and continues", async () => {
-    const { SessionManager } = await import("@mariozechner/pi-coding-agent");
+    const { SessionManager } = await import("@earendil-works/pi-coding-agent");
     const sessionFile = nextSessionFile();
 
     const sessionManager = SessionManager.open(sessionFile);
@@ -444,7 +445,7 @@ describe("runEmbeddedPiAgent", () => {
   });
 
   it("repairs orphaned single-user sessions and continues", async () => {
-    const { SessionManager } = await import("@mariozechner/pi-coding-agent");
+    const { SessionManager } = await import("@earendil-works/pi-coding-agent");
     const sessionFile = nextSessionFile();
 
     const sessionManager = SessionManager.open(sessionFile);

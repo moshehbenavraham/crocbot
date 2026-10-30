@@ -11,7 +11,7 @@
  * remain exact and can be unmasked at execution time.
  */
 
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
 
 import { maskStringsDeep } from "./logging-transport.js";
 import { SecretsRegistry } from "./registry.js";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { AgentTool } from "@mariozechner/pi-agent-core";
+import type { AgentTool } from "@earendil-works/pi-agent-core";
 import { sanitizeToolsForGoogle } from "./google.js";
 
 describe("sanitizeToolsForGoogle", () => {

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { CURRENT_SESSION_VERSION, SessionManager } from "@mariozechner/pi-coding-agent";
+import { CURRENT_SESSION_VERSION, SessionManager } from "@earendil-works/pi-coding-agent";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import type { crocbotConfig } from "../../config/config.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
@@ -69,6 +69,20 @@ function forkSessionFromParent(params: {
     if (leafId) {
       const sessionFile = manager.createBranchedSession(leafId) ?? manager.getSessionFile();
       const sessionId = manager.getSessionId();
+      // pi >=0.74 defers writing a branched session until it has an assistant message;
+      // the forked thread needs the file (header with parentSession) on disk now.
+      const header = manager.getHeader();
+      // Create exclusively ("wx") so an existing file is never overwritten.
+      if (sessionFile && header) {
+        const lines = [header, ...manager.getEntries()].map((entry) => JSON.stringify(entry));
+        try {
+          fs.writeFileSync(sessionFile, `${lines.join("\n")}\n`, { flag: "wx" });
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code !== "EEXIST") {
+            throw err;
+          }
+        }
+      }
       if (sessionFile && sessionId) {
         return { sessionId, sessionFile };
       }

@@ -1,5 +1,5 @@
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
-import type { Api, AssistantMessage, ImageContent, Model } from "@mariozechner/pi-ai";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import type { Api, AssistantMessage, ImageContent, Model } from "@earendil-works/pi-ai";
 import type { discoverAuthStorage, discoverModels } from "../../pi-model-discovery.js";
 
 import type { ReasoningLevel, ThinkLevel, VerboseLevel } from "../../../auto-reply/thinking.js";

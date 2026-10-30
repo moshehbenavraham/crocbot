@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 
-import type { AssistantMessageEvent } from "@mariozechner/pi-ai";
+import type { AssistantMessageEvent } from "@earendil-works/pi-ai";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { emitAgentEvent, onAgentEvent } from "../../infra/agent-events.js";

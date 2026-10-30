@@ -1,5 +1,5 @@
-import { convertMessages } from "@mariozechner/pi-ai/dist/providers/google-shared.js";
-import type { Context, Model } from "@mariozechner/pi-ai/dist/types.js";
+import { convertMessages } from "@earendil-works/pi-ai/dist/providers/google-shared.js";
+import type { Context, Model } from "@earendil-works/pi-ai/dist/types.js";
 import { describe, expect, it } from "vitest";
 
 const asRecord = (value: unknown): Record<string, unknown> => {
@@ -103,15 +103,35 @@ describe("google-shared convertTools", () => {
     } as unknown as Context;
 
     const contents = convertMessages(model, context);
-    expect(contents).toHaveLength(3);
-    expect(contents[0].role).toBe("user");
-    expect(contents[1].role).toBe("model");
-    expect(contents[2].role).toBe("model");
-    const toolCallPart = contents[2].parts?.find(
+    // pi-ai >= 0.74 (transformMessages) also closes a *trailing* orphaned tool call with a
+    // synthetic error tool result ("No result provided"). pi-ai 0.52 only did this when a
+    // later user/assistant message followed. So there is now a 4th content: a user turn
+    // carrying the functionResponse, which keeps the function call paired for Gemini.
+    expect(contents).toHaveLength(4);
+    expect(contents.map((content) => content.role)).toEqual(["user", "model", "model", "user"]);
+    const callIndex = contents.findIndex((content) =>
+      content.parts?.some(
+        (part) => typeof part === "object" && part !== null && "functionCall" in part,
+      ),
+    );
+    expect(callIndex).toBe(2);
+    const toolCallPart = contents[callIndex].parts?.find(
       (part) => typeof part === "object" && part !== null && "functionCall" in part,
     );
     const toolCall = asRecord(toolCallPart);
     expect(toolCall.functionCall).toBeTruthy();
+    // The conversation (and therefore the function call) is preceded by a user turn.
+    expect(contents.slice(0, callIndex).some((content) => content.role === "user")).toBe(true);
+    expect(contents[0].role).toBe("user");
+    // ...and the function call is immediately answered by a user functionResponse turn.
+    const responsePart = asRecord(
+      contents[callIndex + 1].parts?.find(
+        (part) => typeof part === "object" && part !== null && "functionResponse" in part,
+      ),
+    );
+    const functionResponse = asRecord(responsePart.functionResponse);
+    expect(functionResponse.name).toBe("myTool");
+    expect(functionResponse.response).toEqual({ error: "No result provided" });
   });
 
   it("strips tool call and response ids for google-gemini-cli", () => {

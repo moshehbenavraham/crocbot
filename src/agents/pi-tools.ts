@@ -1,10 +1,9 @@
 import {
-  codingTools,
+  createCodingTools,
   createEditTool,
   createReadTool,
   createWriteTool,
-  readTool,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 import type { crocbotConfig } from "../config/config.js";
 import { isSubagentSessionKey } from "../routing/session-key.js";
 import { resolveGatewayMessageChannel } from "../utils/message-channel.js";
@@ -240,8 +239,8 @@ export function createcrocbotCodingTools(options?: {
       allowModels: applyPatchConfig?.allowModels,
     });
 
-  const base = (codingTools as unknown as AnyAgentTool[]).flatMap((tool) => {
-    if (tool.name === readTool.name) {
+  const base = (createCodingTools(workspaceRoot) as unknown as AnyAgentTool[]).flatMap((tool) => {
+    if (tool.name === "read") {
       if (sandboxRoot) {
         return [createSandboxedReadTool(sandboxRoot)];
       }

@@ -1,4 +1,4 @@
-import type { AssistantMessageEvent } from "@mariozechner/pi-ai";
+import type { AssistantMessageEvent } from "@earendil-works/pi-ai";
 import { describe, expect, it } from "vitest";
 
 import { DeepSeekReasoningAdapter } from "./deepseek.js";

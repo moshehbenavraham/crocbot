@@ -4,7 +4,7 @@ import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 
-import type { Api, Model } from "@mariozechner/pi-ai";
+import type { Api, Model } from "@earendil-works/pi-ai";
 import { discoverAuthStorage, discoverModels } from "../agents/pi-model-discovery.js";
 import { describe, it } from "vitest";
 import { resolvecrocbotAgentDir } from "../agents/agent-paths.js";

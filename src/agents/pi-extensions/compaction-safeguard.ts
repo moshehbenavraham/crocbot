@@ -1,5 +1,5 @@
-import type { AgentMessage } from "@mariozechner/pi-agent-core";
-import type { ExtensionAPI, FileOperations } from "@mariozechner/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import type { ExtensionAPI, FileOperations } from "@earendil-works/pi-coding-agent";
 import {
   BASE_CHUNK_RATIO,
   MIN_CHUNK_RATIO,
@@ -182,7 +182,8 @@ export default function compactionSafeguardExtension(api: ExtensionAPI): void {
       };
     }
 
-    const apiKey = await ctx.modelRegistry.getApiKey(model);
+    const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
+    const apiKey = auth.ok ? auth.apiKey : undefined;
     if (!apiKey) {
       return {
         compaction: {

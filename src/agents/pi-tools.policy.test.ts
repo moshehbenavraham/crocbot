@@ -1,4 +1,4 @@
-import type { AgentTool, AgentToolResult } from "@mariozechner/pi-agent-core";
+import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
 import { describe, expect, it } from "vitest";
 import { filterToolsByPolicy, isToolAllowedByPolicyName } from "./pi-tools.policy.js";
 

@@ -1,4 +1,4 @@
-import type { Api, Model } from "@mariozechner/pi-ai";
+import type { Api, Model } from "@earendil-works/pi-ai";
 import { discoverAuthStorage, discoverModels } from "../../agents/pi-model-discovery.js";
 
 import { resolvecrocbotAgentDir } from "../../agents/agent-paths.js";

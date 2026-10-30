@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import type { AgentMessage, StreamFn } from "@mariozechner/pi-agent-core";
+import type { AgentMessage, StreamFn } from "@earendil-works/pi-agent-core";
 
 import type { crocbotConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
@@ -208,15 +208,47 @@ function safeJsonStringify(value: unknown): string | null {
 
 const REDACTED = "[REDACTED]";
 const SENSITIVE_HEADER_RE =
-  /^(authorization|proxy-authorization|cookie|set-cookie)$|api[-_]?key|token|secret|signature/i;
+  /^(authorization|proxy-authorization|cookie|set-cookie)$|api[-_]?key|subscription[-_]?key|functions[-_]?key|token|secret|signature/i;
+const CREDENTIAL_VALUE_RE = /^\s*(bearer|basic)\s/i;
+
+function redactHeaderValue(name: string, value: unknown): unknown {
+  if (value == null) {
+    return value;
+  }
+  if (SENSITIVE_HEADER_RE.test(name)) {
+    return Array.isArray(value) ? value.map(() => REDACTED) : REDACTED;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) =>
+      typeof item === "string" && CREDENTIAL_VALUE_RE.test(item) ? REDACTED : item,
+    );
+  }
+  return typeof value === "string" && CREDENTIAL_VALUE_RE.test(value) ? REDACTED : value;
+}
 
 function redactHeaders(headers: unknown): unknown {
-  if (!headers || typeof headers !== "object" || Array.isArray(headers)) {
+  if (!headers || typeof headers !== "object") {
     return headers;
+  }
+  // Tuple form: [["Authorization", "Bearer ..."], ...]
+  if (Array.isArray(headers)) {
+    return headers.map((entry) =>
+      Array.isArray(entry) && typeof entry[0] === "string"
+        ? [entry[0], ...entry.slice(1).map((value) => redactHeaderValue(entry[0], value))]
+        : entry,
+    );
+  }
+  // Fetch `Headers` (or any iterable of [name, value] pairs).
+  if (typeof (headers as { entries?: unknown }).entries === "function") {
+    const out: Record<string, unknown> = {};
+    for (const [name, value] of (headers as Headers).entries()) {
+      out[name] = redactHeaderValue(name, value);
+    }
+    return out;
   }
   const out: Record<string, unknown> = {};
   for (const [name, value] of Object.entries(headers as Record<string, unknown>)) {
-    out[name] = SENSITIVE_HEADER_RE.test(name) && value != null ? REDACTED : value;
+    out[name] = redactHeaderValue(name, value);
   }
   return out;
 }

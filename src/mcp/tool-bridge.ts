@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 
-import type { AgentToolResult } from "@mariozechner/pi-agent-core";
+import type { AgentToolResult } from "@earendil-works/pi-agent-core";
 
 import type { AnyAgentTool } from "../agents/tools/common.js";
 import { SecretsRegistry } from "../infra/secrets/registry.js";
@@ -33,10 +33,8 @@ export function wrapMcpTool(
     parameters,
     label: `MCP: ${serverName}/${tool.name}`,
 
-    async execute(
-      _toolCallId: string,
-      params: Record<string, unknown>,
-    ): Promise<AgentToolResult<unknown>> {
+    async execute(_toolCallId: string, rawParams: unknown): Promise<AgentToolResult<unknown>> {
+      const params = rawParams as Record<string, unknown>;
       const registry = SecretsRegistry.getInstance();
       const maskText = registry.size > 0 ? (t: string) => registry.mask(t) : (t: string) => t;
 
